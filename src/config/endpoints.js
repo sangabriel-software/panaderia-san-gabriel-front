@@ -3,8 +3,6 @@ const getEndpoints = {
     ALL_PERMISOS: "/consultarPermisos",
     ROL_PERMISOS: "/consultarRolesPermisosId",
     ALL_USERS: "/consultarUsuarios"
-
-
 };
 
 const postEndpoints = {
