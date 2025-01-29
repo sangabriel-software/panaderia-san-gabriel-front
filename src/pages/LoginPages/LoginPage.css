@@ -1,0 +1,140 @@
+/* Estilos generales para el contenedor */
+.contenedorLados {
+    background-color: #1E3032;
+    height: 100vh; /* Forzar que ocupe toda la altura de la pantalla */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  /* Estilos para el contenedor derecho */
+  .derecho {
+    background-color: #1E3032;
+    display: flex; /* Asegura el centrado del contenido */
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%; /* Asegura que el contenido ocupe toda la altura del contenedor */
+    padding: 20px; /* Un poco de margen interno para móviles */
+    overflow: hidden; /* Evitar el scroll */
+  }
+  
+  .derecho h3, 
+  .derecho span {
+    color: #D8D83D;
+  }
+  
+  /* Estilos del formulario flotante */
+  .form-floating {
+    position: relative;
+    width: 100%; /* Asegúrate de que los inputs ocupen el ancho disponible */
+  }
+  
+  /* Estilo del input */
+  .form-floating input {
+    height: 3.5rem;
+    padding: 1rem 0.75rem;
+    font-size: 1rem;
+  }
+  
+  /* Estilo inicial del label (centrado verticalmente) */
+  .form-floating label {
+    position: absolute;
+    top: 50%;
+    left: 0.75rem;
+    transform: translateY(-50%);
+    font-size: 1rem; /* Tamaño más grande */
+    color: #6c757d;
+    transition: all 0.2s;
+    pointer-events: none;
+  }
+  
+  /* Cuando el input está enfocado o tiene texto */
+  .form-floating input:focus + label,
+  .form-floating input:not(:placeholder-shown) + label {
+    top: -0.9rem; /* Ajusta la posición */
+    left: 0.75rem;
+    font-size: 1rem; /* Tamaño más grande en estado enfocado */
+    color: #D8D83D; /* Cambia el color del label */
+  }
+  
+  /* Estilo para el input cuando está enfocado */
+  .form-floating input:focus {
+    border-color: #D8D83D; /* Cambia el color del borde */
+    box-shadow: 0 0 0 0.2rem rgba(216, 216, 61, 0.25); /* Agrega un sombreado para el enfoque */
+  }
+  
+  /* Estilos adicionales para dispositivos móviles */
+  @media (max-width: 768px) {
+    .col-sm-6.text-black {
+      margin-top: -160px; /* Ajusta esta distancia según lo que necesites */
+    }
+  
+    .logo-login {
+      width: 70px; /* Ajusta el tamaño para dispositivos pequeños */
+      height: auto;
+    }
+  
+    .divlogo {
+      text-align: center;
+      height: 150px;
+    }
+  
+    .derecho {
+      justify-content: flex-start; /* Mueve el contenido hacia la parte superior */
+      padding-top: 40px; /* Ajusta este valor según sea necesario */
+    }
+  }
+  
+  /* Estilos para el botón de login */
+  .loginbtn {
+    background-color: #D8D83D;
+    color: #1E3032;
+  }
+  
+  /* Estilos para el logo de login */
+  .logo-login {
+    width: 200px; /* Ajusta el tamaño del logo */
+    height: auto; /* Mantén las proporciones */
+    margin: 0; /* Centra el logo */
+    padding: 0;
+  }
+  
+  /* Estilos adicionales para pantallas grandes */
+  @media (min-width: 769px) {
+    .derecho {
+      justify-content: center; /* Centra el contenido verticalmente */
+      align-items: center; /* Centra el contenido horizontalmente */
+    }
+  
+    .divlogo {
+      text-align: center;
+      height: 150px;
+    }
+  }
+  
+  /* Estilos para el contenedor izquierdo */
+  .izquierdo {
+    position: relative; /* Contexto para posicionar el <h1> */
+  }
+  
+  .izquierdo h1 {
+    position: absolute;
+    top: 20%; /* Ajusta hacia arriba reduciendo el porcentaje (por ejemplo, de 50% a 40%) */
+    left: 50%; /* Mantiene centrado horizontalmente */
+    transform: translate(-50%, -50%); /* Ajusta para que el centro del texto coincida con el punto calculado */
+    color: #D8D83D; /* Asegúrate de que sea visible sobre la imagen */
+    z-index: 2; /* Para asegurarte de que quede encima de la imagen */
+    font-size: 2.5rem; /* Ajusta el tamaño según tus necesidades */
+    text-align: center; /* Asegura que el texto esté centrado si es multilinea */
+    text-shadow: 5px 5px 4px rgba(0, 0, 0, 1); /* Agrega un sombreado para resaltar el texto */
+    font-family: 'Lobster', cursive; /* Fuente personalizada */
+  }
+  
+  .izquierdo img {
+    object-fit: cover;
+    object-position: center;
+    width: 100%;
+    height: 100%;
+  }
+  

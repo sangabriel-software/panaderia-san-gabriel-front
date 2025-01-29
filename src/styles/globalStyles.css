@@ -1,0 +1,51 @@
+/*Boton para cancelar procesos*/
+.bt-cancelar{
+    background-color: #DA1A32;
+    color: #FEF7F8;
+    font-size: 1.2rem;
+    border-radius: 10px;
+    width: 180px;
+  }
+
+  .bt-cancelar:hover {
+    background-color: #AC1528;
+    color: #FEFEFE;
+  }
+/*Boton para cancelar procesos*/
+
+  .bt-general{
+    background-color: #FEFEFE;
+    border: 2px solid #1463C2 ;
+    color: #1463C2;
+    font-size: 1.2rem;
+    border-radius: 10px;
+    width: 180px;
+  }
+
+  .bt-general:hover{
+    background-color: #0F4D8B; 
+    color: #FEFEFE;
+  }
+
+  .input-data{
+    border: 2px solid #5B5859 ;
+    color: #43405A;
+    font-size: 1.1rem;
+    margin-bottom: 1rem; 
+  }
+
+  .label-title{
+    color: #43405A;
+    font-size: 1.2rem;
+  }
+
+  .bt-return{
+    border: 2px solid #28a745;
+    color: #28a745;
+    font-size: 1.2rem;
+  }
+
+  .bt-return:hover{
+    background-color: #FEFEFE; 
+    border-color: #0F4D8B;
+  }

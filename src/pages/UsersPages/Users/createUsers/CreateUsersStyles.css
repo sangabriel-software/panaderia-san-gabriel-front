@@ -1,0 +1,5 @@
+.is-invalid-select .react-select__control {
+    border: 1px solid #dc3545; /* Rojo de bootstrap */
+    border-radius: 0.25rem;
+  }
+  

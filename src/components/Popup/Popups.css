@@ -1,0 +1,289 @@
+/* ErrorPopup style */
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.75);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  
+  .popup-content {
+    background-color: rgb(228, 228, 228);
+    padding: 2rem;
+    border-radius: 15px;
+    position: relative;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+  }
+  
+  .close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    color: #404040;
+  }
+  
+  .close-button:hover {
+    color: #c82333;
+  }
+  
+  .error-icon {
+    margin: 0 auto 1rem;
+    width: 40px;
+    height: 40px;
+    color: #DA1A32;
+  }
+  
+  .popup-title {
+    color: #003371;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    margin-top: 0.5rem;
+  }
+  
+  .popup-message {
+    color: black;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+  
+  .popup-phone {
+    color: black;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+  }
+  
+  .phone-number {
+    color: #007bff;
+    font-weight: bold;
+  }
+  
+  .return-button {
+    background-color: #003D8D;
+    color: white;
+    border: none;
+    padding: 0.75rem 2rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.2s;
+  }
+  
+  .return-button:hover {
+    background-color: #003371;
+  }
+  
+  @media (max-width: 480px) {
+    .popup-content {
+      width: 85%;
+      padding: 1.5rem;
+    }
+  
+    .popup-title {
+      font-size: 1.25rem;
+    }
+  
+    .popup-message {
+      font-size: 0.9rem;
+    }
+  }
+
+  /* Success Popup */
+  .popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.75);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  
+  .popup-content {
+    background-color: rgb(228, 228, 228);
+    padding: 2rem;
+    border-radius: 8px;
+    position: relative;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+  }
+  
+  .close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    color: #404040;
+  }
+  
+  .close-button:hover {
+    color: #c82333;
+  }
+  
+  .success-icon {
+    margin: 0 auto 1rem;
+    width: 40px;
+    height: 40px;
+    color: #28a745;
+  }
+  
+  .popup-title {
+    color: #003371;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    margin-top: 0.5rem;
+  }
+  
+  .popup-message {
+    color: black;
+    margin-bottom: 1.5rem;
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+  
+  .new-button {
+    background-color: #003D8D;
+    color: white;
+    border: none;
+    padding: 0.5rem 1.5rem; /* Ajustar el tamaño del botón */
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.875rem; /* Reducir el tamaño de la fuente */
+    transition: background-color 0.2s;
+    margin: 0.5rem; /* Separar los botones */
+  }
+  
+  .new-button:hover {
+    background-color: #003371;
+  }
+
+  .rol-button {
+    background-color: #198754;
+    color: white;
+    border: none;
+    padding: 0.5rem 1.5rem; /* Ajustar el tamaño del botón */
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.875rem; /* Reducir el tamaño de la fuente */
+    transition: background-color 0.2s;
+    margin: 0.5rem; /* Separar los botones */
+  }
+  
+  .rol-button:hover {
+    background-color: #146c43;
+  }
+  
+  .return-button-container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap; /* Permitir que los botones se ajusten en pantallas pequeñas */
+    gap: 0.5rem; /* Separación entre botones */
+  }
+  
+  
+  @media (max-width: 480px) {
+    .popup-content {
+      width: 85%;
+      padding: 1.5rem;
+    }
+  
+    .popup-title {
+      font-size: 1.25rem;
+    }
+  
+    .popup-message {
+      font-size: 0.9rem;
+    }
+  }
+
+
+  /*buttons popup confirmacion*/
+  .btn-confirm {
+    background-color: #E02A45;
+    color: white;
+    border: none;
+    padding: 0.5rem 1.5rem; /* Ajustar el tamaño del botón */
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem; /* Reducir el tamaño de la fuente */
+    transition: background-color 0.2s;
+    margin: 0.5rem; /* Separar los botones */
+  }
+  
+  .btn-confirm:hover {
+    background-color: #AC1528; /* Fondo al pasar el cursor */
+    border-color: #AC1528;
+    color: #FEFEFE;
+  }
+
+  .btn-cancel {
+    background-color: #003D8D;
+    color: white;
+    border: none;
+    padding: 0.5rem 1.5rem; /* Ajustar el tamaño del botón */
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem; /* Reducir el tamaño de la fuente */
+    transition: background-color 0.2s;
+    margin: 0.5rem; /* Separar los botones */
+  }
+  
+  .btn-cancel:hover {
+    background-color: #003371;
+  }
+
+
+   /*buttons popup error*/
+  .error-button-close{
+    background-color: #0F4D8B; /* Fondo al pasar el cursor */
+    color: #FEFEFE;
+    border: none;
+    padding: 0.5rem 1.5rem; /* Ajustar el tamaño del botón */
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem; /* Reducir el tamaño de la fuente */
+    transition: background-color 0.2s;
+    margin: 0.5rem; /* Separar los botones */
+
+  }
+
+  .error-button-close:hover {
+    background-color: #003371;
+  }
+
+
+  /*Warning popup*/
+  .warning-icon {
+    margin: 0 auto 1rem;
+    width: 40px;
+    height: 40px;
+    color: #e0a800;
+  }
+
+  .nuevo-bt{
+    background-color: #003D8D !important; 
+    color: white;
+    border-color: #003D8D !important;
+  }
+
+  .nuevo-bt:hover {
+    background-color: #0056b3 !important;
+  }

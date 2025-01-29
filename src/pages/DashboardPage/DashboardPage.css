@@ -1,0 +1,12 @@
+.btnReports{
+    background-color: #FEFEFE;
+    border: 1.5px solid #1463C2 ;
+    color: #1463C2;
+    font-size: 1rem;
+    /* background-color: rgb(20, 99, 180); */
+}
+
+.btnReports:hover {
+    background-color: #0F4D8B; /* Fondo al pasar el cursor */
+    color: #FEFEFE;
+  }
