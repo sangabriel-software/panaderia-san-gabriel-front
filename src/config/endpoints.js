@@ -8,7 +8,8 @@ const getEndpoints = {
 const postEndpoints = {
     INGRESAR_ROL: "/ingresarRol",
     INGRESAR_PERMISOSROLES: "/ingresarPermisosBatch",
-    CREAR_USUARIO: "/crearUsuario"
+    CREAR_USUARIO: "/crearUsuario",
+    INICIAR_SESION: "/login"
 
 };
 

@@ -1,18 +1,39 @@
-import React from "react";
+import React, { useState } from "react"; // Importamos useState
 import "./LoginPage.css";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import { iniciarSesion } from "../../services/authServices/auth.service";
 
 function LoginPage() {
   const navigate = useNavigate();
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm();
+  const { register, handleSubmit, formState: { errors } } = useForm();
 
-  const onSubmit = (data) => {
-    navigate("/dashboard");
+  // Estado para manejar si la contraseña es visible o no
+  const [showPassword, setShowPassword] = useState(false);
+
+  const onSubmit = async (data) => {
+    try {
+      // Llamamos al servicio de inicio de sesión
+      const response = await iniciarSesion(data);
+
+      // Guardamos el token en el localStorage
+      localStorage.setItem("token", response.authUser);
+
+      // Redirigimos al usuario al dashboard
+      navigate("/dashboard");
+
+      console.log("Login exitoso, token guardado en localStorage");
+    } catch (error) {
+      console.error("Error durante el login:", error);
+
+      // Aquí puedes mostrar un mensaje de error al usuario
+      alert("Error durante el login. Verifica tus credenciales.");
+    }
+  };
+
+  // Función para alternar la visibilidad de la contraseña
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
   };
 
   return (
@@ -68,23 +89,35 @@ function LoginPage() {
                     <div className="invalid-feedback">{errors.usuario.message}</div>
                   )}
                 </div>
-                {/* Input Contraseña */}
-                <div className="form-floating mb-4">
+                {/* Input Contraseña con ícono de ojo */}
+                <div className="form-floating mb-4 position-relative">
                   <input
-                    type="password"
-                    id="pass"
+                    type={showPassword ? "text" : "password"} // Alternar entre "text" y "password"
+                    id="contrasena"
                     className={`form-control form-control-lg ${
-                      errors.pass ? "is-invalid" : ""
+                      errors.contrasena ? "is-invalid" : ""
                     }`}
                     placeholder="Contraseña"
                     autoComplete="current-password"
-                    {...register("pass", {
+                    {...register("contrasena", {
                       required: "La contraseña es obligatoria",
                     })}
                   />
-                  <label htmlFor="pass">Contraseña</label>
-                  {errors.pass && (
-                    <div className="invalid-feedback">{errors.pass.message}</div>
+                  <label htmlFor="contrasena">Contraseña</label>
+                  {/* Ícono de ojo para mostrar/ocultar contraseña */}
+                  <span
+                    className="position-absolute top-50 end-0 translate-middle-y me-3"
+                    style={{ cursor: "pointer" }}
+                    onClick={togglePasswordVisibility}
+                  >
+                    {showPassword ? (
+                      <i className="fas fa-eye-slash"></i> // Ícono de ojo tachado (contraseña visible)
+                    ) : (
+                      <i className="fas fa-eye"></i> // Ícono de ojo (contraseña oculta)
+                    )}
+                  </span>
+                  {errors.contrasena && (
+                    <div className="invalid-feedback">{errors.contrasena.message}</div>
                   )}
                 </div>
                 <div className="d-flex justify-content-center align-items-center pt-1 mb-4">
