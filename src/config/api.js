@@ -11,16 +11,17 @@ const api = axios.create({
 // Interceptor para agregar el token en cada solicitud
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("token"); // Obtiene el token del localStorage
+    let token = localStorage.getItem("token");
+
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`; // Agrega el token al header
+      token = token.replace(/^"(.*)"$/, "$1"); // Elimina comillas dobles si existen
+      config.headers.Authorization = `Bearer ${token}`;
     }
 
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
+
 
 export default api;

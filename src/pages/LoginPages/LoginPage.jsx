@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { iniciarSesion } from "../../services/authServices/auth.service";
 import { setLocalStorage } from "../../utils/Auth/localstorage";
+import { toast, ToastContainer } from "react-toastify"; // Importamos toast de react-toastify
+import "react-toastify/dist/ReactToastify.css"; // Importamos los estilos de react-toastify
 
 function LoginPage() {
   const navigate = useNavigate();
@@ -18,15 +20,37 @@ function LoginPage() {
       const response = await iniciarSesion(data);
 
       // Guardamos el token en el localStorage
-      setLocalStorage("token", response.authUser)
+      setLocalStorage("token", response.authUser);
 
       // Redirigimos al usuario al dashboard
       navigate("/dashboard");
-    } catch (error) {
-      console.error("Error durante el login:", error);
 
-      // Aquí puedes mostrar un mensaje de error al usuario
-      alert("Error durante el login. Verifica tus credenciales.");
+      // Mostrar un mensaje de éxito (opcional)
+      toast.success("Inicio de sesión exitoso", {
+        autoClose: 3000,
+      });
+    } catch (error) {
+      console.log(error.code);
+
+      // Mostrar un mensaje de error según el tipo de error
+      if (error.response) {
+        // Error de credenciales (por ejemplo, 401 Unauthorized)
+        if (error.response.status === 404) {
+          toast.error("Credenciales incorrectas. Verifica tu usuario y contraseña.", {
+            autoClose: 5000,
+          });
+        } else {
+          // Otros errores del servidor (por ejemplo, 500 Internal Server Error)
+          toast.error("Error en el servidor. Por favor, intenta nuevamente más tarde.", {
+            autoClose: 5000,
+          });
+        }
+      } else {
+        // Error de red o desconocido
+        toast.error("No hubo conexion con el servidor, intenta mas tarde", {
+          autoClose: 5000,
+        });
+      }
     }
   };
 
@@ -132,6 +156,8 @@ function LoginPage() {
           </div>
         </div>
       </div>
+      {/* Contenedor de notificaciones */}
+      <ToastContainer />
     </section>
   );
 }
