@@ -3,6 +3,7 @@ import "./LoginPage.css";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { iniciarSesion } from "../../services/authServices/auth.service";
+import { setLocalStorage } from "../../utils/Auth/localstorage";
 
 function LoginPage() {
   const navigate = useNavigate();
@@ -17,7 +18,7 @@ function LoginPage() {
       const response = await iniciarSesion(data);
 
       // Guardamos el token en el localStorage
-      localStorage.setItem("token", response.authUser);
+      setLocalStorage("token", response.authUser)
 
       // Redirigimos al usuario al dashboard
       navigate("/dashboard");
