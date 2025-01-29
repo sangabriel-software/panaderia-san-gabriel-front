@@ -21,8 +21,6 @@ function LoginPage() {
 
       // Redirigimos al usuario al dashboard
       navigate("/dashboard");
-
-      console.log("Login exitoso, token guardado en localStorage");
     } catch (error) {
       console.error("Error durante el login:", error);
 
