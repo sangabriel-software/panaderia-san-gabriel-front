@@ -5,7 +5,6 @@ import { useForm } from "react-hook-form";
 import { iniciarSesion } from "../../services/authServices/auth.service";
 import { setLocalStorage } from "../../utils/Auth/localstorage";
 import { toast, ToastContainer } from "react-toastify"; // Importamos toast de react-toastify
-import "react-toastify/dist/ReactToastify.css"; // Importamos los estilos de react-toastify
 
 function LoginPage() {
   const navigate = useNavigate();
@@ -14,7 +13,12 @@ function LoginPage() {
   // Estado para manejar si la contraseña es visible o no
   const [showPassword, setShowPassword] = useState(false);
 
+  // Estado para manejar el loading
+  const [isLoading, setIsLoading] = useState(false);
+
   const onSubmit = async (data) => {
+    setIsLoading(true); // Activa el loading
+
     try {
       // Llamamos al servicio de inicio de sesión
       const response = await iniciarSesion(data);
@@ -30,8 +34,6 @@ function LoginPage() {
         autoClose: 3000,
       });
     } catch (error) {
-      console.log(error.code);
-
       // Mostrar un mensaje de error según el tipo de error
       if (error.response) {
         // Error de credenciales (por ejemplo, 401 Unauthorized)
@@ -47,10 +49,12 @@ function LoginPage() {
         }
       } else {
         // Error de red o desconocido
-        toast.error("No hubo conexion con el servidor, intenta mas tarde", {
+        toast.error("No hubo conexión con el servidor, intenta más tarde", {
           autoClose: 5000,
         });
       }
+    } finally {
+      setIsLoading(false); // Desactiva el loading (tanto en éxito como en error)
     }
   };
 
@@ -134,9 +138,9 @@ function LoginPage() {
                     onClick={togglePasswordVisibility}
                   >
                     {showPassword ? (
-                      <i className="fas fa-eye-slash"></i> // Ícono de ojo tachado (contraseña visible)
+                      <i className="fas fa-eye-slash text-dark"></i> // Ícono de ojo tachado (contraseña visible)
                     ) : (
-                      <i className="fas fa-eye"></i> // Ícono de ojo (contraseña oculta)
+                      <i className="fas fa-eye text-dark"></i> // Ícono de ojo (contraseña oculta)
                     )}
                   </span>
                   {errors.contrasena && (
@@ -147,8 +151,20 @@ function LoginPage() {
                   <button
                     className="loginbtn btn btn-success btn-lg fw-bold"
                     type="submit"
+                    disabled={isLoading} // Deshabilita el botón mientras isLoading sea true
                   >
-                    Iniciar Sesión
+                    {isLoading ? (
+                      <>
+                        <span
+                          className="spinner-border spinner-border-sm"
+                          role="status"
+                          aria-hidden="true"
+                        ></span>{" "}
+                        Cargando...
+                      </>
+                    ) : (
+                      "Iniciar Sesión"
+                    )}
                   </button>
                 </div>
               </form>
