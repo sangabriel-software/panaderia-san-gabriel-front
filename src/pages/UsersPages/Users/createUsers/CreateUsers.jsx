@@ -4,11 +4,7 @@ import { useForm } from "react-hook-form";
 import useRoles from "../../../../hooks/roleshooks/roles.hooks";
 import Select from "react-select"; // Importamos React-Select
 import "./CreateUsersStyles.css";
-import {
-  convertirRolesAOpciones,
-  handleCreateUserSubmit,
-  resetForm,
-} from "./CreateUsersUtils";
+import { convertirRolesAOpciones, handleCreateUserSubmit, resetForm, } from "./CreateUsersUtils";
 import SuccessPopup from "../../../../components/Popup/SuccessPopup";
 import { useState } from "react";
 import ErrorPopup from "../../../../components/Popup/ErrorPopUp";
@@ -135,26 +131,26 @@ function CreateUsers() {
             )}
           </div>
 
-          {/* Número de teléfono */}
+          {/* Correo electrónico */}
           <div className="mb-3">
-            <label htmlFor="telefonoUsuario" className="label-title form-label">
-              Número de Teléfono
+            <label htmlFor="correoUsuario" className="label-title form-label">
+              Correo Electrónico
             </label>
             <input
-              type="tel"
-              id="telefonoUsuario"
-              className={`input-data form-control ${errors.telefonoUsuario ? "is-invalid" : ""}`}
-              placeholder="Ingrese el número de teléfono"
-              {...register("telefonoUsuario", {
-                required: "El número de teléfono es obligatorio.",
+              type="text"
+              id="correoUsuario"
+              className={`input-data form-control ${errors.correoUsuario ? "is-invalid" : ""}`}
+              placeholder="Ingrese el correo electrónico"
+              {...register("correoUsuario", {
+                required: "El correo electrónico es obligatorio.",
                 pattern: {
-                  value: /^[0-9]{8}$/, // Acepta exactamente 8 dígitos numéricos
-                  message: "El número de teléfono debe tener exactamente 8 dígitos numéricos.",
+                  value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
+                  message: "Ingrese un correo electrónico válido.",
                 },
               })}
             />
-            {errors.telefonoUsuario && (
-              <div className="invalid-feedback">{errors.telefonoUsuario.message}</div>
+            {errors.correoUsuario && (
+              <div className="invalid-feedback">{errors.correoUsuario.message}</div>
             )}
           </div>
 

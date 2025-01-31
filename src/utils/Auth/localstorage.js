@@ -1,9 +1,6 @@
 export const setLocalStorage = (key, value) => {
     try {
-      // Convierte el valor a string (localStorage solo almacena strings)
-      const valueToStore = JSON.stringify(value);
-      // Guarda el valor en el localStorage
-      localStorage.setItem(key, valueToStore);
+      localStorage.setItem(key, value);
     } catch (error) {
         return null
     }
@@ -13,8 +10,7 @@ export const setLocalStorage = (key, value) => {
     try {
       // Obtiene el valor del localStorage
       const value = localStorage.getItem(key);
-      // Convierte el valor de string a su tipo original (objeto, array, etc.)
-      return value ? JSON.parse(value) : null;
+      return value;
     } catch (error) {
       return null;
     }

@@ -3,6 +3,7 @@ import CardDaschboard from "../../components/CardDashboard/CardDashboard";
 import EarningsOverview from "../../components/GraficasEstadisticas/EarningsOverview";
 import BestSellingProductChart from "../../components/GraficasEstadisticas/BestSellingProductChart";
 import "./DashboardPage.css"
+import { FaDownload } from "react-icons/fa";
 
 function DashboardPage() {
   return (
@@ -11,7 +12,7 @@ function DashboardPage() {
       <div className="d-flex align-items-center justify-content-between mb-4">
         <h1 className="h3 mb-0 text-dark">Dashboard</h1>
         <a className="btnReports btn btn-primary btn-sm shadow">
-          <i className="fas fa-download me-2" />
+        <FaDownload className="me-2" />
           Generate Report
         </a>
       </div>
