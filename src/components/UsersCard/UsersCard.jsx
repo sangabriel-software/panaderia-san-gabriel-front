@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 import "./UsersCard.css";
+import { FaBan, FaEllipsisH, FaTrash } from "react-icons/fa";
 
 const UsersCard = ({
   id,
@@ -166,7 +167,7 @@ const UsersCard = ({
           className="btn-modal btn rounded-circle p-2"
           onClick={() => setIsOptionsVisible(!isOptionsVisible)}
         >
-          <i className="fas fa-ellipsis-h"></i>
+          <FaEllipsisH />
         </button>
         {isOptionsVisible && (
           <div
@@ -187,7 +188,7 @@ const UsersCard = ({
               onClick={(e) => handleOptionClick("delete", e)}
               style={{ color: "#dc3545" }}
             >
-              <i className="fas fa-trash me-2"></i>
+              <FaTrash className="me-2" />
               Eliminar
             </button>
             <button
@@ -198,7 +199,7 @@ const UsersCard = ({
                   status === "Activo" || status === "A" ? "#FF9800" : "#0d6efd",
               }}
             >
-              <i className="fas fa-ban me-2"></i>
+              <FaBan className="me-2" />
               {status === "Activo" || status === "A"
                 ? "Bloquear"
                 : "Desbloquear"}

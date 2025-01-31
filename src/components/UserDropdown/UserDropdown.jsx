@@ -1,11 +1,10 @@
 import React from 'react';
 import { Dropdown, Image } from 'react-bootstrap';
 import { FaUser, FaSignOutAlt, FaCog } from 'react-icons/fa';
+import useLogout from '../../services/session/logout';
 
 function UserDropdown() {
-  const handleLogout = () => {
-    console.log('Logging out...');
-  };
+  const { handleLogout } = useLogout();
 
   return (
     <Dropdown align="end">
