@@ -1,12 +1,13 @@
 import React from "react";
 import "./RolesCard.css"; // Archivo CSS separado
+import { FaEye, FaTrashAlt } from "react-icons/fa";
 
 const RoleCard = ({ title, description, icon, onView, onDelete }) => {
   return (
     <div className="card custom-card mx-auto w-100">
       <div className="icon-container">
         <div className="icon" >
-          <i className={`${icon}`}></i>
+          {icon}
         </div>
       </div>
       <div className="card-body text-center">
@@ -14,10 +15,10 @@ const RoleCard = ({ title, description, icon, onView, onDelete }) => {
         <p className="card-text">{description}</p>
         <div className="btn-container">
           <button className="btn btn-icon btn-view" onClick={onView}>
-          <i className="fa-solid fa-eye" />
+          <FaEye />
           </button>
           <button className="btn btn-icon btn-delete" onClick={onDelete}>
-          <i className="fa-solid fa-trash-can" />
+          <FaTrashAlt />
           </button>
         </div>
       </div>

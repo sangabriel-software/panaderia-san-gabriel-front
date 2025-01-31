@@ -1,14 +1,20 @@
-import React, { useState } from "react"; // Importamos useState
-import "./LoginPage.css";
+import { React, useState } from "react"; // Importamos useState
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { iniciarSesion } from "../../services/authServices/auth.service";
 import { setLocalStorage } from "../../utils/Auth/localstorage";
 import { toast, ToastContainer } from "react-toastify"; // Importamos toast de react-toastify
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import "./LoginPage.css";
 
 function LoginPage() {
   const navigate = useNavigate();
-  const { register, handleSubmit, formState: { errors } } = useForm();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
 
   // Estado para manejar si la contraseña es visible o no
   const [showPassword, setShowPassword] = useState(false);
@@ -37,19 +43,25 @@ function LoginPage() {
       // Mostrar un mensaje de error según el tipo de error
       if (error.response) {
         // Error de credenciales (por ejemplo, 401 Unauthorized)
-        if (error.response.status === 404) {
-          toast.error("Credenciales incorrectas. Verifica tu usuario y contraseña.", {
-            autoClose: 5000,
-          });
+        if (error.response.status === 401 || error.response.status === 404) {
+          toast.error(
+            "Credenciales incorrectas. Verifica tu usuario y contraseña.",
+            {
+              autoClose: 5000,
+            }
+          );
         } else {
           // Otros errores del servidor (por ejemplo, 500 Internal Server Error)
-          toast.error("Error en el servidor. Por favor, intenta nuevamente más tarde.", {
-            autoClose: 5000,
-          });
+          toast.error(
+            "Servicio no disponible, intenta más tarde.",
+            {
+              autoClose: 5000,
+            }
+          );
         }
       } else {
         // Error de red o desconocido
-        toast.error("No hubo conexión con el servidor, intenta más tarde", {
+        toast.error("Servicio no disponible, intenta más tarde", {
           autoClose: 5000,
         });
       }
@@ -89,7 +101,10 @@ function LoginPage() {
               />
             </div>
             <div className="d-flex align-items-center h-custom-2 px-5 ms-xl-4 mt-4 pt-2 pt-xl-0 mt-xl-n5 py-3">
-              <form style={{ width: "23rem" }} onSubmit={handleSubmit(onSubmit)}>
+              <form
+                style={{ width: "23rem" }}
+                onSubmit={handleSubmit(onSubmit)}
+              >
                 <h3
                   className="fw-bold mb-3 pb- text-center"
                   style={{ letterSpacing: 1 }}
@@ -113,7 +128,9 @@ function LoginPage() {
                   />
                   <label htmlFor="usuario">Usuario</label>
                   {errors.usuario && (
-                    <div className="invalid-feedback">{errors.usuario.message}</div>
+                    <div className="invalid-feedback">
+                      {errors.usuario.message}
+                    </div>
                   )}
                 </div>
                 {/* Input Contraseña con ícono de ojo */}
@@ -137,14 +154,15 @@ function LoginPage() {
                     style={{ cursor: "pointer" }}
                     onClick={togglePasswordVisibility}
                   >
-                    {showPassword ? (
-                      <i className="fas fa-eye-slash text-dark"></i> // Ícono de ojo tachado (contraseña visible)
-                    ) : (
-                      <i className="fas fa-eye text-dark"></i> // Ícono de ojo (contraseña oculta)
-                    )}
+                    <FontAwesomeIcon
+                      icon={showPassword ? faEyeSlash : faEye}
+                      className="text-dark"
+                    />
                   </span>
                   {errors.contrasena && (
-                    <div className="invalid-feedback">{errors.contrasena.message}</div>
+                    <div className="invalid-feedback">
+                      {errors.contrasena.message}
+                    </div>
                   )}
                 </div>
                 <div className="d-flex justify-content-center align-items-center pt-1 mb-4">

@@ -6,6 +6,7 @@ import { currentDate } from "../../../../utils/dateUtils";
       nombreUsuario: "",
       apellidoUsuario: "",
       idRol: "",
+      telefonoUsuario: "",
     });
     setValue("idRol", ""); // Resetear el valor en React Hook Form
     clearErrors();

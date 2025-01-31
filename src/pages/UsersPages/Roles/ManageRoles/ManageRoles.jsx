@@ -8,6 +8,7 @@ import ConfirmPopUp from "../../../../components/Popup/ConfirmPopup";
 import ErrorPopup from "../../../../components/Popup/ErrorPopUp";
 import { handleConfirmDelete, handleDelele, handleEditRole } from "./ManageRolesUtils";
 import "./ManageRoles.css";
+import { FaShieldAlt } from "react-icons/fa";
 
 function ManageRoles() {
   const { roles, loading, showError, showInfo, setRoles } = useRoles(); 
@@ -83,7 +84,7 @@ function ManageRoles() {
             key={role.idRol}
           >
             <RoleCard
-              icon={"fa-solid fa-file-invoice-dollar"}
+              icon={<FaShieldAlt />}
               title={role.nombreRol}
               description={role.descripcionRol}
               onView={() => {handleEditRole(role.idRol, navigate)}}

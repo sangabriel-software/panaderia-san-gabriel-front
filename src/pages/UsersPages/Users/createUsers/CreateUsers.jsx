@@ -18,14 +18,7 @@ function CreateUsers() {
   const [selectedOption, setSelectedOption] = useState(null); // Estado del select
   const [isPopupErrorOpen, setIsPopupErrorOpen] = useState(false); // Manejo del popup de errores
   const [errorPopupMessage, setErrorPopupMessage] = useState(""); // Manejo del mensaje para el popup de errores
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-    setValue,
-    clearErrors,
-  } = useForm(); //Configuracion de react hook form
+  const { register, handleSubmit, reset, formState: { errors }, setValue, clearErrors, } = useForm(); //Configuracion de react hook form
   const { roles, loading } = useRoles(); //Roles para asignar al usuario
   const navigate = useNavigate(); //Hook para la navegación
 
