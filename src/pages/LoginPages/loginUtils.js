@@ -18,13 +18,15 @@ export const handleLogin = async (data, navigate, setIsLoading) => {
       // Guardamos el token en localStorage
       setLocalStorage("token", response.authUser);
 
-      // Redirigir al dashboard
-      navigate("/dashboard");
-
       // Mostrar notificación de éxito
       toast.success("Inicio de sesión exitoso", {
-        autoClose: 3000,
+        autoClose: 1000,
       });
+
+      // Redirigir al dashboard después de un pequeño retraso
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 500); // 1 segundo de retraso
     }
 
   } catch (error) {
@@ -33,11 +35,14 @@ export const handleLogin = async (data, navigate, setIsLoading) => {
         toast.error("Usuario o contraseña incorrectos.", {
           autoClose: 5000,
         });
-      } else {
-        toast.error("Servicio no disponible, intenta más tarde.", {
+      } 
+
+      if(error.response.status === 403){
+        toast.error("Usuario Bloqueado, comunicate con el administrador", {
           autoClose: 5000,
         });
       }
+      
     } else {
       toast.error("Servicio no disponible, intenta más tarde.", {
         autoClose: 5000,

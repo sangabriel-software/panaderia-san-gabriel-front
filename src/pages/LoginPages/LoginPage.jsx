@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { ToastContainer } from "react-toastify";
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { handleLogin } from "./loginUtils";
@@ -89,7 +89,6 @@ function LoginPage() {
           </div>
         </div>
       </div>
-      <ToastContainer />
     </section>
   );
 }
