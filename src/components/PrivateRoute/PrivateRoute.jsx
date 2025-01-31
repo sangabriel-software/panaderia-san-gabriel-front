@@ -1,8 +1,8 @@
-import React, { useEffect } from "react";
+import { React, useEffect } from "react";
 import { useNavigate, Outlet, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { getLocalStorage, removeLocalStorage } from "../../utils/Auth/localstorage";
+import { removeLocalStorage } from "../../utils/Auth/localstorage";
 import { getTokenExpiration } from "../../utils/Auth/decodedata";
 
 const PrivateRoute = () => {

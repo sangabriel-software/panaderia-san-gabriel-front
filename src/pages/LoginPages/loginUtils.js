@@ -1,42 +1,49 @@
+import { iniciarSesion } from "../../services/authServices/auth.service";
+import { setLocalStorage } from "../../utils/Auth/localstorage";
+import { toast } from "react-toastify";
 
-export const handlelogin = async (data, reset, setIsPopupOpen, setIsPopupErrorOpen, setErrorPopupMessage) => {
-    setIsLoading(true); // Activa el loading
+/**
+ * Maneja el proceso de inicio de sesión.
+ * @param {Object} data - Datos del formulario de inicio de sesión.
+ * @param {Function} navigate - Función para redirigir al usuario.
+ * @param {Function} setIsLoading - Función para manejar el estado de carga.
+ */
+export const handleLogin = async (data, navigate, setIsLoading) => {
+  setIsLoading(true);
 
-    try {
-      // Llamamos al servicio de inicio de sesión
-      const response = await iniciarSesion(data);
+  try {
+    const response = await iniciarSesion(data);
 
-      // Guardamos el token en el localStorage
+    if (response.status === 200) {
+      // Guardamos el token en localStorage
       setLocalStorage("token", response.authUser);
 
-      // Redirigimos al usuario al dashboard
+      // Redirigir al dashboard
       navigate("/dashboard");
 
-      // Mostrar un mensaje de éxito (opcional)
+      // Mostrar notificación de éxito
       toast.success("Inicio de sesión exitoso", {
         autoClose: 3000,
       });
-    } catch (error) {
-      // Mostrar un mensaje de error según el tipo de error
-      if (error.response) {
-        // Error de credenciales (por ejemplo, 401 Unauthorized)
-        if (error.response.status === 404) {
-          toast.error("Credenciales incorrectas. Verifica tu usuario y contraseña.", {
-            autoClose: 5000,
-          });
-        } else {
-          // Otros errores del servidor (por ejemplo, 500 Internal Server Error)
-          toast.error("Error en el servidor. Por favor, intenta nuevamente más tarde.", {
-            autoClose: 5000,
-          });
-        }
+    }
+
+  } catch (error) {
+    if (error.response) {
+      if (error.response.status === 401 || error.response.status === 404) {
+        toast.error("Usuario o contraseña incorrectos.", {
+          autoClose: 5000,
+        });
       } else {
-        // Error de red o desconocido
-        toast.error("No hubo conexión con el servidor, intenta más tarde", {
+        toast.error("Servicio no disponible, intenta más tarde.", {
           autoClose: 5000,
         });
       }
-    } finally {
-      setIsLoading(false); // Desactiva el loading (tanto en éxito como en error)
+    } else {
+      toast.error("Servicio no disponible, intenta más tarde.", {
+        autoClose: 5000,
+      });
     }
+  } finally {
+    setIsLoading(false);
+  }
 };
