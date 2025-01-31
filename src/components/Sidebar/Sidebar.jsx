@@ -13,6 +13,7 @@ import {
   FaChevronRight,
   FaCog
 } from 'react-icons/fa';
+import { getUserData, getUserPermissions } from '../../utils/Auth/decodedata';
 
 function Sidebar({ show }) {
   const [usersOpen, setUsersOpen] = useState(false);

@@ -14,7 +14,6 @@ api.interceptors.request.use(
     let token = localStorage.getItem("token");
 
     if (token) {
-      token = token.replace(/^"(.*)"$/, "$1"); // Elimina comillas dobles si existen
       config.headers.Authorization = `Bearer ${token}`;
     }
 
