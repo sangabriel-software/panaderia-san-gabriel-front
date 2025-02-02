@@ -54,13 +54,32 @@ const CardProductos = ({
     };
   }, [isOptionsVisible]);
 
-  const getInitial = (name) => name.charAt(0).toUpperCase();
+  const getInitial = (name) => {
+    const words = name.split(" "); // Divide el nombre en palabras
+    const initials = words.slice(0, 1).map(word => word.charAt(0).toUpperCase()); // Toma la inicial de la primera palabra
+  
+    // Si hay más de dos palabras, agrega la inicial de la tercera palabra
+    if (words.length > 2) {
+      initials.push(words[2].charAt(0).toUpperCase());
+    } else if (words.length > 1) {
+      initials.push(words[1].charAt(0).toUpperCase()); // Si hay solo dos palabras, toma la inicial de la segunda
+    }
+  
+    return initials.join(""); // Une las iniciales
+  };
 
   const getRandomColor = (name) => {
     const colors = [
-      "#F44336", "#2196F3", "#4CAF50", "#FF9800", "#9C27B0", "#3F51B5",
-      "#E91E63", "#00BCD4", "#8BC34A", "#FFC107", "#673AB7", "#607D8B",
-    ];
+        "#F44336", "#2196F3", "#4CAF50", "#FF9800", "#9C27B0", "#3F51B5",
+        "#E91E63", "#00BCD4", "#8BC34A", "#FFC107", "#673AB7", "#607D8B",
+        "#FFEB3B", "#795548", "#CDDC39", "#FF5722", "#9E9E9E", "#000000",
+        "#1B5E20", "#B71C1C", "#4A148C", "#1A237E", "#004D40", "#880E4F",
+        "#3E2723", "#212121", "#FFD600", "#00C853", "#C51162", "#AA00FF",
+        "#6200EA", "#304FFE", "#2962FF", "#00BFA5", "#64DD17", "#AEEA00",
+        "#FF6D00", "#DD2C00", "#37474F", "#455A64", "#546E7A", "#1DE9B6",
+        "#00E5FF", "#18FFFF", "#84FFFF", "#A7FFEB", "#B9F6CA", "#CCFF90",
+        "#F4FF81", "#FFFF8D", "#FFE57F", "#FFD740", "#FFAB40", "#FF6E40"
+      ];
     const index = name.length % colors.length;
     return colors[index];
   };
@@ -125,16 +144,16 @@ const CardProductos = ({
         <AvatarContent />
         <div>
           <h6 className="mb-0">{nombreProducto}</h6>
-          <small className="text-muted d-block fw-bold">{`Cantidad: ${cantidad}`}</small>
+          <small className="text-muted d-block fw-bold">{``}</small>
           <span
             className="d-block mt-1 fw-bold"
             style={{
-              color: getRandomColor(nombreProducto),
+              color: "#1463C2",
               fontSize: "0.85rem",
               fontWeight: "500",
             }}
           >
-            Precio: Q.{parseFloat(precio).toFixed(2)}
+            {`${cantidad} X Q.${parseFloat(precio).toFixed(2)}`}
           </span>
         </div>
       </div>
