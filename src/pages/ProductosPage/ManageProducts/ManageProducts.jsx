@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { useGetProductosYPrecios } from "../../../hooks/productosprecios/useGetProductosYprecios";
-import { useSerchPrductos } from "./ManageProductsUtils";
+import { useCategoriasYFiltrado, useSerchPrductos } from "./ManageProductsUtils";
 import CreateButton from "../../../components/CreateButton/CreateButton";
 import SearchInput from "../../../components/SerchInput/SerchInput";
 import Title from "../../../components/Title/Title";
@@ -8,22 +8,10 @@ import CardProductos from "../../../components/CardProductos/CardPoductos";
 import { useNavigate } from "react-router";
 
 const ManageProducts = () => {
-  const { productos, loadigProducts, showErrorProductos, showInfoProductos } = useGetProductosYPrecios();
-  const { filteredProductos, searchQuery, showNoResults, handleSearch } = useSerchPrductos(productos);
+  const { productos, loadigProducts, showErrorProductos, showInfoProductos } = useGetProductosYPrecios();//Consultar productos
+  const { filteredProductos, searchQuery, showNoResults, handleSearch } = useSerchPrductos(productos); //Busqueda local
+  const { categorias, filteredByCategory, selectedCategory, setSelectedCategory } = useCategoriasYFiltrado(productos, filteredProductos);//filtrar por categorias
   const navigate = useNavigate()
-  
-  const [selectedCategory, setSelectedCategory] = useState("Todas");
-
-  const categorias = useMemo(() => {
-    const categoriasSet = new Set(productos.map((p) => p.nombreCategoria));
-    return ["Todas", ...categoriasSet];
-  }, [productos]);
-
-  const filteredByCategory = useMemo(() => {
-    return selectedCategory === "Todas"
-      ? filteredProductos
-      : filteredProductos.filter((p) => p.nombreCategoria === selectedCategory);
-  }, [filteredProductos, selectedCategory]);
 
   if (loadigProducts) {
     return <div className="loading">Cargando productos...</div>;
