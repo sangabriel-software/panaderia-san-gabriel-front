@@ -1,19 +1,8 @@
 import React, { useState } from 'react';
 import { Nav, Collapse } from 'react-bootstrap';
 import { NavLink } from 'react-router-dom';
-import { 
-  FaHome, 
-  FaUsers,
-  FaChartBar, 
-  FaCalendar, 
-  FaFolder,
-  FaUserPlus,
-  FaUsersCog,
-  FaKey,
-  FaChevronRight,
-  FaCog
-} from 'react-icons/fa';
-import { getUserData, getUserPermissions } from '../../utils/Auth/decodedata';
+import { FaHome, FaUsers, FaChartBar, FaCalendar, FaFolder, FaUserPlus, FaUsersCog, FaKey, FaChevronRight, FaCog, FaBox } from 'react-icons/fa';
+import { MdOutlineBakeryDining } from 'react-icons/md';
 
 function Sidebar({ show }) {
   const [usersOpen, setUsersOpen] = useState(false);
@@ -22,26 +11,31 @@ function Sidebar({ show }) {
     <div className={`sidebar bg-dark ${show ? 'show' : 'hide'}`}>
       <Nav className="flex-column pt-3">
         <Nav.Link as={NavLink} to="/dashboard" className="text-light">
-          <FaHome className="me-2" /> Dashboard
+          <FaHome size={25} className="me-2" /> Dashboard
         </Nav.Link>
         <Nav.Link as={NavLink} to="/schedule" className="text-light">
-          <FaCalendar className="me-2" /> Pedidos
+          <FaCalendar size={25} className="me-2" /> Pedidos
         </Nav.Link>
         <Nav.Link as={NavLink} to="/projects" className="text-light">
-          <FaFolder className="me-2" /> Ventas
+          <FaFolder size={25} className="me-2" /> Ventas
         </Nav.Link>
         <Nav.Link as={NavLink} to="/reports" className="text-light">
-          <FaChartBar className="me-2" /> Reportes
+          <FaChartBar size={25} className="me-2" /> Reportes
+        </Nav.Link>
+
+        <Nav.Link as={NavLink} to="/productos" className="text-light">
+        <MdOutlineBakeryDining size={25} className="me-2"  color="#FFC107" /> Productos
         </Nav.Link>
         
-        {/* Users Dropdown */}
-        <Nav.Link 
+
+         {/* Users Dropdown */}
+         <Nav.Link 
           className="text-light d-flex justify-content-between align-items-center"
           onClick={() => setUsersOpen(!usersOpen)}
           style={{ cursor: 'pointer' }}
         >
           <span>
-            <FaUsers className="me-2" /> Usuarios
+            <FaUsers size={25} className="me-2" /> Usuarios
           </span>
           <FaChevronRight className={`dropdown-arrow ${usersOpen ? 'open' : ''}`} />
         </Nav.Link>
@@ -71,10 +65,6 @@ function Sidebar({ show }) {
             </Nav.Link>
           </div>
         </Collapse>
-
-        <Nav.Link as={NavLink} to="/profile" className="text-light">
-          <FaCog className="me-2" /> Configuraciones
-        </Nav.Link>
       </Nav>
     </div>
   );

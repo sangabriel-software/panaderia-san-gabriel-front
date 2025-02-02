@@ -49,3 +49,18 @@
     background-color: #FEFEFE; 
     border-color: #0F4D8B;
   }
+
+
+  .btn-crear {
+    background-color: #fefefe;
+    border: 2px solid #1463c2;
+    color: #1463c2;
+    font-size: 1.09rem;
+    /* background-color: rgb(20, 99, 180); */
+  }
+  
+  .btn-crear:hover {
+    background-color: #0f4d8b; /* Fondo al pasar el cursor */
+    color: #fefefe;
+  }
+  
