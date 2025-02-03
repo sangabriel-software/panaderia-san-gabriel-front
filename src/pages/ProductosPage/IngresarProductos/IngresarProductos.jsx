@@ -145,14 +145,14 @@ function IngresarProductos() {
             </Col>
           </Row>
 
-          <Form.Group className="mb-3">
-            <Form.Label className="label-title">Fecha de Caducidad del Precio (Opcional)</Form.Label>
+          {/* <Form.Group className="mb-3">
+            <Form.Label className="label-title">Vencimiento del Precio (Opcional)</Form.Label>
             <Form.Control
               className="input-data"
               type="date"
               {...register("fechaFin")}
             />
-          </Form.Group>
+          </Form.Group> */}
 
           <ImageUploader onImageChange={handleImageChange} imagePreview={imagePreview} labelName={"Imagen del producto"} />
 
