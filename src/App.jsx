@@ -18,6 +18,7 @@ const UpdateRolesForm = lazy(() => import("./pages/UsersPages/Roles/UpdateRoles/
 const CreateUsers = lazy(() => import("./pages/UsersPages/Users/createUsers/CreateUsers"));
 const PrivateRoute = lazy(() => import("./components/PrivateRoute/PrivateRoute"));
 const ManageProducts = lazy(() => import("./pages/ProductosPage/ManageProducts/ManageProducts"));
+const IngresarProductos = lazy(() => import("./pages/ProductosPage/IngresarProductos/IngresarProductos"));
 
 
 
@@ -42,7 +43,11 @@ function App() {
               <Route path="editRol/:idRol" element={<UpdateRolesForm />} />
             </Route>
 
-            <Route path="/productos" element={<ManageProducts />} />
+            <Route path="/productos">
+              <Route index element={<ManageProducts />} />
+              <Route path="ingresar-producto" element={<IngresarProductos />} />
+            </Route>
+
           </Route>
         </Route>
       </Routes>

@@ -2,17 +2,7 @@ import React, { useRef, useState, useEffect } from "react";
 import "./CardProductos.css"; // Asegúrate de que este archivo CSS tenga los estilos necesarios
 import { FaEllipsisH, FaTrash, FaEdit } from "react-icons/fa";
 
-const CardProductos = ({
-  id,
-  nombreProducto,
-  cantidad,
-  precio,
-  image,
-  showOptions,
-  onOptionsClick,
-  onModify,
-  onDelete,
-}) => {
+const CardProductos = ({ id, nombreProducto, cantidad, precio, image, showOptions, onOptionsClick, onModify, onDelete,}) => {
   const modalRef = useRef(null);
   const buttonRef = useRef(null);
   const [position, setPosition] = useState("bottom");

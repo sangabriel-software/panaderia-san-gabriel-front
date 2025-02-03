@@ -28,10 +28,11 @@
   }
 
   .input-data{
-    border: 2px solid #5B5859 ;
-    color: #43405A;
-    font-size: 1.1rem;
-    margin-bottom: 1rem; 
+    border: 2px solid #5B5859 !important;
+    color: #43405A !important;
+    font-size: 1.1rem !important;
+    margin-bottom: 1rem !important; 
+    border-radius: 6px;
   }
 
   .label-title{
@@ -62,5 +63,19 @@
   .btn-crear:hover {
     background-color: #0f4d8b; /* Fondo al pasar el cursor */
     color: #fefefe;
+  }
+
+  .input-image{
+    border: 2px solid #5B5859 !important;
+    color: #43405A !important;
+    font-size: 1.1rem !important;
+    margin-bottom: 1rem !important; 
+    border-radius: 6px;
+    width:  300px;
+    height: 200%;
+  }
+
+  .btn-cargarimagen{
+    margin-top: 250px;
   }
   
