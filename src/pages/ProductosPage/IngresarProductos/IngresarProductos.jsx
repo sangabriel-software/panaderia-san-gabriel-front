@@ -7,6 +7,8 @@ import { Form, Button, Row, Col, Spinner } from "react-bootstrap";
 import ImageUploader from "../../../components/ImagenUploager/ImagenUploadre";
 import { compressImage } from "../../../utils/CompressImage/CompressImage";
 import useGetCategorias from "../../../hooks/categorias/UseGetCategorias";
+import { crearPayloadPrecioProducto, crearPayloadProducto, crearPayloadProductoImagen } from "./IngresarProductosUtils";
+import { ingresarPrecioProducto, ingresarProducto, ingresarProductoImagen } from "../../../services/productos/productos.service";
 
 function IngresarProductos() {
   const navigate = useNavigate();
@@ -22,19 +24,24 @@ function IngresarProductos() {
 
   const onSubmit = async (data) => {
     try {
+      let resIngresoProducto;
       let imageBase64 = null;
       if (selectedImage) {
         imageBase64 = await compressImage(selectedImage, 20);
       }
 
-      const productoData = {
-        nombre: data.nombreProducto,
-        categoriaId: data.idCategoria,
-        cantidad: data.cantidad,
-        precio: data.precio,
-        imagen: imageBase64,
-      };
-      console.log(productoData);
+      const paylodProducto = crearPayloadProducto(data);
+      resIngresoProducto = await ingresarProducto(paylodProducto);
+
+      if(resIngresoProducto.status === 201){
+        const payloadPrecio = crearPayloadPrecioProducto(data, resIngresoProducto.idProducto);
+        const resIngresoPrecio = await ingresarPrecioProducto(payloadPrecio);
+
+        if(resIngresoPrecio.status === 201 && selectedImage){
+          const payloadImagen = crearPayloadProductoImagen(resIngresoProducto.idProducto, imageBase64)
+          const resImagenProducto = await ingresarProductoImagen(payloadImagen);
+        }
+      }
     } catch (error) {
       console.error("Error al procesar la imagen o enviar los datos:", error);
     }
@@ -54,18 +61,12 @@ function IngresarProductos() {
             </button>
           </div>
           <div className="col-8">
-            <Title
-              title="Productos"
-              description="Ingreso de productos existentes"
-            />
+            <Title title="Productos" description="Ingreso de productos existentes" />
           </div>
         </div>
       </div>
 
-      <Form
-        onSubmit={handleSubmit(onSubmit)}
-        className="row justify-content-center"
-      >
+      <Form onSubmit={handleSubmit(onSubmit)} className="row justify-content-center">
         <div className="col-lg-6 col-md-8 col-sm-10">
           <Form.Group className="mb-3">
             <Form.Label className="label-title">Nombre del Producto</Form.Label>
@@ -73,9 +74,7 @@ function IngresarProductos() {
               className="input-data"
               type="text"
               placeholder="Ingrese el nombre del producto"
-              {...register("nombreProducto", {
-                required: "El nombre del producto es obligatorio.",
-              })}
+              {...register("nombreProducto", { required: "El nombre del producto es obligatorio." })}
               isInvalid={!!errors.nombreProducto}
             />
             <Form.Control.Feedback type="invalid">
@@ -84,9 +83,7 @@ function IngresarProductos() {
           </Form.Group>
 
           <Form.Group className="mb-3">
-            <Form.Label className="label-title">
-              Categoría del Producto
-            </Form.Label>
+            <Form.Label className="label-title">Categoría del Producto</Form.Label>
             {loadingCategorias ? (
               <div className="d-flex align-items-center">
                 <Spinner animation="border" size="sm" className="me-2" />
@@ -94,27 +91,18 @@ function IngresarProductos() {
               </div>
             ) : (
               <Form.Select
-                {...register("idCategoria", {
-                  required: "Debe seleccionar una categoría.",
-                })}
-                className={`input-data ${
-                  errors.idCategoria ? "is-invalid" : ""
-                }`}
+                {...register("idCategoria", { required: "Debe seleccionar una categoría." })}
+                className={`input-data ${errors.idCategoria ? "is-invalid" : ""}`}
               >
                 <option value="">Selecciona una categoría...</option>
                 {categorias.map((categoria) => (
-                  <option
-                    key={categoria.idCategoria}
-                    value={categoria.idCategoria}
-                  >
+                  <option key={categoria.idCategoria} value={categoria.idCategoria}>
                     {categoria.nombreCategoria}
                   </option>
                 ))}
               </Form.Select>
             )}
-            {errors.idCategoria && (
-              <div className="text-danger">{errors.idCategoria.message}</div>
-            )}
+            {errors.idCategoria && <div className="text-danger">{errors.idCategoria.message}</div>}
           </Form.Group>
 
           <Row className="mb-3">
@@ -127,10 +115,7 @@ function IngresarProductos() {
                   placeholder="Ingrese la cantidad"
                   {...register("cantidad", {
                     required: "La cantidad es obligatoria.",
-                    min: {
-                      value: 1,
-                      message: "La cantidad debe ser mayor a 0.",
-                    },
+                    min: { value: 1, message: "La cantidad debe ser mayor a 0." }
                   })}
                   isInvalid={!!errors.cantidad}
                 />
@@ -149,10 +134,7 @@ function IngresarProductos() {
                   step="0.01"
                   {...register("precio", {
                     required: "El precio es obligatorio.",
-                    min: {
-                      value: 0.01,
-                      message: "El precio debe ser mayor a 0.",
-                    },
+                    min: { value: 0.01, message: "El precio debe ser mayor a 0." }
                   })}
                   isInvalid={!!errors.precio}
                 />
@@ -163,16 +145,19 @@ function IngresarProductos() {
             </Col>
           </Row>
 
-          <ImageUploader
-            onImageChange={handleImageChange}
-            imagePreview={imagePreview}
-            labelName={"Imagen del producto"}
-          />
+          <Form.Group className="mb-3">
+            <Form.Label className="label-title">Fecha de Caducidad del Precio (Opcional)</Form.Label>
+            <Form.Control
+              className="input-data"
+              type="date"
+              {...register("fechaFin")}
+            />
+          </Form.Group>
+
+          <ImageUploader onImageChange={handleImageChange} imagePreview={imagePreview} labelName={"Imagen del producto"} />
 
           <div className="text-center">
-            <button type="submit" className="btn bt-general">
-              Ingreasr Producto
-            </button>
+            <button type="submit" className="btn bt-general">Ingresar Producto</button>
           </div>
         </div>
       </Form>

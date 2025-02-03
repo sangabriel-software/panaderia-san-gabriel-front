@@ -10,8 +10,10 @@ const postEndpoints = {
     INGRESAR_ROL: "/ingresarRol",
     INGRESAR_PERMISOSROLES: "/ingresarPermisosBatch",
     CREAR_USUARIO: "/crearUsuario",
-    INICIAR_SESION: "/login"
-
+    INICIAR_SESION: "/login",
+    INGRESAR_PRODUCTO: "/ingresarProducto",
+    INGRESAR_PRECIOPRODUCTO: "/ingresarPrecio",
+    INGRESAR_IMAGEN_PRODUCTO: "/ingresar-img-producto"
 };
 
 const putEndpoints = {
