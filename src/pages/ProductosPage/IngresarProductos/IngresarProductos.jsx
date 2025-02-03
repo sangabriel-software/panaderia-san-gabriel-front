@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { BsArrowLeft } from "react-icons/bs";
 import Title from "../../../components/Title/Title";
 import { useNavigate } from "react-router";
-import { Form, Button, Row, Col } from "react-bootstrap";
+import { Form, Button, Row, Col, Spinner } from "react-bootstrap";
 import ImageUploader from "../../../components/ImagenUploager/ImagenUploadre";
 import { compressImage } from "../../../utils/CompressImage/CompressImage";
 
@@ -27,11 +27,12 @@ function IngresarProductos() {
     setTimeout(() => {
       const data = [
         { idCategoria: 1, nombreCategoria: "Panadería" },
-        { idCategoria: 2, nombreCategoria: "Reposteria" },
+        { idCategoria: 2, nombreCategoria: "Bebidas" },
+        { idCategoria: 3, nombreCategoria: "Lácteos" },
       ];
       setCategorias(data);
       setLoading(false);
-    }, 1000);
+    }, 500);
   }, []);
 
   const handleImageChange = (file, imageUrl) => {
@@ -101,19 +102,26 @@ function IngresarProductos() {
 
           <Form.Group className="mb-3">
             <Form.Label className="label-title">Categoría del Producto</Form.Label>
-            <Form.Select
-              {...register("idCategoria", {
-                required: "Debe seleccionar una categoría.",
-              })}
-              className={`input-data ${errors.idCategoria ? "is-invalid" : ""}`}
-            >
-              <option value="">Selecciona una categoría...</option>
-              {categorias.map((categoria) => (
-                <option key={categoria.idCategoria} value={categoria.idCategoria}>
-                  {categoria.nombreCategoria}
-                </option>
-              ))}
-            </Form.Select>
+            {loading ? (
+              <div className="d-flex align-items-center">
+                <Spinner animation="border" size="sm" className="me-2" />
+                <span>Cargando categorías...</span>
+              </div>
+            ) : (
+              <Form.Select
+                {...register("idCategoria", {
+                  required: "Debe seleccionar una categoría.",
+                })}
+                className={`input-data ${errors.idCategoria ? "is-invalid" : ""}`}
+              >
+                <option value="">Selecciona una categoría...</option>
+                {categorias.map((categoria) => (
+                  <option key={categoria.idCategoria} value={categoria.idCategoria}>
+                    {categoria.nombreCategoria}
+                  </option>
+                ))}
+              </Form.Select>
+            )}
             {errors.idCategoria && (
               <div className="text-danger">{errors.idCategoria.message}</div>
             )}
