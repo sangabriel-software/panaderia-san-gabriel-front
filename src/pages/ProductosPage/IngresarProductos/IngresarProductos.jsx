@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import Select from "react-select";
 import { BsArrowLeft } from "react-icons/bs";
 import Title from "../../../components/Title/Title";
 import { useNavigate } from "react-router";
@@ -19,18 +18,18 @@ function IngresarProductos() {
     register,
     handleSubmit,
     setValue,
-    trigger,
-    watch,
     formState: { errors },
-  } = useForm();
+  } = useForm({
+    defaultValues: { idCategoria: "" },
+  });
 
   useEffect(() => {
     setTimeout(() => {
-      setCategorias([
-        { value: 1, label: "Panadería" },
-        { value: 2, label: "Bebidas" },
-        { value: 3, label: "Lácteos" },
-      ]);
+      const data = [
+        { idCategoria: 1, nombreCategoria: "Panadería" },
+        { idCategoria: 2, nombreCategoria: "Reposteria" },
+      ];
+      setCategorias(data);
       setLoading(false);
     }, 1000);
   }, []);
@@ -82,10 +81,7 @@ function IngresarProductos() {
         </div>
       </div>
 
-      <Form
-        onSubmit={handleSubmit(onSubmit)}
-        className="row justify-content-center"
-      >
+      <Form onSubmit={handleSubmit(onSubmit)} className="row justify-content-center">
         <div className="col-lg-6 col-md-8 col-sm-10">
           <Form.Group className="mb-3">
             <Form.Label className="label-title">Nombre del Producto</Form.Label>
@@ -104,29 +100,20 @@ function IngresarProductos() {
           </Form.Group>
 
           <Form.Group className="mb-3">
-            <Form.Label className="label-title">
-              Categoría del Producto
-            </Form.Label>
-            <Select
-              className="input-data"
-              options={categorias}
-              isLoading={loading}
-              placeholder="Seleccione una categoría"
-              value={categorias.find(cat => cat.value === Number(watch("idCategoria")))} // Convertir a número si es necesario
-              onChange={(selectedOption) => {
-                setValue(
-                  "idCategoria",
-                  selectedOption ? selectedOption.value : null
-                );
-                trigger("idCategoria");
-              }}
-            />
-            <input
-              type="hidden"
+            <Form.Label className="label-title">Categoría del Producto</Form.Label>
+            <Form.Select
               {...register("idCategoria", {
                 required: "Debe seleccionar una categoría.",
               })}
-            />
+              className={`input-data ${errors.idCategoria ? "is-invalid" : ""}`}
+            >
+              <option value="">Selecciona una categoría...</option>
+              {categorias.map((categoria) => (
+                <option key={categoria.idCategoria} value={categoria.idCategoria}>
+                  {categoria.nombreCategoria}
+                </option>
+              ))}
+            </Form.Select>
             {errors.idCategoria && (
               <div className="text-danger">{errors.idCategoria.message}</div>
             )}
@@ -142,10 +129,7 @@ function IngresarProductos() {
                   placeholder="Ingrese la cantidad"
                   {...register("cantidad", {
                     required: "La cantidad es obligatoria.",
-                    min: {
-                      value: 1,
-                      message: "La cantidad debe ser mayor a 0.",
-                    },
+                    min: { value: 1, message: "La cantidad debe ser mayor a 0." },
                   })}
                   isInvalid={!!errors.cantidad}
                 />
@@ -164,10 +148,7 @@ function IngresarProductos() {
                   step="0.01"
                   {...register("precio", {
                     required: "El precio es obligatorio.",
-                    min: {
-                      value: 0.01,
-                      message: "El precio debe ser mayor a 0.",
-                    },
+                    min: { value: 0.01, message: "El precio debe ser mayor a 0." },
                   })}
                   isInvalid={!!errors.precio}
                 />
