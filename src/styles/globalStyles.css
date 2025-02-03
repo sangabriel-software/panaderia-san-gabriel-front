@@ -33,6 +33,11 @@
     font-size: 1.1rem !important;
     margin-bottom: 1rem !important; 
     border-radius: 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    width: 100%;
   }
 
   .label-title{

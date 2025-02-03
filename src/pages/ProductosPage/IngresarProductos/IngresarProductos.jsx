@@ -4,23 +4,25 @@ import Select from "react-select";
 import { BsArrowLeft } from "react-icons/bs";
 import Title from "../../../components/Title/Title";
 import { useNavigate } from "react-router";
-import { Form, Button, Row, Col, Spinner } from "react-bootstrap";
+import { Form, Button, Row, Col } from "react-bootstrap";
+import ImageUploader from "../../../components/ImagenUploager/ImagenUploadre";
+import { compressImage } from "../../../utils/CompressImage/CompressImage";
 
 function IngresarProductos() {
   const navigate = useNavigate();
   const [selectedImage, setSelectedImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
-  const [imageLoading, setImageLoading] = useState(false);
+  const [categorias, setCategorias] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const {
     register,
     handleSubmit,
     setValue,
+    trigger,
+    watch,
     formState: { errors },
   } = useForm();
-
-  const [categorias, setCategorias] = useState([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setTimeout(() => {
@@ -33,28 +35,29 @@ function IngresarProductos() {
     }, 1000);
   }, []);
 
-  const handleImageChange = (event) => {
-    setImageLoading(true); // 🔥 Activar el spinner antes de cargar la imagen
-
-    const file = event.target.files[0];
-    if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      const img = new Image();
-
-      img.onload = () => {
-        setSelectedImage(file);
-        setImagePreview(imageUrl);
-        setImageLoading(false); // 🔥 Desactivar el spinner solo cuando la imagen termine de cargar
-      };
-
-      img.src = imageUrl;
-    } else {
-      setImageLoading(false);
-    }
+  const handleImageChange = (file, imageUrl) => {
+    setSelectedImage(file);
+    setImagePreview(imageUrl);
   };
 
-  const onSubmit = (data) => {
-    console.log("Datos del producto:", data);
+  const onSubmit = async (data) => {
+    try {
+      let imageBase64 = null;
+      if (selectedImage) {
+        imageBase64 = await compressImage(selectedImage, 20);
+      }
+
+      const productoData = {
+        nombre: data.nombreProducto,
+        categoriaId: data.idCategoria,
+        cantidad: data.cantidad,
+        precio: data.precio,
+        imagen: imageBase64,
+      };
+      console.log(productoData);
+    } catch (error) {
+      console.error("Error al procesar la imagen o enviar los datos:", error);
+    }
   };
 
   return (
@@ -109,9 +112,20 @@ function IngresarProductos() {
               options={categorias}
               isLoading={loading}
               placeholder="Seleccione una categoría"
-              onChange={(selectedOption) =>
-                setValue("idCategoria", selectedOption.value)
-              }
+              value={categorias.find(cat => cat.value === Number(watch("idCategoria")))} // Convertir a número si es necesario
+              onChange={(selectedOption) => {
+                setValue(
+                  "idCategoria",
+                  selectedOption ? selectedOption.value : null
+                );
+                trigger("idCategoria");
+              }}
+            />
+            <input
+              type="hidden"
+              {...register("idCategoria", {
+                required: "Debe seleccionar una categoría.",
+              })}
             />
             {errors.idCategoria && (
               <div className="text-danger">{errors.idCategoria.message}</div>
@@ -119,11 +133,11 @@ function IngresarProductos() {
           </Form.Group>
 
           <Row className="mb-3">
-            <Col md={6}>
+            <Col xs={6}>
               <Form.Group>
                 <Form.Label className="label-title">Cantidad</Form.Label>
                 <Form.Control
-                  className="input-data"
+                  className="input-data truncate-placeholder"
                   type="number"
                   placeholder="Ingrese la cantidad"
                   {...register("cantidad", {
@@ -140,11 +154,11 @@ function IngresarProductos() {
                 </Form.Control.Feedback>
               </Form.Group>
             </Col>
-            <Col md={6}>
+            <Col xs={6}>
               <Form.Group>
                 <Form.Label className="label-title">Precio</Form.Label>
                 <Form.Control
-                  className="input-data"
+                  className="input-data truncate-placeholder"
                   type="number"
                   placeholder="Ingrese el precio"
                   step="0.01"
@@ -164,82 +178,11 @@ function IngresarProductos() {
             </Col>
           </Row>
 
-          {/* Imagen del producto */}
-          <Form.Group className="mb-3">
-            <Form.Label className="label-title">Imagen del Producto</Form.Label>
-            <div className="position-relative d-flex justify-content-center w-100">
-              <input type="file" accept="image/*" className="d-none" id="imagen" onChange={handleImageChange} />
-              <div
-                className="input-data flex-grow-1 position-relative"
-                style={{
-                  height: "45px",
-                  display: "flex",
-                  alignItems: "center",
-                  border: "1px solid #ced4da",
-                  borderRadius: "5px",
-                  backgroundColor: "#fff",
-                  minWidth: "320px",
-                  overflow: "hidden",
-                  paddingLeft: "130px",
-                  textOverflow: "ellipsis",
-                }}
-              >
-                <label
-                  htmlFor="imagen"
-                  className={`btn ${selectedImage ? "btn-success" : "btn-primary"} mb-0 position-absolute`}
-                  style={{
-                    height: "100%",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    left: "0",
-                    width: "120px",
-                    borderRadius: "5px 0 0 5px",
-                    fontSize: "14px",
-                  }}
-                >
-                  {imageLoading ? <Spinner animation="border" size="sm" /> : "Cargar"}
-                </label>
-                <span
-                  style={{
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "8px",
-                  }}
-                >
-                  {imageLoading ? (
-                    <>
-                      <Spinner animation="border" size="sm" /> Cargando...
-                    </>
-                  ) : selectedImage ? (
-                    selectedImage.name
-                  ) : (
-                    "Seleccionar archivo"
-                  )}
-                </span>
-              </div>
-            </div>
-
-            {imagePreview && (
-              <div className="d-flex justify-content-center mt-3">
-                <img
-                  src={imagePreview}
-                  alt="Preview"
-                  className="img-fluid rounded shadow"
-                  style={{
-                    width: "100%",
-                    maxWidth: "300px",
-                    height: "200px",
-                    objectFit: "cover",
-                    borderRadius: "10px",
-                  }}
-                />
-              </div>
-            )}
-          </Form.Group>
+          <ImageUploader
+            onImageChange={handleImageChange}
+            imagePreview={imagePreview}
+            labelName={"Imagen del producto"}
+          />
 
           <div className="text-center">
             <Button type="submit" variant="primary">
