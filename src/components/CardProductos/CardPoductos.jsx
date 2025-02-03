@@ -84,18 +84,19 @@ const CardProductos = ({
   };
 
   const AvatarContent = () => {
-    const avatarSize = 80;
+    const avatarSize = 90;
 
     if (image) {
       return (
         <img
           src={image}
           alt={nombreProducto}
-          className="rounded-circle flex-shrink-0 me-3"
+          className="flex-shrink-0 me-3"
           style={{
-            width: `${avatarSize}px`,
-            height: `${avatarSize}px`,
+            width: `100px`,
+            height: `100px`,
             objectFit: "cover",
+            borderRadius: "10px",
           }}
         />
       );
@@ -142,13 +143,13 @@ const CardProductos = ({
       <div className="d-flex align-items-center flex-grow-1">
         <AvatarContent />
         <div>
-          <h6 className="mb-0">{nombreProducto}</h6>
+          <h5 className="mb-0">{nombreProducto}</h5>
           <small className="text-muted d-block fw-bold">{``}</small>
           <span
             className="d-block mt-1 fw-bold"
             style={{
               color: "#1463C2",
-              fontSize: "0.85rem",
+              fontSize: "0.99rem",
               fontWeight: "500",
             }}
           >

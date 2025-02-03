@@ -35,7 +35,7 @@ function Sidebar({ show }) {
           style={{ cursor: 'pointer' }}
         >
           <span>
-            <FaUsers size={25} className="me-2" /> Usuarios
+            <FaUsers size={25} className="me-2"  /> Usuarios
           </span>
           <FaChevronRight className={`dropdown-arrow ${usersOpen ? 'open' : ''}`} />
         </Nav.Link>

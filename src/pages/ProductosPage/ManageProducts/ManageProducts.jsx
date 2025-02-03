@@ -13,6 +13,8 @@ const ManageProducts = () => {
   const { categorias, filteredByCategory, selectedCategory, setSelectedCategory } = useCategoriasYFiltrado(productos, filteredProductos);//filtrar por categorias
   const navigate = useNavigate()
 
+  console.log(productos)
+
   if (loadigProducts) {
     return <div className="loading">Cargando productos...</div>;
   }
@@ -55,7 +57,7 @@ const ManageProducts = () => {
                 nombreProducto={producto.nombreProducto}
                 cantidad={producto.cantidad}
                 precio={producto.precio}
-                image=""
+                image={producto.imagenB64}
               />
             </div>
           ))}
