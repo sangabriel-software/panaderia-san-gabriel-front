@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react"; // Importa useRef y useEffect
 import { useForm } from "react-hook-form";
 import { BsArrowLeft } from "react-icons/bs";
 import Title from "../../../components/Title/Title";
@@ -19,15 +19,27 @@ function IngresarProductos() {
   const [selectedImage, setSelectedImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [isResetImageInput, setIsResetImageInput] = useState(false);
-  const { register, handleSubmit, reset, formState: { errors }, } = useForm({ defaultValues: { idCategoria: "" } });
+  const { register, handleSubmit, reset, formState: { errors } } = useForm({ defaultValues: { idCategoria: "" } });
   const { categorias, loadingCategorias } = useGetCategorias();
 
+  // Referencia para el contenedor de la imagen
+  const imagePreviewRef = useRef(null);
+
+  // Efecto para hacer scroll cuando la imagen se carga
+  useEffect(() => {
+    if (imagePreview && imagePreviewRef.current) {
+      imagePreviewRef.current.scrollIntoView({ behavior: "smooth", block: "end" });
+    }
+  }, [imagePreview]);
+
+  // Función para cargar la imagen
   const handleImageChange = (file, imageUrl) => {
     setIsResetImageInput(false);
     setSelectedImage(file);
     setImagePreview(imageUrl);
   };
 
+  // Función para enviar el formulario
   const onSubmit = (data) => {
     handleIngresarProductoSubmit(
       data,
@@ -64,6 +76,32 @@ function IngresarProductos() {
 
       <Form onSubmit={handleSubmit(onSubmit)} className="row justify-content-center">
         <div className="col-lg-6 col-md-8 col-sm-10">
+          {/* Categoría del producto */}
+          <Form.Group className="mb-3">
+            <Form.Label className="label-title">Categoría del Producto</Form.Label>
+            {loadingCategorias ? (
+              <div className="d-flex align-items-center">
+                <Spinner animation="border" size="sm" className="me-2" />
+                <span>Cargando categorías...</span>
+              </div>
+            ) : (
+              <Form.Select
+                {...register("idCategoria", { required: "Debe seleccionar una categoría." })}
+                className={`input-data ${errors.idCategoria ? "is-invalid" : ""}`}
+                disabled={isLoading}
+              >
+                <option value="">Selecciona una categoría...</option>
+                {categorias.map((categoria) => (
+                  <option key={categoria.idCategoria} value={categoria.idCategoria}>
+                    {categoria.nombreCategoria}
+                  </option>
+                ))}
+              </Form.Select>
+            )}
+            {errors.idCategoria && <div className="text-danger">{errors.idCategoria.message}</div>}
+          </Form.Group>
+
+          {/* Nombre del producto */}
           <Form.Group className="mb-3">
             <Form.Label className="label-title">Nombre del Producto</Form.Label>
             <div className="position-relative">
@@ -90,34 +128,11 @@ function IngresarProductos() {
             </div>
           </Form.Group>
 
-          <Form.Group className="mb-3">
-            <Form.Label className="label-title">Categoría del Producto</Form.Label>
-            {loadingCategorias ? (
-              <div className="d-flex align-items-center">
-                <Spinner animation="border" size="sm" className="me-2" />
-                <span>Cargando categorías...</span>
-              </div>
-            ) : (
-              <Form.Select
-                {...register("idCategoria", { required: "Debe seleccionar una categoría." })}
-                className={`input-data ${errors.idCategoria ? "is-invalid" : ""}`}
-                disabled={isLoading}
-              >
-                <option value="">Selecciona una categoría...</option>
-                {categorias.map((categoria) => (
-                  <option key={categoria.idCategoria} value={categoria.idCategoria}>
-                    {categoria.nombreCategoria}
-                  </option>
-                ))}
-              </Form.Select>
-            )}
-            {errors.idCategoria && <div className="text-danger">{errors.idCategoria.message}</div>}
-          </Form.Group>
-
+          {/* Cantidad y precio */}
           <Row className="mb-3">
             <Col xs={6}>
               <Form.Group>
-                <Form.Label className="label-title">Cantidad</Form.Label>
+                <Form.Label className="label-title">Cantidad Por Quetzal</Form.Label>
                 <Form.Control
                   className="input-data truncate-placeholder"
                   type="number"
@@ -136,7 +151,7 @@ function IngresarProductos() {
             </Col>
             <Col xs={6}>
               <Form.Group>
-                <Form.Label className="label-title">Precio</Form.Label>
+                <Form.Label className="label-title">Precio Q.</Form.Label>
                 <Form.Control
                   className="input-data truncate-placeholder"
                   type="number"
@@ -156,6 +171,7 @@ function IngresarProductos() {
             </Col>
           </Row>
 
+          {/* Subida de imagen */}
           <ImageUploader
             onImageChange={handleImageChange}
             imagePreview={imagePreview}
@@ -163,6 +179,7 @@ function IngresarProductos() {
             isReset={isResetImageInput}
           />
 
+          {/* Botón de enviar */}
           <div className="text-center">
             <button type="submit" className="btn bt-general" disabled={isLoading}>
               {isLoading ? (
@@ -178,6 +195,7 @@ function IngresarProductos() {
         </div>
       </Form>
 
+      {/* Popups de éxito y error */}
       <SuccessPopup
         isOpen={isPopupOpen}
         onClose={() => setIsPopupOpen(false)}

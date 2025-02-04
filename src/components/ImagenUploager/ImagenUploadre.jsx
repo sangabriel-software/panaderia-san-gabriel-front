@@ -1,10 +1,26 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Form, Spinner } from "react-bootstrap";
 
 function ImageUploader({ labelName, onImageChange, imagePreview, isReset }) {
   const [imageLoading, setImageLoading] = useState(false);
   const [imageName, setImageName] = useState("");
-  const [inputKey, setInputKey] = useState(Date.now()); // Para forzar el reinicio del input file
+  const [inputKey, setInputKey] = useState(Date.now());
+
+  // Referencia para el contenedor de la imagen
+  const imagePreviewRef = useRef(null);
+
+  // Efecto para hacer scroll cuando la imagen se carga
+  useEffect(() => {
+    if (imagePreview && imagePreviewRef.current) {
+      // Hace scroll suave hasta el contenedor de la imagen
+      imagePreviewRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+
+      // Ajusta el scroll un poco más hacia abajo
+      setTimeout(() => {
+        window.scrollBy(0, 50); // Desplaza 50 píxeles más hacia abajo
+      }, 500); // Espera 500ms para que el scroll suave termine
+    }
+  }, [imagePreview]);
 
   useEffect(() => {
     if (isReset) {
@@ -35,7 +51,7 @@ function ImageUploader({ labelName, onImageChange, imagePreview, isReset }) {
 
   const handleRemoveImage = () => {
     setImageName("");
-    setInputKey(Date.now()); // Fuerza el reinicio del input file
+    setInputKey(Date.now());
     onImageChange(null, null);
   };
 
@@ -44,7 +60,7 @@ function ImageUploader({ labelName, onImageChange, imagePreview, isReset }) {
       <Form.Label className="label-title">{labelName}</Form.Label>
       <div className="position-relative d-flex justify-content-center w-100">
         <input
-          key={inputKey} // Reinicia el input cuando se elimina la imagen o se resetea
+          key={inputKey}
           type="file"
           accept="image/*"
           className="d-none"
@@ -113,7 +129,7 @@ function ImageUploader({ labelName, onImageChange, imagePreview, isReset }) {
       </div>
 
       {imagePreview && !isReset && (
-        <div className="d-flex justify-content-center mt-3">
+        <div ref={imagePreviewRef} className="d-flex justify-content-center mt-3">
           <img
             src={imagePreview}
             alt="Preview"
