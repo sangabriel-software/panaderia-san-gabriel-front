@@ -1,20 +1,19 @@
-import React, { useState, useEffect } from "react"; // Importa useEffect
+import React, { useState, useEffect } from "react";
 import { Form, Spinner } from "react-bootstrap";
 
 function ImageUploader({ labelName, onImageChange, imagePreview, isReset }) {
   const [imageLoading, setImageLoading] = useState(false);
-  const [imageName, setImageName] = useState(""); // Estado para guardar el nombre del archivo
+  const [imageName, setImageName] = useState("");
+  const [inputKey, setInputKey] = useState(Date.now()); // Para forzar el reinicio del input file
 
-  // Efecto para manejar cambios en isReset
   useEffect(() => {
     if (isReset) {
-      setImageName(""); // Resetea el nombre de la imagen cuando isReset es true
+      setImageName("");
     }
   }, [isReset]);
 
   const handleImageChange = (event) => {
-    setImageLoading(true); // Activar el spinner antes de cargar la imagen
-
+    setImageLoading(true);
     const file = event.target.files[0];
     if (file) {
       const imageUrl = URL.createObjectURL(file);
@@ -22,15 +21,21 @@ function ImageUploader({ labelName, onImageChange, imagePreview, isReset }) {
 
       img.onload = () => {
         onImageChange(file, imageUrl);
-        setImageLoading(false); // Desactivar el spinner cuando la imagen termine de cargar
-        setImageName(file.name); // Guardar el nombre del archivo
+        setImageLoading(false);
+        setImageName(file.name);
       };
 
       img.src = imageUrl;
     } else {
       setImageLoading(false);
-      setImageName(""); // Resetear el nombre si no hay archivo
+      setImageName("");
     }
+  };
+
+  const handleRemoveImage = () => {
+    setImageName("");
+    setInputKey(Date.now()); // Fuerza el reinicio del input file
+    onImageChange(null, null);
   };
 
   return (
@@ -38,6 +43,7 @@ function ImageUploader({ labelName, onImageChange, imagePreview, isReset }) {
       <Form.Label className="label-title">{labelName}</Form.Label>
       <div className="position-relative d-flex justify-content-center w-100">
         <input
+          key={inputKey} // Reinicia el input cuando se elimina la imagen
           type="file"
           accept="image/*"
           className="d-none"
@@ -61,7 +67,7 @@ function ImageUploader({ labelName, onImageChange, imagePreview, isReset }) {
         >
           <label
             htmlFor="imagen"
-            className={`btn ${imagePreview ? "btn-success" : "btn-primary"} mb-0 position-absolute`}
+            className={`btn ${imagePreview ? "btn-success" : "btn btn-simple"} mb-0 position-absolute`}
             style={{
               height: "100%",
               display: "flex",
@@ -90,12 +96,18 @@ function ImageUploader({ labelName, onImageChange, imagePreview, isReset }) {
               <>
                 <Spinner animation="border" size="sm" /> Cargando...
               </>
-            ) : isReset ? ( // Si isReset es true, muestra "Seleccionar archivo"
-              "Seleccionar archivo"
-            ) : (
-              imageName // Si isReset es false, muestra el nombre de la imagen
-            )}
+            ) : imageName || "Seleccionar archivo"}
           </span>
+          {imageName && (
+            <button
+              type="button"
+              className="btn btn-danger btn-sm position-absolute"
+              style={{ right: "10px", top: "50%", transform: "translateY(-50%)" }}
+              onClick={handleRemoveImage}
+            >
+              ×
+            </button>
+          )}
         </div>
       </div>
 

@@ -84,3 +84,13 @@
     margin-top: 250px;
   }
   
+
+.btn-simple{
+  background-color: #0f4d8b; /* Fondo al pasar el cursor */
+  color: #fefefe;
+}
+
+.btn-simple:hover {
+  background-color:  #005BA8 ; /* Fondo al pasar el cursor */
+  color: #fefefe;
+}

@@ -7,8 +7,17 @@ import { Form, Row, Col, Spinner } from "react-bootstrap";
 import ImageUploader from "../../../components/ImagenUploager/ImagenUploadre";
 import { compressImage } from "../../../utils/CompressImage/CompressImage";
 import useGetCategorias from "../../../hooks/categorias/UseGetCategorias";
-import { crearPayloadPrecioProducto, crearPayloadProducto, crearPayloadProductoImagen, resetForm, } from "./IngresarProductosUtils"; // Importa las funciones de utilidad
-import { ingresarPrecioProducto, ingresarProducto, ingresarProductoImagen,} from "../../../services/productos/productos.service";
+import {
+  crearPayloadPrecioProducto,
+  crearPayloadProducto,
+  crearPayloadProductoImagen,
+  resetForm,
+} from "./IngresarProductosUtils"; // Importa las funciones de utilidad
+import {
+  ingresarPrecioProducto,
+  ingresarProducto,
+  ingresarProductoImagen,
+} from "../../../services/productos/productos.service";
 import SuccessPopup from "../../../components/Popup/SuccessPopup";
 import ErrorPopup from "../../../components/Popup/ErrorPopUp";
 
@@ -16,14 +25,20 @@ function IngresarProductos() {
   const [isPopupOpen, setIsPopupOpen] = useState(false); // Abrir popup de éxito
   const [isPopupErrorOpen, setIsPopupErrorOpen] = useState(false); // Abrir popup de error
   const [errorPopupMessage, setErrorPopupMessage] = useState(""); // Mensaje de error
+  const [isLoading, setIsLoading] = useState(false); // Estado para el loading del input
   const navigate = useNavigate();
   const [selectedImage, setSelectedImage] = useState(null); // Estado para la imagen seleccionada
   const [imagePreview, setImagePreview] = useState(null); // Estado para la vista previa de la imagen
-  const { register, handleSubmit, reset, formState: { errors }, } = useForm({ defaultValues: { idCategoria: "" } }); 
+  const [isResetImageInput, setIsResetImageInput] = useState(true); // Estado para resetear el input de la imagen
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm({ defaultValues: { idCategoria: "" } });
   const { categorias, loadingCategorias } = useGetCategorias();
-  const [ isResetImageInput, setIsResetImageInput ] = useState(false);
 
-  // Maneja el cambio de ima gen
+  // Maneja el cambio de imagen
   const handleImageChange = (file, imageUrl) => {
     setSelectedImage(file);
     setImagePreview(imageUrl);
@@ -31,6 +46,7 @@ function IngresarProductos() {
 
   // Función para enviar el formulario
   const onSubmit = async (data) => {
+    setIsLoading(true); // Activar el loading del input
     try {
       let resIngresoProducto;
       let imageBase64 = null;
@@ -60,15 +76,16 @@ function IngresarProductos() {
         resetForm(reset, setSelectedImage, setImagePreview, setIsResetImageInput);
       }
     } catch (error) {
-      console.log(error)
-      if(error.status === 409){
+      console.log(error);
+      if (error.status === 409) {
         setErrorPopupMessage("Ya existe un producto con el nombre ingresado.");
         setIsPopupErrorOpen(true);
-        return
+      } else {
+        setErrorPopupMessage("Hubo un error al ingresar el producto. Inténtelo de nuevo.");
+        setIsPopupErrorOpen(true);
       }
-      setErrorPopupMessage("Hubo un error al ingresar el producto. Inténtelo de nuevo.");
-      setIsPopupErrorOpen(true);
-      return
+    } finally {
+      setIsLoading(false); // Desactivar el loading del input
     }
   };
 
@@ -99,17 +116,28 @@ function IngresarProductos() {
           {/* Nombre del producto */}
           <Form.Group className="mb-3">
             <Form.Label className="label-title">Nombre del Producto</Form.Label>
-            <Form.Control
-              id="nombreProducto"
-              className="input-data"
-              type="text"
-              placeholder="Ingrese el nombre del producto"
-              {...register("nombreProducto", { required: "El nombre del producto es obligatorio." })}
-              isInvalid={!!errors.nombreProducto}
-            />
-            <Form.Control.Feedback type="invalid">
-              {errors.nombreProducto?.message}
-            </Form.Control.Feedback>
+            <div className="position-relative">
+              <Form.Control
+                id="nombreProducto"
+                className="input-data"
+                type="text"
+                placeholder="Ingrese el nombre del producto"
+                {...register("nombreProducto", { required: "El nombre del producto es obligatorio." })}
+                isInvalid={!!errors.nombreProducto}
+                disabled={isLoading} // Deshabilitar el input cuando isLoading es true
+              />
+              {isLoading && ( // Mostrar spinner cuando isLoading es true
+                <div
+                  className="position-absolute"
+                  style={{ top: "50%", right: "10px", transform: "translateY(-50%)" }}
+                >
+                  <Spinner animation="border" size="sm" />
+                </div>
+              )}
+              <Form.Control.Feedback type="invalid">
+                {errors.nombreProducto?.message}
+              </Form.Control.Feedback>
+            </div>
           </Form.Group>
 
           {/* Categoría del producto */}
@@ -124,6 +152,7 @@ function IngresarProductos() {
               <Form.Select
                 {...register("idCategoria", { required: "Debe seleccionar una categoría." })}
                 className={`input-data ${errors.idCategoria ? "is-invalid" : ""}`}
+                disabled={isLoading} // Deshabilitar el select cuando isLoading es true
               >
                 <option value="">Selecciona una categoría...</option>
                 {categorias.map((categoria) => (
@@ -150,6 +179,7 @@ function IngresarProductos() {
                     min: { value: 1, message: "La cantidad debe ser mayor a 0." },
                   })}
                   isInvalid={!!errors.cantidad}
+                  disabled={isLoading} // Deshabilitar el input cuando isLoading es true
                 />
                 <Form.Control.Feedback type="invalid">
                   {errors.cantidad?.message}
@@ -169,6 +199,7 @@ function IngresarProductos() {
                     min: { value: 0.01, message: "El precio debe ser mayor a 0." },
                   })}
                   isInvalid={!!errors.precio}
+                  disabled={isLoading} // Deshabilitar el input cuando isLoading es true
                 />
                 <Form.Control.Feedback type="invalid">
                   {errors.precio?.message}
@@ -183,19 +214,24 @@ function IngresarProductos() {
             imagePreview={imagePreview}
             labelName={"Imagen del producto"}
             isReset={isResetImageInput}
+            disabled={isLoading} // Deshabilitar el input de imagen cuando isLoading es true
           />
 
           {/* Botón de enviar */}
           <div className="text-center">
-            <button type="submit" className="btn bt-general">
-              Ingresar Producto
+            <button type="submit" className="btn bt-general" disabled={isLoading}>
+              {isLoading ? (
+                <>
+                  <Spinner animation="border" size="sm" className="me-2" />
+                  Procesando...
+                </>
+              ) : (
+                "Ingresar Producto"
+              )}
             </button>
           </div>
         </div>
       </Form>
-
-      {/*---------------------------PopUp de confirmacion y errores-----------------------------------------
-      --------------------------------------------------------------------------------------------------- */ }
 
       {/* Popup de éxito */}
       <SuccessPopup
