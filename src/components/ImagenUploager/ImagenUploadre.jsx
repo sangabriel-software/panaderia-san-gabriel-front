@@ -1,9 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react"; // Importa useEffect
 import { Form, Spinner } from "react-bootstrap";
 
-function ImageUploader({ labelName, onImageChange, imagePreview }) {
+function ImageUploader({ labelName, onImageChange, imagePreview, isReset }) {
   const [imageLoading, setImageLoading] = useState(false);
   const [imageName, setImageName] = useState(""); // Estado para guardar el nombre del archivo
+
+  // Efecto para manejar cambios en isReset
+  useEffect(() => {
+    if (isReset) {
+      setImageName(""); // Resetea el nombre de la imagen cuando isReset es true
+    }
+  }, [isReset]);
 
   const handleImageChange = (event) => {
     setImageLoading(true); // Activar el spinner antes de cargar la imagen
@@ -83,10 +90,10 @@ function ImageUploader({ labelName, onImageChange, imagePreview }) {
               <>
                 <Spinner animation="border" size="sm" /> Cargando...
               </>
-            ) : imageName ? (
-              imageName
-            ) : (
+            ) : isReset ? ( // Si isReset es true, muestra "Seleccionar archivo"
               "Seleccionar archivo"
+            ) : (
+              imageName // Si isReset es false, muestra el nombre de la imagen
             )}
           </span>
         </div>

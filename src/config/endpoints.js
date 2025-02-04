@@ -25,7 +25,8 @@ const putEndpoints = {
 const deleteEndpoints = {
     ELIMINAR_ROL: "/eliminarRol",
     ELINAR_PERMISOS: "eliminarRolPermisosBatch",
-    ELMINAR_USUARIOS: "eliminarUsuario"
+    ELMINAR_USUARIOS: "eliminarUsuario",
+    DESACTIVAR_PRODUCTOS: "desactivarProducto"
 };
 
 

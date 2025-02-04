@@ -1,5 +1,5 @@
 import api from "../../config/api";
-import { getEndpoints, postEndpoints } from "../../config/endpoints";
+import { deleteEndpoints, getEndpoints, postEndpoints } from "../../config/endpoints";
 
 
 export const ingresarProducto = async (dataProducto) => {
@@ -36,4 +36,14 @@ export const consultarProductosService = async () => {
     } catch (error) {
       throw error;
     }
+}
+
+export const desactivarProductosService = async (idProducto) => {
+  try {
+    const response = await api.delete(`${deleteEndpoints.DESACTIVAR_PRODUCTOS}/${idProducto}`); 
+      return response.data;
+  } catch (error) {
+    console.log(error)
+    throw error;
+  }
 }
