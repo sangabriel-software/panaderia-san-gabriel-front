@@ -9,8 +9,10 @@ function ImageUploader({ labelName, onImageChange, imagePreview, isReset }) {
   useEffect(() => {
     if (isReset) {
       setImageName("");
+      setInputKey(Date.now()); // Fuerza el reinicio del input file
+      onImageChange(null, null);
     }
-  }, [isReset]);
+  }, [isReset, onImageChange]);
 
   const handleImageChange = (event) => {
     setImageLoading(true);
@@ -43,7 +45,7 @@ function ImageUploader({ labelName, onImageChange, imagePreview, isReset }) {
       <Form.Label className="label-title">{labelName}</Form.Label>
       <div className="position-relative d-flex justify-content-center w-100">
         <input
-          key={inputKey} // Reinicia el input cuando se elimina la imagen
+          key={inputKey} // Reinicia el input cuando se elimina la imagen o se resetea
           type="file"
           accept="image/*"
           className="d-none"
@@ -96,9 +98,9 @@ function ImageUploader({ labelName, onImageChange, imagePreview, isReset }) {
               <>
                 <Spinner animation="border" size="sm" /> Cargando...
               </>
-            ) : imageName || "Seleccionar archivo"}
+            ) : imageName || "Seleccionar imagen"}
           </span>
-          {imageName && (
+          {imageName && !isReset && (
             <button
               type="button"
               className="btn btn-danger btn-sm position-absolute"
@@ -111,7 +113,7 @@ function ImageUploader({ labelName, onImageChange, imagePreview, isReset }) {
         </div>
       </div>
 
-      {imagePreview && (
+      {imagePreview && !isReset && (
         <div className="d-flex justify-content-center mt-3">
           <img
             src={imagePreview}

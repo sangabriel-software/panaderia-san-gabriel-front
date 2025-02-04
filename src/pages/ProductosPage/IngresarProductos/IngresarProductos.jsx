@@ -29,7 +29,7 @@ function IngresarProductos() {
   const navigate = useNavigate();
   const [selectedImage, setSelectedImage] = useState(null); // Estado para la imagen seleccionada
   const [imagePreview, setImagePreview] = useState(null); // Estado para la vista previa de la imagen
-  const [isResetImageInput, setIsResetImageInput] = useState(true); // Estado para resetear el input de la imagen
+  const [isResetImageInput, setIsResetImageInput] = useState(false); // Estado para resetear el input de la imagen
   const {
     register,
     handleSubmit,
