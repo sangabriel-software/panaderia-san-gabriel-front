@@ -9,7 +9,6 @@ function ImageUploader({ labelName, onImageChange, imagePreview, isReset }) {
   useEffect(() => {
     if (isReset) {
       setImageName("");
-      setInputKey(Date.now()); // Fuerza el reinicio del input file
       onImageChange(null, null);
     }
   }, [isReset, onImageChange]);

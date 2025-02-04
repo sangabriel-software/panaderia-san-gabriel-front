@@ -5,97 +5,49 @@ import Title from "../../../components/Title/Title";
 import { useNavigate } from "react-router";
 import { Form, Row, Col, Spinner } from "react-bootstrap";
 import ImageUploader from "../../../components/ImagenUploager/ImagenUploadre";
-import { compressImage } from "../../../utils/CompressImage/CompressImage";
 import useGetCategorias from "../../../hooks/categorias/UseGetCategorias";
-import {
-  crearPayloadPrecioProducto,
-  crearPayloadProducto,
-  crearPayloadProductoImagen,
-  resetForm,
-} from "./IngresarProductosUtils"; // Importa las funciones de utilidad
-import {
-  ingresarPrecioProducto,
-  ingresarProducto,
-  ingresarProductoImagen,
-} from "../../../services/productos/productos.service";
+import { handleIngresarProductoSubmit, resetForm } from "./IngresarProductosUtils";
 import SuccessPopup from "../../../components/Popup/SuccessPopup";
 import ErrorPopup from "../../../components/Popup/ErrorPopUp";
 
 function IngresarProductos() {
-  const [isPopupOpen, setIsPopupOpen] = useState(false); // Abrir popup de éxito
-  const [isPopupErrorOpen, setIsPopupErrorOpen] = useState(false); // Abrir popup de error
-  const [errorPopupMessage, setErrorPopupMessage] = useState(""); // Mensaje de error
-  const [isLoading, setIsLoading] = useState(false); // Estado para el loading del input
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [isPopupErrorOpen, setIsPopupErrorOpen] = useState(false);
+  const [errorPopupMessage, setErrorPopupMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const [selectedImage, setSelectedImage] = useState(null); // Estado para la imagen seleccionada
-  const [imagePreview, setImagePreview] = useState(null); // Estado para la vista previa de la imagen
-  const [isResetImageInput, setIsResetImageInput] = useState(false); // Estado para resetear el input de la imagen
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm({ defaultValues: { idCategoria: "" } });
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [isResetImageInput, setIsResetImageInput] = useState(false);
+  const { register, handleSubmit, reset, formState: { errors }, } = useForm({ defaultValues: { idCategoria: "" } });
   const { categorias, loadingCategorias } = useGetCategorias();
 
-  // Maneja el cambio de imagen
   const handleImageChange = (file, imageUrl) => {
+    setIsResetImageInput(false);
     setSelectedImage(file);
     setImagePreview(imageUrl);
   };
 
-  // Función para enviar el formulario
-  const onSubmit = async (data) => {
-    setIsLoading(true); // Activar el loading del input
-    try {
-      let resIngresoProducto;
-      let imageBase64 = null;
-
-      // Comprime la imagen si está seleccionada
-      if (selectedImage) {
-        imageBase64 = await compressImage(selectedImage, 20);
-      }
-
-      // Crea el payload del producto y lo envía
-      const payloadProducto = crearPayloadProducto(data);
-      resIngresoProducto = await ingresarProducto(payloadProducto);
-
-      if (resIngresoProducto.status === 201) {
-        // Crea el payload del precio y lo envía
-        const payloadPrecio = crearPayloadPrecioProducto(data, resIngresoProducto.idProducto);
-        const resIngresoPrecio = await ingresarPrecioProducto(payloadPrecio);
-
-        // Si hay imagen, la envía
-        if (resIngresoPrecio.status === 201 && selectedImage) {
-          const payloadImagen = crearPayloadProductoImagen(resIngresoProducto.idProducto, imageBase64);
-          await ingresarProductoImagen(payloadImagen);
-        }
-
-        // Muestra el popup de éxito y limpia el formulario
-        setIsPopupOpen(true);
-        resetForm(reset, setSelectedImage, setImagePreview, setIsResetImageInput);
-      }
-    } catch (error) {
-      console.log(error);
-      if (error.status === 409) {
-        setErrorPopupMessage("Ya existe un producto con el nombre ingresado.");
-        setIsPopupErrorOpen(true);
-      } else {
-        setErrorPopupMessage("Hubo un error al ingresar el producto. Inténtelo de nuevo.");
-        setIsPopupErrorOpen(true);
-      }
-    } finally {
-      setIsLoading(false); // Desactivar el loading del input
-    }
+  const onSubmit = (data) => {
+    handleIngresarProductoSubmit(
+      data,
+      setSelectedImage,
+      selectedImage,
+      setImagePreview,
+      setIsResetImageInput,
+      setIsPopupOpen,
+      setErrorPopupMessage,
+      setIsPopupErrorOpen,
+      setIsLoading,
+      reset
+    );
   };
 
   return (
     <div className="container justify-content-center">
-      {/* Título del formulario */}
       <div className="text-center mb-3">
         <div className="row">
           <div className="col-2">
-            {/* Botón de volver */}
             <button
               className="btn bt-return rounded-circle d-flex align-items-center justify-content-center shadow"
               style={{ width: "40px", height: "40px" }}
@@ -110,10 +62,8 @@ function IngresarProductos() {
         </div>
       </div>
 
-      {/* Formulario */}
       <Form onSubmit={handleSubmit(onSubmit)} className="row justify-content-center">
         <div className="col-lg-6 col-md-8 col-sm-10">
-          {/* Nombre del producto */}
           <Form.Group className="mb-3">
             <Form.Label className="label-title">Nombre del Producto</Form.Label>
             <div className="position-relative">
@@ -124,9 +74,9 @@ function IngresarProductos() {
                 placeholder="Ingrese el nombre del producto"
                 {...register("nombreProducto", { required: "El nombre del producto es obligatorio." })}
                 isInvalid={!!errors.nombreProducto}
-                disabled={isLoading} // Deshabilitar el input cuando isLoading es true
+                disabled={isLoading}
               />
-              {isLoading && ( // Mostrar spinner cuando isLoading es true
+              {isLoading && (
                 <div
                   className="position-absolute"
                   style={{ top: "50%", right: "10px", transform: "translateY(-50%)" }}
@@ -140,7 +90,6 @@ function IngresarProductos() {
             </div>
           </Form.Group>
 
-          {/* Categoría del producto */}
           <Form.Group className="mb-3">
             <Form.Label className="label-title">Categoría del Producto</Form.Label>
             {loadingCategorias ? (
@@ -152,7 +101,7 @@ function IngresarProductos() {
               <Form.Select
                 {...register("idCategoria", { required: "Debe seleccionar una categoría." })}
                 className={`input-data ${errors.idCategoria ? "is-invalid" : ""}`}
-                disabled={isLoading} // Deshabilitar el select cuando isLoading es true
+                disabled={isLoading}
               >
                 <option value="">Selecciona una categoría...</option>
                 {categorias.map((categoria) => (
@@ -165,7 +114,6 @@ function IngresarProductos() {
             {errors.idCategoria && <div className="text-danger">{errors.idCategoria.message}</div>}
           </Form.Group>
 
-          {/* Cantidad y precio */}
           <Row className="mb-3">
             <Col xs={6}>
               <Form.Group>
@@ -179,7 +127,7 @@ function IngresarProductos() {
                     min: { value: 1, message: "La cantidad debe ser mayor a 0." },
                   })}
                   isInvalid={!!errors.cantidad}
-                  disabled={isLoading} // Deshabilitar el input cuando isLoading es true
+                  disabled={isLoading}
                 />
                 <Form.Control.Feedback type="invalid">
                   {errors.cantidad?.message}
@@ -199,7 +147,7 @@ function IngresarProductos() {
                     min: { value: 0.01, message: "El precio debe ser mayor a 0." },
                   })}
                   isInvalid={!!errors.precio}
-                  disabled={isLoading} // Deshabilitar el input cuando isLoading es true
+                  disabled={isLoading}
                 />
                 <Form.Control.Feedback type="invalid">
                   {errors.precio?.message}
@@ -208,16 +156,13 @@ function IngresarProductos() {
             </Col>
           </Row>
 
-          {/* Subida de imagen */}
           <ImageUploader
             onImageChange={handleImageChange}
             imagePreview={imagePreview}
             labelName={"Imagen del producto"}
             isReset={isResetImageInput}
-            disabled={isLoading} // Deshabilitar el input de imagen cuando isLoading es true
           />
 
-          {/* Botón de enviar */}
           <div className="text-center">
             <button type="submit" className="btn bt-general" disabled={isLoading}>
               {isLoading ? (
@@ -233,7 +178,6 @@ function IngresarProductos() {
         </div>
       </Form>
 
-      {/* Popup de éxito */}
       <SuccessPopup
         isOpen={isPopupOpen}
         onClose={() => setIsPopupOpen(false)}
@@ -248,7 +192,6 @@ function IngresarProductos() {
         }}
       />
 
-      {/* Popup de error */}
       <ErrorPopup
         isOpen={isPopupErrorOpen}
         onClose={() => setIsPopupErrorOpen(false)}
