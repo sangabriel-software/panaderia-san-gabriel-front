@@ -1,0 +1,32 @@
+/* Contenedor de los inputs */
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+  }
+  
+  /* Input estándar con padding derecho extra */
+  .input-field {
+    width: 100%;
+    padding-right: 35px; /* Espacio para la "X" o el ícono */
+  }
+  
+  /* Icono dentro del input */
+  .input-icon {
+    position: absolute;
+    right: 10px;
+    font-size: 18px;
+    color: #666;
+    cursor: pointer;
+  }
+  
+  /* Icono de la "X" para limpiar */
+  .input-icon:hover {
+    color: #000;
+  }
+  
+  /* Ícono del dropdown */
+  .dropdown-icon {
+    pointer-events: none; /* Evita que el usuario interactúe con el ícono */
+  }

@@ -12,8 +12,11 @@ import CardProductos from "../../../components/CardProductos/CardPoductos";
 import { useNavigate } from "react-router";
 import Alert from "../../../components/Alerts/Alert";
 import {
+  BsChevronBarDown,
+  BsChevronDown,
   BsExclamationTriangleFill,
   BsFillInfoCircleFill,
+  BsX,
 } from "react-icons/bs";
 import {
   handleConfirmDeletePreoducto,
@@ -24,6 +27,7 @@ import ErrorPopup from "../../../components/Popup/ErrorPopUp";
 import ModalIngreso from "../../../components/ModalGenerico/Modal"; // Importa el modal
 import { Form, InputGroup } from "react-bootstrap"; // Para los inputs del modal
 import useGetCategorias from "../../../hooks/categorias/UseGetCategorias";
+import "./ManageProducts.css";
 
 const ManageProducts = () => {
   const {
@@ -87,7 +91,8 @@ const ManageProducts = () => {
       currentValues.nombreProducto !== initialProductValues.nombreProducto ||
       Number(currentValues.idCategoria) !==
         Number(initialProductValues.idCategoria) ||
-      Number(currentValues.cantidad) !== Number(initialProductValues.cantidad) ||
+      Number(currentValues.cantidad) !==
+        Number(initialProductValues.cantidad) ||
       Number(currentValues.precio) !== Number(initialProductValues.precio);
 
     setHasChanges(hasChangesDetected);
@@ -123,9 +128,7 @@ const ManageProducts = () => {
 
       // Actualiza la lista de productos localmente
       const updatedProductos = productos.map((p) =>
-        p.idProducto === selectedProduct.idProducto
-          ? { ...p, ...data }
-          : p
+        p.idProducto === selectedProduct.idProducto ? { ...p, ...data } : p
       );
       setProductos(updatedProductos);
 
@@ -215,141 +218,125 @@ const ManageProducts = () => {
 
       {/* Modal para modificación de productos */}
       <ModalIngreso
-        show={showModifyModal}
-        onHide={() => setShowModifyModal(false)}
-        title="Modificar Producto"
-        onConfirm={handleSubmit(onSubmit)} // Usa handleSubmit de react-hook-form
-        confirmText="Modificar"
-        confirmDisabled={!hasChanges} // Se activa solo si se realizaron cambios en el formulario
-        isLoading={loadingModificar}
-      >
-        {selectedProduct && (
-          <Form>
-            {/* Campo: Nombre del Producto */}
-            <Form.Group className="mb-3">
-              <Form.Label>Nombre del Producto</Form.Label>
-              <InputGroup>
-                <Form.Control
-                  type="text"
-                  placeholder="Ingrese el nombre"
-                  {...register("nombreProducto", {
-                    required: "El nombre del producto es obligatorio.",
-                  })}
-                  isInvalid={!!errors.nombreProducto}
-                />
-                <InputGroup.Text
-                  style={{ cursor: "pointer" }}
-                  onClick={() => setValue("nombreProducto", "")}
-                >
-                  X
-                </InputGroup.Text>
-                {errors.nombreProducto && (
-                  <Form.Control.Feedback type="invalid">
-                    {errors.nombreProducto.message}
-                  </Form.Control.Feedback>
-                )}
-              </InputGroup>
-            </Form.Group>
-
-            {/* Campo: Categoría */}
-            <Form.Group className="mb-3">
-              <Form.Label>Categoría</Form.Label>
-              <Form.Control
-                as="select"
-                {...register("idCategoria", {
-                  required: "La categoría es obligatoria.",
-                })}
-                isInvalid={!!errors.idCategoria}
-              >
-                {loadingCategorias ? (
-                  <option>Cargando categorías...</option>
-                ) : showErrorCategorias ? (
-                  <option>Error al cargar categorías</option>
-                ) : (
-                  categoriasModify.map((categoria) => (
-                    <option
-                      key={categoria.idCategoria}
-                      value={categoria.idCategoria}
-                    >
-                      {categoria.nombreCategoria}
-                    </option>
-                  ))
-                )}
-              </Form.Control>
-              {errors.idCategoria && (
-                <Form.Control.Feedback type="invalid">
-                  {errors.idCategoria.message}
-                </Form.Control.Feedback>
-              )}
-            </Form.Group>
-
-            {/* Campos: Cantidad y Precio (uno al lado del otro) */}
-            <div className="row">
-              <div className="col-md-6 mb-3">
-                <Form.Group>
-                  <Form.Label>Cantidad</Form.Label>
-                  <InputGroup>
-                    <Form.Control
-                      type="number"
-                      placeholder="Ingrese la cantidad"
-                      {...register("cantidad", {
-                        required: "La cantidad es obligatoria.",
-                        min: {
-                          value: 1,
-                          message: "La cantidad debe ser mayor a 0.",
-                        },
-                      })}
-                      isInvalid={!!errors.cantidad}
-                    />
-                    <InputGroup.Text
-                      style={{ cursor: "pointer" }}
-                      onClick={() => setValue("cantidad", "")}
-                    >
-                      X
-                    </InputGroup.Text>
-                    {errors.cantidad && (
-                      <Form.Control.Feedback type="invalid">
-                        {errors.cantidad.message}
-                      </Form.Control.Feedback>
-                    )}
-                  </InputGroup>
-                </Form.Group>
-              </div>
-              <div className="col-md-6 mb-3">
-                <Form.Group>
-                  <Form.Label>Precio</Form.Label>
-                  <InputGroup>
-                    <Form.Control
-                      type="number"
-                      step="0.01"
-                      placeholder="Ingrese el precio"
-                      {...register("precio", {
-                        required: "El precio es obligatorio.",
-                        min: {
-                          value: 0.01,
-                          message: "El precio debe ser mayor a 0.",
-                        },
-                      })}
-                      isInvalid={!!errors.precio}
-                    />
-                    <InputGroup.Text
-                      style={{ cursor: "pointer" }}
-                      onClick={() => setValue("precio", "")}
-                    >
-                      X
-                    </InputGroup.Text>
-                    {errors.precio && (
-                      <Form.Control.Feedback type="invalid">
-                        {errors.precio.message}
-                      </Form.Control.Feedback>
-                    )}
-                  </InputGroup>
-                </Form.Group>
-              </div>
-            </div>
-          </Form>
+  show={showModifyModal}
+  onHide={() => setShowModifyModal(false)}
+  title="Modificar Producto"
+  onConfirm={handleSubmit(onSubmit)}
+  confirmText="Modificar"
+  confirmDisabled={!hasChanges}
+  isLoading={loadingModificar}
+>
+  {selectedProduct && (
+    <Form>
+      {/* Campo: Nombre del Producto */}
+      <Form.Group className="mb-3">
+        <Form.Label>Nombre del Producto</Form.Label>
+        <div className="input-wrapper">
+          <Form.Control
+            type="text"
+            placeholder="Ingrese el nombre"
+            {...register("nombreProducto", {
+              required: "El nombre del producto es obligatorio.",
+            })}
+            isInvalid={!!errors.nombreProducto}
+            className="input-field"
+          />
+          <BsX className="input-icon" onClick={() => setValue("nombreProducto", "")} />
+        </div>
+        {errors.nombreProducto && (
+          <Form.Control.Feedback type="invalid">
+            {errors.nombreProducto.message}
+          </Form.Control.Feedback>
         )}
-      </ModalIngreso>
+      </Form.Group>
+
+      {/* Campo: Categoría */}
+      <Form.Group className="mb-3">
+        <Form.Label>Categoría</Form.Label>
+        <div className="input-wrapper">
+          <Form.Select
+            {...register("idCategoria", {
+              required: "La categoría es obligatoria.",
+            })}
+            isInvalid={!!errors.idCategoria}
+            className="input-field"
+          >
+            <option value="">Selecciona una categoría...</option>
+            {loadingCategorias ? (
+              <option>Cargando categorías...</option>
+            ) : showErrorCategorias ? (
+              <option>Error al cargar categorías</option>
+            ) : (
+              categoriasModify.map((categoria) => (
+                <option key={categoria.idCategoria} value={categoria.idCategoria}>
+                  {categoria.nombreCategoria}
+                </option>
+              ))
+            )}
+          </Form.Select>
+          <BsChevronDown className="input-icon dropdown-icon" />
+        </div>
+        {errors.idCategoria && (
+          <Form.Control.Feedback type="invalid">
+            {errors.idCategoria.message}
+          </Form.Control.Feedback>
+        )}
+      </Form.Group>
+
+      {/* Campos: Cantidad y Precio */}
+      <div className="row">
+        <div className="col-md-6 mb-3">
+          <Form.Group>
+            <Form.Label>Cantidad</Form.Label>
+            <div className="input-wrapper">
+              <Form.Control
+                type="number"
+                placeholder="Ingrese la cantidad"
+                {...register("cantidad", {
+                  required: "La cantidad es obligatoria.",
+                  min: { value: 1, message: "La cantidad debe ser mayor a 0." },
+                })}
+                isInvalid={!!errors.cantidad}
+                className="input-field"
+              />
+              <BsX className="input-icon" onClick={() => setValue("cantidad", "")} />
+            </div>
+            {errors.cantidad && (
+              <Form.Control.Feedback type="invalid">
+                {errors.cantidad.message}
+              </Form.Control.Feedback>
+            )}
+          </Form.Group>
+        </div>
+        <div className="col-md-6 mb-3">
+          <Form.Group>
+            <Form.Label>Precio</Form.Label>
+            <div className="input-wrapper">
+              <Form.Control
+                type="number"
+                step="0.01"
+                placeholder="Ingrese el precio"
+                {...register("precio", {
+                  required: "El precio es obligatorio.",
+                  min: { value: 0.01, message: "El precio debe ser mayor a 0." },
+                })}
+                isInvalid={!!errors.precio}
+                className="input-field"
+              />
+              <BsX className="input-icon" onClick={() => setValue("precio", "")} />
+            </div>
+            {errors.precio && (
+              <Form.Control.Feedback type="invalid">
+                {errors.precio.message}
+              </Form.Control.Feedback>
+            )}
+          </Form.Group>
+        </div>
+      </div>
+    </Form>
+  )}
+</ModalIngreso>;
+      
 
       {/* Resto del código (alertas, popups, etc.) */}
       {filteredProductos.length === 0 &&
