@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useForm } from "react-hook-form"; // Importa useForm
 import { useGetProductosYPrecios } from "../../../hooks/productosprecios/useGetProductosYprecios";
 import {
   useCategoriasYFiltrado,
@@ -21,7 +22,7 @@ import {
 import ConfirmPopUp from "../../../components/Popup/ConfirmPopup";
 import ErrorPopup from "../../../components/Popup/ErrorPopUp";
 import ModalIngreso from "../../../components/ModalGenerico/Modal"; // Importa el modal
-import { Form } from "react-bootstrap"; // Para los inputs del modal
+import { Form, InputGroup } from "react-bootstrap"; // Para los inputs del modal
 import useGetCategorias from "../../../hooks/categorias/UseGetCategorias";
 
 const ManageProducts = () => {
@@ -47,7 +48,7 @@ const ManageProducts = () => {
   const [showModifyModal, setShowModifyModal] = useState(false); // Estado para mostrar el modal de modificación
   const [selectedProduct, setSelectedProduct] = useState(null); // Estado para almacenar el producto seleccionado
   const [initialProductValues, setInitialProductValues] = useState(null); // Estado para almacenar los valores iniciales
-  const [hasChanges, setHasChanges] = useState(true); // Estado para detectar cambios
+  const [hasChanges, setHasChanges] = useState(false); // Estado para detectar cambios
   const navigate = useNavigate();
   const {
     categorias: categoriasModify,
@@ -58,11 +59,22 @@ const ManageProducts = () => {
 
   const [loadingModificar, setLoadingModificar] = useState(false);
 
+  // React Hook Form
+  const {
+    register,
+    handleSubmit,
+    reset,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm();
+
   // Función para manejar el clic en el botón "Modificar"
   const handleModifyClick = (producto) => {
     setSelectedProduct(producto); // Guarda el producto seleccionado
     setInitialProductValues({ ...producto }); // Guarda los valores iniciales
     setShowModifyModal(true); // Abre el modal de modificación
+    reset(producto); // Resetea el formulario con los valores del producto seleccionado
     setHasChanges(false); // Reinicia el estado de cambios
   };
 
@@ -70,25 +82,27 @@ const ManageProducts = () => {
   const checkForChanges = () => {
     if (!selectedProduct || !initialProductValues) return;
 
+    const currentValues = watch(); // Obtiene los valores actuales del formulario
     const hasChangesDetected =
-      selectedProduct.nombreProducto !== initialProductValues.nombreProducto ||
-      Number(selectedProduct.idCategoria) !==
+      currentValues.nombreProducto !== initialProductValues.nombreProducto ||
+      Number(currentValues.idCategoria) !==
         Number(initialProductValues.idCategoria) ||
-      Number(selectedProduct.cantidad) !==
-        Number(initialProductValues.cantidad) ||
-      Number(selectedProduct.precio) !== Number(initialProductValues.precio);
+      Number(currentValues.cantidad) !== Number(initialProductValues.cantidad) ||
+      Number(currentValues.precio) !== Number(initialProductValues.precio);
 
     setHasChanges(hasChangesDetected);
   };
 
-  // Efecto para verificar cambios cada vez que se modifica el producto seleccionado
+  // Efecto para verificar cambios cada vez que se modifica el formulario
   useEffect(() => {
     checkForChanges();
-  }, [selectedProduct]);
+  }, [watch()]); // Observa los cambios en los campos del formulario
 
   // Función para guardar los cambios del producto
-  const handleSaveChanges = async () => {
-    if (!selectedProduct || !hasChanges) return;
+  const onSubmit = async (data) => {
+    if (!hasChanges) return;
+
+    setLoadingModificar(true);
 
     try {
       // Aquí iría la lógica para actualizar el producto en el backend
@@ -99,7 +113,7 @@ const ManageProducts = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(selectedProduct),
+          body: JSON.stringify(data),
         }
       );
 
@@ -109,7 +123,9 @@ const ManageProducts = () => {
 
       // Actualiza la lista de productos localmente
       const updatedProductos = productos.map((p) =>
-        p.idProducto === selectedProduct.idProducto ? selectedProduct : p
+        p.idProducto === selectedProduct.idProducto
+          ? { ...p, ...data }
+          : p
       );
       setProductos(updatedProductos);
 
@@ -121,6 +137,8 @@ const ManageProducts = () => {
         "No se pudo actualizar el producto. Inténtalo de nuevo."
       );
       setIsPopupErrorOpen(true);
+    } finally {
+      setLoadingModificar(false);
     }
   };
 
@@ -200,38 +218,48 @@ const ManageProducts = () => {
         show={showModifyModal}
         onHide={() => setShowModifyModal(false)}
         title="Modificar Producto"
-        onConfirm={handleSaveChanges}
+        onConfirm={handleSubmit(onSubmit)} // Usa handleSubmit de react-hook-form
         confirmText="Modificar"
-        confirmDisabled={!hasChanges} // Desactiva el botón si no hay cambios
+        confirmDisabled={!hasChanges} // Se activa solo si se realizaron cambios en el formulario
         isLoading={loadingModificar}
       >
         {selectedProduct && (
           <Form>
+            {/* Campo: Nombre del Producto */}
             <Form.Group className="mb-3">
               <Form.Label>Nombre del Producto</Form.Label>
-              <Form.Control
-                type="text"
-                value={selectedProduct.nombreProducto}
-                onChange={(e) =>
-                  setSelectedProduct({
-                    ...selectedProduct,
-                    nombreProducto: e.target.value,
-                  })
-                }
-              />
+              <InputGroup>
+                <Form.Control
+                  type="text"
+                  placeholder="Ingrese el nombre"
+                  {...register("nombreProducto", {
+                    required: "El nombre del producto es obligatorio.",
+                  })}
+                  isInvalid={!!errors.nombreProducto}
+                />
+                <InputGroup.Text
+                  style={{ cursor: "pointer" }}
+                  onClick={() => setValue("nombreProducto", "")}
+                >
+                  X
+                </InputGroup.Text>
+                {errors.nombreProducto && (
+                  <Form.Control.Feedback type="invalid">
+                    {errors.nombreProducto.message}
+                  </Form.Control.Feedback>
+                )}
+              </InputGroup>
             </Form.Group>
 
+            {/* Campo: Categoría */}
             <Form.Group className="mb-3">
               <Form.Label>Categoría</Form.Label>
               <Form.Control
                 as="select"
-                value={selectedProduct.idCategoria}
-                onChange={(e) =>
-                  setSelectedProduct({
-                    ...selectedProduct,
-                    idCategoria: Number(e.target.value), // Convertir a número
-                  })
-                }
+                {...register("idCategoria", {
+                  required: "La categoría es obligatoria.",
+                })}
+                isInvalid={!!errors.idCategoria}
               >
                 {loadingCategorias ? (
                   <option>Cargando categorías...</option>
@@ -248,38 +276,74 @@ const ManageProducts = () => {
                   ))
                 )}
               </Form.Control>
+              {errors.idCategoria && (
+                <Form.Control.Feedback type="invalid">
+                  {errors.idCategoria.message}
+                </Form.Control.Feedback>
+              )}
             </Form.Group>
 
+            {/* Campos: Cantidad y Precio (uno al lado del otro) */}
             <div className="row">
               <div className="col-md-6 mb-3">
                 <Form.Group>
                   <Form.Label>Cantidad</Form.Label>
-                  <Form.Control
-                    type="number"
-                    value={selectedProduct.cantidad}
-                    onChange={(e) =>
-                      setSelectedProduct({
-                        ...selectedProduct,
-                        cantidad: Number(e.target.value), // Convertir a número
-                      })
-                    }
-                  />
+                  <InputGroup>
+                    <Form.Control
+                      type="number"
+                      placeholder="Ingrese la cantidad"
+                      {...register("cantidad", {
+                        required: "La cantidad es obligatoria.",
+                        min: {
+                          value: 1,
+                          message: "La cantidad debe ser mayor a 0.",
+                        },
+                      })}
+                      isInvalid={!!errors.cantidad}
+                    />
+                    <InputGroup.Text
+                      style={{ cursor: "pointer" }}
+                      onClick={() => setValue("cantidad", "")}
+                    >
+                      X
+                    </InputGroup.Text>
+                    {errors.cantidad && (
+                      <Form.Control.Feedback type="invalid">
+                        {errors.cantidad.message}
+                      </Form.Control.Feedback>
+                    )}
+                  </InputGroup>
                 </Form.Group>
               </div>
               <div className="col-md-6 mb-3">
                 <Form.Group>
                   <Form.Label>Precio</Form.Label>
-                  <Form.Control
-                    type="number"
-                    step="0.01"
-                    value={selectedProduct.precio}
-                    onChange={(e) =>
-                      setSelectedProduct({
-                        ...selectedProduct,
-                        precio: Number(e.target.value), // Convertir a número
-                      })
-                    }
-                  />
+                  <InputGroup>
+                    <Form.Control
+                      type="number"
+                      step="0.01"
+                      placeholder="Ingrese el precio"
+                      {...register("precio", {
+                        required: "El precio es obligatorio.",
+                        min: {
+                          value: 0.01,
+                          message: "El precio debe ser mayor a 0.",
+                        },
+                      })}
+                      isInvalid={!!errors.precio}
+                    />
+                    <InputGroup.Text
+                      style={{ cursor: "pointer" }}
+                      onClick={() => setValue("precio", "")}
+                    >
+                      X
+                    </InputGroup.Text>
+                    {errors.precio && (
+                      <Form.Control.Feedback type="invalid">
+                        {errors.precio.message}
+                      </Form.Control.Feedback>
+                    )}
+                  </InputGroup>
                 </Form.Group>
               </div>
             </div>
