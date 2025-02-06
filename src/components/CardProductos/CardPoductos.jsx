@@ -170,7 +170,7 @@ const CardProductos = ({ id, nombreProducto, cantidad, precio, image, showOption
             onClick={(e) => e.stopPropagation()}
           >
             <button
-              className="btn btn-light w-100 text-start mb-1"
+              className="btn btn-light w-100 text-start mb-1 text-warning"
               onClick={(e) => handleOptionClick("modify", e)}
             >
               <FaEdit className="me-2" />
