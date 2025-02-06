@@ -219,7 +219,15 @@ function CreateUsers() {
         isOpen={isPopupOpen}
         onClose={() => setIsPopupOpen(false)} // Cierra el popup
         title="¡Éxito!"
-        message="El usuario ha sido creado correctamente."
+        message={
+          <>
+            El usuario ha sido creado correctamente
+            <br />
+            <span className="text-primary">
+              (El usuario ha sido enviado al correo ingresado)
+            </span>
+          </>
+        }
         nombreBotonVolver="Ver Usuarios"
         nombreBotonNuevo="Nuevo Usuario"
         onViewRoles={() => navigate("/users/users")} // Redirige a Ver Usuarios
