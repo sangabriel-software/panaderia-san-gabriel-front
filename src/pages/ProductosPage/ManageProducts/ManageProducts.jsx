@@ -1,27 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form"; // Importa useForm
 import { useGetProductosYPrecios } from "../../../hooks/productosprecios/useGetProductosYprecios";
-import {
-  useCategoriasYFiltrado,
-  useSerchPrductos,
-} from "./ManageProductsUtils";
+import { checkForChanges, handleModifyClick, useCategoriasYFiltrado, useSerchPrductos, } from "./ManageProductsUtils";
 import CreateButton from "../../../components/CreateButton/CreateButton";
 import SearchInput from "../../../components/SerchInput/SerchInput";
 import Title from "../../../components/Title/Title";
 import CardProductos from "../../../components/CardProductos/CardPoductos";
 import { useNavigate } from "react-router";
 import Alert from "../../../components/Alerts/Alert";
-import {
-  BsChevronBarDown,
-  BsChevronDown,
-  BsExclamationTriangleFill,
-  BsFillInfoCircleFill,
-  BsX,
-} from "react-icons/bs";
-import {
-  handleConfirmDeletePreoducto,
-  handleDeleleProducto,
-} from "../IngresarProductos/IngresarProductosUtils";
+import { BsExclamationTriangleFill, BsFillInfoCircleFill, BsX, } from "react-icons/bs";
+import { handleConfirmDeletePreoducto, handleDeleleProducto, } from "../IngresarProductos/IngresarProductosUtils";
 import ConfirmPopUp from "../../../components/Popup/ConfirmPopup";
 import ErrorPopup from "../../../components/Popup/ErrorPopUp";
 import ModalIngreso from "../../../components/ModalGenerico/Modal"; // Importa el modal
@@ -30,21 +18,9 @@ import useGetCategorias from "../../../hooks/categorias/UseGetCategorias";
 import "./ManageProducts.css";
 
 const ManageProducts = () => {
-  const {
-    productos,
-    loadigProducts,
-    showErrorProductos,
-    showInfoProductos,
-    setProductos,
-  } = useGetProductosYPrecios(); // Consultar productos
-  const { filteredProductos, searchQuery, showNoResults, handleSearch } =
-    useSerchPrductos(productos); // Búsqueda local
-  const {
-    categorias,
-    filteredByCategory,
-    selectedCategory,
-    setSelectedCategory,
-  } = useCategoriasYFiltrado(productos, filteredProductos); // Filtrar por categorías
+  const { productos, loadigProducts, showErrorProductos, showInfoProductos, setProductos, } = useGetProductosYPrecios(); // Consultar productos
+  const { filteredProductos, searchQuery, showNoResults, handleSearch } = useSerchPrductos(productos); // Búsqueda local
+  const { categorias, filteredByCategory, selectedCategory, setSelectedCategory, } = useCategoriasYFiltrado(productos, filteredProductos); // Filtrar por categorías
   const [productoToDelete, setProductoToDelete] = useState(null); // Setea el id a eliminar
   const [isPopupOpen, setIsPopupOpen] = useState(false); // Estado para el popup de confirmación
   const [errorPopupMessage, setErrorPopupMessage] = useState(false); // Setea el mensaje a mostrar
@@ -54,55 +30,18 @@ const ManageProducts = () => {
   const [initialProductValues, setInitialProductValues] = useState(null); // Estado para almacenar los valores iniciales
   const [hasChanges, setHasChanges] = useState(false); // Estado para detectar cambios
   const navigate = useNavigate();
-  const {
-    categorias: categoriasModify,
-    loadingCategorias,
-    showErrorCategorias,
-    showInfoCategorias,
-  } = useGetCategorias();
-
+  const { categorias: categoriasModify, loadingCategorias, showErrorCategorias, showInfoCategorias, } = useGetCategorias();
   const [loadingModificar, setLoadingModificar] = useState(false);
 
   // React Hook Form
-  const {
-    register,
-    handleSubmit,
-    reset,
-    watch,
-    setValue,
-    formState: { errors },
-  } = useForm();
-
-  // Función para manejar el clic en el botón "Modificar"
-  const handleModifyClick = (producto) => {
-    setSelectedProduct(producto); // Guarda el producto seleccionado
-    setInitialProductValues({ ...producto }); // Guarda los valores iniciales
-    setShowModifyModal(true); // Abre el modal de modificación
-    reset(producto); // Resetea el formulario con los valores del producto seleccionado
-    setHasChanges(false); // Reinicia el estado de cambios
-  };
-
-  // Función para verificar cambios en los campos
-  const checkForChanges = () => {
-    if (!selectedProduct || !initialProductValues) return;
-
-    const currentValues = watch(); // Obtiene los valores actuales del formulario
-    const hasChangesDetected =
-      currentValues.nombreProducto !== initialProductValues.nombreProducto ||
-      Number(currentValues.idCategoria) !==
-        Number(initialProductValues.idCategoria) ||
-      Number(currentValues.cantidad) !==
-        Number(initialProductValues.cantidad) ||
-      Number(currentValues.precio) !== Number(initialProductValues.precio);
-
-    setHasChanges(hasChangesDetected);
-  };
+  const { register, handleSubmit, reset, watch, setValue, formState: { errors }, } = useForm();
 
   // Efecto para verificar cambios cada vez que se modifica el formulario
   useEffect(() => {
-    checkForChanges();
+    checkForChanges(selectedProduct, initialProductValues, setHasChanges, watch );
   }, [watch()]); // Observa los cambios en los campos del formulario
 
+  
   // Función para guardar los cambios del producto
   const onSubmit = async (data) => {
     if (!hasChanges) return;
@@ -207,7 +146,7 @@ const ManageProducts = () => {
                     setIsPopupOpen
                   )
                 }
-                onModify={() => handleModifyClick(producto)} // Pasa la función para modificar
+                onModify={() => handleModifyClick(producto, setSelectedProduct, setInitialProductValues, setShowModifyModal, reset, setHasChanges )} // Pasa la función para modificar
               />
             </div>
           ))}
