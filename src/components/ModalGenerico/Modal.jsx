@@ -21,7 +21,7 @@ const ModalIngreso = ({
 }) => {
   return (
     <Modal show={show} onHide={onHide} centered={centered} {...rest}>
-      <Modal.Header closeButton>
+      <Modal.Header className="modal-header" closeButton>
         <Modal.Title className={titleCentered ? "w-100 text-center" : ""}>
           {title}
         </Modal.Title>

@@ -10,4 +10,10 @@
       width: auto; /* Permite que se adapte al contenido sin ocupar todo el ancho */
     }
   }
+
+
+  .modal-header{
+    background-color: #005BA8;
+    color: whitesmoke;
+  }
   
