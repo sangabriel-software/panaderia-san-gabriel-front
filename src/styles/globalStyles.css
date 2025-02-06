@@ -5,11 +5,13 @@
     font-size: 1.2rem;
     border-radius: 10px;
     width: 180px;
+    border-color: #DA1A32;
   }
 
   .bt-cancelar:hover {
     background-color: #AC1528;
     color: #FEFEFE;
+    border-color: #AC1528;
   }
 /*Boton para cancelar procesos*/
 
@@ -94,3 +96,17 @@
   background-color:  #005BA8 ; /* Fondo al pasar el cursor */
   color: #fefefe;
 }
+
+.btn-type-category{
+  background-color: #0f4d8b; /* Fondo al pasar el cursor */
+  color: #fefefe;
+  font-size: 1.2rem;
+  border-radius: 10px;
+  width: 180px;
+}
+
+.btn-type-category:hover {
+  background-color:  #005BA8 ; /* Fondo al pasar el cursor */
+  color: #fefefe;
+}
+

@@ -3,7 +3,8 @@ const getEndpoints = {
     ALL_PERMISOS: "/consultarPermisos",
     ROL_PERMISOS: "/consultarRolesPermisosId",
     ALL_USERS: "/consultarUsuarios",
-    ALL_PRODUCTOSYPRECIOS: "/consultarPrecios"
+    ALL_PRODUCTOSYPRECIOS: "/consultarPrecios",
+    CONSULTAR_CATEGORIAS: "/consultarcategorias"
 };
 
 const postEndpoints = {
@@ -13,7 +14,8 @@ const postEndpoints = {
     INICIAR_SESION: "/login",
     INGRESAR_PRODUCTO: "/ingresarProducto",
     INGRESAR_PRECIOPRODUCTO: "/ingresarPrecio",
-    INGRESAR_IMAGEN_PRODUCTO: "/ingresar-img-producto"
+    INGRESAR_IMAGEN_PRODUCTO: "/ingresar-img-producto",
+    INGRESAR_CATEGORIA: "/ingresarcategoria"
 };
 
 const putEndpoints = {
