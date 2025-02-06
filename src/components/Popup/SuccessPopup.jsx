@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
-import { Modal, Button } from "react-bootstrap"; // Importa los componentes de Bootstrap
-import "bootstrap/dist/css/bootstrap.min.css"; // Asegúrate de importar Bootstrap
+import { Modal, Button } from "react-bootstrap";
+import "bootstrap/dist/css/bootstrap.min.css";
 import "./Popups.css";
 
 const SuccessPopup = ({
@@ -15,11 +15,11 @@ const SuccessPopup = ({
 }) => {
   return (
     <Modal show={isOpen} onHide={onClose} centered>
-            <Modal.Header closeButton className="header-modal position-relative">
-        {/* Contenedor para el ícono y el título */}
-        <div className="d-flex flex-column align-items-center w-100">
-          {/* Ícono centrado */}
-          <div className="error-icon mb-2">
+      {/* Eliminamos la prop "closeButton" y creamos la estructura manualmente */}
+      <Modal.Header className="header-modal position-relative">
+        {/* Contenedor centrado para el ícono y el título */}
+        <div className="w-100 text-center">
+          <div className="success-icon">
             <svg width="40" height="40" viewBox="0 0 24 24">
               <circle cx="12" cy="12" r="10" fill="#28a745" />
               <path
@@ -28,22 +28,23 @@ const SuccessPopup = ({
               />
             </svg>
           </div>
-          {/* Título centrado */}
-          <Modal.Title className="title-modal-error text-center w-100">
-            {title}
-          </Modal.Title>
+          <Modal.Title className="popup-title">{title}</Modal.Title>
         </div>
+        {/* Botón de cerrar posicionado en la esquina superior derecha */}
+        <Button
+          variant="close"
+          onClick={onClose}
+          aria-label="Close"
+          className="position-absolute top-0 end-0 m-2"
+        />
       </Modal.Header>
-      <Modal.Body className="body-modal">
-        {/* Centramos el mensaje */}
-        <p className="popup-message text-center">{message}</p>
+      <Modal.Body className="body-modal text-center">
+        <p className="popup-message">{message}</p>
       </Modal.Body>
       <Modal.Footer className="footer-modal d-flex flex-wrap justify-content-center gap-2">
-        {/* Botón para redirigir a "Ver Roles" */}
         <Button className="btn btn-success" onClick={onViewRoles}>
           {nombreBotonVolver || "Ver Roles"}
         </Button>
-        {/* Botón para crear un nuevo rol */}
         <Button className="btn btn-primary nuevo-bt" onClick={onNewRole}>
           {nombreBotonNuevo || "Nuevo Rol"}
         </Button>

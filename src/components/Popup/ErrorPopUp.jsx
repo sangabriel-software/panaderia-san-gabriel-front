@@ -1,15 +1,15 @@
-import PropTypes from 'prop-types';
-import { Modal, Button } from 'react-bootstrap'; // Importa los componentes de Bootstrap
-import './Popups.css';
+import PropTypes from "prop-types";
+import { Modal, Button } from "react-bootstrap";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "./Popups.css";
 
 const ErrorPopup = ({ isOpen, onClose, title, message }) => {
   return (
     <Modal show={isOpen} onHide={onClose} centered>
-      <Modal.Header closeButton className="header-modal position-relative">
-        {/* Contenedor para el ícono y el título */}
-        <div className="d-flex flex-column align-items-center w-100">
-          {/* Ícono centrado */}
-          <div className="error-icon mb-2">
+      <Modal.Header className="header-modal position-relative">
+        {/* Contenedor centrado para el ícono y el título */}
+        <div className="w-100 text-center">
+          <div className="error-icon">
             <svg width="40" height="40" viewBox="0 0 24 24">
               <circle cx="12" cy="12" r="10" fill="#dc3545" />
               <path
@@ -18,17 +18,21 @@ const ErrorPopup = ({ isOpen, onClose, title, message }) => {
               />
             </svg>
           </div>
-          {/* Título centrado */}
-          <Modal.Title className="title-modal-error text-center w-100">
-            {title}
-          </Modal.Title>
+          <Modal.Title className="popup-title">{title}</Modal.Title>
         </div>
+        {/* Botón de cerrar posicionado en la esquina superior derecha */}
+        <Button
+          variant="close"
+          onClick={onClose}
+          aria-label="Close"
+          className="position-absolute top-0 end-0 m-2"
+        />
       </Modal.Header>
-      <Modal.Body className="body-modal">
-        <p className="popup-message text-center">{message}</p>
+      <Modal.Body className="body-modal text-center">
+        <p className="popup-message">{message}</p>
       </Modal.Body>
       <Modal.Footer className="footer-modal d-flex justify-content-center">
-        <Button className="btn-modal-erro" variant="secondary" onClick={onClose}>
+        <Button className="btn btn-modal-erro " onClick={onClose}>
           Cerrar
         </Button>
       </Modal.Footer>
