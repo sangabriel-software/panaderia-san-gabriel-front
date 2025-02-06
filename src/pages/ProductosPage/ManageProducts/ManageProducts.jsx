@@ -236,7 +236,7 @@ const ManageProducts = () => {
                     required: "El nombre del producto es obligatorio.",
                   })}
                   isInvalid={!!errors.nombreProducto}
-                  className="input-field"
+                  className="input-field input-data"
                 />
                 <BsX
                   className="input-icon"
@@ -259,7 +259,7 @@ const ManageProducts = () => {
                     required: "La categoría es obligatoria.",
                   })}
                   isInvalid={!!errors.idCategoria}
-                  className="input-field"
+                  className="input-field input-data"
                 >
                   <option value="">Selecciona una categoría...</option>
                   {loadingCategorias ? (
@@ -277,7 +277,6 @@ const ManageProducts = () => {
                     ))
                   )}
                 </Form.Select>
-                <BsChevronDown className="input-icon dropdown-icon" />
               </div>
               {errors.idCategoria && (
                 <Form.Control.Feedback type="invalid">
@@ -287,73 +286,72 @@ const ManageProducts = () => {
             </Form.Group>
 
             {/* Campos: Cantidad y Precio */}
-            <div className="row gx-2"> {/* Espaciado horizontal entre columnas */}
-  <div className="col-6 mb-3">
-    <Form.Group>
-      <Form.Label>Cantidad</Form.Label>
-      <div className="input-wrapper">
-        <Form.Control
-          type="number"
-          placeholder="Ingrese la cantidad"
-          {...register("cantidad", {
-            required: "La cantidad es obligatoria.",
-            min: {
-              value: 1,
-              message: "La cantidad debe ser mayor a 0.",
-            },
-          })}
-          isInvalid={!!errors.cantidad}
-          className="input-field"
-        />
-        <BsX
-          className="input-icon"
-          onClick={() => setValue("cantidad", "")}
-        />
-      </div>
-      {errors.cantidad && (
-        <Form.Control.Feedback type="invalid">
-          {errors.cantidad.message}
-        </Form.Control.Feedback>
-      )}
-    </Form.Group>
-  </div>
-
-  <div className="col-6 mb-3">
-    <Form.Group>
-      <Form.Label>Precio</Form.Label>
-      <div className="input-wrapper">
-        <Form.Control
-          type="number"
-          step="0.01"
-          placeholder="Ingrese el precio"
-          {...register("precio", {
-            required: "El precio es obligatorio.",
-            min: {
-              value: 0.01,
-              message: "El precio debe ser mayor a 0.",
-            },
-          })}
-          isInvalid={!!errors.precio}
-          className="input-field"
-        />
-        <BsX
-          className="input-icon"
-          onClick={() => setValue("precio", "")}
-        />
-      </div>
-      {errors.precio && (
-        <Form.Control.Feedback type="invalid">
-          {errors.precio.message}
-        </Form.Control.Feedback>
-      )}
-    </Form.Group>
-  </div>
-</div>
-
+            <div className="row gx-2">
+              {" "}
+              {/* Espaciado horizontal entre columnas */}
+              <div className="col-6 mb-3">
+                <Form.Group>
+                  <Form.Label>Cantidad</Form.Label>
+                  <div className="input-wrapper">
+                    <Form.Control
+                      type="number"
+                      placeholder="Ingrese la cantidad"
+                      {...register("cantidad", {
+                        required: "La cantidad es obligatoria.",
+                        min: {
+                          value: 1,
+                          message: "La cantidad debe ser mayor a 0.",
+                        },
+                      })}
+                      isInvalid={!!errors.cantidad}
+                      className="input-field input-data"
+                    />
+                    <BsX
+                      className="input-icon"
+                      onClick={() => setValue("cantidad", "")}
+                    />
+                  </div>
+                  {errors.cantidad && (
+                    <Form.Control.Feedback type="invalid">
+                      {errors.cantidad.message}
+                    </Form.Control.Feedback>
+                  )}
+                </Form.Group>
+              </div>
+              <div className="col-6 mb-3">
+                <Form.Group>
+                  <Form.Label>Precio</Form.Label>
+                  <div className="input-wrapper">
+                    <Form.Control
+                      type="number"
+                      step="0.01"
+                      placeholder="Ingrese el precio"
+                      {...register("precio", {
+                        required: "El precio es obligatorio.",
+                        min: {
+                          value: 0.01,
+                          message: "El precio debe ser mayor a 0.",
+                        },
+                      })}
+                      isInvalid={!!errors.precio}
+                      className="input-field input-data"
+                    />
+                    <BsX
+                      className="input-icon"
+                      onClick={() => setValue("precio", "")}
+                    />
+                  </div>
+                  {errors.precio && (
+                    <Form.Control.Feedback type="invalid">
+                      {errors.precio.message}
+                    </Form.Control.Feedback>
+                  )}
+                </Form.Group>
+              </div>
+            </div>
           </Form>
         )}
       </ModalIngreso>
-
 
       ;{/* Resto del código (alertas, popups, etc.) */}
       {filteredProductos.length === 0 &&
