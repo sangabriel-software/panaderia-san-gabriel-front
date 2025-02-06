@@ -24,7 +24,7 @@ function Sidebar({ show }) {
         </Nav.Link>
 
         <Nav.Link as={NavLink} to="/productos" className="text-light">
-        <MdOutlineBakeryDining size={25} className="me-2"  color="#FFC107" /> Productos
+        <MdOutlineBakeryDining size={25} className="me-2" /> Productos
         </Nav.Link>
         
 
