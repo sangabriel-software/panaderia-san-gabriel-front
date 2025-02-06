@@ -1,8 +1,7 @@
 import api from "../../config/api";
 import { deleteEndpoints, getEndpoints, postEndpoints } from "../../config/endpoints";
 
-
-export const ingresarProductoService = async (categoria) => {
+export const ingresarCategoriaService = async (categoria) => {
   try {
       const response = await api.post(`${postEndpoints.INGRESAR_CATEGORIA}`, categoria); 
       return response.data;

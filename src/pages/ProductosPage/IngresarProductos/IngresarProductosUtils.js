@@ -73,15 +73,13 @@ export const handleConfirmDeletePreoducto = async (productoToDelete, setProducto
 
 
 // Función para resetear el formulario
-export const resetForm = (reset, setSelectedImage, setImagePreview, setIsResetImageInput) => {
+export const resetForm = (reset, setSelectedImage) => {
   reset(); // Limpia los campos del formulario
   setSelectedImage(null); // Resetea la imagen seleccionada
-  setImagePreview(null); // Resetea la vista previa de la imagen
-  setIsResetImageInput(true);
 };
 
 /* Funcion para ingreso de productos */
-export const handleIngresarProductoSubmit = async (data, setSelectedImage, selectedImage, setImagePreview, setIsResetImageInput,  setIsPopupOpen, setErrorPopupMessage, setIsPopupErrorOpen, setIsLoading, reset) => {
+export const handleIngresarProductoSubmit = async (data, setSelectedImage, selectedImage, setIsPopupOpen, setErrorPopupMessage, setIsPopupErrorOpen, setIsLoading, reset) => {
   setIsLoading(true); // Activar el loading del input
     try {
       let resIngresoProducto;
@@ -109,7 +107,7 @@ export const handleIngresarProductoSubmit = async (data, setSelectedImage, selec
 
         // Muestra el popup de éxito y limpia el formulario
         setIsPopupOpen(true);
-        resetForm(reset, setSelectedImage, setImagePreview, setIsResetImageInput);
+        resetForm(reset, setSelectedImage);
       }
     } catch (error) {
       if (error.status === 409) {

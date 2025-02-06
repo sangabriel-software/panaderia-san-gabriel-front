@@ -1,7 +1,8 @@
 // ModalIngreso.js
 import React from "react";
-import { Modal, Button, Spinner } from "react-bootstrap";
-import "./ModalStyles.css"
+import { Modal, Button, Spinner, Alert } from "react-bootstrap";
+import "./ModalStyles.css";
+import { BsExclamationTriangleFill } from "react-icons/bs";
 
 const ModalIngreso = ({
   show,
@@ -15,6 +16,7 @@ const ModalIngreso = ({
   centered = true,
   titleCentered = true,
   footerCentered = true,
+  isError = false,
   ...rest
 }) => {
   return (
@@ -24,6 +26,13 @@ const ModalIngreso = ({
           {title}
         </Modal.Title>
       </Modal.Header>
+      {isError && (
+        <Alert variant="danger" className="d-flex align-items-center text-center">
+          <BsExclamationTriangleFill className="me-2" />
+          Hubo un error al guardar la información, intente mas tarde.
+        </Alert>
+      )}
+
       <Modal.Body>{children}</Modal.Body>
       <Modal.Footer className={footerCentered ? "justify-content-center" : ""}>
         <div className="w-100 d-flex flex-row justify-content-center">

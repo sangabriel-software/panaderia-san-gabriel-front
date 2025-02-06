@@ -1,113 +1,40 @@
-import React, { useState, useRef, useEffect } from "react";
+import { React, useState,} from "react";
 import { useForm } from "react-hook-form";
 import { BsArrowLeft, BsPlus } from "react-icons/bs";
 import Title from "../../../components/Title/Title";
 import { useNavigate } from "react-router";
-import { Form, Row, Col, Spinner, Button, Modal } from "react-bootstrap";
-import ImageUploader from "../../../components/ImagenUploager/ImagenUploadre";
+import { Form, Row, Col, Spinner, Button } from "react-bootstrap";
 import useGetCategorias from "../../../hooks/categorias/UseGetCategorias";
 import { handleIngresarProductoSubmit, resetForm } from "./IngresarProductosUtils";
 import SuccessPopup from "../../../components/Popup/SuccessPopup";
 import ErrorPopup from "../../../components/Popup/ErrorPopUp";
 import ModalIngreso from "../../../components/ModalGenerico/Modal";
+import { saveCategory } from "../../Categorias/categoriasUtils";
 
 function IngresarProductos() {
+  //variables logica productos
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [isPopupErrorOpen, setIsPopupErrorOpen] = useState(false);
   const [errorPopupMessage, setErrorPopupMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const [selectedImage, setSelectedImage] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
-  const [isResetImageInput, setIsResetImageInput] = useState(false);
+  const { register, handleSubmit, reset, formState: { errors } } = useForm({ defaultValues: { idCategoria: "" } });//hook form para el formulario de productos
 
-  // Estados para el modal de ingreso de categorías
+  // variables logica categorias
   const [showCategoryModal, setShowCategoryModal] = useState(false);
-  const [newCategoryName, setNewCategoryName] = useState("");
-  const [newCategoryDescription, setNewCategoryDescription] = useState("");
   const [isCategorySaving, setIsCategorySaving] = useState(false);
+  const [showErrorCategorySave, setShowErrorCategorySave] = useState(false);
+  const { categorias, loadingCategorias} = useGetCategorias();
+  const { register: registerCategory, handleSubmit: handleSubmitCategory, formState: { errors: errorsCategory }, reset: resetCategory,} = useForm({ defaultValues: { nombreCategoria: "", descripcionCategoria: "", }, });//hook form para el formulario de categorias
 
-  // Se asume que el hook retorna una función para refrescar las categorías
-  const { categorias, loadingCategorias, refetch: refetchCategorias } = useGetCategorias();
-
-  const { register, handleSubmit, reset, formState: { errors } } = useForm({ defaultValues: { idCategoria: "" } });
-  const imagePreviewRef = useRef(null);
-
-  useEffect(() => {
-    if (imagePreview && imagePreviewRef.current) {
-      imagePreviewRef.current.scrollIntoView({ behavior: "smooth", block: "end" });
-    }
-  }, [imagePreview]);
-
-  const handleImageChange = (file, imageUrl) => {
-    setIsResetImageInput(false);
-    setSelectedImage(file);
-    setImagePreview(imageUrl);
+  const onSubmit = async (data) => {
+    await handleIngresarProductoSubmit(data, setSelectedImage, selectedImage, setIsPopupOpen, setErrorPopupMessage, setIsPopupErrorOpen, setIsLoading, reset);
   };
 
-  const onSubmit = (data) => {
-    handleIngresarProductoSubmit(
-      data,
-      setSelectedImage,
-      selectedImage,
-      setImagePreview,
-      setIsResetImageInput,
-      setIsPopupOpen,
-      setErrorPopupMessage,
-      setIsPopupErrorOpen,
-      setIsLoading,
-      reset
-    );
-  };
-
-  // Función para guardar la nueva categoría
-  const handleSaveCategory = async () => {
-    // Validar que se haya ingresado al menos el nombre de la categoría
-    if (!newCategoryName.trim()) {
-      alert("El nombre de la categoría es obligatorio.");
-      return;
-    }
-
-    setIsCategorySaving(true);
-
-    try {
-      const response = await fetch("http://localhost:300/api/ingresarcategoria", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          nombreCategoria: newCategoryName,
-          descripcionCategoria: newCategoryDescription,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Error al guardar la categoría.");
-      }
-
-      // Se asume que el endpoint retorna la categoría creada
-      const nuevaCategoria = await response.json();
-
-      // Refrescar las categorías utilizando el hook (o actualizarlas localmente)
-      if (refetchCategorias) {
-        refetchCategorias();
-      }
-      // Alternativamente, si no cuentas con un refetch, podrías actualizar el estado localmente
-      // agregando la nueva categoría a la lista actual:
-      // setCategorias(prev => [...prev, nuevaCategoria]);
-
-      // Cerrar modal y limpiar campos
-      setShowCategoryModal(false);
-      setNewCategoryName("");
-      setNewCategoryDescription("");
-    } catch (error) {
-      console.error("Error al guardar la categoría:", error);
-      alert("No se pudo guardar la categoría. Por favor, inténtalo de nuevo.");
-    } finally {
-      setIsCategorySaving(false);
-    }
-  };
+  const onSubmitCategory = async (data) => {
+    await saveCategory(data, setIsCategorySaving, resetCategory, setShowCategoryModal, setShowErrorCategorySave, categorias );
+  }
 
   return (
     <div className="container justify-content-center">
@@ -123,24 +50,16 @@ function IngresarProductos() {
             </button>
           </div>
           <div className="col-8">
-            <Title
-              title="Productos"
-              description="Ingreso de productos existentes"
-            />
+            <Title title="Productos" description="Ingreso de productos existentes" />
           </div>
         </div>
       </div>
 
-      <Form
-        onSubmit={handleSubmit(onSubmit)}
-        className="row justify-content-center"
-      >
+      <Form onSubmit={handleSubmit(onSubmit)} className="row justify-content-center">
         <div className="col-lg-6 col-md-8 col-sm-10">
           {/* Categoría del producto */}
           <Form.Group className="mb-3">
-            <Form.Label className="label-title">
-              Categoría del Producto
-            </Form.Label>
+            <Form.Label className="label-title">Categoría del Producto</Form.Label>
             {loadingCategorias ? (
               <div className="d-flex align-items-center">
                 <Spinner animation="border" size="sm" className="me-2" />
@@ -149,21 +68,14 @@ function IngresarProductos() {
             ) : (
               <div className="d-flex">
                 <Form.Select
-                  {...register("idCategoria", {
-                    required: "Debe seleccionar una categoría.",
-                  })}
-                  className={`input-data ${
-                    errors.idCategoria ? "is-invalid" : ""
-                  }`}
+                  {...register("idCategoria", { required: "Debe seleccionar una categoría." })}
+                  className={`input-data ${errors.idCategoria ? "is-invalid" : ""}`}
                   disabled={isLoading}
                   style={{ flex: 11, marginRight: "0.5rem" }}
                 >
                   <option value="">Selecciona una categoría...</option>
                   {categorias.map((categoria) => (
-                    <option
-                      key={categoria.idCategoria}
-                      value={categoria.idCategoria}
-                    >
+                    <option key={categoria.idCategoria} value={categoria.idCategoria}>
                       {categoria.nombreCategoria}
                     </option>
                   ))}
@@ -178,9 +90,7 @@ function IngresarProductos() {
                 </Button>
               </div>
             )}
-            {errors.idCategoria && (
-              <div className="text-danger">{errors.idCategoria.message}</div>
-            )}
+            {errors.idCategoria && <div className="text-danger">{errors.idCategoria.message}</div>}
           </Form.Group>
 
           {/* Nombre del producto */}
@@ -192,20 +102,14 @@ function IngresarProductos() {
                 className="input-data"
                 type="text"
                 placeholder="Ingrese el nombre del producto"
-                {...register("nombreProducto", {
-                  required: "El nombre del producto es obligatorio.",
-                })}
+                {...register("nombreProducto", { required: "El nombre del producto es obligatorio." })}
                 isInvalid={!!errors.nombreProducto}
                 disabled={isLoading}
               />
               {isLoading && (
                 <div
                   className="position-absolute"
-                  style={{
-                    top: "50%",
-                    right: "10px",
-                    transform: "translateY(-50%)",
-                  }}
+                  style={{ top: "50%", right: "10px", transform: "translateY(-50%)" }}
                 >
                   <Spinner animation="border" size="sm" />
                 </div>
@@ -227,10 +131,7 @@ function IngresarProductos() {
                   placeholder="Ingrese la cantidad"
                   {...register("cantidad", {
                     required: "La cantidad es obligatoria.",
-                    min: {
-                      value: 1,
-                      message: "La cantidad debe ser mayor a 0.",
-                    },
+                    min: { value: 1, message: "La cantidad debe ser mayor a 0." },
                   })}
                   isInvalid={!!errors.cantidad}
                   disabled={isLoading}
@@ -250,10 +151,7 @@ function IngresarProductos() {
                   step="0.01"
                   {...register("precio", {
                     required: "El precio es obligatorio.",
-                    min: {
-                      value: 0.01,
-                      message: "El precio debe ser mayor a 0.",
-                    },
+                    min: { value: 0.01, message: "El precio debe ser mayor a 0." },
                   })}
                   isInvalid={!!errors.precio}
                   disabled={isLoading}
@@ -267,11 +165,7 @@ function IngresarProductos() {
 
           {/* Botón de enviar */}
           <div className="text-center">
-            <button
-              type="submit"
-              className="btn bt-general"
-              disabled={isLoading}
-            >
+            <button type="submit" className="btn bt-general" disabled={isLoading}>
               {isLoading ? (
                 <>
                   <Spinner animation="border" size="sm" className="me-2" />
@@ -285,14 +179,17 @@ function IngresarProductos() {
         </div>
       </Form>
 
-
-      {/* Modal para ingreso de categorías */}
+      {/* Modal para ingreso de categorías utilizando react-hook-form para validaciones */}
       <ModalIngreso
         show={showCategoryModal}
-        onHide={() => setShowCategoryModal(false)}
+        onHide={() => {
+          setShowCategoryModal(false);
+          resetCategory();
+        }}
         title="Agregar Nueva Categoría"
-        onConfirm={handleSaveCategory}
+        onConfirm={handleSubmitCategory(onSubmitCategory)}
         isLoading={isCategorySaving}
+        isError={showErrorCategorySave}
         confirmText="Guardar"
       >
         <Form>
@@ -302,10 +199,14 @@ function IngresarProductos() {
               className="input-data"
               type="text"
               placeholder="Ingrese el nombre de la categoría"
-              value={newCategoryName}
-              onChange={(e) => setNewCategoryName(e.target.value)}
+              {...registerCategory("nombreCategoria", {
+                required: "El nombre de la categoría es obligatorio.",
+              })}
               disabled={isCategorySaving}
             />
+            {errorsCategory.nombreCategoria && (
+              <div className="text-danger">{errorsCategory.nombreCategoria.message}</div>
+            )}
           </Form.Group>
           <Form.Group className="mb-3" controlId="categoriaDescripcion">
             <Form.Label className="label-title">Descripción</Form.Label>
@@ -314,8 +215,7 @@ function IngresarProductos() {
               as="textarea"
               rows={3}
               placeholder="Ingrese la descripción de la categoría"
-              value={newCategoryDescription}
-              onChange={(e) => setNewCategoryDescription(e.target.value)}
+              {...registerCategory("descripcionCategoria")}
               disabled={isCategorySaving}
             />
           </Form.Group>
@@ -334,12 +234,7 @@ function IngresarProductos() {
         onViewRoles={() => navigate("/productos")}
         onNewRole={() => {
           setIsPopupOpen(false);
-          resetForm(
-            reset,
-            setSelectedImage,
-            setImagePreview,
-            setIsResetImageInput
-          );
+          resetForm(reset, setSelectedImage, setImagePreview, setIsResetImageInput);
         }}
       />
 
