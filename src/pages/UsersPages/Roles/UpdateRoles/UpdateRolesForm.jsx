@@ -17,7 +17,7 @@ function UpdateRolesForm() {
   const { register, handleSubmit, setError, clearErrors, reset, formState: { errors }, } = useForm();
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [isPopupErrorOpen, setIsPopupErrorOpen] = useState(false);
-  const [isPopupWarOpen, setIsPopupWarOpen] = useState(true);
+  const [isPopupWarOpen, setIsPopupWarOpen] = useState(false);
   const [errorPopupMessage, setErrorPopupMessage] = useState("");
 
   const {setSelectedPermisos, selectedPermisos, setActivatedPermisos, activatedPermisos, setDeactivatedPermisos, 
