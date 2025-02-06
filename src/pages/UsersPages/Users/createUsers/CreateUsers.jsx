@@ -2,30 +2,39 @@ import { BsArrowLeft } from "react-icons/bs";
 import { useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
 import useRoles from "../../../../hooks/roleshooks/roles.hooks";
-import Select from "react-select"; // Importamos React-Select
 import "./CreateUsersStyles.css";
-import { convertirRolesAOpciones, handleCreateUserSubmit, resetForm, } from "./CreateUsersUtils";
+import { handleCreateUserSubmit, resetForm } from "./CreateUsersUtils";
 import SuccessPopup from "../../../../components/Popup/SuccessPopup";
 import { useState } from "react";
 import ErrorPopup from "../../../../components/Popup/ErrorPopUp";
+import { Spinner } from "react-bootstrap"; // Importamos el Spinner de react-bootstrap
 
 function CreateUsers() {
   const [isPopupOpen, setIsPopupOpen] = useState(false); // Abrir popup de éxito
   const [selectedOption, setSelectedOption] = useState(null); // Estado del select
   const [isPopupErrorOpen, setIsPopupErrorOpen] = useState(false); // Manejo del popup de errores
   const [errorPopupMessage, setErrorPopupMessage] = useState(""); // Manejo del mensaje para el popup de errores
-  const { register, handleSubmit, reset, formState: { errors }, setValue, clearErrors, } = useForm(); //Configuracion de react hook form
-  const { roles, loading } = useRoles(); //Roles para asignar al usuario
-  const navigate = useNavigate(); //Hook para la navegación
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+    setValue,
+    clearErrors,
+  } = useForm(); // Configuración de react-hook-form
+  const { roles, loading } = useRoles(); // Roles para asignar al usuario
+  const [isLoadingSave, setIsloadingSave] = useState(false); //Ingreso de usuaros loading
+  const navigate = useNavigate(); // Hook para la navegaciónlo
 
   const onSubmit = (data) => {
-    //Función para guardar usuario
+    // Función para guardar usuario
     handleCreateUserSubmit(
       data,
       reset,
       setIsPopupOpen,
       setIsPopupErrorOpen,
-      setErrorPopupMessage
+      setErrorPopupMessage,
+      setIsloadingSave
     );
   };
 
@@ -46,40 +55,71 @@ function CreateUsers() {
           </div>
           <div className="col-8">
             <h1 className="fw-bold rolText">Crear Usuario</h1>
-            <p className="text-muted">Crea un usuario para ingreso al sistema.</p>
+            <p className="text-muted">
+              Crea un usuario para ingreso al sistema.
+            </p>
           </div>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="row justify-content-center">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="row justify-content-center"
+      >
         <div className="col-lg-6 col-md-8 col-sm-10">
-          {/* Selección del Rol con búsqueda */}
+          {/* Selección del Rol con un select normal */}
           <div className="mb-3">
             <label htmlFor="idRol" className="label-title form-label">
               Rol del Usuario
             </label>
             {loading ? (
-              <div>Cargando roles...</div>
+              <div className="d-flex align-items-center">
+                <Spinner animation="border" size="sm" className="me-2" />
+                <span>Cargando Roles...</span>
+              </div>
             ) : (
               <div>
-                <Select
+                <select
                   id="idRol"
-                  options={convertirRolesAOpciones(roles)}
-                  placeholder="Selecciona un rol..."
-                  value={selectedOption}
-                  isSearchable
-                  isClearable
-                  onChange={(selectedOption) => {
-                    setSelectedOption(selectedOption);
-                    setValue("idRol", selectedOption?.value || "");
-                    if (selectedOption) {
+                  className={`input-data form-select ${
+                    errors.idRol ? "is-invalid" : ""
+                  }`}
+                  // Mantenemos el value sincronizado con nuestro estado local:
+                  value={selectedOption ? selectedOption.value : ""}
+                  onChange={(e) => {
+                    // Si idRol es numérico en tu backend, usamos == o parseInt para comparar
+                    const selectedRole = roles.find(
+                      (role) => role.idRol == e.target.value
+                    );
+
+                    // Guardamos en el estado local la información del rol seleccionado
+                    setSelectedOption(
+                      selectedRole
+                        ? {
+                            value: selectedRole.idRol,
+                            label: selectedRole.nombreRol,
+                          }
+                        : null
+                    );
+
+                    // Sincronizamos con React Hook Form
+                    setValue("idRol", e.target.value);
+
+                    // Si se ha seleccionado un rol válido, limpiamos el error de validación
+                    if (e.target.value) {
                       clearErrors("idRol");
                     }
                   }}
-                  className={`input-data ${errors.idRol ? "is-invalid-select" : ""}`}
-                />
+                >
+                  <option value="">Selecciona un rol...</option>
+                  {roles.map((role) => (
+                    <option key={role.idRol} value={role.idRol}>
+                      {role.nombreRol}
+                    </option>
+                  ))}
+                </select>
 
-                {/* Esto asegura que React Hook Form valide este campo */}
+                {/* Campo hidden para que React Hook Form lo valide internamente */}
                 <input
                   type="hidden"
                   {...register("idRol", {
@@ -89,7 +129,9 @@ function CreateUsers() {
               </div>
             )}
             {errors.idRol && (
-              <div className="invalid-feedback d-block">{errors.idRol.message}</div>
+              <div className="invalid-feedback d-block">
+                {errors.idRol.message}
+              </div>
             )}
           </div>
 
@@ -101,14 +143,18 @@ function CreateUsers() {
             <input
               type="text"
               id="nombreUsuario"
-              className={`input-data form-control ${errors.nombreUsuario ? "is-invalid" : ""}`}
+              className={`input-data form-control ${
+                errors.nombreUsuario ? "is-invalid" : ""
+              }`}
               placeholder="Ingrese el nombre del usuario"
               {...register("nombreUsuario", {
                 required: "El nombre del usuario es obligatorio.",
               })}
             />
             {errors.nombreUsuario && (
-              <div className="invalid-feedback">{errors.nombreUsuario.message}</div>
+              <div className="invalid-feedback">
+                {errors.nombreUsuario.message}
+              </div>
             )}
           </div>
 
@@ -120,14 +166,18 @@ function CreateUsers() {
             <input
               type="text"
               id="apellidoUsuario"
-              className={`input-data form-control ${errors.apellidoUsuario ? "is-invalid" : ""}`}
+              className={`input-data form-control ${
+                errors.apellidoUsuario ? "is-invalid" : ""
+              }`}
               placeholder="Ingrese el apellido del usuario"
               {...register("apellidoUsuario", {
                 required: "El apellido del usuario es obligatorio.",
               })}
             />
             {errors.apellidoUsuario && (
-              <div className="invalid-feedback">{errors.apellidoUsuario.message}</div>
+              <div className="invalid-feedback">
+                {errors.apellidoUsuario.message}
+              </div>
             )}
           </div>
 
@@ -139,7 +189,9 @@ function CreateUsers() {
             <input
               type="text"
               id="correoUsuario"
-              className={`input-data form-control ${errors.correoUsuario ? "is-invalid" : ""}`}
+              className={`input-data form-control ${
+                errors.correoUsuario ? "is-invalid" : ""
+              }`}
               placeholder="Ingrese el correo electrónico"
               {...register("correoUsuario", {
                 required: "El correo electrónico es obligatorio.",
@@ -150,14 +202,27 @@ function CreateUsers() {
               })}
             />
             {errors.correoUsuario && (
-              <div className="invalid-feedback">{errors.correoUsuario.message}</div>
+              <div className="invalid-feedback">
+                {errors.correoUsuario.message}
+              </div>
             )}
           </div>
 
           {/* Botón de enviar */}
           <div className="text-center">
-            <button type="submit" className="btn bt-general">
-              Crear Usuario
+            <button
+              type="submit"
+              className="btn bt-general"
+              disabled={isLoadingSave}
+            >
+              {isLoadingSave ? (
+                <>
+                  <Spinner animation="border" size="sm" className="me-2" />
+                  Procesando...
+                </>
+              ) : (
+                "Crear Usuario"
+              )}
             </button>
           </div>
         </div>
@@ -171,7 +236,7 @@ function CreateUsers() {
         message="El usuario ha sido creado correctamente."
         nombreBotonVolver="Ver Usuarios"
         nombreBotonNuevo="Nuevo Usuario"
-        onViewRoles={() => navigate("/users/users")} // Redirige a Ver Roles
+        onViewRoles={() => navigate("/users/users")} // Redirige a Ver Usuarios
         onNewRole={() => {
           setIsPopupOpen(false); // Cierra el popup
           resetForm(reset, setValue, clearErrors, setSelectedOption); // Limpia el formulario

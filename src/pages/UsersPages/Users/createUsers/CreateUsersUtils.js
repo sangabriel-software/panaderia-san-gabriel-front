@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { crearUsuario } from "../../../../services/userServices/usersservices/users.service";
 import { currentDate } from "../../../../utils/dateUtils";
 
@@ -37,7 +38,9 @@ export const payloadCreacionDeUsuario = (data) => {
 
 
 // Función para manejar el envío del formulario
-export const handleCreateUserSubmit = async (data, reset, setIsPopupOpen, setIsPopupErrorOpen, setErrorPopupMessage) => {
+export const handleCreateUserSubmit = async (data, reset, setIsPopupOpen, setIsPopupErrorOpen, setErrorPopupMessage, setIsloadingSave) => {
+  setIsloadingSave(true);
+
   try {
     const dataUsuario = payloadCreacionDeUsuario(data);
     const resCrearUsuario = await crearUsuario(dataUsuario);
@@ -49,5 +52,7 @@ export const handleCreateUserSubmit = async (data, reset, setIsPopupOpen, setIsP
       "Hubo un error al crear el usuario. Intente más tarde."
     );
     setIsPopupErrorOpen(true);
+  }finally{
+    setIsloadingSave(false);
   }
 };
