@@ -17,6 +17,7 @@ const ModalIngreso = ({
   titleCentered = true,
   footerCentered = true,
   isError = false,
+  confirmDisabled, 
   ...rest
 }) => {
   return (
@@ -47,7 +48,7 @@ const ModalIngreso = ({
             className="btn-type-category flex-fill modal-ingreso-btn"
             variant="primary"
             onClick={onConfirm}
-            disabled={isLoading}
+            disabled={isLoading || confirmDisabled}
           >
             {isLoading ? (
               <>

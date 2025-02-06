@@ -170,14 +170,14 @@ const CardProductos = ({ id, nombreProducto, cantidad, precio, image, showOption
             onClick={(e) => e.stopPropagation()}
           >
             <button
-              className="btn btn-light w-100 text-start mb-1 text-warning"
+              className="btn btn-light w-100 text-start mb-1 text-warning shadow"
               onClick={(e) => handleOptionClick("modify", e)}
             >
               <FaEdit className="me-2" />
               Modificar
             </button>
             <button
-              className="btn btn-light w-100 text-start"
+              className="btn btn-light w-100 text-start shadow"
               onClick={(e) => handleOptionClick("delete", e)}
               style={{ color: "#dc3545" }}
             >
