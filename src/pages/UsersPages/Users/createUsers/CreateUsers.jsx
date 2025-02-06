@@ -14,28 +14,14 @@ function CreateUsers() {
   const [selectedOption, setSelectedOption] = useState(null); // Estado del select
   const [isPopupErrorOpen, setIsPopupErrorOpen] = useState(false); // Manejo del popup de errores
   const [errorPopupMessage, setErrorPopupMessage] = useState(""); // Manejo del mensaje para el popup de errores
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-    setValue,
-    clearErrors,
-  } = useForm(); // Configuración de react-hook-form
+  const { register, handleSubmit, reset, formState: { errors }, setValue, clearErrors, } = useForm(); // Configuración de react-hook-form
   const { roles, loading } = useRoles(); // Roles para asignar al usuario
   const [isLoadingSave, setIsloadingSave] = useState(false); //Ingreso de usuaros loading
   const navigate = useNavigate(); // Hook para la navegaciónlo
 
   const onSubmit = (data) => {
     // Función para guardar usuario
-    handleCreateUserSubmit(
-      data,
-      reset,
-      setIsPopupOpen,
-      setIsPopupErrorOpen,
-      setErrorPopupMessage,
-      setIsloadingSave
-    );
+    handleCreateUserSubmit( data, reset, setIsPopupOpen, setIsPopupErrorOpen, setErrorPopupMessage, setIsloadingSave );
   };
 
   return (

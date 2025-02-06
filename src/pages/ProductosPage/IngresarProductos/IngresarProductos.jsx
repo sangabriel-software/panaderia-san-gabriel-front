@@ -41,17 +41,8 @@ function IngresarProductos() {
 
   // Función para enviar el formulario
   const onSubmit = (data) => {
-    handleIngresarProductoSubmit(
-      data,
-      setSelectedImage,
-      selectedImage,
-      setImagePreview,
-      setIsResetImageInput,
-      setIsPopupOpen,
-      setErrorPopupMessage,
-      setIsPopupErrorOpen,
-      setIsLoading,
-      reset
+    handleIngresarProductoSubmit( data, setSelectedImage, selectedImage, setImagePreview, setIsResetImageInput, 
+                                  setIsPopupOpen, setErrorPopupMessage, setIsPopupErrorOpen, setIsLoading, reset
     );
   };
 
@@ -132,7 +123,7 @@ function IngresarProductos() {
           <Row className="mb-3">
             <Col xs={6}>
               <Form.Group>
-                <Form.Label className="label-title">Cantidad Por Quetzal</Form.Label>
+                <Form.Label className="label-title">Cantidad</Form.Label>
                 <Form.Control
                   className="input-data truncate-placeholder"
                   type="number"
@@ -172,12 +163,12 @@ function IngresarProductos() {
           </Row>
 
           {/* Subida de imagen */}
-          <ImageUploader
+          {/* <ImageUploader
             onImageChange={handleImageChange}
             imagePreview={imagePreview}
             labelName={"Imagen del producto"}
             isReset={isResetImageInput}
-          />
+          /> */}
 
           {/* Botón de enviar */}
           <div className="text-center">
