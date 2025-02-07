@@ -13,8 +13,8 @@ function Sidebar({ show }) {
         <Nav.Link as={NavLink} to="/dashboard" className="text-light">
           <FaHome size={25} className="me-2" /> Dashboard
         </Nav.Link>
-        <Nav.Link as={NavLink} to="/schedule" className="text-light">
-          <FaCalendar size={25} className="me-2" /> Pedidos
+        <Nav.Link as={NavLink} to="/pedidos-produccion" className="text-light">
+          <FaCalendar size={25} className="me-2" /> Pedidos a produccion
         </Nav.Link>
         <Nav.Link as={NavLink} to="/projects" className="text-light">
           <FaFolder size={25} className="me-2" /> Ventas

@@ -19,6 +19,7 @@ const CreateUsers = lazy(() => import("./pages/UsersPages/Users/createUsers/Crea
 const PrivateRoute = lazy(() => import("./components/PrivateRoute/PrivateRoute"));
 const ManageProducts = lazy(() => import("./pages/ProductosPage/ManageProducts/ManageProducts"));
 const IngresarProductos = lazy(() => import("./pages/ProductosPage/IngresarProductos/IngresarProductos"));
+const GestionPedidosProd = lazy(() => import("./pages/PedidosProdPage/GestionPedidos/GestionPedidosProd"));
 
 
 
@@ -48,6 +49,9 @@ function App() {
               <Route path="ingresar-producto" element={<IngresarProductos />} />
             </Route>
 
+            <Route path="/pedidos-produccion">
+              <Route index element={<GestionPedidosProd/>} />
+            </Route>
           </Route>
         </Route>
       </Routes>
