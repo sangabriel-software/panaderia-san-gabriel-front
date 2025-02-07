@@ -40,11 +40,4 @@ const ErrorPopup = ({ isOpen, onClose, title, message }) => {
   );
 };
 
-ErrorPopup.propTypes = {
-  isOpen: PropTypes.bool.isRequired,
-  onClose: PropTypes.func.isRequired,
-  title: PropTypes.string.isRequired,
-  message: PropTypes.string.isRequired,
-};
-
 export default ErrorPopup;

@@ -1,47 +1,47 @@
 import React, { useState, useEffect } from "react";
-import { useForm } from "react-hook-form"; // Importa useForm
+import { useForm } from "react-hook-form";
 import { useGetProductosYPrecios } from "../../../hooks/productosprecios/useGetProductosYprecios";
-import { checkForChanges, handleModifyClick, useCategoriasYFiltrado, useSerchPrductos, } from "./ManageProductsUtils";
+import { checkForChanges, handleModifyClick, useCategoriasYFiltrado, useSerchPrductos } from "./ManageProductsUtils";
 import CreateButton from "../../../components/CreateButton/CreateButton";
 import SearchInput from "../../../components/SerchInput/SerchInput";
 import Title from "../../../components/Title/Title";
 import CardProductos from "../../../components/CardProductos/CardPoductos";
 import { useNavigate } from "react-router";
 import Alert from "../../../components/Alerts/Alert";
-import { BsExclamationTriangleFill, BsFillInfoCircleFill, BsX, } from "react-icons/bs";
-import { handleConfirmDeletePreoducto, handleDeleleProducto, } from "../IngresarProductos/IngresarProductosUtils";
+import { BsExclamationTriangleFill, BsFillInfoCircleFill, BsX } from "react-icons/bs";
+import { handleConfirmDeletePreoducto, handleDeleleProducto } from "../IngresarProductos/IngresarProductosUtils";
 import ConfirmPopUp from "../../../components/Popup/ConfirmPopup";
 import ErrorPopup from "../../../components/Popup/ErrorPopUp";
-import ModalIngreso from "../../../components/ModalGenerico/Modal"; // Importa el modal
-import { Form, InputGroup } from "react-bootstrap"; // Para los inputs del modal
+import ModalIngreso from "../../../components/ModalGenerico/Modal";
+import { Form, InputGroup } from "react-bootstrap";
 import useGetCategorias from "../../../hooks/categorias/UseGetCategorias";
 import "./ManageProducts.css";
+import { actualizarPrecioProductoSevice, actualizarProductoSevice } from "../../../services/productos/productos.service";
 
 const ManageProducts = () => {
-  const { productos, loadigProducts, showErrorProductos, showInfoProductos, setProductos, } = useGetProductosYPrecios(); // Consultar productos
-  const { filteredProductos, searchQuery, showNoResults, handleSearch } = useSerchPrductos(productos); // Búsqueda local
-  const { categorias, filteredByCategory, selectedCategory, setSelectedCategory, } = useCategoriasYFiltrado(productos, filteredProductos); // Filtrar por categorías
-  const [productoToDelete, setProductoToDelete] = useState(null); // Setea el id a eliminar
-  const [isPopupOpen, setIsPopupOpen] = useState(false); // Estado para el popup de confirmación
-  const [errorPopupMessage, setErrorPopupMessage] = useState(false); // Setea el mensaje a mostrar
-  const [isPopupErrorOpen, setIsPopupErrorOpen] = useState(false); // Estado para el popup de errores
-  const [showModifyModal, setShowModifyModal] = useState(false); // Estado para mostrar el modal de modificación
-  const [selectedProduct, setSelectedProduct] = useState(null); // Estado para almacenar el producto seleccionado
-  const [initialProductValues, setInitialProductValues] = useState(null); // Estado para almacenar los valores iniciales
-  const [hasChanges, setHasChanges] = useState(false); // Estado para detectar cambios
+  const { productos, loadigProducts, showErrorProductos, showInfoProductos, setProductos } = useGetProductosYPrecios();
+  const { filteredProductos, searchQuery, showNoResults, handleSearch } = useSerchPrductos(productos);
+  const { categorias, filteredByCategory, selectedCategory, setSelectedCategory } = useCategoriasYFiltrado(productos, filteredProductos);
+  const [productoToDelete, setProductoToDelete] = useState(null);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [errorPopupMessage, setErrorPopupMessage] = useState(false);
+  const [isPopupErrorOpen, setIsPopupErrorOpen] = useState(false);
+  const [showModifyModal, setShowModifyModal] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [initialProductValues, setInitialProductValues] = useState(null);
+  const [hasChanges, setHasChanges] = useState(false);
   const navigate = useNavigate();
-  const { categorias: categoriasModify, loadingCategorias, showErrorCategorias, showInfoCategorias, } = useGetCategorias();
+  const { categorias: categoriasModify, loadingCategorias, showErrorCategorias, showInfoCategorias } = useGetCategorias();
   const [loadingModificar, setLoadingModificar] = useState(false);
 
   // React Hook Form
-  const { register, handleSubmit, reset, watch, setValue, formState: { errors }, } = useForm();
+  const { register, handleSubmit, reset, watch, setValue, formState: { errors } } = useForm();
 
   // Efecto para verificar cambios cada vez que se modifica el formulario
   useEffect(() => {
-    checkForChanges(selectedProduct, initialProductValues, setHasChanges, watch );
-  }, [watch()]); // Observa los cambios en los campos del formulario
+    checkForChanges(selectedProduct, initialProductValues, setHasChanges, watch);
+  }, [watch()]);
 
-  
   // Función para guardar los cambios del producto
   const onSubmit = async (data) => {
     if (!hasChanges) return;
@@ -49,35 +49,29 @@ const ManageProducts = () => {
     setLoadingModificar(true);
 
     try {
-      // Aquí iría la lógica para actualizar el producto en el backend
-      const response = await fetch(
-        `http://localhost:300/api/productos/${selectedProduct.idProducto}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
-        }
-      );
+      // Actualiza el producto en el servidor
+      const resProdActualizado = await actualizarProductoSevice(data);
 
-      if (!response.ok) {
-        throw new Error("Error al actualizar el producto.");
+      if (resProdActualizado.status === 200) {
+        // Actualiza el precio del producto en el servidor
+        const resPrecioActualizado = await actualizarPrecioProductoSevice(data);
+
+        // Actualiza el estado local con el producto modificado
+        const updatedProductos = productos.map((producto) =>
+          producto.idProducto === selectedProduct.idProducto
+            ? { ...producto, ...data } // Reemplaza los datos del producto con los nuevos
+            : producto
+        );
+
+        setProductos(updatedProductos); // Actualiza el estado de productos
+        setShowModifyModal(false); // Cierra el modal
+        setSelectedProduct(null); // Limpia el producto seleccionado
+        setInitialProductValues(null); // Limpia los valores iniciales
+        setHasChanges(false); // Restablece el estado de cambios
       }
-
-      // Actualiza la lista de productos localmente
-      const updatedProductos = productos.map((p) =>
-        p.idProducto === selectedProduct.idProducto ? { ...p, ...data } : p
-      );
-      setProductos(updatedProductos);
-
-      // Cierra el modal
-      setShowModifyModal(false);
     } catch (error) {
-      console.error("Error al actualizar el producto:", error);
-      setErrorPopupMessage(
-        "No se pudo actualizar el producto. Inténtalo de nuevo."
-      );
+      setShowModifyModal(false);
+      setErrorPopupMessage("No se pudo actualizar el producto. Inténtalo de nuevo.");
       setIsPopupErrorOpen(true);
     } finally {
       setLoadingModificar(false);
@@ -146,7 +140,7 @@ const ManageProducts = () => {
                     setIsPopupOpen
                   )
                 }
-                onModify={() => handleModifyClick(producto, setSelectedProduct, setInitialProductValues, setShowModifyModal, reset, setHasChanges )} // Pasa la función para modificar
+                onModify={() => handleModifyClick(producto, setSelectedProduct, setInitialProductValues, setShowModifyModal, reset, setHasChanges)}
               />
             </div>
           ))}
@@ -226,8 +220,6 @@ const ManageProducts = () => {
 
             {/* Campos: Cantidad y Precio */}
             <div className="row gx-2">
-              {" "}
-              {/* Espaciado horizontal entre columnas */}
               <div className="col-6 mb-3">
                 <Form.Group>
                   <Form.Label>Cantidad</Form.Label>
@@ -292,7 +284,7 @@ const ManageProducts = () => {
         )}
       </ModalIngreso>
 
-      ;{/* Resto del código (alertas, popups, etc.) */}
+      {/* Resto del código (alertas, popups, etc.) */}
       {filteredProductos.length === 0 &&
         !loadigProducts &&
         !showErrorProductos &&

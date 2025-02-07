@@ -22,6 +22,8 @@ const putEndpoints = {
     ACTUALIZAR_ROL: "/actualizarRol",
     DESBLOQUEAR_USAURIO: "/desbloquearUsuario",
     BLOQUEAR_USUARIO: "/bloquearUsuario",
+    ACTUALIZAR_PRODUCTO: "/actualizarProducto",
+    ACTUALIZAR_PRECIO: "/actualizarPrecio"
 };
 
 const deleteEndpoints = {
