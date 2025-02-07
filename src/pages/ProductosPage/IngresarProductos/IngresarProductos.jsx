@@ -106,14 +106,7 @@ function IngresarProductos() {
                 isInvalid={!!errors.nombreProducto}
                 disabled={isLoading}
               />
-              {isLoading && (
-                <div
-                  className="position-absolute"
-                  style={{ top: "50%", right: "10px", transform: "translateY(-50%)" }}
-                >
-                  <Spinner animation="border" size="sm" />
-                </div>
-              )}
+
               <Form.Control.Feedback type="invalid">
                 {errors.nombreProducto?.message}
               </Form.Control.Feedback>

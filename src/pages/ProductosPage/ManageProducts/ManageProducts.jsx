@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useGetProductosYPrecios } from "../../../hooks/productosprecios/useGetProductosYprecios";
-import { checkForChanges, handleModifyClick, useCategoriasYFiltrado, useSerchPrductos } from "./ManageProductsUtils";
+import { checkForChanges, handleModifyClick, handleUpdateProduct, useCategoriasYFiltrado, useSerchPrductos } from "./ManageProductsUtils";
 import CreateButton from "../../../components/CreateButton/CreateButton";
 import SearchInput from "../../../components/SerchInput/SerchInput";
 import Title from "../../../components/Title/Title";
@@ -13,10 +13,9 @@ import { handleConfirmDeletePreoducto, handleDeleleProducto } from "../IngresarP
 import ConfirmPopUp from "../../../components/Popup/ConfirmPopup";
 import ErrorPopup from "../../../components/Popup/ErrorPopUp";
 import ModalIngreso from "../../../components/ModalGenerico/Modal";
-import { Form, InputGroup } from "react-bootstrap";
+import { Form } from "react-bootstrap";
 import useGetCategorias from "../../../hooks/categorias/UseGetCategorias";
 import "./ManageProducts.css";
-import { actualizarPrecioProductoSevice, actualizarProductoSevice } from "../../../services/productos/productos.service";
 
 const ManageProducts = () => {
   const { productos, loadigProducts, showErrorProductos, showInfoProductos, setProductos } = useGetProductosYPrecios();
@@ -44,38 +43,8 @@ const ManageProducts = () => {
 
   // Función para guardar los cambios del producto
   const onSubmit = async (data) => {
-    if (!hasChanges) return;
-
-    setLoadingModificar(true);
-
-    try {
-      // Actualiza el producto en el servidor
-      const resProdActualizado = await actualizarProductoSevice(data);
-
-      if (resProdActualizado.status === 200) {
-        // Actualiza el precio del producto en el servidor
-        const resPrecioActualizado = await actualizarPrecioProductoSevice(data);
-
-        // Actualiza el estado local con el producto modificado
-        const updatedProductos = productos.map((producto) =>
-          producto.idProducto === selectedProduct.idProducto
-            ? { ...producto, ...data } // Reemplaza los datos del producto con los nuevos
-            : producto
-        );
-
-        setProductos(updatedProductos); // Actualiza el estado de productos
-        setShowModifyModal(false); // Cierra el modal
-        setSelectedProduct(null); // Limpia el producto seleccionado
-        setInitialProductValues(null); // Limpia los valores iniciales
-        setHasChanges(false); // Restablece el estado de cambios
-      }
-    } catch (error) {
-      setShowModifyModal(false);
-      setErrorPopupMessage("No se pudo actualizar el producto. Inténtalo de nuevo.");
-      setIsPopupErrorOpen(true);
-    } finally {
-      setLoadingModificar(false);
-    }
+    handleUpdateProduct( data, selectedProduct, setProductos, setShowModifyModal, setSelectedProduct, setInitialProductValues,
+                         setHasChanges, setErrorPopupMessage, setIsPopupErrorOpen, setLoadingModificar );
   };
 
   if (loadigProducts) {
@@ -84,18 +53,15 @@ const ManageProducts = () => {
 
   return (
     <div className="container">
-      <Title
-        title="Productos"
-        description="Administración de productos existentes"
-      />
+      <Title title="Productos" description="Administración de productos existentes" />
       <div className="row mb-4">
         <div className="col-12 col-md-3 mb-2 mb-md-0">
-          <CreateButton
-            onClick={() => navigate("/productos/ingresar-producto")}
-          />
+          <CreateButton onClick={() => navigate("/productos/ingresar-producto")} />
         </div>
         <div className="col-12 col-md-6">
           <SearchInput
+            id="searchInput"
+            aria-label="Buscar Producto"
             searchQuery={searchQuery}
             handleSearch={handleSearch}
             placeholder={
@@ -108,6 +74,8 @@ const ManageProducts = () => {
         </div>
         <div className="col-12 col-md-3">
           <select
+            id="selectedCategory"
+            name="selectedCategory"
             className="form-control input-data"
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
@@ -133,14 +101,8 @@ const ManageProducts = () => {
                 cantidad={producto.cantidad}
                 precio={producto.precio}
                 image={producto.imagenB64}
-                onDelete={() =>
-                  handleDeleleProducto(
-                    producto.idProducto,
-                    setProductoToDelete,
-                    setIsPopupOpen
-                  )
-                }
-                onModify={() => handleModifyClick(producto, setSelectedProduct, setInitialProductValues, setShowModifyModal, reset, setHasChanges)}
+                onDelete={() => handleDeleleProducto( producto.idProducto, setProductoToDelete, setIsPopupOpen )}
+                onModify={() => handleModifyClick( producto, setSelectedProduct, setInitialProductValues, setShowModifyModal, reset, setHasChanges ) }
               />
             </div>
           ))}
@@ -159,7 +121,7 @@ const ManageProducts = () => {
         {selectedProduct && (
           <Form>
             {/* Campo: Nombre del Producto */}
-            <Form.Group className="mb-3">
+            <Form.Group className="mb-3" controlId="nombreProducto">
               <Form.Label>Nombre del Producto</Form.Label>
               <div className="input-wrapper">
                 <Form.Control
@@ -184,7 +146,7 @@ const ManageProducts = () => {
             </Form.Group>
 
             {/* Campo: Categoría */}
-            <Form.Group className="mb-3">
+            <Form.Group className="mb-3" controlId="idCategoria">
               <Form.Label>Categoría</Form.Label>
               <div className="input-wrapper">
                 <Form.Select
@@ -221,7 +183,7 @@ const ManageProducts = () => {
             {/* Campos: Cantidad y Precio */}
             <div className="row gx-2">
               <div className="col-6 mb-3">
-                <Form.Group>
+                <Form.Group controlId="cantidad">
                   <Form.Label>Cantidad</Form.Label>
                   <div className="input-wrapper">
                     <Form.Control
@@ -250,7 +212,7 @@ const ManageProducts = () => {
                 </Form.Group>
               </div>
               <div className="col-6 mb-3">
-                <Form.Group>
+                <Form.Group controlId="precio">
                   <Form.Label>Precio</Form.Label>
                   <div className="input-wrapper">
                     <Form.Control

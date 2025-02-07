@@ -56,13 +56,6 @@ function Sidebar({ show }) {
             >
               <FaUsersCog className="me-2" /> Control de Roles
             </Nav.Link>
-            <Nav.Link 
-              as={NavLink} 
-              to="/users/reset-password" 
-              className="text-light ps-4 submenu-item"
-            >
-              <FaKey className="me-2" /> Reiniciar Contraseñas
-            </Nav.Link>
           </div>
         </Collapse>
       </Nav>
