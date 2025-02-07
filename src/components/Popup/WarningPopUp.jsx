@@ -8,8 +8,8 @@ const WarningPopup = ({
   onClose,
   title,
   message,
-  onViewRoles,
-  onNewRole,
+  onViews,
+  onNew,
 }) => {
   return (
     <Modal show={isOpen} onHide={onClose} centered>
@@ -45,10 +45,10 @@ const WarningPopup = ({
         <p className="popup-message">{message}</p>
       </Modal.Body>
       <Modal.Footer className="footer-modal d-flex flex-wrap justify-content-center gap-2">
-        <Button className="btn btn-success rol-button" onClick={onViewRoles}>
+        <Button className="btn btn-success rol-button" onClick={onViews}>
           Ver Roles
         </Button>
-        <Button className="btn btn-primary new-button" onClick={onNewRole}>
+        <Button className="btn btn-primary new-button" onClick={onNew}>
           Nuevo Rol
         </Button>
       </Modal.Footer>
@@ -61,8 +61,8 @@ WarningPopup.propTypes = {
   onClose: PropTypes.func.isRequired,
   title: PropTypes.string.isRequired,
   message: PropTypes.string.isRequired,
-  onViewRoles: PropTypes.func.isRequired,
-  onNewRole: PropTypes.func.isRequired,
+  onViews: PropTypes.func.isRequired,
+  onNew: PropTypes.func.isRequired,
 };
 
 export default WarningPopup;

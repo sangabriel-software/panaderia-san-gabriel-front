@@ -58,6 +58,10 @@ function Sidebar({ show }) {
             </Nav.Link>
           </div>
         </Collapse>
+
+        <Nav.Link as={NavLink} to="/config" className="text-light">
+        <FaCog className="me-2" size={25} /> Configuraciones
+        </Nav.Link>
       </Nav>
     </div>
   );

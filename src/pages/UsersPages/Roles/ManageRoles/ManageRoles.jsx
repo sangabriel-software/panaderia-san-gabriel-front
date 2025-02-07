@@ -122,14 +122,14 @@ function ManageRoles() {
         onClose={() => setIsPopupErrorOpen(false)} // Cierra el popup
         title="!Error!"
         message={errorPopupMessage}
-        onViewRoles={() => navigate("/users/roles")} // Redirige a Ver Roles
-        onNewRole={() => {
+        onView={()=>navigate("/users/roles")} // Redirige a Ver Roles
+        onNew={() => {
           setIsPopupOpen(false); // Cierra el popup
           resetForm(); // Limpia el formulario
         }}
       />
     </div>
-  );
+  ); 
 }
 
 export default ManageRoles;

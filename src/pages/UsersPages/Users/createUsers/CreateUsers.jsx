@@ -230,8 +230,8 @@ function CreateUsers() {
         }
         nombreBotonVolver="Ver Usuarios"
         nombreBotonNuevo="Nuevo Usuario"
-        onViewRoles={() => navigate("/users/users")} // Redirige a Ver Usuarios
-        onNewRole={() => {
+        onViews={() => navigate("/users/users")} // Redirige a Ver Usuarios
+        onNew={() => {
           setIsPopupOpen(false); // Cierra el popup
           resetForm(reset, setValue, clearErrors, setSelectedOption); // Limpia el formulario
         }}
@@ -242,8 +242,8 @@ function CreateUsers() {
         onClose={() => setIsPopupErrorOpen(false)} // Cierra el popup
         title="¡Error!"
         message={errorPopupMessage}
-        onViewRoles={() => navigate("/users/roles")} // Redirige a Ver Roles
-        onNewRole={() => {
+        onViews={() => navigate("/users/roles")} // Redirige a Ver Roles
+        onNew={() => {
           setIsPopupOpen(false); // Cierra el popup
           resetForm(reset, setValue, clearErrors, setSelectedOption); // Limpia el formulario
         }}

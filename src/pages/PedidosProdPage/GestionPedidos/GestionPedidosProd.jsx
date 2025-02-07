@@ -7,14 +7,10 @@ import DownloadDropdown from "../../../components/DownloadDropdown/DownloadDropd
 import FilterBar from "../../../components/FilterBar/FilterBar";
 import OrderTable from "../../../components/OrdersComponents/OrderCard";
 
-const GestionPedidosProd = ({
-  ordersData,
-  onViewDetails,
-  onDownloadXLS,
-  onDownloadPDF,
-}) => {
+const GestionPedidosProd = () => {
   const isMobile = useMediaQuery({ maxWidth: 767 });
   const [filters, setFilters] = useState({ search: "", date: "", status: "" });
+  const [ordersData, setOrdersData] = useState([])
   const [filteredOrders, setFilteredOrders] = useState(ordersData || []);
 
   useEffect(() => {
@@ -34,6 +30,21 @@ const GestionPedidosProd = ({
     setFilteredOrders(filtered);
   }, [ordersData, filters]);
 
+
+  const onViewDetails = () => {
+    console.log("ver detalles")
+  }
+
+  
+  const onDownloadXLS = () => {
+    console.log("descargar xls");
+  }
+
+  const  onDownloadPDF = () => {
+    console.log("descargar PDF");
+  }
+  
+
   return (
     <Container>
       <Title
@@ -47,11 +58,15 @@ const GestionPedidosProd = ({
       />
       {/* Barra de filtros */}
       <FilterBar filters={filters} onFilterChange={setFilters} />
-      {/* Renderizado condicional según el tamaño de pantalla */}
+
+
+      {/* Renderizado cpar movil */}
       {isMobile ? (
         filteredOrders.map((order) => (
           <OrderCard key={order.id} order={order} onViewDetails={onViewDetails} />
         ))
+
+        // Renderiza si es pc
       ) : (
         <OrderTable orders={filteredOrders} onViewDetails={onViewDetails} />
       )}

@@ -29,13 +29,14 @@ function IngresarProductos() {
   const { register: registerCategory, handleSubmit: handleSubmitCategory, formState: { errors: errorsCategory }, reset: resetCategory,} = useForm({ defaultValues: { nombreCategoria: "", descripcionCategoria: "", }, });//hook form para el formulario de categorias
 
   const onSubmit = async (data) => {
-    await handleIngresarProductoSubmit(data, setSelectedImage, selectedImage, setIsPopupOpen, setErrorPopupMessage, setIsPopupErrorOpen, setIsLoading, reset);
+    await handleIngresarProductoSubmit(data, setIsPopupOpen, setErrorPopupMessage, setIsPopupErrorOpen, setIsLoading, reset);
   };
 
   const onSubmitCategory = async (data) => {
     await saveCategory(data, setIsCategorySaving, resetCategory, setShowCategoryModal, setShowErrorCategorySave, categorias );
   }
 
+  console.log(isPopupOpen);
   return (
     <div className="container justify-content-center">
       <div className="text-center mb-3">
@@ -224,8 +225,8 @@ function IngresarProductos() {
         message="El producto ha sido creado con éxito."
         nombreBotonVolver="Ver Productos"
         nombreBotonNuevo="Ingresar Producto"
-        onViewRoles={() => navigate("/productos")}
-        onNewRole={() => {
+        onViews={() => navigate("/productos")}
+        onNew={() => {
           setIsPopupOpen(false);
           resetForm(reset, setSelectedImage, setImagePreview, setIsResetImageInput);
         }}

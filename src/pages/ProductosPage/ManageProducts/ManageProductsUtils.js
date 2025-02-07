@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo} from "react";
-import { actualizarPrecioProductoSevice, actualizarProductoSevice } from "../../../services/productos/productos.service";
+import { actualizarPrecioProductoSevice, actualizarProductoSevice, desactivarProductosService } from "../../../services/productos/productos.service";
 
 /* Consulta interna par la pagina de roles Busqueda de usuarios*/
 export const useSerchPrductos = (productos) => {
@@ -51,6 +51,35 @@ export const useCategoriasYFiltrado = (productos, filteredProductos) => {
   return { categorias, filteredByCategory, selectedCategory, setSelectedCategory };
 };
 
+/* Elminacion de productos*/
+export const handleDeleleProducto = (idProducto, setProductoToDelete, setIsPopupOpen) => {
+  setProductoToDelete(idProducto);
+  setIsPopupOpen(true);
+}
+
+  /* funcion para ejcutar la logica de eliminacion de producto */
+export const handleConfirmDeletePreoducto = async (productoToDelete, setProducto, setIsPopupOpen, setErrorPopupMessage, setIsPopupErrorOpen ) => {
+  try{
+
+      if (productoToDelete) {
+        const resDelete = await desactivarProductosService(productoToDelete);
+
+        if (resDelete.status === 200) {
+            setProducto((prevProductos) => prevProductos.filter(producto => producto.idProducto !== productoToDelete));
+          setIsPopupOpen(false); 
+        }
+      }else{
+
+      }
+    }catch(error){
+      if(error.status === 409 && error.data.error.code === 402){
+        setIsPopupOpen(false); 
+        setErrorPopupMessage(`Para elminar el rol debe elminar los usuarios al que esta relacionado`);
+        setIsPopupErrorOpen(true);
+      }
+
+    }
+  };
 
   // Función para manejar el clic en el botón "Modificar"
  export const handleModifyClick = (producto, setSelectedProduct, setInitialProductValues, setShowModifyModal, reset, setHasChanges ) => {

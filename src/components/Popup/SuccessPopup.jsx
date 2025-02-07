@@ -8,8 +8,8 @@ const SuccessPopup = ({
   onClose,
   title,
   message,
-  onViewRoles,
-  onNewRole,
+  onView,
+  onNew,
   nombreBotonVolver,
   nombreBotonNuevo,
 }) => {
@@ -42,10 +42,10 @@ const SuccessPopup = ({
         <p className="popup-message">{message}</p>
       </Modal.Body>
       <Modal.Footer className="footer-modal d-flex flex-wrap justify-content-center gap-2">
-        <Button className="btn btn-success" onClick={onViewRoles}>
+        <Button className="btn btn-success" onClick={onView}>
           {nombreBotonVolver || "Ver Roles"}
         </Button>
-        <Button className="btn btn-primary nuevo-bt" onClick={onNewRole}>
+        <Button className="btn btn-primary nuevo-bt" onClick={onNew}>
           {nombreBotonNuevo || "Nuevo Rol"}
         </Button>
       </Modal.Footer>
@@ -58,8 +58,8 @@ SuccessPopup.propTypes = {
   onClose: PropTypes.func.isRequired,
   title: PropTypes.string.isRequired,
   message: PropTypes.string.isRequired,
-  onViewRoles: PropTypes.func.isRequired,
-  onNewRole: PropTypes.func.isRequired,
+  onView: PropTypes.func.isRequired,
+  onNew: PropTypes.func.isRequired,
   nombreBotonVolver: PropTypes.string,
   nombreBotonNuevo: PropTypes.string,
 };

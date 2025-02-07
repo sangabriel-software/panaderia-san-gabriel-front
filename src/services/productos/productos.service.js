@@ -20,15 +20,6 @@ export const ingresarPrecioProducto = async (dataPrecio) => {
   }
 }
 
-export const ingresarProductoImagen = async (dataImagen) => {
-  try {
-      const response = await api.post(`${postEndpoints.INGRESAR_IMAGEN_PRODUCTO}`, dataImagen); 
-      return response.data;
-  } catch (error) {
-    throw error;
-  }
-}
-
 export const consultarProductosService = async () => {
     try {
         const response = await api.get(`${getEndpoints.ALL_PRODUCTOSYPRECIOS}`); 
