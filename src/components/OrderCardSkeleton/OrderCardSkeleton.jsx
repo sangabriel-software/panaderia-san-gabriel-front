@@ -16,6 +16,7 @@ const OrderCardSkeleton = () => {
         {/* Detalles del Skeleton */}
         <div className="skeleton-detail"></div>
         <div className="skeleton-detail"></div>
+        <div className="skeleton-detail"></div>
 
         {/* Botones del Skeleton */}
         <div className="d-flex justify-content-between">
