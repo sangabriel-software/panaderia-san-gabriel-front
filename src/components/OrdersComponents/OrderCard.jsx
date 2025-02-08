@@ -1,6 +1,7 @@
 // src/components/Orders/OrderCard.jsx
 import React from "react";
 import { Card, Button } from "react-bootstrap";
+import { formatDateToDisplay } from "../../utils/dateUtils";
 
 const OrderCard = ({ order, onViewDetails }) => {
   return (
@@ -8,9 +9,9 @@ const OrderCard = ({ order, onViewDetails }) => {
       <Card.Body>
         <Card.Title>{order.orderNumber}</Card.Title>
         <Card.Text>
-          <strong>Fecha:</strong> {order.date} <br />
-          <strong>Items:</strong> {order.totalItems} <br />
-          <strong>Estado:</strong> {order.status}
+          <strong>Fecha a producir:</strong> {formatDateToDisplay(order.fechaAProducir)} <br />
+          <strong>Productos:</strong> {order.cantidadProductos} <br />
+          <strong>Estado:</strong> {order.estadoOrden}
         </Card.Text>
         <Button variant="primary" size="sm" onClick={() => onViewDetails(order)}>
           Ver Detalles

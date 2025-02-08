@@ -1,5 +1,6 @@
 import React from "react";
 import { Form, Row, Col, Button, InputGroup } from "react-bootstrap";
+import "./FilterBar.css"
 
 const FilterBar = ({ filters, onFilterChange }) => {
   const handleSearchChange = (e) => {
@@ -18,8 +19,9 @@ const FilterBar = ({ filters, onFilterChange }) => {
         {/* Campo de búsqueda */}
         <Col xs={12} md={4}>
           <InputGroup>
-            <InputGroup.Text style={{ fontWeight: "bold", color: "blue" }}>ORD-</InputGroup.Text>
+            <InputGroup.Text className="span-filter" style={{ fontWeight: "bold", color: "blue" }}>ORD-</InputGroup.Text>
             <Form.Control
+              className="input-filter"
               type="text"
               placeholder="Ingrese número de orden..."
               value={filters.search}
@@ -32,6 +34,7 @@ const FilterBar = ({ filters, onFilterChange }) => {
         <Col xs={12} md={4}>
           <InputGroup>
             <Form.Control
+              className="input-filter"
               type="date"
               value={filters.date}
               onChange={(e) => onFilterChange({ ...filters, date: e.target.value })}
@@ -47,6 +50,7 @@ const FilterBar = ({ filters, onFilterChange }) => {
         {/* Filtro por estado */}
         <Col xs={12} md={4}>
           <Form.Select
+            className="input-filter"
             value={filters.status}
             onChange={(e) => onFilterChange({ ...filters, status: e.target.value })}
           >

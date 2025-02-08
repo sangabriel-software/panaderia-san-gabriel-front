@@ -72,6 +72,10 @@ const GestionPedidosProd = () => {
     // Llamar a un endpoint o generar el archivo PDF
   };
 
+  if (loadingOrdenes) {
+    return <div className="loading">Cargando Ordenes...</div>;
+  }
+
   return (
     <Container>
       <Title

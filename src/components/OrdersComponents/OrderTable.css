@@ -3,12 +3,19 @@
     width: 100%;
   }
   
-
-  
   .modern-table th,
   .modern-table td {
     padding: 12px 15px;
     text-align: center;
+  }
+  
+  .modern-table thead {
+    background-color: #292A2D; /* Fondo del encabezado */
+    color: #ffffff; /* Color del texto del encabezado */
+  }
+  
+  .modern-table th {
+    font-weight: 600; /* Hacemos el texto del encabezado más grueso */
   }
   
   .modern-table tr:nth-child(even) {
@@ -23,8 +30,6 @@
     font-size: 14px;
     font-weight: 500;
   }
-  
-
   
   .action-btn {
     transition: background-color 0.3s ease, transform 0.3s ease;
@@ -53,4 +58,3 @@
     background-color: #f8f9fa;
     border-color: #007bff;
   }
-  

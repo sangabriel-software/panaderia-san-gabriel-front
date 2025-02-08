@@ -2,12 +2,14 @@ import React, { useState } from "react";
 import { Table, Button, Badge, Container, Pagination } from "react-bootstrap";
 import { formatDateToDisplay } from "../../utils/dateUtils";
 import { FaFileAlt, FaTrashAlt } from "react-icons/fa";
+import { useNavigate } from "react-router-dom"; // Importar useNavigate para redireccionar
 import "./OrderTable.css";
 
 const ITEMS_PER_PAGE = 5;
 
 const OrderTable = ({ orders, onViewDetails, onDelete }) => {
   const [currentPage, setCurrentPage] = useState(1);
+  const navigate = useNavigate(); // Hook para redireccionar
 
   const totalPages = Math.ceil(orders.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -19,10 +21,15 @@ const OrderTable = ({ orders, onViewDetails, onDelete }) => {
     }
   };
 
+  // Función para manejar el clic en una fila
+  const handleRowClick = (idOrdenProduccion) => {
+    navigate(`/pedidos-produccion/detalles/${idOrdenProduccion}`); // Redirigir a la vista de detalles
+  };
+
   return (
     <Container className="p-3">
       <Table striped hover responsive bordered className="modern-table shadow-lg">
-        <thead className="thead-dark thead bg-dark text-white">
+        <thead style={{ backgroundColor: '#292A2D' }}>
           <tr>
             <th className="text-center p-3">#</th>
             <th className="text-center p-3">Número de Orden</th>
@@ -34,7 +41,12 @@ const OrderTable = ({ orders, onViewDetails, onDelete }) => {
         </thead>
         <tbody>
           {paginatedOrders.map((order, index) => (
-            <tr key={order.idOrdenProduccion} className="align-middle">
+            <tr
+              key={order.idOrdenProduccion}
+              className="align-middle"
+              onClick={() => handleRowClick(order.idOrdenProduccion)} // Evento onClick en la fila
+              style={{ cursor: "pointer" }} // Cambiar el cursor a pointer para indicar que es clickeable
+            >
               <td className="text-center p-3">{startIndex + index + 1}</td>
               <td className="text-center p-3">{`ORD-${order.idOrdenProduccion}`}</td>
               <td className="text-center p-3">
@@ -45,24 +57,30 @@ const OrderTable = ({ orders, onViewDetails, onDelete }) => {
                 <Badge
                   pill
                   bg={order.estadoOrden === "C" ? "success" : "warning"}
-                  className="px-3 py-2"
+                  className="px-1 py-1"
                 >
                   {order.estadoOrden === "C" ? "Completado" : "Pendiente"}
                 </Badge>
               </td>
               <td className="text-center p-3">
-                <Button
+                {/* <Button
                   variant="outline-primary"
                   size="sm"
-                  onClick={() => onViewDetails(order)}
+                  onClick={(e) => {
+                    e.stopPropagation(); // Evitar que el evento de la fila se dispare
+                    onViewDetails(order);
+                  }}
                   className="me-2"
                 >
                   <FaFileAlt /> Ver Detalles
-                </Button>
+                </Button> */}
                 <Button
                   variant="outline-danger"
                   size="sm"
-                  onClick={() => onDelete(order.idOrdenProduccion)}
+                  onClick={(e) => {
+                    e.stopPropagation(); // Evitar que el evento de la fila se dispare
+                    onDelete(order.idOrdenProduccion);
+                  }}
                 >
                   <FaTrashAlt /> Eliminar
                 </Button>
