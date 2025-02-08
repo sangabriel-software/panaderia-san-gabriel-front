@@ -1,38 +1,23 @@
-// src/components/Orders/OrderTable.jsx
+// src/components/Orders/OrderCard.jsx
 import React from "react";
-import { Table, Button } from "react-bootstrap";
+import { Card, Button } from "react-bootstrap";
 
-const OrderTable = ({ orders, onViewDetails }) => {
+const OrderCard = ({ order, onViewDetails }) => {
   return (
-    <Table striped hover responsive>
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Fecha</th>
-          <th>Número de Orden</th>
-          <th>Total Items</th>
-          <th>Estado</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        {orders.map((order) => (
-          <tr key={order.id}>
-            <td>{order.id}</td>
-            <td>{order.date}</td>
-            <td>{order.orderNumber}</td>
-            <td>{order.totalItems}</td>
-            <td>{order.status}</td>
-            <td>
-              <Button variant="primary" size="sm" onClick={() => onViewDetails(order)}>
-                Ver Detalles
-              </Button>
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </Table>
+    <Card className="mb-3">
+      <Card.Body>
+        <Card.Title>{order.orderNumber}</Card.Title>
+        <Card.Text>
+          <strong>Fecha:</strong> {order.date} <br />
+          <strong>Items:</strong> {order.totalItems} <br />
+          <strong>Estado:</strong> {order.status}
+        </Card.Text>
+        <Button variant="primary" size="sm" onClick={() => onViewDetails(order)}>
+          Ver Detalles
+        </Button>
+      </Card.Body>
+    </Card>
   );
 };
 
-export default OrderTable;
+export default OrderCard;
