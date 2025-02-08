@@ -44,7 +44,7 @@ function ManageRoles() {
         <div className="col-12 col-md-9">
           <input
             type="search"
-            className="form-control"
+            className="form-control input-data"
             placeholder={showError || showInfo ? "No se pueden realizar busquedas" : "Buscar Rol"}
             value={searchQuery}
             onChange={handleSearch}

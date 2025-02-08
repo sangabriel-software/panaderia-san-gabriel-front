@@ -79,9 +79,7 @@ const GestionPedidosProd = () => {
         description="Gestiona los pedidos de la producción a realizar"
       />
       {/* boton para crear orden */}
-
         <AddButton buttonText="Ingresar Orden" />
-
       {/* Barra de filtros */}
       <FilterBar filters={filters} onFilterChange={setFilters} />
       {/* Renderizado condicional: tarjetas para móvil, tabla para escritorio */}

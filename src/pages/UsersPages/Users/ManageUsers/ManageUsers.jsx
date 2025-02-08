@@ -49,7 +49,7 @@ function ManageUsers() {
         <div className="col-12 col-md-9">
           <input
             type="search"
-            className="form-control"
+            className="form-control input-data"
             placeholder={
               showErrorUsers || showInfoUsers
                 ? "No se pueden realizar búsquedas"

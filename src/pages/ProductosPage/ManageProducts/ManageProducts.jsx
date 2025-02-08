@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useGetProductosYPrecios } from "../../../hooks/productosprecios/useGetProductosYprecios";
 import { checkForChanges, handleConfirmDeletePreoducto, handleDeleleProducto, handleModifyClick, handleUpdateProduct, useCategoriasYFiltrado, useSerchPrductos } from "./ManageProductsUtils";
-import CreateButton from "../../../components/CreateButton/CreateButton";
 import SearchInput from "../../../components/SerchInput/SerchInput";
 import Title from "../../../components/Title/Title";
 import CardProductos from "../../../components/CardProductos/CardPoductos";
@@ -15,6 +14,7 @@ import ModalIngreso from "../../../components/ModalGenerico/Modal";
 import { Form } from "react-bootstrap";
 import useGetCategorias from "../../../hooks/categorias/UseGetCategorias";
 import "./ManageProducts.css";
+import AddButton from "../../../components/AddButton/AddButton";
 
 const ManageProducts = () => {
   const { productos, loadigProducts, showErrorProductos, showInfoProductos, setProductos } = useGetProductosYPrecios();
@@ -54,9 +54,9 @@ const ManageProducts = () => {
     <div className="container">
       <Title title="Productos" description="Administración de productos existentes" />
       <div className="row mb-4">
-        <div className="col-12 col-md-3 mb-2 mb-md-0">
-          <CreateButton onClick={() => navigate("/productos/ingresar-producto")} />
-        </div>
+
+          <AddButton buttonText="Ingresar Producto" onRedirect={() => navigate("/productos/ingresar-producto")} />
+
         <div className="col-12 col-md-6">
           <SearchInput
             id="searchInput"
