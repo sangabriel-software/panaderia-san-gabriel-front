@@ -47,9 +47,10 @@ const OrderTable = ({ orders, onViewDetails, onDelete }) => {
           <tr>
             <th className="text-center p-3">#</th>
             <th className="text-center p-3">Número de Orden</th>
+            <th className="text-center p-3">Sucursal</th>
+            <th className="text-center p-3">Panadero Encargado</th>
             <th className="text-center p-3">Fecha a Producir</th>
             <th className="text-center p-3">Total Productos</th>
-            <th className="text-center p-3">Sucursal</th>
             <th className="text-center p-3">Acciones</th>
           </tr>
         </thead>
@@ -64,17 +65,15 @@ const OrderTable = ({ orders, onViewDetails, onDelete }) => {
               <td className="text-center p-3" title="Doble click para ver detalles">{startIndex + index + 1}</td>
               <td className="text-center p-3" title="Doble click para ver detalles">{`ORD-${order.idOrdenProduccion}`}</td>
               <td className="text-center p-3" title="Doble click para ver detalles">
-                {formatDateToDisplay(order.fechaAProducir)}
-              </td>
-              <td className="text-center p-3" title="Doble click para ver detalles">{order.cantidadProductos}</td>
-              <td className="text-center p-3" title="Doble click para ver detalles">
-                <Badge
-                  style={{ backgroundColor: getColorByLength(order.nombreSucursal), color: "#FFF" }}
+                <Badge style={{ backgroundColor: getColorByLength(order.nombreSucursal), color: "#FFF" }}
                   className="px-1 py-1"
                 >
                   {order.nombreSucursal}
                 </Badge>
               </td>
+              <td className="text-center p-3" title="Doble click para ver detalles">{order.nombrePanadero}</td>
+              <td className="text-center p-3" title="Doble click para ver detalles">{formatDateToDisplay(order.fechaAProducir)}</td>
+              <td className="text-center p-3" title="Doble click para ver detalles">{order.cantidadProductos}</td>
               <td className="text-center p-3" onDoubleClick={(e) => e.stopPropagation()}>
                 {/* <Button
                   variant="outline-primary"
