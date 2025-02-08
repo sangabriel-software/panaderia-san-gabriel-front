@@ -16,7 +16,11 @@ const GestionPedidosProd = () => {
   // Obtener las órdenes de producción
   const { ordenesProduccion, loadingOrdenes } = useGetOrdenesProduccion();
   // Estado para los filtros
-  const [filters, setFilters] = useState({ search: "", date: "", sucursal: "" });
+  const [filters, setFilters] = useState({
+    search: "",
+    date: "",
+    sucursal: "",
+  });
   // Usar el hook para filtrar las órdenes
   const filteredOrders = useFilterOrders(ordenesProduccion, filters);
 
@@ -41,25 +45,6 @@ const GestionPedidosProd = () => {
     console.log("Descargar PDF");
   };
 
-  if (loadingOrdenes) {
-    return (
-      <Container>
-        <Title
-          title="Órdenes de Producción"
-          description="Gestiona los pedidos de la producción a realizar"
-        />
-        <AddButton buttonText="Ingresar Orden" />
-        <FilterBar filters={filters} onFilterChange={setFilters} ordenesProduccion={ordenesProduccion} />
-        {/* Mostrar Skeleton mientras se cargan las órdenes */}
-        {isMobile ? (
-          [...Array(5)].map((_, index) => <OrderCardSkeleton key={index} />)
-        ) : (
-          <OrderTable orders={[]} onViewDetails={onViewDetails} />
-        )}
-      </Container>
-    );
-  }
-
   return (
     <Container>
       <Title
@@ -67,16 +52,24 @@ const GestionPedidosProd = () => {
         description="Gestiona los pedidos de la producción a realizar"
       />
       <AddButton buttonText="Ingresar Orden" />
-      <FilterBar filters={filters} onFilterChange={setFilters} ordenesProduccion={ordenesProduccion} />
+      <FilterBar
+        filters={filters}
+        onFilterChange={setFilters}
+        ordenesProduccion={ordenesProduccion}
+      />
       {isMobile ? (
-        filteredOrders.map((order) => (
-          <OrderCard
-            key={order.idOrdenProduccion}
-            order={order}
-            onViewDetails={onViewDetails}
-            onDeleteOrder={onDeleteOrder}
-          />
-        ))
+        loadingOrdenes ? (
+          [...Array(5)].map((_, index) => <OrderCardSkeleton key={index} />)
+        ) : (
+          filteredOrders.map((order) => (
+            <OrderCard
+              key={order.idOrdenProduccion}
+              order={order}
+              onViewDetails={onViewDetails}
+              onDeleteOrder={onDeleteOrder}
+            />
+          ))
+        )
       ) : (
         <OrderTable orders={filteredOrders} onViewDetails={onViewDetails} />
       )}
