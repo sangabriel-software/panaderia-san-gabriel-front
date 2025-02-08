@@ -36,7 +36,7 @@ const OrderCard = ({ order, onViewDetails, onDeleteOrder }) => {
           <Button
             variant="primary"
             size="sm"
-            className="order-card-button me-2"
+            className="order-card-button ver me-2"
             onClick={() => onViewDetails(order)}
           >
             Ver detalles

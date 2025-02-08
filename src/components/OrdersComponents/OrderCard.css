@@ -53,3 +53,11 @@
     margin: 1rem 0;
   }
   
+  .ver{
+    background-color: #0F4D8B;
+    border-color: #0F4D8B;
+  }
+
+  .ver:hover{
+   background-color: #005BA8;
+  }
