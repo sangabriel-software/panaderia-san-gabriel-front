@@ -19,14 +19,12 @@ const OrderCard = ({ order, onViewDetails, onDeleteOrder }) => {
         </div>
 
         {/* Detalles de la orden */}
-        <Card.Text className="order-card-text">
-          <div className="order-card-detail">
-            <strong>Fecha a producir:</strong> {formatDateToDisplay(order.fechaAProducir)}
-          </div>
-          <div className="order-card-detail">
-            <strong>Productos:</strong> {order.cantidadProductos}
-          </div>
-        </Card.Text>
+        <div className="order-card-detail">
+          <strong>Fecha a producir:</strong> {formatDateToDisplay(order.fechaAProducir)}
+        </div>
+        <div className="order-card-detail">
+          <strong>Productos:</strong> {order.cantidadProductos}
+        </div>
 
         {/* Botones de acción */}
         <div className="d-flex justify-content-between">

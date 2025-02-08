@@ -51,6 +51,7 @@ const GestionPedidosProd = () => {
             key={order.idOrdenProduccion}
             order={order}
             onViewDetails={onViewDetails}
+            onViewDelete={onViewDetails}
           />
         ))
       ) : (
