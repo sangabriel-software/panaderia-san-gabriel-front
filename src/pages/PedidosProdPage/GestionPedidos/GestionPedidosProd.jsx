@@ -1,4 +1,3 @@
-// src/components/Orders/GestionPedidosProd.jsx
 import React, { useState, useEffect } from "react";
 import Title from "../../../components/Title/Title";
 import { Container } from "react-bootstrap";
@@ -6,9 +5,11 @@ import { useMediaQuery } from "react-responsive";
 import FilterBar from "../../../components/FilterBar/FilterBar";
 import OrderTable from "../../../components/OrdersComponents/OrderTable";
 import OrderCard from "../../../components/OrdersComponents/OrderCard";
+
 import useGetOrdenesProduccion from "../../../hooks/ordenesproduccion/useGetOrdenesProduccion";
 import AddButton from "../../../components/AddButton/AddButton";
 import useFilterOrders from "../../../hooks/ordenesproduccion/useFilterOrders";
+import OrderCardSkeleton from "../../../components/OrderCardSkeleton/OrderCardSkeleton";
 
 const GestionPedidosProd = () => {
   const isMobile = useMediaQuery({ maxWidth: 767 });
@@ -24,6 +25,13 @@ const GestionPedidosProd = () => {
     console.log("Ver detalles de la orden:", order);
   };
 
+  // Función para eliminar una orden
+  const onDeleteOrder = (orderId) => {
+    console.log("Eliminar orden:", orderId);
+    // Aquí puedes implementar la lógica para eliminar la orden del backend
+    // y actualizar el estado de `ordenesProduccion`.
+  };
+
   // Funciones para descarga
   const onDownloadXLS = () => {
     console.log("Descargar XLS");
@@ -34,7 +42,22 @@ const GestionPedidosProd = () => {
   };
 
   if (loadingOrdenes) {
-    return <div className="loading">Cargando Ordenes...</div>;
+    return (
+      <Container>
+        <Title
+          title="Órdenes de Producción"
+          description="Gestiona los pedidos de la producción a realizar"
+        />
+        <AddButton buttonText="Ingresar Orden" />
+        <FilterBar filters={filters} onFilterChange={setFilters} ordenesProduccion={ordenesProduccion} />
+        {/* Mostrar Skeleton mientras se cargan las órdenes */}
+        {isMobile ? (
+          [...Array(5)].map((_, index) => <OrderCardSkeleton key={index} />)
+        ) : (
+          <OrderTable orders={[]} onViewDetails={onViewDetails} />
+        )}
+      </Container>
+    );
   }
 
   return (
@@ -51,7 +74,7 @@ const GestionPedidosProd = () => {
             key={order.idOrdenProduccion}
             order={order}
             onViewDetails={onViewDetails}
-            onViewDelete={onViewDetails}
+            onDeleteOrder={onDeleteOrder}
           />
         ))
       ) : (
