@@ -10,9 +10,9 @@ const OrderCard = ({ order, onViewDetails, onDeleteOrder }) => {
         {/* Encabezado de la tarjeta */}
         <div className="d-flex justify-content-between align-items-center mb-2">
           <Card.Title className="order-card-title">
-            Orden #{order.idOrdenProduccion}
+            ORD-{order.idOrdenProduccion}
           </Card.Title>
-          <Badge bg="secondary" className="order-card-badge">
+          <Badge bg="success" className="order-card-badge">
             {order.nombreSucursal}
           </Badge>
         </div>
