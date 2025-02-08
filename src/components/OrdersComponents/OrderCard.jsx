@@ -25,12 +25,16 @@ const OrderCard = ({ order, onViewDetails, onDeleteOrder }) => {
           <strong>Productos:</strong> {order.cantidadProductos}
         </div>
 
-        {/* Botones de acción */}
-        <div className="d-flex justify-content-between">
+        <div className="order-card-detail">
+          <strong>Panadero Encargado:</strong> {order.nombrePanadero}
+        </div>
+
+        {/* Botones de acción centrados */}
+        <div className="d-flex justify-content-center mt-3">
           <Button
             variant="primary"
             size="sm"
-            className="order-card-button"
+            className="order-card-button me-2"
             onClick={() => onViewDetails(order)}
           >
             Ver Detalles

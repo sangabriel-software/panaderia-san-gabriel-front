@@ -9,16 +9,16 @@ const ITEMS_PER_PAGE = 5;
 
 
 
-const getColorByLength = (text) => {
-  const COLORS = [
-    "#E63946", "#F4A261", "#2A9D8F", "#264653", "#8AB17D",
-    "#F77F00", "#3D348B", "#E56B6F", "#6A0572", "#F5EE9E",
-    "#9D4EDD", "#FF5D8F", "#1B9AAA", "#D81159", "#FF9F1C"
-  ];
+const getColorByName = (name) => {
+  const COLORS = [    "succes", "primary", "info", "secondary"];
 
-  if (!text) return "warning"; // Si está vacío, usa amarillo como advertencia
-  const index = text.length % COLORS.length; // Selecciona un color en base a la longitud
-  return COLORS[index];
+  if (!name) return "#FFC107"; // Amarillo si el nombre está vacío
+
+  // Crear un hash basado en los caracteres del nombre
+  const hash = name.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  const index = hash % COLORS.length;
+
+  return COLORS[index]; // Seleccionar un color basado en el hash
 };
 
 const OrderTable = ({ orders, onViewDetails, onDelete }) => {
@@ -65,7 +65,7 @@ const OrderTable = ({ orders, onViewDetails, onDelete }) => {
               <td className="text-center p-3" title="Doble click para ver detalles">{startIndex + index + 1}</td>
               <td className="text-center p-3" title="Doble click para ver detalles">{`ORD-${order.idOrdenProduccion}`}</td>
               <td className="text-center p-3" title="Doble click para ver detalles">
-                <Badge style={{ backgroundColor: getColorByLength(order.nombreSucursal), color: "#FFF" }}
+                <Badge bg={getColorByName(order.nombreSucursal)}
                   className="px-1 py-1"
                 >
                   {order.nombreSucursal}

@@ -9,6 +9,7 @@ import useOptionsMenu from "../../../../hooks/usuarioshook/useOptionsMenu";
 import { useGetUsers } from "../../../../hooks/usuarioshook/useGetUsers";
 import { handleBloqueoDesbloqueo, handleConfirmDelete, handleDelele, useUsersSerch } from "./ManageUsersUtils";
 import "./ManageUsersStyle.css"
+import OrderCardSkeleton from "../../../../components/OrderCardSkeleton/OrderCardSkeleton";
 
 function ManageUsers() {
 
@@ -23,10 +24,6 @@ function ManageUsers() {
   const { filteredUsers, searchQuery, showNoResults, handleSearch } = useUsersSerch(usuarios);
   const [ userToDelete, setUserToDelete] = useState(null); // Setea el id a eliminar
 
-
-  if (loadingUsers) {
-    return <div className="loading">Cargando usuarios...</div>;
-  }
 
   return (
     <div className="container">
@@ -64,7 +61,17 @@ function ManageUsers() {
 
       <div className="container mt-4">
         <div className="row">
-          {filteredUsers.map((user) => (
+         {loadingUsers ? (
+          <div className="row">
+          {[...Array(6)].map((_, index) => (
+            <div className="col-12 col-md-6 mb-4" key={index}>
+              <OrderCardSkeleton />
+            </div>
+          ))}
+        </div>
+         ): (
+
+          filteredUsers.map((user) => (
             <div key={user.idUsuario} className="col-xs-12 col-12 col-lg-6 mb-4">
               <UsersCard
                 id={user.idUsuario}
@@ -80,7 +87,10 @@ function ManageUsers() {
                 onBlock={() => {handleBloqueoDesbloqueo(user.idUsuario, user.estadoUsuario, setUsuarios, setIsPopupOpen, setErrorPopupMessage, setIsPopupErrorOpen)}}
               />
             </div>
-          ))}
+          ))
+          
+         )}
+         
         </div>
       </div>
 
