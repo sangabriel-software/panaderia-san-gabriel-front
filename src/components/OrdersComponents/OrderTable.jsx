@@ -7,6 +7,20 @@ import "./OrderTable.css";
 
 const ITEMS_PER_PAGE = 5;
 
+
+
+const getColorByLength = (text) => {
+  const COLORS = [
+    "#E63946", "#F4A261", "#2A9D8F", "#264653", "#8AB17D",
+    "#F77F00", "#3D348B", "#E56B6F", "#6A0572", "#F5EE9E",
+    "#9D4EDD", "#FF5D8F", "#1B9AAA", "#D81159", "#FF9F1C"
+  ];
+
+  if (!text) return "warning"; // Si está vacío, usa amarillo como advertencia
+  const index = text.length % COLORS.length; // Selecciona un color en base a la longitud
+  return COLORS[index];
+};
+
 const OrderTable = ({ orders, onViewDetails, onDelete }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const navigate = useNavigate(); // Hook para redireccionar
@@ -29,13 +43,13 @@ const OrderTable = ({ orders, onViewDetails, onDelete }) => {
   return (
     <Container className="p-3">
       <Table striped hover responsive bordered className="modern-table shadow-lg">
-        <thead style={{ backgroundColor: '#292A2D' }}>
+        <thead className="custom-thead">
           <tr>
             <th className="text-center p-3">#</th>
             <th className="text-center p-3">Número de Orden</th>
             <th className="text-center p-3">Fecha a Producir</th>
             <th className="text-center p-3">Total Productos</th>
-            <th className="text-center p-3">Estado</th>
+            <th className="text-center p-3">Sucursal</th>
             <th className="text-center p-3">Acciones</th>
           </tr>
         </thead>
@@ -44,25 +58,24 @@ const OrderTable = ({ orders, onViewDetails, onDelete }) => {
             <tr
               key={order.idOrdenProduccion}
               className="align-middle"
-              onClick={() => handleRowClick(order.idOrdenProduccion)} // Evento onClick en la fila
+              onDoubleClick={() => handleRowClick(order.idOrdenProduccion)} // Evento onClick en la fila
               style={{ cursor: "pointer" }} // Cambiar el cursor a pointer para indicar que es clickeable
             >
-              <td className="text-center p-3">{startIndex + index + 1}</td>
-              <td className="text-center p-3">{`ORD-${order.idOrdenProduccion}`}</td>
-              <td className="text-center p-3">
+              <td className="text-center p-3" title="Doble click para ver detalles">{startIndex + index + 1}</td>
+              <td className="text-center p-3" title="Doble click para ver detalles">{`ORD-${order.idOrdenProduccion}`}</td>
+              <td className="text-center p-3" title="Doble click para ver detalles">
                 {formatDateToDisplay(order.fechaAProducir)}
               </td>
-              <td className="text-center p-3">{order.cantidadProductos}</td>
-              <td className="text-center p-3">
+              <td className="text-center p-3" title="Doble click para ver detalles">{order.cantidadProductos}</td>
+              <td className="text-center p-3" title="Doble click para ver detalles">
                 <Badge
-                  pill
-                  bg={order.estadoOrden === "C" ? "success" : "warning"}
+                  style={{ backgroundColor: getColorByLength(order.nombreSucursal), color: "#FFF" }}
                   className="px-1 py-1"
                 >
-                  {order.estadoOrden === "C" ? "Completado" : "Pendiente"}
+                  {order.nombreSucursal}
                 </Badge>
               </td>
-              <td className="text-center p-3">
+              <td className="text-center p-3" onDoubleClick={(e) => e.stopPropagation()}>
                 {/* <Button
                   variant="outline-primary"
                   size="sm"

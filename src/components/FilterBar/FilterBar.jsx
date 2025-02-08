@@ -1,8 +1,8 @@
 import React from "react";
 import { Form, Row, Col, Button, InputGroup } from "react-bootstrap";
-import "./FilterBar.css"
+import "./FilterBar.css";
 
-const FilterBar = ({ filters, onFilterChange }) => {
+const FilterBar = ({ filters, onFilterChange, ordenesProduccion }) => {
   const handleSearchChange = (e) => {
     let inputValue = e.target.value.replace(/^ORD-/, ""); // Evita que se borre el prefijo
     if (inputValue.trim() === "") inputValue = ""; // Corrige el bug cuando se borra todo
@@ -12,6 +12,11 @@ const FilterBar = ({ filters, onFilterChange }) => {
   const handleClearDate = () => {
     onFilterChange({ ...filters, date: "" }); // Limpia la fecha y restaura los datos
   };
+
+  // Obtener lista única de sucursales
+  const uniqueSucursales = Array.from(
+    new Set(ordenesProduccion?.map((order) => order.nombreSucursal))
+  );
 
   return (
     <Form className="mb-4" onSubmit={(e) => e.preventDefault()}> {/* Evita recarga al presionar Enter */}
@@ -47,16 +52,17 @@ const FilterBar = ({ filters, onFilterChange }) => {
           </InputGroup>
         </Col>
 
-        {/* Filtro por estado */}
+        {/* Filtro por sucursal */}
         <Col xs={12} md={4}>
           <Form.Select
             className="input-filter"
-            value={filters.status}
-            onChange={(e) => onFilterChange({ ...filters, status: e.target.value })}
+            value={filters.sucursal}
+            onChange={(e) => onFilterChange({ ...filters, sucursal: e.target.value })}
           >
-            <option value="">Todos los estados</option>
-            <option value="C">Completado</option>
-            <option value="P">Pendiente</option>
+            <option value="">Todas las sucursales</option>
+            {uniqueSucursales.map((sucursal, index) => (
+              <option key={index} value={sucursal}>{sucursal}</option>
+            ))}
           </Form.Select>
         </Col>
       </Row>
