@@ -39,7 +39,6 @@
     font-size: 0.875rem;
     padding: 5px 15px;
     border-radius: 8px;
-    text-transform: uppercase;
     font-weight: 500;
     letter-spacing: 0.5px;
   }
@@ -47,3 +46,10 @@
   .order-card-button:hover {
     opacity: 0.9;
   }
+
+  .order-card-divider {
+    border: 0;
+    border-top: 1px solid #333;
+    margin: 1rem 0;
+  }
+  

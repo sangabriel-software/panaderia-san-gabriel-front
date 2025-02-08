@@ -17,6 +17,9 @@ const OrderCard = ({ order, onViewDetails, onDeleteOrder }) => {
           </Badge>
         </div>
 
+        {/* Línea divisoria */}
+        <hr className="order-card-divider" />
+
         {/* Detalles de la orden */}
         <div className="order-card-detail">
           <strong>Fecha a producir:</strong> {formatDateToDisplay(order.fechaAProducir)}
@@ -24,7 +27,6 @@ const OrderCard = ({ order, onViewDetails, onDeleteOrder }) => {
         <div className="order-card-detail">
           <strong>Productos:</strong> {order.cantidadProductos}
         </div>
-
         <div className="order-card-detail">
           <strong>Panadero Encargado:</strong> {order.nombrePanadero}
         </div>
@@ -37,7 +39,7 @@ const OrderCard = ({ order, onViewDetails, onDeleteOrder }) => {
             className="order-card-button me-2"
             onClick={() => onViewDetails(order)}
           >
-            Ver Detalles
+            Ver detalles
           </Button>
           <Button
             variant="danger"
