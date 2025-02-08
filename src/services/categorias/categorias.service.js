@@ -1,5 +1,5 @@
 import api from "../../config/api";
-import { deleteEndpoints, getEndpoints, postEndpoints } from "../../config/endpoints";
+import { getEndpoints, postEndpoints } from "../../config/endpoints";
 
 export const ingresarCategoriaService = async (categoria) => {
   try {

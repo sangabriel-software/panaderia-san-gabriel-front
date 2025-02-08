@@ -36,7 +36,6 @@ function IngresarProductos() {
     await saveCategory(data, setIsCategorySaving, resetCategory, setShowCategoryModal, setShowErrorCategorySave, categorias );
   }
 
-  console.log(isPopupOpen);
   return (
     <div className="container justify-content-center">
       <div className="text-center mb-3">
@@ -225,7 +224,7 @@ function IngresarProductos() {
         message="El producto ha sido creado con éxito."
         nombreBotonVolver="Ver Productos"
         nombreBotonNuevo="Ingresar Producto"
-        onViews={() => navigate("/productos")}
+        onView={() => navigate("/productos")}
         onNew={() => {
           setIsPopupOpen(false);
           resetForm(reset, setSelectedImage, setImagePreview, setIsResetImageInput);
