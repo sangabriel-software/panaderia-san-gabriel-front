@@ -2,8 +2,9 @@ import React, { useState } from "react";
 import { Table, Button, Badge, Container, Pagination } from "react-bootstrap";
 import { formatDateToDisplay } from "../../utils/dateUtils";
 import { FaFileAlt, FaTrashAlt } from "react-icons/fa";
+import "./OrderTable.css";
 
-const ITEMS_PER_PAGE = 10; // Número de órdenes por página
+const ITEMS_PER_PAGE = 5;
 
 const OrderTable = ({ orders, onViewDetails, onDelete }) => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -20,12 +21,12 @@ const OrderTable = ({ orders, onViewDetails, onDelete }) => {
 
   return (
     <Container className="p-3">
-      <Table striped hover responsive bordered className="shadow-sm rounded">
-        <thead className="thead-dark bg-primary text-white">
+      <Table striped hover responsive bordered className="modern-table shadow-lg">
+        <thead className="thead-dark thead bg-dark text-white">
           <tr>
             <th className="text-center p-3">#</th>
             <th className="text-center p-3">Número de Orden</th>
-            <th className="text-center p-3">Fecha a producir</th>
+            <th className="text-center p-3">Fecha a Producir</th>
             <th className="text-center p-3">Total Productos</th>
             <th className="text-center p-3">Estado</th>
             <th className="text-center p-3">Acciones</th>
