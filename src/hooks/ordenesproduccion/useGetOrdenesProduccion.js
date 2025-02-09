@@ -29,7 +29,7 @@ export const useGetOrdenesProduccion = () => {
       fetchOrdenesProduccion();
     }, []);
   
-    return { ordenesProduccion, loadingOrdenes, showErrorOrdenes, showInfoOrdenes };
+    return { ordenesProduccion, loadingOrdenes, showErrorOrdenes, showInfoOrdenes, setOrdenesProduccion };
   };
   
   export default useGetOrdenesProduccion;

@@ -10,13 +10,21 @@ import AddButton from "../../../components/AddButton/AddButton";
 import useFilterOrders from "../../../hooks/ordenesproduccion/useFilterOrders";
 import PaginationComponent from "../../../components/PaginationComponent/PaginationComponent";
 import OrderCardSkeleton from "../../../components/OrderCardSkeleton/OrderCardSkeleton";
-import { getCurrentItems } from "./GestionPedidosProdUtils";
+import { getCurrentItems, handleConfirmDeleteOrdenProduccion, handleDeleteOrder } from "./GestionPedidosProdUtils";
+import ConfirmPopUp from "../../../components/Popup/ConfirmPopup";
+import { eliminarOrdenProduccionService } from "../../../services/ordenesproduccion/ordenesProduccion.service";
 
 const GestionPedidosProd = () => {
   const isMobile = useMediaQuery({ maxWidth: 767 });
-  const { ordenesProduccion, loadingOrdenes } = useGetOrdenesProduccion();
+  const { ordenesProduccion, loadingOrdenes, setOrdenesProduccion } = useGetOrdenesProduccion();
   const [filters, setFilters] = useState({ search: "", date: "", sucursal: "" });
   const filteredOrders = useFilterOrders(ordenesProduccion, filters);
+
+  // Variables de estado para mostrar popup y almacenar la orden a eliminar
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [errorPopupMessage, setErrorPopupMessage] = useState(false);
+  const [isPopupErrorOpen, setIsPopupErrorOpen] = useState(false);
+  const [ordenToDelete, setOrdenToDelete] = useState(null);
 
   /* Variables para la paginacion */
   const [currentPage, setCurrentPage] = useState(1);
@@ -40,7 +48,7 @@ const GestionPedidosProd = () => {
                 key={order.idOrdenProduccion}
                 order={order}
                 onViewDetails={() => {}}
-                onDeleteOrder={() => {}}
+                onDeleteOrder={() => handleConfirmDeleteOrdenProduccion( order.idOrdenProduccion, setOrdenToDelete, setIsPopupOpen )}
               />
             ))}
             <PaginationComponent
@@ -52,8 +60,19 @@ const GestionPedidosProd = () => {
           </>
         )
       ) : (
-        <OrderTable orders={filteredOrders} onViewDetails={() => {}} />
+        <OrderTable orders={filteredOrders} onDelete={(idOrder) => handleConfirmDeleteOrdenProduccion(idOrder, setOrdenToDelete, setIsPopupOpen )
+          }
+        />
       )}
+
+      <ConfirmPopUp
+        isOpen={isPopupOpen}
+        onClose={() => setIsPopupOpen(false)}
+        title="Confirmar Eliminación"
+        message="¿Está seguro de eliminar la orden?"
+        onConfirm={()=> {handleDeleteOrder(ordenToDelete, setOrdenesProduccion, setIsPopupOpen, setErrorPopupMessage, setIsPopupErrorOpen )}}
+        onCancel={() => setIsPopupOpen(false)}
+      />
     </Container>
   );
 };

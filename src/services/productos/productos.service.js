@@ -34,7 +34,6 @@ export const desactivarProductosService = async (idProducto) => {
     const response = await api.delete(`${deleteEndpoints.DESACTIVAR_PRODUCTOS}/${idProducto}`); 
       return response.data;
   } catch (error) {
-    console.log(error)
     throw error;
   }
 }

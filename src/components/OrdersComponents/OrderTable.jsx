@@ -17,7 +17,7 @@ const getColorByName = (name) => {
   return COLORS[index];
 };
 
-const OrderTable = ({ orders, onViewDetails, onDelete }) => {
+const OrderTable = ({ orders, onDelete }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const containerRef = useRef(null);
   const navigate = useNavigate();

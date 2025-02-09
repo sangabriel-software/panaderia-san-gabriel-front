@@ -31,7 +31,8 @@ const deleteEndpoints = {
     ELIMINAR_ROL: "/eliminarRol",
     ELINAR_PERMISOS: "eliminarRolPermisosBatch",
     ELMINAR_USUARIOS: "eliminarUsuario",
-    DESACTIVAR_PRODUCTOS: "desactivarProducto"
+    DESACTIVAR_PRODUCTOS: "desactivarProducto",
+    ELIMINAR_ORDEN_PRODUCCION: "/eliminar-ordenes-produccion"
 };
 
 

@@ -1,5 +1,5 @@
 import api from "../../config/api";
-import { getEndpoints, postEndpoints } from "../../config/endpoints";
+import { getEndpoints, postEndpoints, deleteEndpoints } from "../../config/endpoints";
 
 
 export const consultarOrdenesProduccion = async () => {
@@ -10,3 +10,12 @@ export const consultarOrdenesProduccion = async () => {
     throw error;
   }
 };
+
+export const eliminarOrdenProduccionService = async (idOrdenProduccion) => {
+  try {
+    const response = await api.delete(`${deleteEndpoints.ELIMINAR_ORDEN_PRODUCCION}/${idOrdenProduccion}`); 
+      return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
