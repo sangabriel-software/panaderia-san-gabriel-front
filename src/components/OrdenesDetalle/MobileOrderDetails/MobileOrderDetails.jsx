@@ -97,12 +97,9 @@ const ProductCardMobile = ({ product, index }) => {
             <div className="fw-bold">{product.cantidadUnidades.toLocaleString()}</div>
           </div>
           <div className="text-center">
-            <div className="text-muted">Venta</div>
+            <div className="text-muted">Categoria</div>
             <div className="fw-bold text-success">
-              ${ventaEstimada.toLocaleString(undefined, { 
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2 
-              })}
+              {product.nombreCategoria}
             </div>
           </div>
         </div>
