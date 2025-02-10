@@ -10,7 +10,7 @@ import PaginationComponent from "../PaginationComponent/PaginationComponent";
 const ITEMS_PER_PAGE = 5;
 
 const getColorByName = (name) => {
-  const COLORS = ["succes", "primary", "info", "secondary"];
+  const COLORS = ["succes", "primary", "info",];
   if (!name) return "#FFC107";
   const hash = name.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
   const index = hash % COLORS.length;

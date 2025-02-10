@@ -9,6 +9,10 @@ const FilterBar = ({ filters, onFilterChange, ordenesProduccion }) => {
     onFilterChange({ ...filters, search: inputValue });
   };
 
+  const handleClearSearch = () => {
+    onFilterChange({ ...filters, search: "" }); // Limpia el campo de búsqueda
+  };
+
   const handleClearDate = () => {
     onFilterChange({ ...filters, date: "" }); // Limpia la fecha y restaura los datos
   };
@@ -19,12 +23,19 @@ const FilterBar = ({ filters, onFilterChange, ordenesProduccion }) => {
   );
 
   return (
-    <Form className="mb-4" onSubmit={(e) => e.preventDefault()}> {/* Evita recarga al presionar Enter */}
+    <Form className="mb-4" onSubmit={(e) => e.preventDefault()}>
+      {" "}
+      {/* Evita recarga al presionar Enter */}
       <Row className="g-2">
         {/* Campo de búsqueda */}
-        <Col xs={12} md={4}>
+        <Col xs={12} md={3} lg={3}>
           <InputGroup>
-            <InputGroup.Text className="span-filter" style={{ fontWeight: "bold", color: "blue" }}>ORD-</InputGroup.Text>
+            <InputGroup.Text
+              className="span-filter"
+              style={{ fontWeight: "bold", color: "blue" }}
+            >
+              ORD-
+            </InputGroup.Text>
             <Form.Control
               className="input-filter"
               type="text"
@@ -32,17 +43,28 @@ const FilterBar = ({ filters, onFilterChange, ordenesProduccion }) => {
               value={filters.search}
               onChange={handleSearchChange}
             />
+            {filters.search && ( // Mostrar botón solo si hay texto en el campo de búsqueda
+              <Button
+                variant="outline-danger"
+                onClick={handleClearSearch}
+                style={{ borderLeft: "none" }}
+              >
+                ❌
+              </Button>
+            )}
           </InputGroup>
         </Col>
 
         {/* Filtro por fecha con botón de limpiar */}
-        <Col xs={12} md={4}>
+        <Col xs={12} md={3} lg={3}>
           <InputGroup>
             <Form.Control
               className="input-filter"
               type="date"
               value={filters.date}
-              onChange={(e) => onFilterChange({ ...filters, date: e.target.value })}
+              onChange={(e) =>
+                onFilterChange({ ...filters, date: e.target.value })
+              }
             />
             {filters.date && ( // Solo mostrar botón si hay fecha seleccionada
               <Button variant="outline-danger" onClick={handleClearDate}>
@@ -53,15 +75,19 @@ const FilterBar = ({ filters, onFilterChange, ordenesProduccion }) => {
         </Col>
 
         {/* Filtro por sucursal */}
-        <Col xs={12} md={4}>
+        <Col xs={12} md={3}>
           <Form.Select
             className="input-filter"
             value={filters.sucursal}
-            onChange={(e) => onFilterChange({ ...filters, sucursal: e.target.value })}
+            onChange={(e) =>
+              onFilterChange({ ...filters, sucursal: e.target.value })
+            }
           >
             <option value="">Todas las sucursales</option>
             {uniqueSucursales.map((sucursal, index) => (
-              <option key={index} value={sucursal}>{sucursal}</option>
+              <option key={index} value={sucursal}>
+                {sucursal}
+              </option>
             ))}
           </Form.Select>
         </Col>
