@@ -94,6 +94,12 @@ const GestionPedidosProd = () => {
             />
           </>
         )
+      ) : loadingOrdenes ? (
+        <div className="d-flex justify-content-center  my-5">
+          <div className="spinner-border text-primary my-5 my-5" role="status">
+            <span className="visually-hidden">Cargando...</span>
+          </div>
+        </div>
       ) : (
         <OrderTable
           orders={filteredOrders}
@@ -129,7 +135,7 @@ const GestionPedidosProd = () => {
             <div className="col-md-6 text-center">
               <Alert
                 type="primary"
-                message="No se han ingresado ordens de produccion."
+                message="No se han ingresado órdenes de producción."
                 icon={<BsFillInfoCircleFill />}
               />
             </div>
@@ -141,14 +147,14 @@ const GestionPedidosProd = () => {
           <div className="col-md-6 text-center">
             <Alert
               type="danger"
-              message="Hubo un error al consultar las ordenes de produccion. Intenta más tarde..."
+              message="Hubo un error al consultar las órdenes de producción. Intenta más tarde..."
               icon={<BsExclamationTriangleFill />}
             />
           </div>
         </div>
       )}
 
-      {/* Popup confirmacion de elminacion */}
+      {/* Popup confirmacion de eliminación */}
       <ConfirmPopUp
         isOpen={isPopupOpen}
         onClose={() => setIsPopupOpen(false)}
