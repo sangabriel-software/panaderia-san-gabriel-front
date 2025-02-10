@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 
 import "./OrderTable.css";
 import PaginationComponent from "../PaginationComponent/PaginationComponent";
+import { handleViewDetalle } from "../../pages/PedidosProdPage/DetallesOrdenesProd/DetallesOrdenesProdUtils";
 
 const ITEMS_PER_PAGE = 5;
 
@@ -31,7 +32,7 @@ const OrderTable = ({ orders, onDelete }) => {
 
   // Manejador para redireccionar al hacer doble clic en una fila
   const handleRowClick = (idOrdenProduccion) => {
-    navigate(`/ordenes-produccion/detalle-orden/${idOrdenProduccion}`);
+    handleViewDetalle(idOrdenProduccion, navigate)
   };
 
   // Cada vez que cambie la página, se realiza el scroll al final del contenedor

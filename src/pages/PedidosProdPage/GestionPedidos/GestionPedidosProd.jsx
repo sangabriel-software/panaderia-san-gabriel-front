@@ -15,6 +15,7 @@ import ConfirmPopUp from "../../../components/Popup/ConfirmPopup";
 import Alert from "../../../components/Alerts/Alert";
 import { BsExclamationTriangleFill, BsFillInfoCircleFill, } from "react-icons/bs";
 import { useNavigate } from "react-router";
+import { handleViewDetalle } from "../DetallesOrdenesProd/DetallesOrdenesProdUtils";
 
 const GestionPedidosProd = () => {
   const isMobile = useMediaQuery({ maxWidth: 767 });
@@ -57,7 +58,7 @@ const GestionPedidosProd = () => {
               <OrderCard
                 key={order.idOrdenProduccion}
                 order={order}
-                onViewDetails={()=> {navigate(`/ordenes-produccion/detalle-orden/${order.idOrdenProduccion}`);}}
+                onViewDetails={()=> {handleViewDetalle(order.idOrdenProduccion, navigate)}}
                 onDeleteOrder={() =>
                   handleConfirmDeleteOrdenProduccion(
                     order.idOrdenProduccion,

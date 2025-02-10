@@ -7,18 +7,14 @@ import Title from "../../../components/Title/Title";
 import MobileOrderDetails from "../../../components/OrdenesDetalle/MobileOrderDetails/MobileOrderDetails";
 import DesktopOrderDetails from "../../../components/OrdenesDetalle/DesktopOrderDetails/DesktopOrderDetails";
 import useGetDetalleOrden from "../../../hooks/ordenesproduccion/useGetDetalleOrden";
+import { decryptId } from "../../../utils/CryptoParams";
 
 const DetallesOrdenesProduccionPage = () => {
   const navigate = useNavigate();
   const isMobile = useMediaQuery({ maxWidth: 768 });
   const { idOrdenProduccion } = useParams();
-
-  const {
-    detalleOrden,
-    loadingDetalleOrdene,
-    showErrorDetalleOrdene,
-    showInfoDetalleOrden,
-  } = useGetDetalleOrden(idOrdenProduccion);
+  const decryptedIdRol = decryptId(decodeURIComponent(idOrdenProduccion));
+  const {detalleOrden, loadingDetalleOrdene, showErrorDetalleOrdene, showInfoDetalleOrden, } = useGetDetalleOrden(decryptedIdRol);
   const handleDownloadXLS = () => console.log("Descargando XLS...");
   const handleDownloadPDF = () => console.log("Descargando PDF...");
 

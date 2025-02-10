@@ -2,6 +2,7 @@ import React from "react";
 import { Badge, Card, Col, Container, Row, Table } from "react-bootstrap";
 import DownloadDropdown from "../../../components/DownloadDropdown/DownloadDropdown";
 import { formatDateToDisplay } from "../../../utils/dateUtils";
+import "./DesktopOrderDetails.css"
 
 const DesktopOrderDetails = ({ order, onDownloadXLS, onDownloadPDF }) => {
   // Acceder a los datos anidados
@@ -28,7 +29,7 @@ const DesktopHeader = ({ encabezado, onDownloadXLS, onDownloadPDF }) => (
     <Card.Body className="p-4">
       <Row className="g-4">
         <Col md={4} className="border-end border-light">
-          <h3 className="mb-3 fw-bold" >{`ORD #${encabezado?.idOrdenProduccion}`}</h3>
+          <h3 className="mb-3 fw-bold">{`ORD #${encabezado?.idOrdenProduccion}`}</h3>
           <div className="d-flex flex-column text-dark">
             <div className="mb-3">
               <span className="text-uppercase small opacity-75">
@@ -89,6 +90,7 @@ const DesktopHeader = ({ encabezado, onDownloadXLS, onDownloadPDF }) => (
                 onDownloadXLS={onDownloadXLS}
                 onDownloadPDF={onDownloadPDF}
                 variant="light"
+                className="w-100 w-md-auto" // Nueva clase añadida
               />
             </div>
           </div>
