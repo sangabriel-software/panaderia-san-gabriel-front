@@ -10,14 +10,32 @@ import AddButton from "../../../components/AddButton/AddButton";
 import useFilterOrders from "../../../hooks/ordenesproduccion/useFilterOrders";
 import PaginationComponent from "../../../components/PaginationComponent/PaginationComponent";
 import OrderCardSkeleton from "../../../components/OrderCardSkeleton/OrderCardSkeleton";
-import { getCurrentItems, handleConfirmDeleteOrdenProduccion, handleDeleteOrder } from "./GestionPedidosProdUtils";
+import {
+  getCurrentItems,
+  handleConfirmDeleteOrdenProduccion,
+  handleDeleteOrder,
+} from "./GestionPedidosProdUtils";
 import ConfirmPopUp from "../../../components/Popup/ConfirmPopup";
-import { eliminarOrdenProduccionService } from "../../../services/ordenesproduccion/ordenesProduccion.service";
+import Alert from "../../../components/Alerts/Alert";
+import {
+  BsExclamationTriangleFill,
+  BsFillInfoCircleFill,
+} from "react-icons/bs";
 
 const GestionPedidosProd = () => {
   const isMobile = useMediaQuery({ maxWidth: 767 });
-  const { ordenesProduccion, loadingOrdenes, setOrdenesProduccion } = useGetOrdenesProduccion();
-  const [filters, setFilters] = useState({ search: "", date: "", sucursal: "" });
+  const {
+    ordenesProduccion,
+    loadingOrdenes,
+    showErrorOrdenes,
+    showInfoOrdenes,
+    setOrdenesProduccion,
+  } = useGetOrdenesProduccion();
+  const [filters, setFilters] = useState({
+    search: "",
+    date: "",
+    sucursal: "",
+  });
   const filteredOrders = useFilterOrders(ordenesProduccion, filters);
 
   // Variables de estado para mostrar popup y almacenar la orden a eliminar
@@ -29,14 +47,25 @@ const GestionPedidosProd = () => {
   /* Variables para la paginacion */
   const [currentPage, setCurrentPage] = useState(1);
   const ordersPerPage = 5;
-  const currentOrders = getCurrentItems(filteredOrders, currentPage, ordersPerPage);
+  const currentOrders = getCurrentItems(
+    filteredOrders,
+    currentPage,
+    ordersPerPage
+  );
   const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
     <Container>
-      <Title title="Órdenes de Producción" description="Gestiona los pedidos de la producción a realizar" />
+      <Title
+        title="Órdenes de Producción"
+        description="Gestiona los pedidos de la producción a realizar"
+      />
       <AddButton buttonText="Ingresar Orden" />
-      <FilterBar filters={filters} onFilterChange={setFilters} ordenesProduccion={ordenesProduccion} />
+      <FilterBar
+        filters={filters}
+        onFilterChange={setFilters}
+        ordenesProduccion={ordenesProduccion}
+      />
 
       {isMobile ? (
         loadingOrdenes ? (
@@ -48,7 +77,13 @@ const GestionPedidosProd = () => {
                 key={order.idOrdenProduccion}
                 order={order}
                 onViewDetails={() => {}}
-                onDeleteOrder={() => handleConfirmDeleteOrdenProduccion( order.idOrdenProduccion, setOrdenToDelete, setIsPopupOpen )}
+                onDeleteOrder={() =>
+                  handleConfirmDeleteOrdenProduccion(
+                    order.idOrdenProduccion,
+                    setOrdenToDelete,
+                    setIsPopupOpen
+                  )
+                }
               />
             ))}
             <PaginationComponent
@@ -60,17 +95,74 @@ const GestionPedidosProd = () => {
           </>
         )
       ) : (
-        <OrderTable orders={filteredOrders} onDelete={(idOrder) => handleConfirmDeleteOrdenProduccion(idOrder, setOrdenToDelete, setIsPopupOpen )
+        <OrderTable
+          orders={filteredOrders}
+          onDelete={(idOrder) =>
+            handleConfirmDeleteOrdenProduccion(
+              idOrder,
+              setOrdenToDelete,
+              setIsPopupOpen
+            )
           }
         />
       )}
 
+      {/* Alertas mostrar error y notificacion de informacion */}
+      {filteredOrders.length === 0 &&
+        (filters.search || filters.date || filters.sucursal) && (
+          <div className="row justify-content-center">
+            <div className="col-md-6 text-center">
+              <Alert
+                type="primary"
+                message="No se encontraron productos que coincidan con la búsqueda."
+                icon={<BsFillInfoCircleFill />}
+              />
+            </div>
+          </div>
+        )}
+
+      {filteredOrders.length === 0 &&
+        !loadingOrdenes &&
+        !showErrorOrdenes &&
+        showInfoOrdenes && (
+          <div className="row justify-content-center">
+            <div className="col-md-6 text-center">
+              <Alert
+                type="primary"
+                message="No se han ingresado ordens de produccion."
+                icon={<BsFillInfoCircleFill />}
+              />
+            </div>
+          </div>
+        )}
+
+      {showErrorOrdenes && (
+        <div className="row justify-content-center">
+          <div className="col-md-6 text-center">
+            <Alert
+              type="danger"
+              message="Hubo un error al consultar las ordenes de produccion. Intenta más tarde..."
+              icon={<BsExclamationTriangleFill />}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Popup confirmacion de elminacion */}
       <ConfirmPopUp
         isOpen={isPopupOpen}
         onClose={() => setIsPopupOpen(false)}
         title="Confirmar Eliminación"
         message="¿Está seguro de eliminar la orden?"
-        onConfirm={()=> {handleDeleteOrder(ordenToDelete, setOrdenesProduccion, setIsPopupOpen, setErrorPopupMessage, setIsPopupErrorOpen )}}
+        onConfirm={() => {
+          handleDeleteOrder(
+            ordenToDelete,
+            setOrdenesProduccion,
+            setIsPopupOpen,
+            setErrorPopupMessage,
+            setIsPopupErrorOpen
+          );
+        }}
         onCancel={() => setIsPopupOpen(false)}
       />
     </Container>
