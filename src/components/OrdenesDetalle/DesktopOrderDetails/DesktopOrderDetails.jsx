@@ -27,7 +27,7 @@ const DesktopHeader = ({ encabezado, onDownloadXLS, onDownloadPDF }) => (
     style={{ borderRadius: "15px" }}
   >
     <Card.Body className="p-4">
-      <Row className="g-4">
+      <Row className="g-3">
         <Col md={4} className="border-end border-light">
           <h3 className="mb-3 fw-bold">{`ORD #${encabezado?.idOrdenProduccion}`}</h3>
           <div className="d-flex flex-column text-dark">
@@ -45,7 +45,7 @@ const DesktopHeader = ({ encabezado, onDownloadXLS, onDownloadPDF }) => (
             </div>
           </div>
         </Col>
-        <Col md={4} className="border-end border-light">
+        <Col md={3} className="border-end border-light">
           <div className="d-flex flex-column text-dark">
             <div className="mb-3">
               <span className="text-uppercase small opacity-75">Turno</span>
@@ -68,7 +68,7 @@ const DesktopHeader = ({ encabezado, onDownloadXLS, onDownloadPDF }) => (
             </div>
           </div>
         </Col>
-        <Col md={4} className="ps-5">
+        <Col md={5} className="ps-5">
           <div className="d-flex flex-column text-dark">
             <div className="mb-3">
               <span className="text-uppercase small opacity-75">
