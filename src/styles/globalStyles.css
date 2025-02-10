@@ -136,3 +136,12 @@
   background-color: #0f4d8b; /* Fondo al pasar el cursor */
   color: #fefefe;
 }
+
+@media (max-width: 768px) {
+  .mobile-optimized {
+    font-size: 0.9rem;
+  }
+  .mobile-optimized h6 {
+    font-size: 0.95rem;
+  }
+}
