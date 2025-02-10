@@ -5,7 +5,8 @@ const getEndpoints = {
     ALL_USERS: "/consultarUsuarios",
     ALL_PRODUCTOSYPRECIOS: "/consultarPrecios",
     CONSULTAR_CATEGORIAS: "/consultarcategorias",
-    CONSULTAR_ORDENES_PRODUCCION: "/consultar-ordenes-produccion"
+    CONSULTAR_ORDENES_PRODUCCION: "/consultar-ordenes-produccion",
+    CONSULTAR_DETALLES_ORDENES_PRODUCCION: "/consultar-detalle-ordenes-produccion",
 };
 
 const postEndpoints = {

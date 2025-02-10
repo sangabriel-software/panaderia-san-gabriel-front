@@ -53,7 +53,7 @@ function App() {
 
             <Route path="/ordenes-produccion">
               <Route index element={<GestionPedidosProd/>} />
-              <Route path="detalle-orden/:idDetalleOrdenProduccion" element={<DetallesOrdenesProduccionPage />} />
+              <Route path="detalle-orden/:idOrdenProduccion" element={<DetallesOrdenesProduccionPage />} />
             </Route>
           </Route>
         </Route>
