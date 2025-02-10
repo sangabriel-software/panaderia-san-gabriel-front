@@ -31,7 +31,7 @@ const OrderTable = ({ orders, onDelete }) => {
 
   // Manejador para redireccionar al hacer doble clic en una fila
   const handleRowClick = (idOrdenProduccion) => {
-    navigate(`/pedidos-produccion/detalles/${idOrdenProduccion}`);
+    navigate(`/ordenes-produccion/detalle-orden/${idOrdenProduccion}`);
   };
 
   // Cada vez que cambie la página, se realiza el scroll al final del contenedor
@@ -47,11 +47,11 @@ const OrderTable = ({ orders, onDelete }) => {
         <thead className="custom-thead">
           <tr>
             <th className="text-center p-3">#</th>
-            <th className="text-center p-3">Número de Orden</th>
+            <th className="text-center p-3">No. de Orden</th>
             <th className="text-center p-3">Sucursal</th>
-            <th className="text-center p-3">Panadero Encargado</th>
+            <th className="text-center p-3">Turno</th>
+            <th className="text-center p-3">Estado Orden</th>
             <th className="text-center p-3">Fecha a Producir</th>
-            <th className="text-center p-3">Total Productos</th>
             <th className="text-center p-3">Acciones</th>
           </tr>
         </thead>
@@ -75,13 +75,15 @@ const OrderTable = ({ orders, onDelete }) => {
                 </Badge>
               </td>
               <td className="text-center p-3" title="Doble click para ver detalles">
-                {order.nombrePanadero}
+                {order.ordenTurno}
+              </td>
+              <td className="text-center p-3"  title="Doble click para ver detalles">
+              <Badge bg={order.estadoOrden === "P" ? "danger" : "success"} className="px-1 py-1">
+                  {order.estadoOrden === "P"? "Venta Pendiente" : "Venta Cerrada"}
+                </Badge>
               </td>
               <td className="text-center p-3" title="Doble click para ver detalles">
                 {formatDateToDisplay(order.fechaAProducir)}
-              </td>
-              <td className="text-center p-3" title="Doble click para ver detalles">
-                {order.cantidadProductos}
               </td>
               <td className="text-center p-3" onDoubleClick={(e) => e.stopPropagation()}>
                 <Button
