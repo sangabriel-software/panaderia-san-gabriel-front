@@ -13,7 +13,12 @@ const DetallesOrdenesProduccionPage = () => {
   const isMobile = useMediaQuery({ maxWidth: 768 });
   const { idOrdenProduccion } = useParams();
 
-  const { detalleOrden, loadingDetalleOrdene, showErrorDetalleOrdene, showInfoDetalleOrden } = useGetDetalleOrden(idOrdenProduccion);
+  const {
+    detalleOrden,
+    loadingDetalleOrdene,
+    showErrorDetalleOrdene,
+    showInfoDetalleOrden,
+  } = useGetDetalleOrden(idOrdenProduccion);
   const handleDownloadXLS = () => console.log("Descargando XLS...");
   const handleDownloadPDF = () => console.log("Descargando PDF...");
 
@@ -36,7 +41,13 @@ const DetallesOrdenesProduccionPage = () => {
         </div>
       </div>
 
-      {isMobile ? (
+      {loadingDetalleOrdene ? (
+        <div className="d-flex justify-content-center  my-5 mt-5">
+          <div className="spinner-border text-primary my-5 mt-5" role="status">
+            <span className="visually-hidden">Cargando...</span>
+          </div>
+        </div>
+      ) : isMobile ? (
         <MobileOrderDetails
           order={detalleOrden}
           onDownloadXLS={handleDownloadXLS}
