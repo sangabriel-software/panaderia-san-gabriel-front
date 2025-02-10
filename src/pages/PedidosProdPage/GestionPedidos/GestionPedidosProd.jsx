@@ -10,33 +10,18 @@ import AddButton from "../../../components/AddButton/AddButton";
 import useFilterOrders from "../../../hooks/ordenesproduccion/useFilterOrders";
 import PaginationComponent from "../../../components/PaginationComponent/PaginationComponent";
 import OrderCardSkeleton from "../../../components/OrderCardSkeleton/OrderCardSkeleton";
-import {
-  getCurrentItems,
-  handleConfirmDeleteOrdenProduccion,
-  handleDeleteOrder,
-} from "./GestionPedidosProdUtils";
+import { getCurrentItems, handleConfirmDeleteOrdenProduccion, handleDeleteOrder, } from "./GestionPedidosProdUtils";
 import ConfirmPopUp from "../../../components/Popup/ConfirmPopup";
 import Alert from "../../../components/Alerts/Alert";
-import {
-  BsExclamationTriangleFill,
-  BsFillInfoCircleFill,
-} from "react-icons/bs";
+import { BsExclamationTriangleFill, BsFillInfoCircleFill, } from "react-icons/bs";
+import { useNavigate } from "react-router";
 
 const GestionPedidosProd = () => {
   const isMobile = useMediaQuery({ maxWidth: 767 });
-  const {
-    ordenesProduccion,
-    loadingOrdenes,
-    showErrorOrdenes,
-    showInfoOrdenes,
-    setOrdenesProduccion,
-  } = useGetOrdenesProduccion();
-  const [filters, setFilters] = useState({
-    search: "",
-    date: "",
-    sucursal: "",
-  });
+  const {ordenesProduccion, loadingOrdenes, showErrorOrdenes, showInfoOrdenes, setOrdenesProduccion,} = useGetOrdenesProduccion();
+  const [filters, setFilters] = useState({search: "", date: "", sucursal: "", });
   const filteredOrders = useFilterOrders(ordenesProduccion, filters);
+  const navigate = useNavigate();
 
   // Variables de estado para mostrar popup y almacenar la orden a eliminar
   const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -47,11 +32,7 @@ const GestionPedidosProd = () => {
   /* Variables para la paginacion */
   const [currentPage, setCurrentPage] = useState(1);
   const ordersPerPage = 5;
-  const currentOrders = getCurrentItems(
-    filteredOrders,
-    currentPage,
-    ordersPerPage
-  );
+  const currentOrders = getCurrentItems(filteredOrders, currentPage, ordersPerPage  );
   const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
@@ -76,7 +57,7 @@ const GestionPedidosProd = () => {
               <OrderCard
                 key={order.idOrdenProduccion}
                 order={order}
-                onViewDetails={() => {}}
+                onViewDetails={()=> {navigate(`/ordenes-produccion/detalle-orden/${order.idOrdenProduccion}`);}}
                 onDeleteOrder={() =>
                   handleConfirmDeleteOrdenProduccion(
                     order.idOrdenProduccion,
