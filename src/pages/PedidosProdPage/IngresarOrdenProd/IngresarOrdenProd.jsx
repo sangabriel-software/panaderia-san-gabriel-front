@@ -60,6 +60,7 @@ const IngresarOrdenProd = () => {
 
   // Función que se ejecuta al enviar el formulario (encabezado)
   const onSubmit = async (data) => {
+    console.log("Data:", data);
     // Generar detalle de la orden a partir de los inputs de productos
     const detalleOrden = Object.entries(trayQuantities)
       .filter(([_, cantidad]) => cantidad > 0)
@@ -83,6 +84,7 @@ const IngresarOrdenProd = () => {
       detalleOrden,
     };
 
+    console.log(payload);
     try {
       const response = await fetch("http://localhost:3000/api/ingresar-orden", {
         method: "POST",
@@ -97,6 +99,7 @@ const IngresarOrdenProd = () => {
 
   return (
     <Container className="py-4">
+      {/* titulo */}
       <div className="text-center">
         <div className="row">
           <div className="col-2">
@@ -120,10 +123,69 @@ const IngresarOrdenProd = () => {
         style={{ borderRadius: "15px" }}
       >
         <Card.Body>
-          <Form onSubmit={handleSubmit(onSubmit)}>
-            <Row className="g-3 align-items-center">
-              {/* Sucursal */}
-              <Col md={4} className="border-end border-light">
+          <Form onSumit={handleSubmit(onSubmit)}>
+            <Row>
+            <Col xs={12} md={4} xl={4} className="border-end border-light">
+              <Form.Group>
+                <label className="form-label text-muted small mb-1">FECHA DE PRODUCCIÓN</label>
+                <InputGroup>
+                  <Controller
+                    control={control}
+                    name="fechaAProducir"
+                    render={({ field }) => (
+                      <DatePicker
+                        {...field}
+                        selected={field.value}
+                        onChange={field.onChange}
+                        className="form-control border-primary w-100"
+                        minDate={tomorrow}
+                        dateFormat="dd/MM/yyyy"
+                        placeholderText="Seleccionar fecha"
+                      />
+                    )}
+                  />
+                  <InputGroup.Text className="bg-white border-primary">
+                    📅
+                  </InputGroup.Text>
+                </InputGroup>
+              </Form.Group>
+            </Col>
+
+              <Col xs={12} md={2} className="border-end border-light my-2">
+                <Form.Group>
+                  <label className="form-label text-muted small mb-1">
+                    TURNO
+                  </label>
+                  <InputGroup className="w-100">
+                    <Button
+                      className="w-50"
+                      variant={
+                        turnoValue === "AM" ? "primary" : "outline-primary"
+                      }
+                      onClick={() => setValue("turno", "AM")}
+                      type="button"
+                    >
+                      AM
+                    </Button>
+                    <Button
+                      className="w-50"
+                      variant={
+                        turnoValue === "PM" ? "primary" : "outline-primary"
+                      }
+                      onClick={() => setValue("turno", "PM")}
+                      type="button"
+                    >
+                      PM
+                    </Button>
+                  </InputGroup>
+                </Form.Group>
+              </Col>
+
+              <Col xs={12} md={1} className="border-end border-light">
+                {/* espacio */}
+              </Col>
+
+              <Col xs={12} md={4} className="border-end border-light my-2">
                 <Form.Group>
                   <label className="form-label text-muted small mb-1">
                     SUCURSAL
@@ -148,101 +210,7 @@ const IngresarOrdenProd = () => {
                   )}
                 </Form.Group>
               </Col>
-
-              {/* Turno */}
-              <Col md={4} className="ps-5">
-                <Form.Group>
-                  <label className="form-label text-muted small mb-1">
-                    TURNO
-                  </label>
-                  <InputGroup>
-                    <Button
-                      variant={
-                        turnoValue === "AM" ? "primary" : "outline-primary"
-                      }
-                      onClick={() => setValue("turno", "AM")}
-                      type="button"
-                    >
-                      AM
-                    </Button>
-                    <Button
-                      variant={
-                        turnoValue === "PM" ? "primary" : "outline-primary"
-                      }
-                      onClick={() => setValue("turno", "PM")}
-                      type="button"
-                    >
-                      PM
-                    </Button>
-                  </InputGroup>
-                </Form.Group>
-              </Col>
-
-              {/* Fecha de Producción */}
-              <Col md={4}>
-                <Form.Group>
-                  <label className="form-label text-muted small mb-1">
-                    FECHA DE PRODUCCIÓN
-                  </label>
-                  <Controller
-                    control={control}
-                    name="fechaAProducir"
-                    render={({ field }) => (
-                      <DatePicker
-                        {...field}
-                        selected={field.value}
-                        onChange={field.onChange}
-                        className="form-control border-primary"
-                        minDate={tomorrow}
-                        dateFormat="dd/MM/yyyy"
-                        placeholderText="dd/mm/aaaa"
-                      />
-                    )}
-                  />
-                </Form.Group>
-              </Col>
             </Row>
-
-            <Row className="g-3 align-items-center mt-3">
-              {/* Nombre del Panadero */}
-              <Col md={4} className="border-end border-light">
-                <Form.Group>
-                  <label className="form-label text-muted small mb-1">
-                    NOMBRE DEL PANADERO
-                  </label>
-                  <Form.Control
-                    type="text"
-                    placeholder="Ej. María Pérez"
-                    {...register("nombrePanadero", {
-                      required: "El nombre del panadero es requerido",
-                    })}
-                    className="border-primary"
-                  />
-                  {errors.nombrePanadero && (
-                    <span className="text-danger">
-                      {errors.nombrePanadero.message}
-                    </span>
-                  )}
-                </Form.Group>
-              </Col>
-
-              <Col md={2}> </Col>
-              {/* Nombre del usuario */}
-              <Col md={6}>
-                <Form.Group>
-                  <label className="form-label text-muted small mb-1">
-                    USUARIO
-                  </label>
-                  <span className="badge bg-success ms-2">admin</span>
-                </Form.Group>
-              </Col>
-            </Row>
-
-            <div className="text-center mt-4">
-              <Button variant="success" size="lg" type="submit">
-                🚀 Guardar Orden de Producción
-              </Button>
-            </div>
           </Form>
         </Card.Body>
       </Card>
