@@ -1,66 +1,28 @@
-import { useEffect, useRef, useState } from "react";
-import {
-  Container,
-  Form,
-  Row,
-  Col,
-  Button,
-  Card,
-  InputGroup,
-} from "react-bootstrap";
-import { useForm, Controller } from "react-hook-form";
+import { useRef, useState } from "react";
+import { Container, Form, Row, Col, Button, Card, InputGroup, } from "react-bootstrap";
+import { useForm } from "react-hook-form";
 import useGetProductosYPrecios from "../../../hooks/productosprecios/useGetProductosYprecios";
 import { useGetSucursales } from "../../../hooks/sucursales/useGetSucursales";
-import DatePicker from "react-datepicker";
 import { BsArrowLeft, BsExclamationTriangleFill } from "react-icons/bs";
 import { useNavigate } from "react-router";
-import "react-datepicker/dist/react-datepicker.css";
-import dayjs from "dayjs";
-import "./ordenes.css";
 import Title from "../../../components/Title/Title";
-import {
-  getInitials,
-  getUniqueColor,
-  handleIngresarOrdenProduccionSubmit,
-  scrollToAlert,
-} from "./IngresarOrdenProdUtils";
+import { getInitials, getUniqueColor, handleIngresarOrdenProduccionSubmit, scrollToAlert, } from "./IngresarOrdenProdUtils";
 import Alert from "../../../components/Alerts/Alert";
 import SuccessPopup from "../../../components/Popup/SuccessPopup";
+import OrderSummary from "../../../components/OrderSummary/OrderSummary";
+import dayjs from "dayjs";
+import "./ordenes.css";
+
 
 const IngresarOrdenProd = () => {
-  const { sucursales, loadingSucursales, showErrorSucursales } =
-    useGetSucursales();
-  const {
-    productos,
-    loadigProducts,
-    showErrorProductos,
-    showInfoProductos,
-    setProductos,
-  } = useGetProductosYPrecios();
+  const alertRef = useRef(null);
   const navigate = useNavigate();
-    // Formatear la fecha inicial como YYYY-MM-DD
-    const tomorrow = dayjs().add(1, "day").format("YYYY-MM-DD");
+  const { sucursales, loadingSucursales, showErrorSucursales } = useGetSucursales();
+  const { productos, loadigProducts, showErrorProductos, } = useGetProductosYPrecios(); 
+  const tomorrow = dayjs().add(1, "day").format("YYYY-MM-DD");
 
-    const {
-      register,
-      handleSubmit,
-      formState: { errors },
-      setValue,
-      control,
-      watch,
-      reset,
-    } = useForm({
-      defaultValues: {
-        sucursal: "",
-        turno: "AM",
-        fechaAProducir: tomorrow, // Valor inicial formateado
-        nombrePanadero: "",
-      },
-    });
-
-    const alertRef = useRef(null); // Crear referencia para la alerta
-
-
+  const { register, handleSubmit, formState: { errors }, setValue, watch, reset, getValues, } = useForm({
+          defaultValues: { sucursal: "", turno: "AM", fechaAProducir: tomorrow, nombrePanadero: "", }, });
 
   const turnoValue = watch("turno");
   const [activeCategory, setActiveCategory] = useState("Panadería");
@@ -69,6 +31,10 @@ const IngresarOrdenProd = () => {
   const [isPopupErrorOpen, setIsPopupErrorOpen] = useState(false);
   const [errorPopupMessage, setErrorPopupMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showOrderSummary, setShowOrderSummary] = useState(false);
+
+  const handleShowOrderSummary = () => setShowOrderSummary(true);
+  const handleCloseOrderSummary = () => setShowOrderSummary(false);
 
   const panaderiaProducts = productos.filter(
     (p) => p.nombreCategoria === "Panadería"
@@ -78,19 +44,18 @@ const IngresarOrdenProd = () => {
   );
 
   const onSubmit = async (data) => {
-    await handleIngresarOrdenProduccionSubmit(
-      data,
-      trayQuantities,
-      setTrayQuantities,
-      setIsPopupOpen,
-      setErrorPopupMessage,
-      setIsPopupErrorOpen,
-      setIsLoading,
-      reset
-    );
+    setShowOrderSummary(true);
   };
-  // Use the scrollToAlert function
+
+  const handleConfirmOrder = async () => {
+    const data = getValues();
+    await handleIngresarOrdenProduccionSubmit( data, trayQuantities, setTrayQuantities, setIsPopupOpen, setErrorPopupMessage, setIsPopupErrorOpen,
+                                               setIsLoading, reset );
+    setShowOrderSummary(false);
+  };
+
   scrollToAlert(errorPopupMessage, isPopupErrorOpen, alertRef);
+
   return (
     <Container className="glassmorphism-container py-4">
       {/* Encabezado */}
@@ -362,6 +327,19 @@ const IngresarOrdenProd = () => {
         ↑
       </Button>
 
+
+      {/* Resumen de Orden */}
+      <OrderSummary
+        show={showOrderSummary}
+        handleClose={handleCloseOrderSummary}
+        orderData={getValues()}
+        trayQuantities={trayQuantities}
+        productos={productos}
+        sucursales={sucursales}
+        onConfirm={handleConfirmOrder}
+      />
+
+      {/* Popup de Éxito */}
       <SuccessPopup
         isOpen={isPopupOpen}
         onClose={() => setIsPopupOpen(false)}
@@ -372,12 +350,7 @@ const IngresarOrdenProd = () => {
         onView={() => navigate("/ordenes-produccion")}
         onNew={() => {
           setIsPopupOpen(false);
-          resetForm(
-            reset,
-            setSelectedImage,
-            setImagePreview,
-            setIsResetImageInput
-          );
+          reset();
         }}
       />
     </Container>
