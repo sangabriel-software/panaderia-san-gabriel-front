@@ -1,10 +1,11 @@
 import { ingresarPrecioProducto, ingresarProducto } from "../../../services/productos/productos.service"
 import { currentDate } from "../../../utils/dateUtils"
+import { capitalizeFirstLetter } from "../../../utils/utils"
 
 /* Funcion para crear paylod datos de productos */
 export const crearPayloadProducto = (data) => {
     const productoPayload = {
-        nombreProducto: data.nombreProducto,
+        nombreProducto: capitalizeFirstLetter( data.nombreProducto ),
         idCategoria: data.idCategoria ,
         fechaCreacion: currentDate(),
     }

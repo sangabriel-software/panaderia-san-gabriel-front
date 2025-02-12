@@ -18,6 +18,22 @@ import Title from "../../../components/Title/Title";
 import { BsArrowLeft } from "react-icons/bs";
 import { useNavigate } from "react-router";
 
+const getInitials = (name) => {
+  const names = name.split(" ");
+  const initials = names.map((n) => n[0]).join("");
+  return initials.toUpperCase();
+};
+
+// Function to generate a random color
+const getRandomColor = () => {
+  const letters = '0123456789ABCDEF';
+  let color = '#';
+  for (let i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+};
+
 const IngresarOrdenProd = () => {
   const { sucursales } = useGetSucursales();
   const { productos } = useGetProductosYPrecios();
@@ -299,30 +315,24 @@ const IngresarOrdenProd = () => {
 
       {/* Listado de Productos con estilo (según la segunda imagen) */}
       <Row className="g-3">
-        {(activeCategory === "Panadería"
-          ? panaderiaProducts
-          : reposteriaProducts
-        ).map((producto) => (
+        {(activeCategory === "Panadería" ? panaderiaProducts : reposteriaProducts).map((producto) => (
           <Col key={producto.idProducto} xs={12} md={6} lg={4}>
             <Card className="h-100 shadow border-0 product-card text-center p-3">
-              <Card.Body className="d-flex flex-column align-items-center">
-                <Card.Title className="product-title fw-bold">
-                  {producto.nombreProducto}
-                </Card.Title>
+              <Card.Body className="d-flex flex-column align-items-center position-relative">
+                <div className="position-absolute top-0 start-0 m-2 text-white rounded-circle d-flex align-items-center justify-content-center" style={{ width: 30, height: 30, backgroundColor: getRandomColor() }}>
+                  {getInitials(producto.nombreProducto)}
+                </div>
+                <Card.Title className="product-title fw-bold">{producto.nombreProducto}</Card.Title>
                 <span className="text-muted">Cantidad en Bandejas</span>
                 <InputGroup className="mt-2 w-75">
                   <Form.Control
                     type="number"
                     min="0"
                     value={trayQuantities[producto.idProducto] || ""}
-                    onChange={(e) =>
-                      setTrayQuantities({
-                        ...trayQuantities,
-                        [producto.idProducto]: parseInt(e.target.value) || 0,
-                      })
-                    }
+                    onChange={(e) => setTrayQuantities({ ...trayQuantities, [producto.idProducto]: parseInt(e.target.value) || 0 })}
                     className="text-center border-primary"
                   />
+                  <Button variant="outline-primary" onClick={() => setTrayQuantities({ ...trayQuantities, [producto.idProducto]: (trayQuantities[producto.idProducto] || 0) + 1 })}>+</Button>
                 </InputGroup>
               </Card.Body>
             </Card>
