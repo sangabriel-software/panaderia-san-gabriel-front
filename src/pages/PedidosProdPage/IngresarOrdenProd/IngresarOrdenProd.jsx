@@ -48,9 +48,7 @@ const IngresarOrdenProd = () => {
     },
   });
 
-  // Para leer el valor actual del turno y aplicar estilos en los botones
   const turnoValue = watch("turno");
-
   const [activeCategory, setActiveCategory] = useState("Panadería");
   const [trayQuantities, setTrayQuantities] = useState({});
   const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -58,7 +56,6 @@ const IngresarOrdenProd = () => {
   const [errorPopupMessage, setErrorPopupMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  // Filtrar productos por categoría
   const panaderiaProducts = productos.filter(
     (p) => p.nombreCategoria === "Panadería"
   );
@@ -72,292 +69,222 @@ const IngresarOrdenProd = () => {
   };
 
   return (
-    <Container className="py-4">
-      {/* titulo */}
-      <div className="text-center">
-        <div className="row">
-          <div className="col-2">
-            <button
-              className="btn bt-return rounded-circle d-flex align-items-center justify-content-center shadow"
-              style={{ width: "40px", height: "40px" }}
-              onClick={() => navigate("/ordenes-produccion")}
-            >
-              <BsArrowLeft size={20} />
-            </button>
-          </div>
-          <div className="col-8">
-            <Title title="🍞 Nueva Orden de Producción" />
-          </div>
+    <Container className="glassmorphism-container py-4">
+      {/* Encabezado */}
+      <div className="text-center mb-5">
+        <div className="d-flex align-items-center justify-content-center gap-3">
+          <button
+            className="btn btn-return rounded-circle shadow-sm"
+            onClick={() => navigate("/ordenes-produccion")}
+          >
+            <BsArrowLeft size={20} />
+          </button>
+          <Title 
+            title="Nueva Orden de Producción" 
+            className="gradient-text" 
+            icon="🍞"
+          />
         </div>
       </div>
-      {errorPopupMessage && !isPopupErrorOpen && (
-        <div className="row justify-content-center">
-          <div className="col-md-6 text-center">
-            <Alert
-              type="danger"
-              message={errorPopupMessage}
-              icon={<BsExclamationTriangleFill />}
-            />
-          </div>
-        </div>
+
+            {/* Manejo de Errores */}
+            {errorPopupMessage && !isPopupErrorOpen && (
+        <Alert
+          type="danger"
+          message={errorPopupMessage}
+          icon={<BsExclamationTriangleFill />}
+          className="mt-4"
+        />
       )}
-      {/* Encabezado en Card */}
-      <Card
-        className="shadow-lg border-0 mb-4 bg-gradient-primary"
-        style={{ borderRadius: "15px" }}
-      >
-        <Card.Body>
+
+      {/* Formulario Principal */}
+      <Card className="glass-card mb-5">
+        <Card.Body className="p-4">
           <Form onSubmit={handleSubmit(onSubmit)}>
-            <Row>
-              {/* Fecha de Producción - Mejorado para móviles */}
-              <Col
-                xs={12}
-                md={4}
-                xl={4}
-                className="border-end border-light mb-3 mb-md-0"
-              >
-                <Form.Group>
-                  <label className="form-label text-muted small mb-1">
-                    FECHA DE PRODUCCIÓN
-                  </label>
-                  <InputGroup>
-                    <Controller
-                      control={control}
-                      name="fechaAProducir"
-                      render={({ field }) => (
-                        <DatePicker
-                          {...field}
-                          selected={field.value}
-                          onChange={field.onChange}
-                          className="form-control border-primary w-100 mobile-datepicker"
-                          minDate={tomorrow}
-                          dateFormat="dd/MM/yyyy"
-                          placeholderText="Seleccionar fecha"
-                          showPopperArrow={false}
-                          popperPlacement="auto"
-                          popperModifiers={[
-                            {
-                              name: "preventOverflow",
-                              options: {
-                                altBoundary: true,
-                                tether: false,
-                              },
-                            },
-                          ]}
-                          withPortal
-                          isClearable
-                          calendarClassName="mobile-calendar"
+            <Row className="g-4">
+              {/* Sección Fecha y Turno */}
+              <Col xs={12} lg={6}>
+                <Row className="g-3">
+                <Col xs={12} md={6}>
+                    <Form.Group>
+                      <label className="form-label small text-uppercase text-muted fw-bold mb-2">
+                        Fecha de Producción
+                      </label>
+                      <InputGroup className="modern-input-group">
+                        <Form.Control
+                          type="date"
+                          {...register("fechaAProducir", {
+                            required: "Seleccione una fecha",
+                          })}
+                          className="form-control modern-datepicker"
+                          min={tomorrow}
                         />
+                        <InputGroup.Text className="input-icon">📅</InputGroup.Text>
+                      </InputGroup>
+                      {errors.fechaAProducir && (
+                        <div className="text-danger small mt-1">{errors.fechaAProducir.message}</div>
                       )}
-                    />
-                    <InputGroup.Text className="bg-white border-primary">
-                      📅
-                    </InputGroup.Text>
-                  </InputGroup>
-                </Form.Group>
-              </Col>
+                    </Form.Group>
+                  </Col>
 
-              <Col xs={12} md={2} className="border-end border-light my-2">
-                <Form.Group>
-                  <label className="form-label text-muted small mb-1">
-                    TURNO
-                  </label>
-                  <InputGroup className="w-100">
-                    <Button
-                      className="w-50"
-                      variant={
-                        turnoValue === "AM" ? "primary" : "outline-primary"
-                      }
-                      onClick={() => setValue("turno", "AM")}
-                      type="button"
-                    >
-                      AM
-                    </Button>
-                    <Button
-                      className="w-50"
-                      variant={
-                        turnoValue === "PM" ? "primary" : "outline-primary"
-                      }
-                      onClick={() => setValue("turno", "PM")}
-                      type="button"
-                    >
-                      PM
-                    </Button>
-                  </InputGroup>
-                </Form.Group>
-              </Col>
-
-              <Col xs={12} md={1} className="border-end border-light">
-                {/* espacio */}
-              </Col>
-              <Col xs={12} md={4} className="border-end border-light my-2">
-                <Form.Group>
-                  <label className="form-label text-muted small mb-1">
-                    SUCURSAL
-                  </label>
-                  {loadingSucursales ? (
-                    <div className="d-flex justify-content-center my-5">
-                      <div
-                        className="spinner-border text-primary"
-                        role="status"
-                      >
-                        <span className="visually-hidden">
-                          Cargando Sucursales...
-                        </span>
+                  <Col xs={12} md={6}>
+                    <Form.Group>
+                      <label className="form-label small text-uppercase text-muted fw-bold mb-2">
+                        Turno
+                      </label>
+                      <div className="d-flex gap-2 shift-selector">
+                        <Button
+                          variant={turnoValue === "AM" ? "primary" : "outline-primary"}
+                          className="shift-btn"
+                          onClick={() => setValue("turno", "AM")}
+                        >
+                          🌅 AM
+                        </Button>
+                        <Button
+                          variant={turnoValue === "PM" ? "primary" : "outline-primary"}
+                          className="shift-btn"
+                          onClick={() => setValue("turno", "PM")}
+                        >
+                          🌇 PM
+                        </Button>
                       </div>
-                    </div>
-                  ) : sucursales.length === 0 ? (
-                    <div className="alert alert-danger" role="alert">
-                      {showErrorSucursales === true
-                        ? "Error al cargar las sucursales"
-                        : "No hay sucursales disponibles"}
-                    </div>
-                  ) : (
-                    <>
-                      <Form.Select
-                        {...register("sucursal", {
-                          required: "Seleccione sucursal",
-                        })}
-                        className="border-primary"
-                      >
-                        <option value="">Seleccione sucursal</option>
-                        {sucursales.map((s) => (
-                          <option key={s.idSucursal} value={s.idSucursal}>
-                            {s.nombreSucursal}
-                          </option>
-                        ))}
-                      </Form.Select>
-                      {errors.sucursal && (
-                        <span className="text-danger">
-                          {errors.sucursal.message}
-                        </span>
+                    </Form.Group>
+                  </Col>
+                </Row>
+              </Col>
+
+              {/* Sección Sucursal y Panadero */}
+              <Col xs={12} lg={6}>
+                <Row className="g-3">
+                  <Col xs={12} md={6}>
+                    <Form.Group>
+                      <label className="form-label small text-uppercase text-muted fw-bold mb-2">
+                        Sucursal
+                      </label>
+                      {loadingSucursales ? (
+                        <div className="loading-spinner">
+                          <div className="spinner-border text-primary" role="status" />
+                        </div>
+                      ) : (
+                        <Form.Select
+                          {...register("sucursal", {
+                            required: "Seleccione sucursal",
+                          })}
+                          className="modern-select"
+                        >
+                          <option value="">Seleccionar sucursal</option>
+                          {sucursales.map((s) => (
+                            <option key={s.idSucursal} value={s.idSucursal}>
+                              {s.nombreSucursal}
+                            </option>
+                          ))}
+                        </Form.Select>
                       )}
-                    </>
-                  )}
-                </Form.Group>
+                      {errors.sucursal && (
+                        <div className="text-danger small mt-1">
+                          {errors.sucursal.message}
+                        </div>
+                      )}
+                    </Form.Group>
+                  </Col>
+
+                  <Col xs={12} md={6}>
+                    <Form.Group>
+                      <label className="form-label small text-uppercase text-muted fw-bold mb-2">
+                        Panadero Responsable
+                      </label>
+                      <Form.Control
+                        type="text"
+                        placeholder="Nombre del panadero"
+                        {...register("nombrePanadero", {
+                          required: "Campo requerido",
+                        })}
+                        className="modern-input"
+                      />
+                      {errors.nombrePanadero && (
+                        <div className="text-danger small mt-1">
+                          {errors.nombrePanadero.message}
+                        </div>
+                      )}
+                    </Form.Group>
+                  </Col>
+                </Row>
               </Col>
             </Row>
 
-            <Row className="g-3 mt-3">
-              {/* Nombre del Panadero */}
-              <Col xs={12} md={4} className="border-end-md border-light">
-                <Form.Group>
-                  <label className="form-label text-muted small mb-1">
-                    NOMBRE DEL PANADERO
-                  </label>
-                  <InputGroup>
-                    <Form.Control
-                      type="text"
-                      placeholder="Ingresar nombre"
-                      {...register("nombrePanadero", {
-                        required: "El nombre del panadero es requerido",
-                      })}
-                      className="border-primary"
-                    />
-                  </InputGroup>
-                  {errors.nombrePanadero && (
-                    <span className="text-danger">
-                      {errors.nombrePanadero.message}
-                    </span>
-                  )}
-                </Form.Group>
-              </Col>
-
-              <Col xs={12} md={2} className="d-none d-md-block"></Col>
-
-              {/* Nombre del usuario */}
-              <Col xs={12} md={6} className="text-center text-md-start">
-                <Form.Group>
-                  <label className="form-label text-muted small mb-1">
-                    USUARIO
-                  </label>
-                  <span className="badge bg-success ms-2">admin</span>
-                </Form.Group>
-              </Col>
-            </Row>
-            <div className="text-center mt-4">
+            {/* Botón de Envío */}
+            <div className="text-center mt-5">
               <Button
-                variant="success"
-                size="lg"
+                variant="primary"
+                className="submit-btn"
                 type="submit"
                 disabled={isLoading || loadingSucursales || loadigProducts || showErrorSucursales || showErrorProductos}
               >
-                {isLoading ? "Guardando..." : "🚀 Guardar Orden de Producción"}
+                {isLoading ? (
+                  <span className="spinner-border spinner-border-sm" role="status" />
+                ) : (
+                  <>
+                    <span className="btn-icon">🚀</span>
+                    Guardar Orden
+                  </>
+                )}
               </Button>
             </div>
           </Form>
         </Card.Body>
       </Card>
-      {/* Listado de Productos con estilo (según la segunda imagen) */}
+
+      {/* Sección de Productos */}
       {loadigProducts ? (
-        <div className="d-flex justify-content-center  my-5">
-          <div className="spinner-border text-primary my-5 my-5" role="status">
-            <span className="visually-hidden">Cargando...</span>
-          </div>
+        <div className="loading-products">
+          <div className="spinner-border text-primary" role="status" />
         </div>
       ) : (
-        <>
-          {/* Selector de Categorías */}
-          <div className="d-flex gap-2 mb-4" id="category-selection">
+        <div className="products-section">
+          <div className="category-selector mb-4">
             <Button
-              variant={
-                activeCategory === "Panadería" ? "primary" : "outline-primary"
-              }
+              variant={activeCategory === "Panadería" ? "primary" : "outline-primary"}
               onClick={() => setActiveCategory("Panadería")}
+              className="category-btn"
             >
               Panadería ({panaderiaProducts.length})
             </Button>
             <Button
-              variant={
-                activeCategory === "Repostería" ? "primary" : "outline-primary"
-              }
+              variant={activeCategory === "Repostería" ? "primary" : "outline-primary"}
               onClick={() => setActiveCategory("Repostería")}
+              className="category-btn"
             >
               Repostería ({reposteriaProducts.length})
             </Button>
           </div>
 
-          <Row className="g-3">
-            {(activeCategory === "Panadería"
-              ? panaderiaProducts
-              : reposteriaProducts
-            ).map((producto) => (
-              <Col key={producto.idProducto} xs={12} md={6} lg={4}>
-                <Card className="h-100 shadow border-0 product-card text-center p-3">
-                  <Card.Body className="d-flex flex-column align-items-center position-relative">
-                    <div
-                      className="position-absolute top-0 start-0 m-2 text-white rounded-circle d-flex align-items-center justify-content-center"
-                      style={{
-                        width: 30,
-                        height: 30,
-                        backgroundColor: getUniqueColor(
-                          producto.nombreProducto
-                        ),
-                      }}
+          <Row className="g-4 product-grid">
+            {(activeCategory === "Panadería" ? panaderiaProducts : reposteriaProducts).map((producto) => (
+              <Col key={producto.idProducto} xs={12} md={6} lg={4} xl={3}>
+                <Card className="product-card">
+                  <Card.Body className="product-card-body">
+                    <div 
+                      className="product-badge"
+                      style={{ backgroundColor: getUniqueColor(producto.nombreProducto) }}
                     >
                       {getInitials(producto.nombreProducto)}
                     </div>
-                    <Card.Title className="product-title fw-bold">
-                      {producto.nombreProducto}
-                    </Card.Title>
-                    <span className="text-muted">
-                      {producto.nombreCategoria === "Panadería"
-                        ? "Cantidad en Bandejas"
+                    <h3 className="product-title">{producto.nombreProducto}</h3>
+                    <p className="product-category">
+                      {producto.nombreCategoria === "Panadería" 
+                        ? "Bandejas" 
                         : "Unidades"}
-                    </span>
-                    <InputGroup className="mt-2 w-75">
+                    </p>
+                    <InputGroup className="product-input-group">
                       <Form.Control
                         type="number"
                         min="0"
                         value={trayQuantities[producto.idProducto] || ""}
-                        onChange={(e) =>
-                          setTrayQuantities({
-                            ...trayQuantities,
-                            [producto.idProducto]:
-                              parseInt(e.target.value) || 0,
-                          })
-                        }
-                        className="text-center border-primary"
+                        onChange={(e) => setTrayQuantities({
+                          ...trayQuantities,
+                          [producto.idProducto]: parseInt(e.target.value) || 0,
+                        })}
+                        className="product-input"
                       />
                     </InputGroup>
                   </Card.Body>
@@ -365,31 +292,17 @@ const IngresarOrdenProd = () => {
               </Col>
             ))}
           </Row>
-        </>
+        </div>
       )}
 
-      {/* Floating button for mobile devices */}
+      {/* Botón Flotante para Móvil */}
       <Button
         variant="primary"
-        className="d-md-none position-fixed bottom-0 end-0 m-3 rounded-circle"
-        style={{ width: "50px", height: "50px", zIndex: 1000 }}
+        className="floating-scroll-btn d-md-none"
         onClick={() => window.scrollTo({ top: 240, behavior: "smooth" })}
       >
         ↑
       </Button>
-
-      {/* Alertar errore y data no encontrada */}
-      {showErrorSucursales && !showInfoProductos && (
-        <div className="row justify-content-center my-3">
-          <div className="col-md-6 text-center">
-            <Alert
-              type="danger"
-              message="Hubo un error al consultar los productos. Intenta más tarde..."
-              icon={<BsExclamationTriangleFill />}
-            />
-          </div>
-        </div>
-      )}
     </Container>
   );
 };
