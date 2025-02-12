@@ -2,6 +2,7 @@ import React from "react";
 import { Modal, Button, Table } from "react-bootstrap";
 import { BsCheckCircle, BsBoxSeam, BsClock, BsShop, BsPerson } from "react-icons/bs";
 import styled from "styled-components";
+import { formatDateToDisplay } from "../../utils/dateUtils";
 
 const StyledModal = styled(Modal)`
   .modal-content {
@@ -119,7 +120,7 @@ const OrderSummary = ({ show, handleClose, orderData, trayQuantities, productos,
           </div>
           <div className="detail-item">
             <BsBoxSeam />
-            <span><strong>Fecha Producción:</strong> {orderData.fechaAProducir}</span>
+            <span><strong>Fecha Producción:</strong> {formatDateToDisplay(orderData.fechaAProducir)}</span>
           </div>
           <div className="detail-item">
             <BsPerson />
@@ -133,7 +134,7 @@ const OrderSummary = ({ show, handleClose, orderData, trayQuantities, productos,
             <thead>
               <tr>
                 <th>Producto</th>
-                <th className="text-end">Cantidad</th>
+                <th className="text-end">Cantidad de bandejas</th>
               </tr>
             </thead>
             <tbody>
