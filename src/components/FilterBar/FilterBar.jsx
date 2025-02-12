@@ -34,7 +34,7 @@ const FilterBar = ({ filters, onFilterChange, ordenesProduccion }) => {
             </InputGroup.Text>
             <Form.Control
               type="text"
-              placeholder="Número de orden..."
+              placeholder="Orden..."
               value={filters.search}
               onChange={handleSearchChange}
               className="filter-input"
