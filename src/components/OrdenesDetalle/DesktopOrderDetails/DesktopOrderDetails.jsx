@@ -158,7 +158,7 @@ const TableRow = ({ product, index }) => {
         </span>
       </td>
       <td className="text-center">
-        <span className="badge bg-secondary bg-opacity-10 text-dark rounded-pill px-3 py-2">
+        <span className="badge bg-primary bg-opacity-10 text-dark rounded-pill px-3 py-2">
           {product.nombreCategoria}
         </span>
       </td>

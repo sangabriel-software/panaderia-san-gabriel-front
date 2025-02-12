@@ -22,8 +22,7 @@ const ManageProducts = lazy(() => import("./pages/ProductosPage/ManageProducts/M
 const IngresarProductos = lazy(() => import("./pages/ProductosPage/IngresarProductos/IngresarProductos"));
 const GestionPedidosProd = lazy(() => import("./pages/PedidosProdPage/GestionPedidos/GestionPedidosProd"));
 const DetallesOrdenesProduccionPage = lazy(() => import("./pages/PedidosProdPage/DetallesOrdenesProd/DetallesOrdenesProd"));
-
-
+const IngresarOrdenProd = lazy(() => import("./pages/PedidosProdPage/IngresarOrdenProd/IngresarOrdenProd"));
 
 
 function App() {
@@ -54,6 +53,7 @@ function App() {
             <Route path="/ordenes-produccion">
               <Route index element={<GestionPedidosProd/>} />
               <Route path="detalle-orden/:idOrdenProduccion" element={<DetallesOrdenesProduccionPage />} />
+              <Route path="ingresar-orden" element={<IngresarOrdenProd />} />
             </Route>
           </Route>
         </Route>

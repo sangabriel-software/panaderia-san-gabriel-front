@@ -42,7 +42,7 @@ const GestionPedidosProd = () => {
         title="Órdenes de Producción"
         description="Gestiona los pedidos de la producción a realizar"
       />
-      <AddButton buttonText="Ingresar Orden" />
+      <AddButton buttonText="Ingresar Orden" onRedirect={() => navigate("ingresar-orden")}/>
       <FilterBar
         filters={filters}
         onFilterChange={setFilters}
