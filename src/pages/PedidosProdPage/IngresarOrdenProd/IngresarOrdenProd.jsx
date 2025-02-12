@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Container,
   Form,
@@ -37,24 +37,29 @@ const IngresarOrdenProd = () => {
     setProductos,
   } = useGetProductosYPrecios();
   const navigate = useNavigate();
-  const tomorrow = dayjs().add(1, "day").toDate();
+    // Formatear la fecha inicial como YYYY-MM-DD
+    const tomorrow = dayjs().add(1, "day").format("YYYY-MM-DD");
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    setValue,
-    control,
-    watch,
-    reset,
-  } = useForm({
-    defaultValues: {
-      sucursal: "",
-      turno: "AM",
-      fechaAProducir: tomorrow,
-      nombrePanadero: "",
-    },
-  });
+    const {
+      register,
+      handleSubmit,
+      formState: { errors },
+      setValue,
+      control,
+      watch,
+      reset,
+    } = useForm({
+      defaultValues: {
+        sucursal: "",
+        turno: "AM",
+        fechaAProducir: tomorrow, // Valor inicial formateado
+        nombrePanadero: "",
+      },
+    });
+
+    const alertRef = useRef(null); // Crear referencia para la alerta
+
+
 
   const turnoValue = watch("turno");
   const [activeCategory, setActiveCategory] = useState("Panadería");
@@ -84,6 +89,16 @@ const IngresarOrdenProd = () => {
     );
   };
 
+        // Efecto para scroll automático
+        useEffect(() => {
+          if (errorPopupMessage && !isPopupErrorOpen && alertRef.current) {
+            alertRef.current.scrollIntoView({
+              behavior: "smooth",
+              block: "center"
+            });
+          }
+        }, [errorPopupMessage, isPopupErrorOpen]);
+
   return (
     <Container className="glassmorphism-container py-4">
       {/* Encabezado */}
@@ -105,12 +120,18 @@ const IngresarOrdenProd = () => {
 
       {/* Manejo de Errores */}
       {errorPopupMessage && !isPopupErrorOpen && (
+        <>
+                <div ref={alertRef} />
         <Alert
-          type="danger"
-          message={errorPopupMessage}
-          icon={<BsExclamationTriangleFill />}
-          className="mt-4"
-        />
+        type="danger"
+        message={errorPopupMessage}
+        icon={<BsExclamationTriangleFill />}
+        className="mt-4"
+      />
+        </>
+
+
+
       )}
 
       {/* Formulario Principal */}
