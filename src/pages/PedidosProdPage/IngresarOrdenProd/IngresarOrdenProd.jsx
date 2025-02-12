@@ -22,6 +22,7 @@ import {
   getInitials,
   getUniqueColor,
   handleIngresarOrdenProduccionSubmit,
+  scrollToAlert,
 } from "./IngresarOrdenProdUtils";
 import Alert from "../../../components/Alerts/Alert";
 import SuccessPopup from "../../../components/Popup/SuccessPopup";
@@ -88,17 +89,8 @@ const IngresarOrdenProd = () => {
       reset
     );
   };
-
-        // Efecto para scroll automático
-        useEffect(() => {
-          if (errorPopupMessage && !isPopupErrorOpen && alertRef.current) {
-            alertRef.current.scrollIntoView({
-              behavior: "smooth",
-              block: "center"
-            });
-          }
-        }, [errorPopupMessage, isPopupErrorOpen]);
-
+  // Use the scrollToAlert function
+  scrollToAlert(errorPopupMessage, isPopupErrorOpen, alertRef);
   return (
     <Container className="glassmorphism-container py-4">
       {/* Encabezado */}
@@ -121,17 +113,15 @@ const IngresarOrdenProd = () => {
       {/* Manejo de Errores */}
       {errorPopupMessage && !isPopupErrorOpen && (
         <>
-                <div ref={alertRef} />
-        <Alert
-        type="danger"
-        message={errorPopupMessage}
-        icon={<BsExclamationTriangleFill />}
-        className="mt-4"
-      />
+          <div ref={alertRef} />
+          <Alert
+            type="danger"
+            message={errorPopupMessage}
+            icon={<BsExclamationTriangleFill />}
+            className="mt-4 mx-auto text-center"
+            style={{ maxWidth: "500px" }}
+          />
         </>
-
-
-
       )}
 
       {/* Formulario Principal */}

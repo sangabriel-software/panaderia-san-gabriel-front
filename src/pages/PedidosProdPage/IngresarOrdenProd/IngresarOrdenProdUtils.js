@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import { ingresarOrdenProduccionService } from "../../../services/ordenesproduccion/ordenesProduccion.service";
-
+import { useEffect } from "react";
 
 export const getInitials = (name) => {
   const names = name.split(" ");
@@ -25,8 +25,6 @@ const assignedColors = {}; // Almacena los colores asignados de manera persisten
     assignedColors[text] = color;
     return color;
 };
-
-
 
 const crearPyaloadOrdenProduccion = (data, trayQuantities) => {
   const detalleOrden = Object.entries(trayQuantities)
@@ -82,4 +80,15 @@ export const handleIngresarOrdenProduccionSubmit = async ( data, trayQuantities,
   } finally {
     setIsLoading(false); // Desactivar el loading del input
   }
+};
+
+export const scrollToAlert = (errorPopupMessage, isPopupErrorOpen, alertRef) => {
+  useEffect(() => {
+    if (errorPopupMessage && !isPopupErrorOpen && alertRef.current) {
+      alertRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }
+  }, [errorPopupMessage, isPopupErrorOpen]);
 };
