@@ -74,7 +74,7 @@ export const handleIngresarOrdenProduccionSubmit = async ( data, trayQuantities,
     }
   } catch (error) {
     setErrorPopupMessage(
-      "Hubo un error al ingresar el producto. Inténtelo de nuevo."
+      "Hubo un error al ingresar la orden. Inténtelo mas tarde."
     );
     setIsPopupErrorOpen(true);
   } finally {

@@ -12,6 +12,7 @@ import SuccessPopup from "../../../components/Popup/SuccessPopup";
 import OrderSummary from "../../../components/OrderSummary/OrderSummary";
 import dayjs from "dayjs";
 import "./ordenes.css";
+import ErrorPopup from "../../../components/Popup/ErrorPopUp";
 
 
 const IngresarOrdenProd = () => {
@@ -327,7 +328,6 @@ const IngresarOrdenProd = () => {
         ↑
       </Button>
 
-
       {/* Resumen de Orden */}
       <OrderSummary
         show={showOrderSummary}
@@ -353,6 +353,14 @@ const IngresarOrdenProd = () => {
           setIsPopupOpen(false);
           reset();
         }}
+      />
+
+        {/* Popup errores */}
+      <ErrorPopup
+        isOpen={isPopupErrorOpen}
+        onClose={() => setIsPopupErrorOpen(false)}
+        title="¡Error!"
+        message={errorPopupMessage}
       />
     </Container>
   );
