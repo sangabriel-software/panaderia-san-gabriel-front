@@ -1,65 +1,79 @@
 .product-card {
-    border-radius: 15px;
-    transition: transform 0.2s;
-    background: linear-gradient(145deg, #ffffff, #f8f9fa);
-  }
-  
-  /* .product-card:hover {
-    transform: translateY(-5px);
-  } */
-  
-  .quantity-input input {
-    font-size: 1.1rem;
-    font-weight: 500;
-    border-radius: 10px;
-  }
-  
-  .quantity-input input:focus {
-    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
-    border-color: #0d6efd;
-  }
-  
-  .border-primary {
-    border: 2px solid #0d6efd !important;
-  }
+  border-radius: 15px;
+  transition: transform 0.2s, box-shadow 0.2s;
+  background: linear-gradient(145deg, #ffffff, #f8f9fa);
+}
 
-  /* Estilos para móvil */
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.product-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.product-input {
+  border-radius: 10px;
+  border: 2px solid #007bff;
+  padding: 0.5rem;
+  font-size: 1rem;
+}
+
+.quantity-input input {
+  font-size: 1.1rem;
+  font-weight: 500;
+  border-radius: 10px;
+}
+
+.quantity-input input:focus {
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+  border-color: #0d6efd;
+}
+
+.border-primary {
+  border: 2px solid #0d6efd !important;
+}
+
+/* Estilos para móvil */
 @media (max-width: 768px) {
-    .mobile-datepicker {
-      font-size: 16px !important;
-      height: 45px !important;
-    }
-    
-    .mobile-calendar {
-      position: fixed !important;
-      top: 50% !important;
-      left: 50% !important;
-      transform: translate(-50%, -50%) !important;
-      z-index: 9999 !important;
-      width: 90% !important;
-      max-width: 400px !important;
-      box-shadow: 0 0 15px rgba(0,0,0,0.2) !important;
-    }
-    
-    .react-datepicker__triangle {
-      display: none !important;
-    }
-    
-    .react-datepicker__month-container {
-      width: 100% !important;
-    }
-    
-    .react-datepicker__day-names,
-    .react-datepicker__week {
-      justify-content: space-around !important;
-    }
+  .mobile-datepicker {
+    font-size: 16px !important;
+    height: 45px !important;
   }
   
-  /* Ajustes generales para el datepicker */
-  .react-datepicker-wrapper {
-    width: 100%;
-  }
-  
-  .react-datepicker-popper {
+  .mobile-calendar {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
     z-index: 9999 !important;
+    width: 90% !important;
+    max-width: 400px !important;
+    box-shadow: 0 0 15px rgba(0,0,0,0.2) !important;
   }
+  
+  .react-datepicker__triangle {
+    display: none !important;
+  }
+  
+  .react-datepicker__month-container {
+    width: 100% !important;
+  }
+  
+  .react-datepicker__day-names,
+  .react-datepicker__week {
+    justify-content: space-around !important;
+  }
+}
+
+/* Ajustes generales para el datepicker */
+.react-datepicker-wrapper {
+  width: 100%;
+}
+
+.react-datepicker-popper {
+  z-index: 9999 !important;
+}

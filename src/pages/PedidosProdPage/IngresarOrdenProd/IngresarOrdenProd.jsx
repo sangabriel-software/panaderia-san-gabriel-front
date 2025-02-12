@@ -123,50 +123,55 @@ const IngresarOrdenProd = () => {
         style={{ borderRadius: "15px" }}
       >
         <Card.Body>
-          <Form onSumit={handleSubmit(onSubmit)}>
+          <Form onSubmit={handleSubmit(onSubmit)}>
             <Row>
-{/* Fecha de Producción - Mejorado para móviles */}
-<Col xs={12} md={4} xl={4} className="border-end border-light mb-3 mb-md-0">
-          <Form.Group>
-            <label className="form-label text-muted small mb-1">
-              FECHA DE PRODUCCIÓN
-            </label>
-            <InputGroup>
-              <Controller
-                control={control}
-                name="fechaAProducir"
-                render={({ field }) => (
-                  <DatePicker
-                    {...field}
-                    selected={field.value}
-                    onChange={field.onChange}
-                    className="form-control border-primary w-100 mobile-datepicker"
-                    minDate={tomorrow}
-                    dateFormat="dd/MM/yyyy"
-                    placeholderText="Seleccionar fecha"
-                    showPopperArrow={false}
-                    popperPlacement="auto"
-                    popperModifiers={[
-                      {
-                        name: 'preventOverflow',
-                        options: {
-                          altBoundary: true,
-                          tether: false,
-                        },
-                      },
-                    ]}
-                    withPortal
-                    isClearable
-                    calendarClassName="mobile-calendar"
-                  />
-                )}
-              />
-              <InputGroup.Text className="bg-white border-primary">
-                📅
-              </InputGroup.Text>
-            </InputGroup>
-          </Form.Group>
-        </Col>
+              {/* Fecha de Producción - Mejorado para móviles */}
+              <Col
+                xs={12}
+                md={4}
+                xl={4}
+                className="border-end border-light mb-3 mb-md-0"
+              >
+                <Form.Group>
+                  <label className="form-label text-muted small mb-1">
+                    FECHA DE PRODUCCIÓN
+                  </label>
+                  <InputGroup>
+                    <Controller
+                      control={control}
+                      name="fechaAProducir"
+                      render={({ field }) => (
+                        <DatePicker
+                          {...field}
+                          selected={field.value}
+                          onChange={field.onChange}
+                          className="form-control border-primary w-100 mobile-datepicker"
+                          minDate={tomorrow}
+                          dateFormat="dd/MM/yyyy"
+                          placeholderText="Seleccionar fecha"
+                          showPopperArrow={false}
+                          popperPlacement="auto"
+                          popperModifiers={[
+                            {
+                              name: "preventOverflow",
+                              options: {
+                                altBoundary: true,
+                                tether: false,
+                              },
+                            },
+                          ]}
+                          withPortal
+                          isClearable
+                          calendarClassName="mobile-calendar"
+                        />
+                      )}
+                    />
+                    <InputGroup.Text className="bg-white border-primary">
+                      📅
+                    </InputGroup.Text>
+                  </InputGroup>
+                </Form.Group>
+              </Col>
 
               <Col xs={12} md={2} className="border-end border-light my-2">
                 <Form.Group>
@@ -238,7 +243,7 @@ const IngresarOrdenProd = () => {
                   </label>
                   <Form.Control
                     type="text"
-                    placeholder="Ej. María Pérez"
+                    placeholder="Ingresar nombre"
                     {...register("nombrePanadero", {
                       required: "El nombre del panadero es requerido",
                     })}
@@ -264,7 +269,6 @@ const IngresarOrdenProd = () => {
                 </Form.Group>
               </Col>
             </Row>
-
             <div className="text-center mt-4">
               <Button variant="success" size="lg" type="submit">
                 🚀 Guardar Orden de Producción
@@ -273,7 +277,6 @@ const IngresarOrdenProd = () => {
           </Form>
         </Card.Body>
       </Card>
-
       {/* Selector de Categorías */}
       <div className="d-flex gap-2 mb-4">
         <Button
@@ -301,28 +304,26 @@ const IngresarOrdenProd = () => {
           : reposteriaProducts
         ).map((producto) => (
           <Col key={producto.idProducto} xs={12} md={6} lg={4}>
-            <Card
-              className="h-100 shadow border-0"
-              style={{ borderRadius: "10px" }}
-            >
-              <Card.Body className="d-flex flex-column">
-                <Card.Title>{producto.nombreProducto}</Card.Title>
-                <Card.Text className="text-muted mb-2">
-                  Precio por bandeja: Q{producto.precioPorUnidad}
-                </Card.Text>
-                <Form.Control
-                  type="number"
-                  min="0"
-                  value={trayQuantities[producto.idProducto] || ""}
-                  onChange={(e) =>
-                    setTrayQuantities({
-                      ...trayQuantities,
-                      [producto.idProducto]: parseInt(e.target.value) || 0,
-                    })
-                  }
-                  placeholder="N° de bandejas"
-                  className="mt-auto"
-                />
+            <Card className="h-100 shadow border-0 product-card text-center p-3">
+              <Card.Body className="d-flex flex-column align-items-center">
+                <Card.Title className="product-title fw-bold">
+                  {producto.nombreProducto}
+                </Card.Title>
+                <span className="text-muted">Cantidad en Bandejas</span>
+                <InputGroup className="mt-2 w-75">
+                  <Form.Control
+                    type="number"
+                    min="0"
+                    value={trayQuantities[producto.idProducto] || ""}
+                    onChange={(e) =>
+                      setTrayQuantities({
+                        ...trayQuantities,
+                        [producto.idProducto]: parseInt(e.target.value) || 0,
+                      })
+                    }
+                    className="text-center border-primary"
+                  />
+                </InputGroup>
               </Card.Body>
             </Card>
           </Col>
