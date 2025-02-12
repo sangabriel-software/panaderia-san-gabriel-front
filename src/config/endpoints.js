@@ -7,6 +7,7 @@ const getEndpoints = {
     CONSULTAR_CATEGORIAS: "/consultarcategorias",
     CONSULTAR_ORDENES_PRODUCCION: "/consultar-ordenes-produccion",
     CONSULTAR_DETALLES_ORDENES_PRODUCCION: "/consultar-detalle-ordenes-produccion",
+    CONSULTAR_SUCURSALES: "/getSucursales"
 };
 
 const postEndpoints = {
@@ -17,7 +18,8 @@ const postEndpoints = {
     INGRESAR_PRODUCTO: "/ingresarProducto",
     INGRESAR_PRECIOPRODUCTO: "/ingresarPrecio",
     INGRESAR_IMAGEN_PRODUCTO: "/ingresar-img-producto",
-    INGRESAR_CATEGORIA: "/ingresarcategoria"
+    INGRESAR_CATEGORIA: "/ingresarcategoria",
+    INGRESAR_ORDEN: "/ingresar-orden"
 };
 
 const putEndpoints = {

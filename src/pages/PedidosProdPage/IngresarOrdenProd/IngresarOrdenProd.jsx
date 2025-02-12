@@ -1,256 +1,225 @@
-import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Button, Form, Badge, Spinner } from 'react-bootstrap';
-import { useMediaQuery } from 'react-responsive';
-import { FaPlus, FaMinus, FaClipboardList, FaUser, FaClock, FaStore, FaBreadSlice, FaCookie } from 'react-icons/fa';
-
-const colors = {
-  primary: '#6366f1',
-  secondary: '#10b981',
-  accent: '#f59e0b',
-  background: '#f8fafc',
-  text: '#334155'
-};
-
-const sucursalesMock = [
-  { id: 1, nombre: 'Sucursal Centro' },
-  { id: 2, nombre: 'Sucursal Norte' },
-  { id: 3, nombre: 'Sucursal Sur' }
-];
-
-const productos = [
-  { id: 1, nombre: 'Pan Francés', categoria: 'Panadería' },
-  { id: 2, nombre: 'Pan Dulce', categoria: 'Panadería' },
-  { id: 3, nombre: 'Pirujo Pequeño', categoria: 'Repostería' },
-  { id: 4, nombre: 'Pirujo Grande', categoria: 'Repostería' },
-  { id: 4, nombre: 'Pirujo Grande', categoria: 'Repostería' },
-  { id: 4, nombre: 'Pirujo Grande', categoria: 'Repostería' },
-  { id: 4, nombre: 'Pirujo Grande', categoria: 'Repostería' },
-  { id: 4, nombre: 'Pirujo Grande', categoria: 'Repostería' },
-];
+import { useState } from "react";
+import { Container, Form, Row, Col, Button, Card, InputGroup } from "react-bootstrap";
+import { useForm, Controller } from "react-hook-form";
+import useGetProductosYPrecios from "../../../hooks/productosprecios/useGetProductosYprecios";
+import { useGetSucursales } from "../../../hooks/sucursales/useGetSucursales";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 const IngresarOrdenProd = () => {
-  const [cantidades, setCantidades] = useState({});
-  const [turno, setTurno] = useState('AM');
-  const [panadero, setPanadero] = useState('');
-  const [sucursalId, setSucursalId] = useState('');
-  const [sucursales, setSucursales] = useState([]);
-  const [loadingSucursales, setLoadingSucursales] = useState(true);
-  const [errorSucursales, setErrorSucursales] = useState(null);
-  const isMobile = useMediaQuery({ maxWidth: 768 });
+  const { sucursales } = useGetSucursales();
+  const { productos } = useGetProductosYPrecios();
 
-  useEffect(() => {
-    const fetchSucursales = async () => {
-      try {
-        setSucursales(sucursalesMock);
-        setLoadingSucursales(false);
-      } catch (error) {
-        setErrorSucursales('Error cargando sucursales');
-        setLoadingSucursales(false);
-      }
-    };
-    fetchSucursales();
-  }, []);
+  // Calcular mañana para el minDate del DatePicker
+  const today = new Date();
+  const tomorrow = new Date();
+  tomorrow.setDate(today.getDate() + 1);
 
-  const getFechaActual = () => {
-    const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
-    return new Date().toLocaleDateString('es-ES', options);
-  };
-
-  const handleCantidad = (id, valor) => {
-    const nuevaCantidad = Math.max(0, Number(valor));
-    setCantidades(prev => ({ ...prev, [id]: nuevaCantidad }));
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const payload = {
-      fecha: getFechaActual(),
-      turno,
-      panadero,
-      sucursalId,
-      usuario: 'admin',
-      productos: Object.entries(cantidades)
-        .filter(([_, cantidad]) => cantidad > 0)
-        .map(([id, cantidad]) => ({
-          productId: Number(id),
-          cantidad
-        }))
-    };
-    console.log('Orden generada:', payload);
-  };
-
-  // Agrupar productos por categoría
-  const productosPorCategoria = productos.reduce((acc, producto) => {
-    if (!acc[producto.categoria]) {
-      acc[producto.categoria] = [];
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+    control,
+    watch
+  } = useForm({
+    defaultValues: {
+      sucursal: "",
+      turno: "AM",
+      fechaAProducir: tomorrow,
+      nombrePanadero: ""
     }
-    acc[producto.categoria].push(producto);
-    return acc;
-  }, {});
+  });
+
+  // Para leer el valor actual del turno y aplicar estilos en los botones
+  const turnoValue = watch("turno");
+
+  const [activeCategory, setActiveCategory] = useState("Panadería");
+  const [trayQuantities, setTrayQuantities] = useState({});
+
+  // Filtrar productos por categoría
+  const panaderiaProducts = productos.filter(p => p.nombreCategoria === "Panadería");
+  const reposteriaProducts = productos.filter(p => p.nombreCategoria === "Repostería");
+
+  // Función que se ejecuta al enviar el formulario (encabezado)
+  const onSubmit = async (data) => {
+    // Generar detalle de la orden a partir de los inputs de productos
+    const detalleOrden = Object.entries(trayQuantities)
+      .filter(([_, cantidad]) => cantidad > 0)
+      .map(([idProducto, cantidad]) => ({
+        idProducto: Number(idProducto),
+        cantidadBandejas: cantidad,
+        fechaCreacion: new Date().toISOString()
+      }));
+
+    const payload = {
+      encabezadoOrden: {
+        idSucursal: Number(data.sucursal),
+        ordenTurno: data.turno,
+        nombrePanadero: data.nombrePanadero,
+        fechaAProducir: new Date(data.fechaAProducir).toISOString().split("T")[0],
+        idUsuario: 1, // Se asume que el usuario está logueado
+        fechaCreacion: new Date().toISOString().split("T")[0]
+      },
+      detalleOrden
+    };
+
+    try {
+      const response = await fetch("http://localhost:3000/api/ingresar-orden", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      // Aquí se puede manejar la respuesta (éxito, error, etc.)
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
 
   return (
-    <Container fluid className="p-3 p-md-4" style={{ backgroundColor: colors.background, minHeight: '100vh' }}>
-      <h1 className="text-center mb-4 display-5 fw-bold" style={{ color: colors.primary }}>
-        <FaClipboardList className="me-2" />
-        Orden de Producción
-      </h1>
-
-      {/* Encabezado completo */}
-      <div className="mb-4 p-3 rounded-3 shadow-sm" style={{ backgroundColor: 'white', border: `1px solid ${colors.primary}20` }}>
-        <Row className="g-3 align-items-center">
-          <Col xs={12} md={3}>
-            <div className="d-flex align-items-center gap-2">
-              <FaStore style={{ color: colors.primary }}/>
-              <Form.Select
-                value={sucursalId}
-                onChange={(e) => setSucursalId(e.target.value)}
-                style={{ borderColor: colors.primary }}
-                disabled={loadingSucursales}
-              >
-                <option value="">Seleccionar sucursal</option>
-                {sucursales.map(sucursal => (
-                  <option key={sucursal.id} value={sucursal.id}>
-                    {sucursal.nombre}
-                  </option>
-                ))}
-              </Form.Select>
-            </div>
-          </Col>
-
-          <Col xs={6} md={2}>
-            <Form.Select 
-              value={turno} 
-              onChange={(e) => setTurno(e.target.value)}
-              style={{ borderColor: colors.primary }}
-            >
-              <option value="AM">AM</option>
-              <option value="PM">PM</option>
-            </Form.Select>
-          </Col>
-
-          <Col xs={6} md={3}>
-            <div className="d-flex align-items-center gap-2">
-              <FaUser style={{ color: colors.primary }}/>
-              <Form.Control
-                placeholder="Nombre panadero"
-                value={panadero}
-                onChange={(e) => setPanadero(e.target.value)}
-                required
-                style={{ borderColor: colors.primary }}
-              />
-            </div>
-          </Col>
-
-          <Col xs={12} md={4}>
-            <div className="d-flex align-items-center gap-2">
-              <FaClock style={{ color: colors.primary }}/>
-              <Form.Control
-                type="date"
-                value={new Date().toISOString().split('T')[0]}
-                disabled
-                style={{ borderColor: colors.primary }}
-              />
-            </div>
-          </Col>
-        </Row>
-      </div>
-
-      {/* Categorías de productos */}
-      {Object.entries(productosPorCategoria).map(([categoria, productos]) => (
-        <div key={categoria} className="mb-4">
-          <div className="d-flex align-items-center gap-3 mb-3">
-            {categoria === 'Panadería' ? (
-              <FaBreadSlice style={{ color: colors.accent, fontSize: '1.5rem' }}/>
-            ) : (
-              <FaCookie style={{ color: colors.accent, fontSize: '1.5rem' }}/>
-            )}
-            <h2 className="h4 mb-0 fw-bold" style={{ color: colors.text }}>
-              {categoria}
-            </h2>
-          </div>
-
-          <Row xs={1} md={2} lg={3} className="g-3">
-            {productos.map(producto => (
-              <Col key={producto.id}>
-                <div className="p-3 rounded-4 shadow-sm position-relative" 
-                     style={{ backgroundColor: 'white', border: `1px solid ${colors.primary}20` }}>
-                  <div className="d-flex justify-content-between align-items-center mb-3">
-                    <h3 className="h6 mb-0 fw-bold" style={{ color: colors.text }}>
-                      {producto.nombre}
-                    </h3>
-                    <Badge 
-                      pill 
-                      className="fs-6"
-                      style={{ 
-                        backgroundColor: colors.secondary,
-                        minWidth: '35px',
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-                      }}
-                    >
-                      {cantidades[producto.id] || 0}
-                    </Badge>
-                  </div>
-
-                  <small className="d-block text-center mb-2" style={{ color: colors.primary }}>
-                    Cantidad en Bandejas
-                  </small>
-
-                  <div className="d-flex align-items-center justify-content-center gap-2">
-                    <Button 
-                      variant="outline-primary" 
-                      size="sm"
-                      onClick={() => handleCantidad(producto.id, (cantidades[producto.id] || 0) - 1)}
-                      style={{ borderRadius: '8px', padding: '0.25rem 0.5rem' }}
-                    >
-                      <FaMinus />
-                    </Button>
-                    
-                    <Form.Control
-                      type="number"
-                      min="0"
-                      value={cantidades[producto.id] || 0}
-                      onChange={(e) => handleCantidad(producto.id, e.target.value)}
-                      className="text-center"
-                      style={{
-                        width: '70px',
-                        borderColor: colors.primary,
-                        borderRadius: '8px',
-                        padding: '0.25rem'
-                      }}
-                    />
-                    
-                    <Button 
-                      variant="outline-primary" 
-                      size="sm"
-                      onClick={() => handleCantidad(producto.id, (cantidades[producto.id] || 0) + 1)}
-                      style={{ borderRadius: '8px', padding: '0.25rem 0.5rem' }}
-                    >
-                      <FaPlus />
-                    </Button>
-                  </div>
-                </div>
+    <Container className="py-4">
+      <h2 className="mb-4 text-primary">🍞 Nueva Orden de Producción</h2>
+      
+      {/* Encabezado en Card */}
+      <Card className="mb-4">
+        <Card.Body>
+          <Form onSubmit={handleSubmit(onSubmit)}>
+            <Row className="g-3">
+              {/* Sucursal */}
+              <Col md={6}>
+                <Form.Group>
+                  <Form.Label>Sucursal</Form.Label>
+                  <Form.Select
+                    {...register("sucursal", { required: "Seleccione sucursal" })}
+                  >
+                    <option value="">Seleccione sucursal</option>
+                    {sucursales.map((s) => (
+                      <option key={s.idSucursal} value={s.idSucursal}>
+                        {s.nombreSucursal}
+                      </option>
+                    ))}
+                  </Form.Select>
+                  {errors.sucursal && (
+                    <span className="text-danger">{errors.sucursal.message}</span>
+                  )}
+                </Form.Group>
               </Col>
-            ))}
-          </Row>
-        </div>
-      ))}
 
-      <div className={`mt-4 ${isMobile ? 'fixed-bottom p-3' : 'text-center'}`}>
-        <Button 
-          variant="primary" 
-          type="submit" 
-          className="w-100 fw-bold py-2"
-          style={{
-            background: colors.primary,
-            border: 'none',
-            borderRadius: '10px',
-            fontSize: '1rem'
-          }}
-          onClick={handleSubmit}
+              {/* Turno */}
+              <Col md={3}>
+                <Form.Group>
+                  <Form.Label>Turno</Form.Label>
+                  <InputGroup>
+                    <Button
+                      variant={turnoValue === "AM" ? "primary" : "outline-primary"}
+                      onClick={() => setValue("turno", "AM")}
+                      type="button"
+                    >
+                      AM
+                    </Button>
+                    <Button
+                      variant={turnoValue === "PM" ? "primary" : "outline-primary"}
+                      onClick={() => setValue("turno", "PM")}
+                      type="button"
+                    >
+                      PM
+                    </Button>
+                  </InputGroup>
+                </Form.Group>
+              </Col>
+
+              {/* Fecha de Producción */}
+              <Col md={3}>
+                <Form.Group>
+                  <Form.Label>Fecha de Producción</Form.Label>
+                  <Controller
+                    control={control}
+                    name="fechaAProducir"
+                    render={({ field }) => (
+                      <DatePicker
+                        {...field}
+                        selected={field.value}
+                        onChange={(date) => field.onChange(date)}
+                        className="form-control"
+                        minDate={tomorrow}
+                        dateFormat="yyyy-MM-dd"
+                      />
+                    )}
+                  />
+                </Form.Group>
+              </Col>
+
+              {/* Nombre del Panadero */}
+              <Col md={12}>
+                <Form.Group>
+                  <Form.Label>Nombre del Panadero</Form.Label>
+                  <Form.Control
+                    type="text"
+                    placeholder="Ej. María Pérez"
+                    {...register("nombrePanadero", { required: "El nombre del panadero es requerido" })}
+                  />
+                  {errors.nombrePanadero && (
+                    <span className="text-danger">{errors.nombrePanadero.message}</span>
+                  )}
+                </Form.Group>
+              </Col>
+            </Row>
+            <div className="text-center mt-4">
+              <Button variant="success" size="lg" type="submit">
+                🚀 Guardar Orden de Producción
+              </Button>
+            </div>
+          </Form>
+        </Card.Body>
+      </Card>
+
+      {/* Selector de Categorías */}
+      <div className="d-flex gap-2 mb-4">
+        <Button
+          variant={activeCategory === "Panadería" ? "primary" : "outline-primary"}
+          onClick={() => setActiveCategory("Panadería")}
         >
-          Generar Orden
+          Panadería ({panaderiaProducts.length})
+        </Button>
+        <Button
+          variant={activeCategory === "Repostería" ? "primary" : "outline-primary"}
+          onClick={() => setActiveCategory("Repostería")}
+        >
+          Repostería ({reposteriaProducts.length})
         </Button>
       </div>
+
+      {/* Listado de Productos con estilo (según la segunda imagen) */}
+      <Row className="g-3">
+        {(activeCategory === "Panadería" ? panaderiaProducts : reposteriaProducts).map((producto) => (
+          <Col key={producto.idProducto} xs={12} md={6} lg={4}>
+            <Card
+              className="h-100 shadow border-0"
+              style={{ borderRadius: "10px" }}
+            >
+              <Card.Body className="d-flex flex-column">
+                <Card.Title>{producto.nombreProducto}</Card.Title>
+                <Card.Text className="text-muted mb-2">
+                  Precio por bandeja: Q{producto.precioPorUnidad}
+                </Card.Text>
+                <Form.Control
+                  type="number"
+                  min="0"
+                  value={trayQuantities[producto.idProducto] || ""}
+                  onChange={(e) =>
+                    setTrayQuantities({
+                      ...trayQuantities,
+                      [producto.idProducto]: parseInt(e.target.value) || 0
+                    })
+                  }
+                  placeholder="N° de bandejas"
+                  className="mt-auto"
+                />
+              </Card.Body>
+            </Card>
+          </Col>
+        ))}
+      </Row>
     </Container>
   );
 };
