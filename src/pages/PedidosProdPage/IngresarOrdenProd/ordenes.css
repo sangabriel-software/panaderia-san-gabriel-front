@@ -1,32 +1,24 @@
-/* Estilos para el encabezado */
-.header-card-moderno {
+.product-card {
     border-radius: 15px;
-    overflow: hidden;
+    transition: transform 0.2s;
+    background: linear-gradient(145deg, #ffffff, #f8f9fa);
   }
   
-  .form-control-moderno {
-    border: 2px solid #dee2e6;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-  }
-  
-  .form-control-moderno:focus {
-    border-color: #0d6efd;
-    box-shadow: none;
-  }
-  
-  /* Estilos para las cards de productos */
-  .product-card-moderno {
-    border: none;
-    border-radius: 12px;
-    transition: transform 0.2s ease;
-  }
-  
-  .product-card-moderno:hover {
+  /* .product-card:hover {
     transform: translateY(-5px);
+  } */
+  
+  .quantity-input input {
+    font-size: 1.1rem;
+    font-weight: 500;
+    border-radius: 10px;
   }
   
-  .product-card-moderno .card-body {
-    padding: 1.5rem;
-    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+  .quantity-input input:focus {
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    border-color: #0d6efd;
+  }
+  
+  .border-primary {
+    border: 2px solid #0d6efd !important;
   }

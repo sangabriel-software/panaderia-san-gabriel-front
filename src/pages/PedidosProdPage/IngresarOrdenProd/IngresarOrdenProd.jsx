@@ -1,14 +1,27 @@
 import { useState } from "react";
-import { Container, Form, Row, Col, Button, Card, InputGroup } from "react-bootstrap";
+import {
+  Container,
+  Form,
+  Row,
+  Col,
+  Button,
+  Card,
+  InputGroup,
+} from "react-bootstrap";
 import { useForm, Controller } from "react-hook-form";
 import useGetProductosYPrecios from "../../../hooks/productosprecios/useGetProductosYprecios";
 import { useGetSucursales } from "../../../hooks/sucursales/useGetSucursales";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import "./ordenes.css";
+import Title from "../../../components/Title/Title";
+import { BsArrowLeft } from "react-icons/bs";
+import { useNavigate } from "react-router";
 
 const IngresarOrdenProd = () => {
   const { sucursales } = useGetSucursales();
   const { productos } = useGetProductosYPrecios();
+  const navigate = useNavigate();
 
   // Calcular mañana para el minDate del DatePicker
   const today = new Date();
@@ -21,14 +34,14 @@ const IngresarOrdenProd = () => {
     formState: { errors },
     setValue,
     control,
-    watch
+    watch,
   } = useForm({
     defaultValues: {
       sucursal: "",
       turno: "AM",
       fechaAProducir: tomorrow,
-      nombrePanadero: ""
-    }
+      nombrePanadero: "",
+    },
   });
 
   // Para leer el valor actual del turno y aplicar estilos en los botones
@@ -38,8 +51,12 @@ const IngresarOrdenProd = () => {
   const [trayQuantities, setTrayQuantities] = useState({});
 
   // Filtrar productos por categoría
-  const panaderiaProducts = productos.filter(p => p.nombreCategoria === "Panadería");
-  const reposteriaProducts = productos.filter(p => p.nombreCategoria === "Repostería");
+  const panaderiaProducts = productos.filter(
+    (p) => p.nombreCategoria === "Panadería"
+  );
+  const reposteriaProducts = productos.filter(
+    (p) => p.nombreCategoria === "Repostería"
+  );
 
   // Función que se ejecuta al enviar el formulario (encabezado)
   const onSubmit = async (data) => {
@@ -49,7 +66,7 @@ const IngresarOrdenProd = () => {
       .map(([idProducto, cantidad]) => ({
         idProducto: Number(idProducto),
         cantidadBandejas: cantidad,
-        fechaCreacion: new Date().toISOString()
+        fechaCreacion: new Date().toISOString(),
       }));
 
     const payload = {
@@ -57,18 +74,20 @@ const IngresarOrdenProd = () => {
         idSucursal: Number(data.sucursal),
         ordenTurno: data.turno,
         nombrePanadero: data.nombrePanadero,
-        fechaAProducir: new Date(data.fechaAProducir).toISOString().split("T")[0],
+        fechaAProducir: new Date(data.fechaAProducir)
+          .toISOString()
+          .split("T")[0],
         idUsuario: 1, // Se asume que el usuario está logueado
-        fechaCreacion: new Date().toISOString().split("T")[0]
+        fechaCreacion: new Date().toISOString().split("T")[0],
       },
-      detalleOrden
+      detalleOrden,
     };
 
     try {
       const response = await fetch("http://localhost:3000/api/ingresar-orden", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
       });
       // Aquí se puede manejar la respuesta (éxito, error, etc.)
     } catch (error) {
@@ -78,19 +97,42 @@ const IngresarOrdenProd = () => {
 
   return (
     <Container className="py-4">
-      <h2 className="mb-4 text-primary">🍞 Nueva Orden de Producción</h2>
-      
+      <div className="text-center">
+        <div className="row">
+          <div className="col-2">
+            <button
+              className="btn bt-return rounded-circle d-flex align-items-center justify-content-center shadow"
+              style={{ width: "40px", height: "40px" }}
+              onClick={() => navigate("/ordenes-produccion")}
+            >
+              <BsArrowLeft size={20} />
+            </button>
+          </div>
+          <div className="col-8">
+            <Title title="🍞 Nueva Orden de Producción" />
+          </div>
+        </div>
+      </div>
+
       {/* Encabezado en Card */}
-      <Card className="mb-4">
+      <Card
+        className="shadow-lg border-0 mb-4 bg-gradient-primary"
+        style={{ borderRadius: "15px" }}
+      >
         <Card.Body>
           <Form onSubmit={handleSubmit(onSubmit)}>
-            <Row className="g-3">
+            <Row className="g-3 align-items-center">
               {/* Sucursal */}
-              <Col md={6}>
+              <Col md={4} className="border-end border-light">
                 <Form.Group>
-                  <Form.Label>Sucursal</Form.Label>
+                  <label className="form-label text-muted small mb-1">
+                    SUCURSAL
+                  </label>
                   <Form.Select
-                    {...register("sucursal", { required: "Seleccione sucursal" })}
+                    {...register("sucursal", {
+                      required: "Seleccione sucursal",
+                    })}
+                    className="border-primary"
                   >
                     <option value="">Seleccione sucursal</option>
                     {sucursales.map((s) => (
@@ -100,25 +142,33 @@ const IngresarOrdenProd = () => {
                     ))}
                   </Form.Select>
                   {errors.sucursal && (
-                    <span className="text-danger">{errors.sucursal.message}</span>
+                    <span className="text-danger">
+                      {errors.sucursal.message}
+                    </span>
                   )}
                 </Form.Group>
               </Col>
 
               {/* Turno */}
-              <Col md={3}>
+              <Col md={4} className="ps-5">
                 <Form.Group>
-                  <Form.Label>Turno</Form.Label>
+                  <label className="form-label text-muted small mb-1">
+                    TURNO
+                  </label>
                   <InputGroup>
                     <Button
-                      variant={turnoValue === "AM" ? "primary" : "outline-primary"}
+                      variant={
+                        turnoValue === "AM" ? "primary" : "outline-primary"
+                      }
                       onClick={() => setValue("turno", "AM")}
                       type="button"
                     >
                       AM
                     </Button>
                     <Button
-                      variant={turnoValue === "PM" ? "primary" : "outline-primary"}
+                      variant={
+                        turnoValue === "PM" ? "primary" : "outline-primary"
+                      }
                       onClick={() => setValue("turno", "PM")}
                       type="button"
                     >
@@ -129,9 +179,11 @@ const IngresarOrdenProd = () => {
               </Col>
 
               {/* Fecha de Producción */}
-              <Col md={3}>
+              <Col md={4}>
                 <Form.Group>
-                  <Form.Label>Fecha de Producción</Form.Label>
+                  <label className="form-label text-muted small mb-1">
+                    FECHA DE PRODUCCIÓN
+                  </label>
                   <Controller
                     control={control}
                     name="fechaAProducir"
@@ -139,31 +191,53 @@ const IngresarOrdenProd = () => {
                       <DatePicker
                         {...field}
                         selected={field.value}
-                        onChange={(date) => field.onChange(date)}
-                        className="form-control"
+                        onChange={field.onChange}
+                        className="form-control border-primary"
                         minDate={tomorrow}
-                        dateFormat="yyyy-MM-dd"
+                        dateFormat="dd/MM/yyyy"
+                        placeholderText="dd/mm/aaaa"
                       />
                     )}
                   />
                 </Form.Group>
               </Col>
+            </Row>
 
+            <Row className="g-3 align-items-center mt-3">
               {/* Nombre del Panadero */}
-              <Col md={12}>
+              <Col md={4} className="border-end border-light">
                 <Form.Group>
-                  <Form.Label>Nombre del Panadero</Form.Label>
+                  <label className="form-label text-muted small mb-1">
+                    NOMBRE DEL PANADERO
+                  </label>
                   <Form.Control
                     type="text"
                     placeholder="Ej. María Pérez"
-                    {...register("nombrePanadero", { required: "El nombre del panadero es requerido" })}
+                    {...register("nombrePanadero", {
+                      required: "El nombre del panadero es requerido",
+                    })}
+                    className="border-primary"
                   />
                   {errors.nombrePanadero && (
-                    <span className="text-danger">{errors.nombrePanadero.message}</span>
+                    <span className="text-danger">
+                      {errors.nombrePanadero.message}
+                    </span>
                   )}
                 </Form.Group>
               </Col>
+
+              <Col md={2}> </Col>
+              {/* Nombre del usuario */}
+              <Col md={6}>
+                <Form.Group>
+                  <label className="form-label text-muted small mb-1">
+                    USUARIO
+                  </label>
+                  <span className="badge bg-success ms-2">admin</span>
+                </Form.Group>
+              </Col>
             </Row>
+
             <div className="text-center mt-4">
               <Button variant="success" size="lg" type="submit">
                 🚀 Guardar Orden de Producción
@@ -176,13 +250,17 @@ const IngresarOrdenProd = () => {
       {/* Selector de Categorías */}
       <div className="d-flex gap-2 mb-4">
         <Button
-          variant={activeCategory === "Panadería" ? "primary" : "outline-primary"}
+          variant={
+            activeCategory === "Panadería" ? "primary" : "outline-primary"
+          }
           onClick={() => setActiveCategory("Panadería")}
         >
           Panadería ({panaderiaProducts.length})
         </Button>
         <Button
-          variant={activeCategory === "Repostería" ? "primary" : "outline-primary"}
+          variant={
+            activeCategory === "Repostería" ? "primary" : "outline-primary"
+          }
           onClick={() => setActiveCategory("Repostería")}
         >
           Repostería ({reposteriaProducts.length})
@@ -191,7 +269,10 @@ const IngresarOrdenProd = () => {
 
       {/* Listado de Productos con estilo (según la segunda imagen) */}
       <Row className="g-3">
-        {(activeCategory === "Panadería" ? panaderiaProducts : reposteriaProducts).map((producto) => (
+        {(activeCategory === "Panadería"
+          ? panaderiaProducts
+          : reposteriaProducts
+        ).map((producto) => (
           <Col key={producto.idProducto} xs={12} md={6} lg={4}>
             <Card
               className="h-100 shadow border-0"
@@ -209,7 +290,7 @@ const IngresarOrdenProd = () => {
                   onChange={(e) =>
                     setTrayQuantities({
                       ...trayQuantities,
-                      [producto.idProducto]: parseInt(e.target.value) || 0
+                      [producto.idProducto]: parseInt(e.target.value) || 0,
                     })
                   }
                   placeholder="N° de bandejas"
