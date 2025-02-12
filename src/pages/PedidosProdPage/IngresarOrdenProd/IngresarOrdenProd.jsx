@@ -27,8 +27,15 @@ import Alert from "../../../components/Alerts/Alert";
 import SuccessPopup from "../../../components/Popup/SuccessPopup";
 
 const IngresarOrdenProd = () => {
-  const { sucursales, loadingSucursales, showErrorSucursales } = useGetSucursales();
-  const { productos, loadigProducts, showErrorProductos, showInfoProductos, setProductos } = useGetProductosYPrecios();
+  const { sucursales, loadingSucursales, showErrorSucursales } =
+    useGetSucursales();
+  const {
+    productos,
+    loadigProducts,
+    showErrorProductos,
+    showInfoProductos,
+    setProductos,
+  } = useGetProductosYPrecios();
   const navigate = useNavigate();
   const tomorrow = dayjs().add(1, "day").toDate();
 
@@ -65,8 +72,16 @@ const IngresarOrdenProd = () => {
   );
 
   const onSubmit = async (data) => {
-    await handleIngresarOrdenProduccionSubmit( data, trayQuantities, setTrayQuantities, setIsPopupOpen,  setErrorPopupMessage,
-                                              setIsPopupErrorOpen, setIsLoading, reset);
+    await handleIngresarOrdenProduccionSubmit(
+      data,
+      trayQuantities,
+      setTrayQuantities,
+      setIsPopupOpen,
+      setErrorPopupMessage,
+      setIsPopupErrorOpen,
+      setIsLoading,
+      reset
+    );
   };
 
   return (
@@ -120,9 +135,6 @@ const IngresarOrdenProd = () => {
                           className="form-control modern-datepicker"
                           min={tomorrow}
                         />
-                        <InputGroup.Text className="input-icon">
-                          📅
-                        </InputGroup.Text>
                       </InputGroup>
                       {errors.fechaAProducir && (
                         <div className="text-danger small mt-1">

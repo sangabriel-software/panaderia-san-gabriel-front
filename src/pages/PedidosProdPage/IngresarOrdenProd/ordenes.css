@@ -47,8 +47,8 @@
 }
 
 .modern-calendar .react-datepicker__header {
-  background: rgba(52, 152, 219, 0.1);
-  border-bottom: none;
+  background: rgba(52, 152, 219, 0.1) !important;
+  border-bottom: none !important;
   border-radius: 15px 15px 0 0 !important;
 }
 
