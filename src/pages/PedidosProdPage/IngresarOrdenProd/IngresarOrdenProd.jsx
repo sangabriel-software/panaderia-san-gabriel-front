@@ -125,31 +125,33 @@ const IngresarOrdenProd = () => {
         <Card.Body>
           <Form onSumit={handleSubmit(onSubmit)}>
             <Row>
-            <Col xs={12} md={4} xl={4} className="border-end border-light">
-              <Form.Group>
-                <label className="form-label text-muted small mb-1">FECHA DE PRODUCCIÓN</label>
-                <InputGroup>
-                  <Controller
-                    control={control}
-                    name="fechaAProducir"
-                    render={({ field }) => (
-                      <DatePicker
-                        {...field}
-                        selected={field.value}
-                        onChange={field.onChange}
-                        className="form-control border-primary w-100"
-                        minDate={tomorrow}
-                        dateFormat="dd/MM/yyyy"
-                        placeholderText="Seleccionar fecha"
-                      />
-                    )}
-                  />
-                  <InputGroup.Text className="bg-white border-primary">
-                    📅
-                  </InputGroup.Text>
-                </InputGroup>
-              </Form.Group>
-            </Col>
+              <Col xs={12} md={4} xl={4} className="border-end border-light">
+                <Form.Group>
+                  <label className="form-label text-muted small mb-1">
+                    FECHA DE PRODUCCIÓN
+                  </label>
+                  <InputGroup>
+                    <Controller
+                      control={control}
+                      name="fechaAProducir"
+                      render={({ field }) => (
+                        <DatePicker
+                          {...field}
+                          selected={field.value}
+                          onChange={field.onChange}
+                          className="form-control border-primary w-100"
+                          minDate={tomorrow}
+                          dateFormat="dd/MM/yyyy"
+                          placeholderText="Seleccionar fecha"
+                        />
+                      )}
+                    />
+                    <InputGroup.Text className="bg-white border-primary">
+                      📅
+                    </InputGroup.Text>
+                  </InputGroup>
+                </Form.Group>
+              </Col>
 
               <Col xs={12} md={2} className="border-end border-light my-2">
                 <Form.Group>
@@ -211,6 +213,48 @@ const IngresarOrdenProd = () => {
                 </Form.Group>
               </Col>
             </Row>
+
+            <Row className="g-3 mt-3">
+              {/* Nombre del Panadero */}
+              <Col xs={12} md={4} className="border-end-md border-light">
+                <Form.Group>
+                  <label className="form-label text-muted small mb-1">
+                    NOMBRE DEL PANADERO
+                  </label>
+                  <Form.Control
+                    type="text"
+                    placeholder="Ej. María Pérez"
+                    {...register("nombrePanadero", {
+                      required: "El nombre del panadero es requerido",
+                    })}
+                    className="border-primary"
+                  />
+                  {errors.nombrePanadero && (
+                    <span className="text-danger">
+                      {errors.nombrePanadero.message}
+                    </span>
+                  )}
+                </Form.Group>
+              </Col>
+
+              <Col xs={12} md={2} className="d-none d-md-block"></Col>
+
+              {/* Nombre del usuario */}
+              <Col xs={12} md={6} className="text-center text-md-start">
+                <Form.Group>
+                  <label className="form-label text-muted small mb-1">
+                    USUARIO
+                  </label>
+                  <span className="badge bg-success ms-2">admin</span>
+                </Form.Group>
+              </Col>
+            </Row>
+
+            <div className="text-center mt-4">
+              <Button variant="success" size="lg" type="submit">
+                🚀 Guardar Orden de Producción
+              </Button>
+            </div>
           </Form>
         </Card.Body>
       </Card>
