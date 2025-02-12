@@ -28,3 +28,12 @@ export const eliminarOrdenProduccionService = async (idOrdenProduccion) => {
     throw error;
   }
 }
+
+export const ingresarOrdenProduccionService = async (dataOrden) => {
+  try {
+      const response = await api.post(`${postEndpoints.INGRESAR_ORDEN_PRODUCCION}`, dataOrden); 
+      return response.data;
+  } catch (error) {
+    throw error;
+  }
+}

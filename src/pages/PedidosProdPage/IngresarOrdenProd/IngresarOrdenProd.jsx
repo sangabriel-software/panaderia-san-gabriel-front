@@ -1,79 +1,35 @@
 import { useState } from "react";
-import {
-  Container,
-  Form,
-  Row,
-  Col,
-  Button,
-  Card,
-  InputGroup,
-  Alert,
-} from "react-bootstrap";
+import { Container, Form, Row, Col, Button, Card, InputGroup, Alert, } from "react-bootstrap";
 import { useForm, Controller } from "react-hook-form";
 import useGetProductosYPrecios from "../../../hooks/productosprecios/useGetProductosYprecios";
 import { useGetSucursales } from "../../../hooks/sucursales/useGetSucursales";
 import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import "./ordenes.css";
-import Title from "../../../components/Title/Title";
 import { BsArrowLeft } from "react-icons/bs";
 import { useNavigate } from "react-router";
-
-const getInitials = (name) => {
-  const names = name.split(" ");
-  const initials = names.map((n) => n[0]).join("");
-  return initials.toUpperCase();
-};
-
-const colors = [
-  "#FF5733", "#33FF57", "#3357FF", "#FF33A1", "#FF8C33", "#33FFF5", "#8D33FF", "#FF3333"
-];
-let colorIndex = 0;
-const assignedColors = {};
-
-// Function to get a unique color for each product
-const getUniqueColor = (id) => {
-  if (!assignedColors[id]) {
-    assignedColors[id] = colors[colorIndex % colors.length];
-    colorIndex++;
-  }
-  return assignedColors[id];
-};
+import "react-datepicker/dist/react-datepicker.css";
+import dayjs from 'dayjs';
+import "./ordenes.css";
+import Title from "../../../components/Title/Title"; 
+import { getInitials, getUniqueColor, handleIngresarOrdenProduccionSubmit } from "./IngresarOrdenProdUtils";
 
 const IngresarOrdenProd = () => {
-  const { sucursales } = useGetSucursales();
-  const { productos } = useGetProductosYPrecios();
-  console.log("Productos:", productos);
+  const { sucursales, loadingSucursales } = useGetSucursales();
+  const { productos, loadigProducts } = useGetProductosYPrecios();
   const navigate = useNavigate();
+  const tomorrow = dayjs().add(1, 'day').toDate();
 
-  // Calcular mañana para el minDate del DatePicker
-  const today = new Date();
-  const tomorrow = new Date();
-  tomorrow.setDate(today.getDate() + 1);
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    setValue,
-    control,
-    watch,
-  } = useForm({
-    defaultValues: {
-      sucursal: "",
-      turno: "AM",
-      fechaAProducir: tomorrow,
-      nombrePanadero: "",
-    },
-  });
+  const { register, handleSubmit, formState: { errors }, setValue, control, watch, reset}
+  = useForm({ defaultValues: {sucursal: "", turno: "AM", fechaAProducir: tomorrow, nombrePanadero: "", }, });
 
   // Para leer el valor actual del turno y aplicar estilos en los botones
   const turnoValue = watch("turno");
 
   const [activeCategory, setActiveCategory] = useState("Panadería");
   const [trayQuantities, setTrayQuantities] = useState({});
-  const [loading, setLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [isPopupErrorOpen, setIsPopupErrorOpen] = useState(false);
+  const [errorPopupMessage, setErrorPopupMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   // Filtrar productos por categoría
   const panaderiaProducts = productos.filter(
@@ -83,53 +39,10 @@ const IngresarOrdenProd = () => {
     (p) => p.nombreCategoria === "Repostería"
   );
 
-  // Función que se ejecuta al enviar el formulario (encabezado)
-  const onSubmit = async (data) => {
-    console.log("Data:", data);
-    // Generar detalle de la orden a partir de los inputs de productos
-    const detalleOrden = Object.entries(trayQuantities)
-      .filter(([_, cantidad]) => cantidad > 0)
-      .map(([idProducto, cantidad]) => ({
-        idProducto: Number(idProducto),
-        cantidadBandejas: cantidad,
-        fechaCreacion: new Date().toISOString(),
-      }));
 
-    if (detalleOrden.length === 0) {
-      setErrorMessage("Debe ingresar la cantidad de productos para al menos un producto.");
-      return;
-    }
-
-    const payload = {
-      encabezadoOrden: {
-        idSucursal: Number(data.sucursal),
-        ordenTurno: data.turno,
-        nombrePanadero: data.nombrePanadero,
-        fechaAProducir: new Date(data.fechaAProducir)
-          .toISOString()
-          .split("T")[0],
-        idUsuario: 1, // Se asume que el usuario está logueado
-        fechaCreacion: new Date().toISOString().split("T")[0],
-      },
-      detalleOrden,
+    const onSubmit = async (data) => {
+      await handleIngresarOrdenProduccionSubmit( data, trayQuantities, setTrayQuantities, setIsPopupOpen, setErrorPopupMessage, setIsPopupErrorOpen, setIsLoading, reset )
     };
-
-    setLoading(true);
-    setErrorMessage("");
-    try {
-      const response = await fetch("http://localhost:3000/api/ingresar-orden", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      // Aquí se puede manejar la respuesta (éxito, error, etc.)
-    } catch (error) {
-      console.error("Error:", error);
-      setErrorMessage("No se pudo guardar la orden. Intente nuevamente.");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <Container className="py-4">
@@ -137,8 +50,7 @@ const IngresarOrdenProd = () => {
       <div className="text-center">
         <div className="row">
           <div className="col-2">
-            <button
-              className="btn bt-return rounded-circle d-flex align-items-center justify-content-center shadow"
+            <button className="btn bt-return rounded-circle d-flex align-items-center justify-content-center shadow"
               style={{ width: "40px", height: "40px" }}
               onClick={() => navigate("/ordenes-produccion")}
             >
@@ -150,7 +62,7 @@ const IngresarOrdenProd = () => {
           </div>
         </div>
       </div>
-      {errorMessage && <Alert variant="danger">{errorMessage}</Alert>}
+      {errorPopupMessage && <Alert variant="danger">{errorPopupMessage}</Alert>}
       {/* Encabezado en Card */}
       <Card
         className="shadow-lg border-0 mb-4 bg-gradient-primary"
@@ -306,8 +218,8 @@ const IngresarOrdenProd = () => {
               </Col>
             </Row>
             <div className="text-center mt-4">
-              <Button variant="success" size="lg" type="submit" disabled={loading}>
-                {loading ? "Guardando..." : "🚀 Guardar Orden de Producción"}
+              <Button variant="success" size="lg" type="submit" disabled={isLoading}>
+                {isLoading ? "Guardando..." : "🚀 Guardar Orden de Producción"}
               </Button>
             </div>
           </Form>
@@ -347,7 +259,7 @@ const IngresarOrdenProd = () => {
                   style={{
                     width: 30,
                     height: 30,
-                    backgroundColor: getUniqueColor(producto.idProducto),
+                    backgroundColor: getUniqueColor(producto.nombreProducto),
                   }}
                 >
                   {getInitials(producto.nombreProducto)}
