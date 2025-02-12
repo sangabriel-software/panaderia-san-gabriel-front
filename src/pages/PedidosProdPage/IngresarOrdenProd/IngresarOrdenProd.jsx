@@ -337,6 +337,7 @@ const IngresarOrdenProd = () => {
         productos={productos}
         sucursales={sucursales}
         onConfirm={handleConfirmOrder}
+        isLoading={isLoading}
       />
 
       {/* Popup de Éxito */}

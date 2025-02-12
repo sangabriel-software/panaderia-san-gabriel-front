@@ -1,5 +1,5 @@
 import React from "react";
-import { Modal, Button, Table } from "react-bootstrap";
+import { Modal, Button, Table, Spinner } from "react-bootstrap";
 import { BsCheckCircle, BsBoxSeam, BsClock, BsShop, BsPerson } from "react-icons/bs";
 import styled from "styled-components";
 import { formatDateToDisplay } from "../../utils/dateUtils";
@@ -76,7 +76,7 @@ const StyledModal = styled(Modal)`
   }
 `;
 
-const OrderSummary = ({ show, handleClose, orderData, trayQuantities, productos, sucursales, onConfirm }) => {
+const OrderSummary = ({ show, handleClose, orderData, trayQuantities, productos, sucursales, isLoading, onConfirm }) => {
   // Función para obtener el nombre del producto basado en el idProducto
   const getProductName = (idProducto) => {
     const product = productos.find((p) => p.idProducto === idProducto);
@@ -106,25 +106,34 @@ const OrderSummary = ({ show, handleClose, orderData, trayQuantities, productos,
           Resumen de la Orden
         </Modal.Title>
       </Modal.Header>
-      
+
       <Modal.Body>
         <div className="mb-4">
           <h5 className="mb-3 fw-semibold text-primary">Detalles Generales</h5>
           <div className="detail-item">
             <BsShop />
-            <span><strong>Sucursal:</strong> {getSucursalName(orderData.sucursal)}</span>
+            <span>
+              <strong>Sucursal:</strong> {getSucursalName(orderData.sucursal)}
+            </span>
           </div>
           <div className="detail-item">
             <BsClock />
-            <span><strong>Turno:</strong> {orderData.turno}</span>
+            <span>
+              <strong>Turno:</strong> {orderData.turno}
+            </span>
           </div>
           <div className="detail-item">
             <BsBoxSeam />
-            <span><strong>Fecha Producción:</strong> {formatDateToDisplay(orderData.fechaAProducir)}</span>
+            <span>
+              <strong>Fecha Producción:</strong>{" "}
+              {formatDateToDisplay(orderData.fechaAProducir)}
+            </span>
           </div>
           <div className="detail-item">
             <BsPerson />
-            <span><strong>Panadero:</strong> {orderData.nombrePanadero}</span>
+            <span>
+              <strong>Panadero:</strong> {orderData.nombrePanadero}
+            </span>
           </div>
         </div>
 
@@ -139,14 +148,14 @@ const OrderSummary = ({ show, handleClose, orderData, trayQuantities, productos,
             </thead>
             <tbody>
               {filteredProducts.length > 0 ? (
-                filteredProducts.map(({ idProducto, nombreProducto, cantidad }) => (
-                  <tr key={idProducto}>
-                    <td>
-                      {nombreProducto}
-                    </td>
-                    <td className="text-end fw-semibold">{cantidad}</td>
-                  </tr>
-                ))
+                filteredProducts.map(
+                  ({ idProducto, nombreProducto, cantidad }) => (
+                    <tr key={idProducto}>
+                      <td>{nombreProducto}</td>
+                      <td className="text-end fw-semibold">{cantidad}</td>
+                    </tr>
+                  )
+                )
               ) : (
                 <tr>
                   <td colSpan="2" className="text-center text-muted py-3">
@@ -160,23 +169,30 @@ const OrderSummary = ({ show, handleClose, orderData, trayQuantities, productos,
       </Modal.Body>
 
       <Modal.Footer className="border-top-0">
-        <Button 
-          variant="outline-secondary" 
+        <Button
+          variant="outline-secondary"
           onClick={handleClose}
           className="px-4 rounded-pill"
         >
           Cancelar
         </Button>
-        <Button 
-          variant="primary" 
+        <Button
+          variant="primary"
           onClick={() => {
             onConfirm();
             handleClose();
           }}
           className="px-4 rounded-pill"
-          disabled={filteredProducts.length === 0}
+          disabled={filteredProducts.length === 0 || isLoading}
         >
-          Confirmar y Guardar
+          {isLoading ? (
+            <>
+              <Spinner animation="border" size="sm" className="me-2" />
+              Procesando...
+            </>
+          ) : (
+            "Confirmar y Guardar"
+          )}{" "}
         </Button>
       </Modal.Footer>
     </StyledModal>
