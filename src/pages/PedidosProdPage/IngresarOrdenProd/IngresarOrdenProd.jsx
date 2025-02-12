@@ -7,6 +7,7 @@ import {
   Button,
   Card,
   InputGroup,
+  Alert,
 } from "react-bootstrap";
 import { useForm, Controller } from "react-hook-form";
 import useGetProductosYPrecios from "../../../hooks/productosprecios/useGetProductosYprecios";
@@ -24,19 +25,25 @@ const getInitials = (name) => {
   return initials.toUpperCase();
 };
 
-// Function to generate a random color
-const getRandomColor = () => {
-  const letters = '0123456789ABCDEF';
-  let color = '#';
-  for (let i = 0; i < 6; i++) {
-    color += letters[Math.floor(Math.random() * 16)];
+const colors = [
+  "#FF5733", "#33FF57", "#3357FF", "#FF33A1", "#FF8C33", "#33FFF5", "#8D33FF", "#FF3333"
+];
+let colorIndex = 0;
+const assignedColors = {};
+
+// Function to get a unique color for each product
+const getUniqueColor = (id) => {
+  if (!assignedColors[id]) {
+    assignedColors[id] = colors[colorIndex % colors.length];
+    colorIndex++;
   }
-  return color;
+  return assignedColors[id];
 };
 
 const IngresarOrdenProd = () => {
   const { sucursales } = useGetSucursales();
   const { productos } = useGetProductosYPrecios();
+  console.log("Productos:", productos);
   const navigate = useNavigate();
 
   // Calcular mañana para el minDate del DatePicker
@@ -65,6 +72,8 @@ const IngresarOrdenProd = () => {
 
   const [activeCategory, setActiveCategory] = useState("Panadería");
   const [trayQuantities, setTrayQuantities] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   // Filtrar productos por categoría
   const panaderiaProducts = productos.filter(
@@ -86,6 +95,11 @@ const IngresarOrdenProd = () => {
         fechaCreacion: new Date().toISOString(),
       }));
 
+    if (detalleOrden.length === 0) {
+      setErrorMessage("Debe ingresar la cantidad de productos para al menos un producto.");
+      return;
+    }
+
     const payload = {
       encabezadoOrden: {
         idSucursal: Number(data.sucursal),
@@ -100,7 +114,8 @@ const IngresarOrdenProd = () => {
       detalleOrden,
     };
 
-    console.log(payload);
+    setLoading(true);
+    setErrorMessage("");
     try {
       const response = await fetch("http://localhost:3000/api/ingresar-orden", {
         method: "POST",
@@ -110,6 +125,9 @@ const IngresarOrdenProd = () => {
       // Aquí se puede manejar la respuesta (éxito, error, etc.)
     } catch (error) {
       console.error("Error:", error);
+      setErrorMessage("No se pudo guardar la orden. Intente nuevamente.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -132,7 +150,7 @@ const IngresarOrdenProd = () => {
           </div>
         </div>
       </div>
-
+      {errorMessage && <Alert variant="danger">{errorMessage}</Alert>}
       {/* Encabezado en Card */}
       <Card
         className="shadow-lg border-0 mb-4 bg-gradient-primary"
@@ -257,14 +275,16 @@ const IngresarOrdenProd = () => {
                   <label className="form-label text-muted small mb-1">
                     NOMBRE DEL PANADERO
                   </label>
-                  <Form.Control
-                    type="text"
-                    placeholder="Ingresar nombre"
-                    {...register("nombrePanadero", {
-                      required: "El nombre del panadero es requerido",
-                    })}
-                    className="border-primary"
-                  />
+                  <InputGroup>
+                    <Form.Control
+                      type="text"
+                      placeholder="Ingresar nombre"
+                      {...register("nombrePanadero", {
+                        required: "El nombre del panadero es requerido",
+                      })}
+                      className="border-primary"
+                    />
+                  </InputGroup>
                   {errors.nombrePanadero && (
                     <span className="text-danger">
                       {errors.nombrePanadero.message}
@@ -286,15 +306,15 @@ const IngresarOrdenProd = () => {
               </Col>
             </Row>
             <div className="text-center mt-4">
-              <Button variant="success" size="lg" type="submit">
-                🚀 Guardar Orden de Producción
+              <Button variant="success" size="lg" type="submit" disabled={loading}>
+                {loading ? "Guardando..." : "🚀 Guardar Orden de Producción"}
               </Button>
             </div>
           </Form>
         </Card.Body>
       </Card>
       {/* Selector de Categorías */}
-      <div className="d-flex gap-2 mb-4">
+      <div className="d-flex gap-2 mb-4" id="category-selection">
         <Button
           variant={
             activeCategory === "Panadería" ? "primary" : "outline-primary"
@@ -315,30 +335,60 @@ const IngresarOrdenProd = () => {
 
       {/* Listado de Productos con estilo (según la segunda imagen) */}
       <Row className="g-3">
-        {(activeCategory === "Panadería" ? panaderiaProducts : reposteriaProducts).map((producto) => (
+        {(activeCategory === "Panadería"
+          ? panaderiaProducts
+          : reposteriaProducts
+        ).map((producto) => (
           <Col key={producto.idProducto} xs={12} md={6} lg={4}>
             <Card className="h-100 shadow border-0 product-card text-center p-3">
               <Card.Body className="d-flex flex-column align-items-center position-relative">
-                <div className="position-absolute top-0 start-0 m-2 text-white rounded-circle d-flex align-items-center justify-content-center" style={{ width: 30, height: 30, backgroundColor: getRandomColor() }}>
+                <div
+                  className="position-absolute top-0 start-0 m-2 text-white rounded-circle d-flex align-items-center justify-content-center"
+                  style={{
+                    width: 30,
+                    height: 30,
+                    backgroundColor: getUniqueColor(producto.idProducto),
+                  }}
+                >
                   {getInitials(producto.nombreProducto)}
                 </div>
-                <Card.Title className="product-title fw-bold">{producto.nombreProducto}</Card.Title>
-                <span className="text-muted">Cantidad en Bandejas</span>
+                <Card.Title className="product-title fw-bold">
+                  {producto.nombreProducto}
+                </Card.Title>
+                <span className="text-muted">
+                  {producto.nombreCategoria === "Panadería"
+                    ? "Cantidad en Bandejas"
+                    : "Unidades"}
+                </span>
                 <InputGroup className="mt-2 w-75">
                   <Form.Control
                     type="number"
                     min="0"
                     value={trayQuantities[producto.idProducto] || ""}
-                    onChange={(e) => setTrayQuantities({ ...trayQuantities, [producto.idProducto]: parseInt(e.target.value) || 0 })}
+                    onChange={(e) =>
+                      setTrayQuantities({
+                        ...trayQuantities,
+                        [producto.idProducto]: parseInt(e.target.value) || 0,
+                      })
+                    }
                     className="text-center border-primary"
                   />
-                  <Button variant="outline-primary" onClick={() => setTrayQuantities({ ...trayQuantities, [producto.idProducto]: (trayQuantities[producto.idProducto] || 0) + 1 })}>+</Button>
                 </InputGroup>
               </Card.Body>
             </Card>
           </Col>
         ))}
       </Row>
+
+      {/* Floating button for mobile devices */}
+      <Button
+        variant="primary"
+        className="d-md-none position-fixed bottom-0 end-0 m-3 rounded-circle"
+        style={{ width: "50px", height: "50px", zIndex: 1000 }}
+        onClick={() => window.scrollTo({ top: 240, behavior: "smooth" })}
+      >
+        ↑
+      </Button>
     </Container>
   );
 };
