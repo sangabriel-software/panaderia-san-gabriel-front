@@ -24,6 +24,7 @@ import {
   handleIngresarOrdenProduccionSubmit,
 } from "./IngresarOrdenProdUtils";
 import Alert from "../../../components/Alerts/Alert";
+import SuccessPopup from "../../../components/Popup/SuccessPopup";
 
 const IngresarOrdenProd = () => {
   const { sucursales, loadingSucursales, showErrorSucursales } = useGetSucursales();
@@ -79,16 +80,16 @@ const IngresarOrdenProd = () => {
           >
             <BsArrowLeft size={20} />
           </button>
-          <Title 
-            title="Nueva Orden de Producción" 
-            className="gradient-text" 
+          <Title
+            title="Nueva Orden de Producción"
+            className="gradient-text"
             icon="🍞"
           />
         </div>
       </div>
 
-            {/* Manejo de Errores */}
-            {errorPopupMessage && !isPopupErrorOpen && (
+      {/* Manejo de Errores */}
+      {errorPopupMessage && !isPopupErrorOpen && (
         <Alert
           type="danger"
           message={errorPopupMessage}
@@ -105,7 +106,7 @@ const IngresarOrdenProd = () => {
               {/* Sección Fecha y Turno */}
               <Col xs={12} lg={6}>
                 <Row className="g-3">
-                <Col xs={12} md={6}>
+                  <Col xs={12} md={6}>
                     <Form.Group>
                       <label className="form-label small text-uppercase text-muted fw-bold mb-2">
                         Fecha de Producción
@@ -119,10 +120,14 @@ const IngresarOrdenProd = () => {
                           className="form-control modern-datepicker"
                           min={tomorrow}
                         />
-                        <InputGroup.Text className="input-icon">📅</InputGroup.Text>
+                        <InputGroup.Text className="input-icon">
+                          📅
+                        </InputGroup.Text>
                       </InputGroup>
                       {errors.fechaAProducir && (
-                        <div className="text-danger small mt-1">{errors.fechaAProducir.message}</div>
+                        <div className="text-danger small mt-1">
+                          {errors.fechaAProducir.message}
+                        </div>
                       )}
                     </Form.Group>
                   </Col>
@@ -134,14 +139,18 @@ const IngresarOrdenProd = () => {
                       </label>
                       <div className="d-flex gap-2 shift-selector">
                         <Button
-                          variant={turnoValue === "AM" ? "primary" : "outline-primary"}
+                          variant={
+                            turnoValue === "AM" ? "primary" : "outline-primary"
+                          }
                           className="shift-btn"
                           onClick={() => setValue("turno", "AM")}
                         >
                           🌅 AM
                         </Button>
                         <Button
-                          variant={turnoValue === "PM" ? "primary" : "outline-primary"}
+                          variant={
+                            turnoValue === "PM" ? "primary" : "outline-primary"
+                          }
                           className="shift-btn"
                           onClick={() => setValue("turno", "PM")}
                         >
@@ -163,7 +172,10 @@ const IngresarOrdenProd = () => {
                       </label>
                       {loadingSucursales ? (
                         <div className="loading-spinner">
-                          <div className="spinner-border text-primary" role="status" />
+                          <div
+                            className="spinner-border text-primary"
+                            role="status"
+                          />
                         </div>
                       ) : (
                         <Form.Select
@@ -218,10 +230,19 @@ const IngresarOrdenProd = () => {
                 variant="primary"
                 className="submit-btn"
                 type="submit"
-                disabled={isLoading || loadingSucursales || loadigProducts || showErrorSucursales || showErrorProductos}
+                disabled={
+                  isLoading ||
+                  loadingSucursales ||
+                  loadigProducts ||
+                  showErrorSucursales ||
+                  showErrorProductos
+                }
               >
                 {isLoading ? (
-                  <span className="spinner-border spinner-border-sm" role="status" />
+                  <span
+                    className="spinner-border spinner-border-sm"
+                    role="status"
+                  />
                 ) : (
                   <>
                     <span className="btn-icon">🚀</span>
@@ -243,14 +264,18 @@ const IngresarOrdenProd = () => {
         <div className="products-section">
           <div className="category-selector mb-4">
             <Button
-              variant={activeCategory === "Panadería" ? "primary" : "outline-primary"}
+              variant={
+                activeCategory === "Panadería" ? "primary" : "outline-primary"
+              }
               onClick={() => setActiveCategory("Panadería")}
               className="category-btn"
             >
               Panadería ({panaderiaProducts.length})
             </Button>
             <Button
-              variant={activeCategory === "Repostería" ? "primary" : "outline-primary"}
+              variant={
+                activeCategory === "Repostería" ? "primary" : "outline-primary"
+              }
               onClick={() => setActiveCategory("Repostería")}
               className="category-btn"
             >
@@ -259,20 +284,27 @@ const IngresarOrdenProd = () => {
           </div>
 
           <Row className="g-4 product-grid">
-            {(activeCategory === "Panadería" ? panaderiaProducts : reposteriaProducts).map((producto) => (
+            {(activeCategory === "Panadería"
+              ? panaderiaProducts
+              : reposteriaProducts
+            ).map((producto) => (
               <Col key={producto.idProducto} xs={12} md={6} lg={4} xl={3}>
                 <Card className="product-card">
                   <Card.Body className="product-card-body">
-                    <div 
+                    <div
                       className="product-badge"
-                      style={{ backgroundColor: getUniqueColor(producto.nombreProducto) }}
+                      style={{
+                        backgroundColor: getUniqueColor(
+                          producto.nombreProducto
+                        ),
+                      }}
                     >
                       {getInitials(producto.nombreProducto)}
                     </div>
                     <h3 className="product-title">{producto.nombreProducto}</h3>
                     <p className="product-category">
-                      {producto.nombreCategoria === "Panadería" 
-                        ? "Bandejas" 
+                      {producto.nombreCategoria === "Panadería"
+                        ? "Bandejas"
                         : "Unidades"}
                     </p>
                     <InputGroup className="product-input-group">
@@ -280,10 +312,13 @@ const IngresarOrdenProd = () => {
                         type="number"
                         min="0"
                         value={trayQuantities[producto.idProducto] || ""}
-                        onChange={(e) => setTrayQuantities({
-                          ...trayQuantities,
-                          [producto.idProducto]: parseInt(e.target.value) || 0,
-                        })}
+                        onChange={(e) =>
+                          setTrayQuantities({
+                            ...trayQuantities,
+                            [producto.idProducto]:
+                              parseInt(e.target.value) || 0,
+                          })
+                        }
                         className="product-input"
                       />
                     </InputGroup>
@@ -303,6 +338,25 @@ const IngresarOrdenProd = () => {
       >
         ↑
       </Button>
+
+      <SuccessPopup
+        isOpen={isPopupOpen}
+        onClose={() => setIsPopupOpen(false)}
+        title="¡Éxito!"
+        message="La orden se agrego correctamente"
+        nombreBotonVolver="Ver Ordenes"
+        nombreBotonNuevo="Ingresar orden"
+        onView={() => navigate("/ordenes-produccion")}
+        onNew={() => {
+          setIsPopupOpen(false);
+          resetForm(
+            reset,
+            setSelectedImage,
+            setImagePreview,
+            setIsResetImageInput
+          );
+        }}
+      />
     </Container>
   );
 };
