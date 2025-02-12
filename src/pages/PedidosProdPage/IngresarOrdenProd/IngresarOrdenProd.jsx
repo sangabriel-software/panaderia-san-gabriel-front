@@ -125,33 +125,48 @@ const IngresarOrdenProd = () => {
         <Card.Body>
           <Form onSumit={handleSubmit(onSubmit)}>
             <Row>
-              <Col xs={12} md={4} xl={4} className="border-end border-light">
-                <Form.Group>
-                  <label className="form-label text-muted small mb-1">
-                    FECHA DE PRODUCCIÓN
-                  </label>
-                  <InputGroup>
-                    <Controller
-                      control={control}
-                      name="fechaAProducir"
-                      render={({ field }) => (
-                        <DatePicker
-                          {...field}
-                          selected={field.value}
-                          onChange={field.onChange}
-                          className="form-control border-primary w-100"
-                          minDate={tomorrow}
-                          dateFormat="dd/MM/yyyy"
-                          placeholderText="Seleccionar fecha"
-                        />
-                      )}
-                    />
-                    <InputGroup.Text className="bg-white border-primary">
-                      📅
-                    </InputGroup.Text>
-                  </InputGroup>
-                </Form.Group>
-              </Col>
+{/* Fecha de Producción - Mejorado para móviles */}
+<Col xs={12} md={4} xl={4} className="border-end border-light mb-3 mb-md-0">
+          <Form.Group>
+            <label className="form-label text-muted small mb-1">
+              FECHA DE PRODUCCIÓN
+            </label>
+            <InputGroup>
+              <Controller
+                control={control}
+                name="fechaAProducir"
+                render={({ field }) => (
+                  <DatePicker
+                    {...field}
+                    selected={field.value}
+                    onChange={field.onChange}
+                    className="form-control border-primary w-100 mobile-datepicker"
+                    minDate={tomorrow}
+                    dateFormat="dd/MM/yyyy"
+                    placeholderText="Seleccionar fecha"
+                    showPopperArrow={false}
+                    popperPlacement="auto"
+                    popperModifiers={[
+                      {
+                        name: 'preventOverflow',
+                        options: {
+                          altBoundary: true,
+                          tether: false,
+                        },
+                      },
+                    ]}
+                    withPortal
+                    isClearable
+                    calendarClassName="mobile-calendar"
+                  />
+                )}
+              />
+              <InputGroup.Text className="bg-white border-primary">
+                📅
+              </InputGroup.Text>
+            </InputGroup>
+          </Form.Group>
+        </Col>
 
               <Col xs={12} md={2} className="border-end border-light my-2">
                 <Form.Group>
