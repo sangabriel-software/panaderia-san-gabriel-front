@@ -1,9 +1,105 @@
-.input-filter{
-    border: 2px solid #5B5859 !important;
-    color: #43405A !important;
+/* FilterBar.css */
+.modern-filter {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    margin-bottom: 2rem;
+  }
+  
+  .filter-input-group {
+    position: relative;
+    transition: all 0.3s ease;
+  }
+  
+  .filter-input-group:hover {
+    transform: translateY(-1px);
+  }
+  
+  /* .filter-prefix {
+    background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+    border: none !important;
+    color: white !important;
+    border-radius: 8px 0 0 8px !important;
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 500;
+  } */
+  
+  .filter-input {
+    border: 2px solid #e0e0e0 !important;
+    border-left: none !important;
+    border-radius: 0 8px 8px 0 !important;
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
 
-}
-
-.span-filter{
-    border: 1px solid #5B5859 !important;
-}
+    color: #2c3e50;
+  }
+  
+  .filter-input:focus {
+    background: #ffffff;
+    border-color: #3498db !important;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+  }
+  
+  .filter-input::placeholder {
+    color: #95a5a6;
+  }
+  
+  .clear-btn {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 3;
+    color: #e74c3c !important;
+    padding: 0.25rem;
+    background: none;
+    border: none;
+    opacity: 0.7;
+    transition: all 0.2s ease;
+  }
+  
+  .clear-btn:hover {
+    opacity: 1;
+    transform: translateY(-50%) scale(1.1);
+  }
+  
+  .clear-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+  
+  /* Estilos personalizados para el select */
+  .filter-input-group select.filter-input {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232c3e50' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1em;
+  }
+  
+  /* Efecto hover para el select */
+  .filter-input-group select.filter-input:hover {
+    cursor: pointer;
+    background-color: #ffffff;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .modern-filter {
+      padding: 1rem;
+    }
+    
+    .filter-prefix {
+      padding: 0.5rem 0.75rem;
+    }
+    
+    .filter-input {
+      padding: 0.5rem 0.75rem;
+    }
+  }

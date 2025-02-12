@@ -1,63 +1,149 @@
-/* src/components/Orders/OrderCard.css */
+/* OrderCard.css */
 .order-card {
-    border: 1px solid #e0e0e0;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-  }
-  
-  /* .order-card:hover {
-    transform: translateY(px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-  } */
-  
-  .order-card-title {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: #333;
-    margin: 0;
-  }
-  
-  .order-card-badge {
-    font-size: 0.875rem;
-    font-weight: 500;
-    padding: 5px 10px;
+  background: rgba(255, 255, 255, 0.95);
+  border: none;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(8px);
+  margin-bottom: 1.5rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.order-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.card-header::after {
+  content: '';
+  position: absolute;
+  bottom: -0.75rem;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.1) 50%, transparent 100%);
+}
+
+.order-badge {
+  background: #b520b5 !important;
+  color: white !important;
+  font-size: 0.60rem;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  letter-spacing: 0.5px;
+}
+
+.order-number {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin: 0.5rem 0 0 0;
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.status-dot.pending {
+  background: #ff9f43;
+}
+
+.status-dot.completed {
+  background: #2ecc71;
+}
+
+.card-details {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.9rem;
+  color: #4a5568;
+}
+
+.detail-icon {
+  color: #3498db;
+  font-size: 1.1rem;
+  min-width: 20px;
+}
+
+.card-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  padding: 0.75rem;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.detail-btn {
+  background: #c65be7;
+  color: white !important;
+}
+
+.detail-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+}
+
+.action-btn:active {
+  transform: scale(0.98);
+}
+
+.btn-icon {
+  font-size: 0.9rem;
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+  .order-card {
     border-radius: 12px;
   }
   
-  .order-card-text {
-    font-size: 0.9rem;
-    color: #555;
-    margin: 0;
+  .card-actions {
+    grid-template-columns: 1fr;
   }
   
-  .order-card-detail {
-    margin-bottom: 8px;
+  .order-number {
+    font-size: 1rem;
   }
   
-  .order-card-button {
-    font-size: 0.875rem;
-    padding: 5px 15px;
-    border-radius: 8px;
-    font-weight: 500;
-    letter-spacing: 0.5px;
+  .detail-item {
+    font-size: 0.85rem;
   }
-  
-  .order-card-button:hover {
-    opacity: 0.9;
-  }
-
-  .order-card-divider {
-    border: 0;
-    border-top: 1.5px solid #333;
-    margin: 1rem 0;
-  }
-  
-  .ver{
-    background-color: #0F4D8B;
-    border-color: #0F4D8B;
-  }
-
-  .ver:hover{
-   background-color: #005BA8;
-  }
+}

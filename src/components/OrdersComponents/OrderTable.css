@@ -1,69 +1,151 @@
-.modern-table {
-    border-collapse: collapse;
-    width: 100%;
-  }
-  
-  .modern-table th,
-  .modern-table td {
-    padding: 12px 15px;
-    text-align: center;
-  }
-  
-  .modern-table thead {
-    background-color: #292A2D; /* Fondo del encabezado */
-    color: #ffffff; /* Color del texto del encabezado */
-  }
+/* OrderTable.css */
+.table-container {
+  background: #ffffff;
+  border-radius: 18px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  padding: 2rem;
+}
 
-  thead.custom-thead th {
-    background-color: #5B5859 !important;
-    color: #ffffff !important;
-    border-color: #292a2d !important;
-    padding: 15px !important;
-    text-align: center !important;
-  }
-  
-  
-  .modern-table th {
-    font-weight: 600; /* Hacemos el texto del encabezado más grueso */
-  }
-  
-  .modern-table tr:nth-child(even) {
-    background-color: #f4f6f9;
-  }
-  
-  .modern-table tr:hover {
-    background-color: #e0e0e0;
-  }
-  
-  .modern-table td {
-    font-size: 14px;
-    font-weight: 500;
-  }
-  
-  .action-btn {
-    transition: background-color 0.3s ease, transform 0.3s ease;
-  }
-  
-  .action-btn:hover {
-    background-color: #007bff;
-    color: #ffffff;
-    transform: scale(1.05);
-  }
-  
-  .badge {
-    font-size: 14px;
-  }
-  
-  .pagination .page-item.active .page-link {
-    background-color: #007bff;
-    border-color: #007bff;
-  }
-  
-  .pagination .page-link {
-    border-radius: 50%;
-  }
-  
-  .pagination .page-link:hover {
-    background-color: #f8f9fa;
-    border-color: #007bff;
-  }
+.modern-table {
+  --table-accent-color: #f8f9fa;
+  --table-hover-color: #f1f4f7;
+  margin-bottom: 2rem;
+  border-collapse: separate;
+  border-spacing: 0 8px;
+}
+
+.table-header {
+  background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+  color: white;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.table-header th {
+  border: none;
+  font-weight: 600;
+  padding: 1.2rem 1.5rem;
+  font-size: 0.95rem;
+  letter-spacing: 0.5px;
+  position: relative;
+}
+
+.table-header th:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 60%;
+  width: 1px;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.table-row {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.table-row:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background: var(--table-hover-color);
+}
+
+.table-row td {
+  border: none;
+  padding: 1.2rem 1.5rem;
+  vertical-align: middle;
+  position: relative;
+  font-size: 0.95rem;
+}
+
+.table-row td:first-child {
+  border-radius: 12px 0 0 12px;
+}
+
+.table-row td:last-child {
+  border-radius: 0 12px 12px 0;
+}
+
+.branch-badge {
+  background: #e3f2fd;
+  color: #1976d2;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+}
+
+.status-badge {
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  padding: 0.6rem 1.2rem;
+  font-size: 0.85rem;
+}
+
+.status-pending {
+  background: #fff3e0 !important;
+  color: #FF5252 !important;
+}
+
+.status-completed {
+  background: #e8f5e9 !important;
+  color: #2e7d32 !important;
+}
+
+.action-btn {
+  padding: 0.5rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.delete-btn {
+  color: #ff5252 !important;
+}
+
+.delete-btn:hover {
+  background: #ffebee !important;
+  transform: scale(1.1);
+}
+
+.action-icon {
+  font-size: 1.1rem;
+  vertical-align: middle;
+}
+
+.serial-number {
+  font-weight: 600;
+  color: #607d8b;
+}
+
+.order-number {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.production-date {
+  color: #666;
+  font-weight: 500;
+}
+
+/* Paginación personalizada */
+.pagination .page-item .page-link {
+  border-radius: 8px;
+  margin: 0 3px;
+  border: none;
+  color: #2c3e50;
+  transition: all 0.3s ease;
+}
+
+.pagination .page-item.active .page-link {
+  background: linear-gradient(135deg, #3498db 0%, #2c3e50 100%);
+  color: white;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.pagination .page-item:hover .page-link {
+  background: #f1f4f7;
+}

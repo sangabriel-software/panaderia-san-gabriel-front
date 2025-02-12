@@ -5,8 +5,8 @@ import { consultarSucursalesService } from "../../services/sucursales/sucursales
 /* Consulta a BD los permisoso */
 export const useGetSucursales = () => {
     const [sucursales, setSucursales] = useState([]);
-    const [loadingSucursales, setLoadingSucursales] = useState(true);
-    const [showErrorSucursales, setShowErrorSucursales] = useState(false);
+    const [loadingSucursales, setLoadingSucursales,] = useState(true);
+    const [showErrorSucursales, setShowErrorSucursales, ] = useState(false);
     const [showInfoSucursales, setShowInfoSucursales] = useState(false);
   
     useEffect(() => {

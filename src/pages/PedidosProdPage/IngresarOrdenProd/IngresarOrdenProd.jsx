@@ -1,25 +1,52 @@
 import { useState } from "react";
-import { Container, Form, Row, Col, Button, Card, InputGroup, Alert, } from "react-bootstrap";
+import {
+  Container,
+  Form,
+  Row,
+  Col,
+  Button,
+  Card,
+  InputGroup,
+} from "react-bootstrap";
 import { useForm, Controller } from "react-hook-form";
 import useGetProductosYPrecios from "../../../hooks/productosprecios/useGetProductosYprecios";
 import { useGetSucursales } from "../../../hooks/sucursales/useGetSucursales";
 import DatePicker from "react-datepicker";
-import { BsArrowLeft } from "react-icons/bs";
+import { BsArrowLeft, BsExclamationTriangleFill } from "react-icons/bs";
 import { useNavigate } from "react-router";
 import "react-datepicker/dist/react-datepicker.css";
-import dayjs from 'dayjs';
+import dayjs from "dayjs";
 import "./ordenes.css";
-import Title from "../../../components/Title/Title"; 
-import { getInitials, getUniqueColor, handleIngresarOrdenProduccionSubmit } from "./IngresarOrdenProdUtils";
+import Title from "../../../components/Title/Title";
+import {
+  getInitials,
+  getUniqueColor,
+  handleIngresarOrdenProduccionSubmit,
+} from "./IngresarOrdenProdUtils";
+import Alert from "../../../components/Alerts/Alert";
 
 const IngresarOrdenProd = () => {
-  const { sucursales, loadingSucursales } = useGetSucursales();
-  const { productos, loadigProducts } = useGetProductosYPrecios();
+  const { sucursales, loadingSucursales, showErrorSucursales } = useGetSucursales();
+  const { productos, loadigProducts, showErrorProductos, showInfoProductos, setProductos } = useGetProductosYPrecios();
   const navigate = useNavigate();
-  const tomorrow = dayjs().add(1, 'day').toDate();
+  const tomorrow = dayjs().add(1, "day").toDate();
 
-  const { register, handleSubmit, formState: { errors }, setValue, control, watch, reset}
-  = useForm({ defaultValues: {sucursal: "", turno: "AM", fechaAProducir: tomorrow, nombrePanadero: "", }, });
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+    control,
+    watch,
+    reset,
+  } = useForm({
+    defaultValues: {
+      sucursal: "",
+      turno: "AM",
+      fechaAProducir: tomorrow,
+      nombrePanadero: "",
+    },
+  });
 
   // Para leer el valor actual del turno y aplicar estilos en los botones
   const turnoValue = watch("turno");
@@ -39,10 +66,10 @@ const IngresarOrdenProd = () => {
     (p) => p.nombreCategoria === "Repostería"
   );
 
-
-    const onSubmit = async (data) => {
-      await handleIngresarOrdenProduccionSubmit( data, trayQuantities, setTrayQuantities, setIsPopupOpen, setErrorPopupMessage, setIsPopupErrorOpen, setIsLoading, reset )
-    };
+  const onSubmit = async (data) => {
+    await handleIngresarOrdenProduccionSubmit( data, trayQuantities, setTrayQuantities, setIsPopupOpen,  setErrorPopupMessage,
+                                              setIsPopupErrorOpen, setIsLoading, reset);
+  };
 
   return (
     <Container className="py-4">
@@ -50,7 +77,8 @@ const IngresarOrdenProd = () => {
       <div className="text-center">
         <div className="row">
           <div className="col-2">
-            <button className="btn bt-return rounded-circle d-flex align-items-center justify-content-center shadow"
+            <button
+              className="btn bt-return rounded-circle d-flex align-items-center justify-content-center shadow"
               style={{ width: "40px", height: "40px" }}
               onClick={() => navigate("/ordenes-produccion")}
             >
@@ -62,7 +90,17 @@ const IngresarOrdenProd = () => {
           </div>
         </div>
       </div>
-      {errorPopupMessage && <Alert variant="danger">{errorPopupMessage}</Alert>}
+      {errorPopupMessage && !isPopupErrorOpen && (
+        <div className="row justify-content-center">
+          <div className="col-md-6 text-center">
+            <Alert
+              type="danger"
+              message={errorPopupMessage}
+              icon={<BsExclamationTriangleFill />}
+            />
+          </div>
+        </div>
+      )}
       {/* Encabezado en Card */}
       <Card
         className="shadow-lg border-0 mb-4 bg-gradient-primary"
@@ -152,29 +190,49 @@ const IngresarOrdenProd = () => {
               <Col xs={12} md={1} className="border-end border-light">
                 {/* espacio */}
               </Col>
-
               <Col xs={12} md={4} className="border-end border-light my-2">
                 <Form.Group>
                   <label className="form-label text-muted small mb-1">
                     SUCURSAL
                   </label>
-                  <Form.Select
-                    {...register("sucursal", {
-                      required: "Seleccione sucursal",
-                    })}
-                    className="border-primary"
-                  >
-                    <option value="">Seleccione sucursal</option>
-                    {sucursales.map((s) => (
-                      <option key={s.idSucursal} value={s.idSucursal}>
-                        {s.nombreSucursal}
-                      </option>
-                    ))}
-                  </Form.Select>
-                  {errors.sucursal && (
-                    <span className="text-danger">
-                      {errors.sucursal.message}
-                    </span>
+                  {loadingSucursales ? (
+                    <div className="d-flex justify-content-center my-5">
+                      <div
+                        className="spinner-border text-primary"
+                        role="status"
+                      >
+                        <span className="visually-hidden">
+                          Cargando Sucursales...
+                        </span>
+                      </div>
+                    </div>
+                  ) : sucursales.length === 0 ? (
+                    <div className="alert alert-danger" role="alert">
+                      {showErrorSucursales === true
+                        ? "Error al cargar las sucursales"
+                        : "No hay sucursales disponibles"}
+                    </div>
+                  ) : (
+                    <>
+                      <Form.Select
+                        {...register("sucursal", {
+                          required: "Seleccione sucursal",
+                        })}
+                        className="border-primary"
+                      >
+                        <option value="">Seleccione sucursal</option>
+                        {sucursales.map((s) => (
+                          <option key={s.idSucursal} value={s.idSucursal}>
+                            {s.nombreSucursal}
+                          </option>
+                        ))}
+                      </Form.Select>
+                      {errors.sucursal && (
+                        <span className="text-danger">
+                          {errors.sucursal.message}
+                        </span>
+                      )}
+                    </>
                   )}
                 </Form.Group>
               </Col>
@@ -218,79 +276,97 @@ const IngresarOrdenProd = () => {
               </Col>
             </Row>
             <div className="text-center mt-4">
-              <Button variant="success" size="lg" type="submit" disabled={isLoading}>
+              <Button
+                variant="success"
+                size="lg"
+                type="submit"
+                disabled={isLoading || loadingSucursales || loadigProducts || showErrorSucursales || showErrorProductos}
+              >
                 {isLoading ? "Guardando..." : "🚀 Guardar Orden de Producción"}
               </Button>
             </div>
           </Form>
         </Card.Body>
       </Card>
-      {/* Selector de Categorías */}
-      <div className="d-flex gap-2 mb-4" id="category-selection">
-        <Button
-          variant={
-            activeCategory === "Panadería" ? "primary" : "outline-primary"
-          }
-          onClick={() => setActiveCategory("Panadería")}
-        >
-          Panadería ({panaderiaProducts.length})
-        </Button>
-        <Button
-          variant={
-            activeCategory === "Repostería" ? "primary" : "outline-primary"
-          }
-          onClick={() => setActiveCategory("Repostería")}
-        >
-          Repostería ({reposteriaProducts.length})
-        </Button>
-      </div>
-
       {/* Listado de Productos con estilo (según la segunda imagen) */}
-      <Row className="g-3">
-        {(activeCategory === "Panadería"
-          ? panaderiaProducts
-          : reposteriaProducts
-        ).map((producto) => (
-          <Col key={producto.idProducto} xs={12} md={6} lg={4}>
-            <Card className="h-100 shadow border-0 product-card text-center p-3">
-              <Card.Body className="d-flex flex-column align-items-center position-relative">
-                <div
-                  className="position-absolute top-0 start-0 m-2 text-white rounded-circle d-flex align-items-center justify-content-center"
-                  style={{
-                    width: 30,
-                    height: 30,
-                    backgroundColor: getUniqueColor(producto.nombreProducto),
-                  }}
-                >
-                  {getInitials(producto.nombreProducto)}
-                </div>
-                <Card.Title className="product-title fw-bold">
-                  {producto.nombreProducto}
-                </Card.Title>
-                <span className="text-muted">
-                  {producto.nombreCategoria === "Panadería"
-                    ? "Cantidad en Bandejas"
-                    : "Unidades"}
-                </span>
-                <InputGroup className="mt-2 w-75">
-                  <Form.Control
-                    type="number"
-                    min="0"
-                    value={trayQuantities[producto.idProducto] || ""}
-                    onChange={(e) =>
-                      setTrayQuantities({
-                        ...trayQuantities,
-                        [producto.idProducto]: parseInt(e.target.value) || 0,
-                      })
-                    }
-                    className="text-center border-primary"
-                  />
-                </InputGroup>
-              </Card.Body>
-            </Card>
-          </Col>
-        ))}
-      </Row>
+      {loadigProducts ? (
+        <div className="d-flex justify-content-center  my-5">
+          <div className="spinner-border text-primary my-5 my-5" role="status">
+            <span className="visually-hidden">Cargando...</span>
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* Selector de Categorías */}
+          <div className="d-flex gap-2 mb-4" id="category-selection">
+            <Button
+              variant={
+                activeCategory === "Panadería" ? "primary" : "outline-primary"
+              }
+              onClick={() => setActiveCategory("Panadería")}
+            >
+              Panadería ({panaderiaProducts.length})
+            </Button>
+            <Button
+              variant={
+                activeCategory === "Repostería" ? "primary" : "outline-primary"
+              }
+              onClick={() => setActiveCategory("Repostería")}
+            >
+              Repostería ({reposteriaProducts.length})
+            </Button>
+          </div>
+
+          <Row className="g-3">
+            {(activeCategory === "Panadería"
+              ? panaderiaProducts
+              : reposteriaProducts
+            ).map((producto) => (
+              <Col key={producto.idProducto} xs={12} md={6} lg={4}>
+                <Card className="h-100 shadow border-0 product-card text-center p-3">
+                  <Card.Body className="d-flex flex-column align-items-center position-relative">
+                    <div
+                      className="position-absolute top-0 start-0 m-2 text-white rounded-circle d-flex align-items-center justify-content-center"
+                      style={{
+                        width: 30,
+                        height: 30,
+                        backgroundColor: getUniqueColor(
+                          producto.nombreProducto
+                        ),
+                      }}
+                    >
+                      {getInitials(producto.nombreProducto)}
+                    </div>
+                    <Card.Title className="product-title fw-bold">
+                      {producto.nombreProducto}
+                    </Card.Title>
+                    <span className="text-muted">
+                      {producto.nombreCategoria === "Panadería"
+                        ? "Cantidad en Bandejas"
+                        : "Unidades"}
+                    </span>
+                    <InputGroup className="mt-2 w-75">
+                      <Form.Control
+                        type="number"
+                        min="0"
+                        value={trayQuantities[producto.idProducto] || ""}
+                        onChange={(e) =>
+                          setTrayQuantities({
+                            ...trayQuantities,
+                            [producto.idProducto]:
+                              parseInt(e.target.value) || 0,
+                          })
+                        }
+                        className="text-center border-primary"
+                      />
+                    </InputGroup>
+                  </Card.Body>
+                </Card>
+              </Col>
+            ))}
+          </Row>
+        </>
+      )}
 
       {/* Floating button for mobile devices */}
       <Button
@@ -301,6 +377,19 @@ const IngresarOrdenProd = () => {
       >
         ↑
       </Button>
+
+      {/* Alertar errore y data no encontrada */}
+      {showErrorSucursales && !showInfoProductos && (
+        <div className="row justify-content-center my-3">
+          <div className="col-md-6 text-center">
+            <Alert
+              type="danger"
+              message="Hubo un error al consultar los productos. Intenta más tarde..."
+              icon={<BsExclamationTriangleFill />}
+            />
+          </div>
+        </div>
+      )}
     </Container>
   );
 };

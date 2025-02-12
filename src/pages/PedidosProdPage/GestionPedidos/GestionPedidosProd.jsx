@@ -98,7 +98,7 @@ const GestionPedidosProd = () => {
       {/* Alertas mostrar error y notificacion de informacion */}
       {filteredOrders.length === 0 &&
         (filters.search || filters.date || filters.sucursal) && (
-          <div className="row justify-content-center">
+          <div className="row justify-content-center my-3">
             <div className="col-md-6 text-center">
               <Alert
                 type="primary"
@@ -113,7 +113,7 @@ const GestionPedidosProd = () => {
         !loadingOrdenes &&
         !showErrorOrdenes &&
         showInfoOrdenes && (
-          <div className="row justify-content-center">
+          <div className="row justify-content-center my-3">
             <div className="col-md-6 text-center">
               <Alert
                 type="primary"

@@ -1,21 +1,19 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Table, Button, Badge, Container } from "react-bootstrap";
 import { formatDateToDisplay } from "../../utils/dateUtils";
-import { FaTrashAlt } from "react-icons/fa";
+import { FaTrashAlt, FaRegEdit } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-
-import "./OrderTable.css";
 import PaginationComponent from "../PaginationComponent/PaginationComponent";
 import { handleViewDetalle } from "../../pages/PedidosProdPage/DetallesOrdenesProd/DetallesOrdenesProdUtils";
+import "./OrderTable.css";
 
 const ITEMS_PER_PAGE = 5;
 
 const getColorByName = (name) => {
-  const COLORS = ["succes", "primary", "info",];
-  if (!name) return "#FFC107";
+  const COLORS = ["success", "primary", "info"];
+  if (!name) return "warning";
   const hash = name.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  const index = hash % COLORS.length;
-  return COLORS[index];
+  return COLORS[hash % COLORS.length];
 };
 
 const OrderTable = ({ orders, onDelete }) => {
@@ -26,76 +24,61 @@ const OrderTable = ({ orders, onDelete }) => {
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const paginatedOrders = orders.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
-  const handlePageChange = (newPage) => {
-    setCurrentPage(newPage);
-  };
+  const handlePageChange = (newPage) => setCurrentPage(newPage);
 
-  // Manejador para redireccionar al hacer doble clic en una fila
   const handleRowClick = (idOrdenProduccion) => {
-    handleViewDetalle(idOrdenProduccion, navigate)
+    handleViewDetalle(idOrdenProduccion, navigate);
   };
 
-  // Cada vez que cambie la página, se realiza el scroll al final del contenedor
   useEffect(() => {
-    if (containerRef.current) {
-      containerRef.current.scrollIntoView({ behavior: "smooth", block: "end" });
-    }
+    containerRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [currentPage]);
 
   return (
-    <Container className="p-3" ref={containerRef}>
-      <Table striped hover responsive bordered className="modern-table shadow">
-        <thead className="custom-thead">
+    <Container className="p-4 table-container" ref={containerRef}>
+      <Table hover responsive className="modern-table">
+        <thead className="table-header">
           <tr>
-            <th className="text-center p-3">#</th>
-            <th className="text-center p-3">No. de Orden</th>
-            <th className="text-center p-3">Sucursal</th>
-            <th className="text-center p-3">Turno</th>
-            <th className="text-center p-3">Estado Orden</th>
-            <th className="text-center p-3">Fecha a Producir</th>
-            <th className="text-center p-3">Acciones</th>
+            <th className="text-center">#</th>
+            <th className="text-center">No. de Orden</th>
+            <th className="text-center">Sucursal</th>
+            <th className="text-center">Turno</th>
+            <th className="text-center">Estado</th>
+            <th className="text-center">Fecha Producción</th>
+            <th className="text-center">Acciones</th>
           </tr>
         </thead>
         <tbody>
           {paginatedOrders.map((order, index) => (
             <tr
               key={order.idOrdenProduccion}
-              className="align-middle"
+              className="table-row"
               onDoubleClick={() => handleRowClick(order.idOrdenProduccion)}
-              style={{ cursor: "pointer" }}
             >
-              <td className="text-center p-3" title="Doble click para ver detalles">
-                {startIndex + index + 1}
-              </td>
-              <td className="text-center p-3" title="Doble click para ver detalles">
-                {`ORD-${order.idOrdenProduccion}`}
-              </td>
-              <td className="text-center p-3" title="Doble click para ver detalles">
-                <Badge bg={getColorByName(order.nombreSucursal)} className="px-1 py-1">
+              <td className="text-center serial-number">#{startIndex + index + 1}</td>
+              <td className="text-center order-number">ORD-{order.idOrdenProduccion}</td>
+              <td className="text-center">
+                <Badge pill className="branch-badge text-light" bg={getColorByName(order.nombreSucursal)}>
                   {order.nombreSucursal}
                 </Badge>
               </td>
-              <td className="text-center p-3" title="Doble click para ver detalles">
-                {order.ordenTurno}
-              </td>
-              <td className="text-center p-3"  title="Doble click para ver detalles">
-              <Badge bg={order.estadoOrden === "P" ? "danger" : "success"} className="px-1 py-1">
-                  {order.estadoOrden === "P"? "Venta Pendiente" : "Venta Cerrada"}
+              <td className="text-center shift-cell">{order.ordenTurno}</td>
+              <td className="text-center">
+                <Badge pill className={`status-badge ${order.estadoOrden === "P" ? "status-pending" : "status-completed"}`}>
+                  {order.estadoOrden === "P" ? "Pendiente" : "Completado"}
                 </Badge>
               </td>
-              <td className="text-center p-3" title="Doble click para ver detalles">
-                {formatDateToDisplay(order.fechaAProducir)}
-              </td>
-              <td className="text-center p-3" onDoubleClick={(e) => e.stopPropagation()}>
+              <td className="text-center production-date">{formatDateToDisplay(order.fechaAProducir)}</td>
+              <td className="text-center actions-cell">
                 <Button
-                  variant="outline-danger"
-                  size="sm"
+                  variant="link"
+                  className="action-btn delete-btn"
                   onClick={(e) => {
                     e.stopPropagation();
                     onDelete(order.idOrdenProduccion);
                   }}
                 >
-                  <FaTrashAlt /> Eliminar
+                  <FaTrashAlt className="action-icon" />
                 </Button>
               </td>
             </tr>

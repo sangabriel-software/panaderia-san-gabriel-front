@@ -58,7 +58,7 @@ const crearPyaloadOrdenProduccion = (data, trayQuantities) => {
 export const handleIngresarOrdenProduccionSubmit = async ( data, trayQuantities, setTrayQuantities, setIsPopupOpen, setErrorPopupMessage, setIsPopupErrorOpen, setIsLoading, reset ) => {
   setIsLoading(true); // Activar el loading del input
   try {
-    if (trayQuantities.length === 0) {
+    if (trayQuantities.length === 0 || Object.keys(trayQuantities).length === 0){
       setErrorPopupMessage(
         "Ingresar la cantidad de productos para al menos un producto."
       );
