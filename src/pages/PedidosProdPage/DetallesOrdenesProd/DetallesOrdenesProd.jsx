@@ -9,7 +9,7 @@ import DesktopOrderDetails from "../../../components/OrdenesDetalle/DesktopOrder
 import useGetDetalleOrden from "../../../hooks/ordenesproduccion/useGetDetalleOrden";
 import { decryptId } from "../../../utils/CryptoParams";
 import OrderDetailsPdf from "../../../components/PDFs/OrdenDetails/OrderDetailsPdf";
-import { pdf } from "@react-pdf/renderer";  // Importar el método pdf
+import { generateAndDownloadPDF } from "../../../utils/PdfUtils/PdfUtils";
 
 const DetallesOrdenesProduccionPage = () => {
   const navigate = useNavigate();
@@ -21,18 +21,11 @@ const DetallesOrdenesProduccionPage = () => {
   // Función para manejar la descarga del PDF
   const handleDownloadPDF = () => {
     const documento = <OrderDetailsPdf detalleOrden={detalleOrden.detalleOrden} encabezadoOrden={detalleOrden.encabezadoOrden || {}} />;
-    
-    pdf(documento)
-      .toBlob() // Convierte el documento a un Blob
-      .then((blob) => {
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `orden_produccion_${decryptedIdRol}.pdf`; // Nombre del archivo
-        link.click(); // Simula el click para descargar el archivo
-        URL.revokeObjectURL(url); // Limpia la URL del Blob después de la descarga
-      });
+    const fileName = `orden_produccion_${decryptedIdRol}.pdf`;
+  
+    generateAndDownloadPDF(documento, fileName);
   };
+  
 
   return (
     <Container className="mt-4">
