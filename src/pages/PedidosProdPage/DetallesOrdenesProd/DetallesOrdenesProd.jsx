@@ -8,15 +8,31 @@ import MobileOrderDetails from "../../../components/OrdenesDetalle/MobileOrderDe
 import DesktopOrderDetails from "../../../components/OrdenesDetalle/DesktopOrderDetails/DesktopOrderDetails";
 import useGetDetalleOrden from "../../../hooks/ordenesproduccion/useGetDetalleOrden";
 import { decryptId } from "../../../utils/CryptoParams";
+import OrderDetailsPdf from "../../../components/PDFs/OrdenDetails/OrderDetailsPdf";
+import { pdf } from "@react-pdf/renderer";  // Importar el método pdf
 
 const DetallesOrdenesProduccionPage = () => {
   const navigate = useNavigate();
   const isMobile = useMediaQuery({ maxWidth: 768 });
   const { idOrdenProduccion } = useParams();
   const decryptedIdRol = decryptId(decodeURIComponent(idOrdenProduccion));
-  const {detalleOrden, loadingDetalleOrdene, showErrorDetalleOrdene, showInfoDetalleOrden, } = useGetDetalleOrden(decryptedIdRol);
-  const handleDownloadXLS = () => console.log("Descargando XLS...");
-  const handleDownloadPDF = () => console.log("Descargando PDF...");
+  const {detalleOrden, loadingDetalleOrdene, showErrorDetalleOrdene, showInfoDetalleOrden} = useGetDetalleOrden(decryptedIdRol);
+
+  // Función para manejar la descarga del PDF
+  const handleDownloadPDF = () => {
+    const documento = <OrderDetailsPdf detalleOrden={detalleOrden.detalleOrden} encabezadoOrden={detalleOrden.encabezadoOrden || {}} />;
+    
+    pdf(documento)
+      .toBlob() // Convierte el documento a un Blob
+      .then((blob) => {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `orden_produccion_${decryptedIdRol}.pdf`; // Nombre del archivo
+        link.click(); // Simula el click para descargar el archivo
+        URL.revokeObjectURL(url); // Limpia la URL del Blob después de la descarga
+      });
+  };
 
   return (
     <Container className="mt-4">
@@ -46,14 +62,14 @@ const DetallesOrdenesProduccionPage = () => {
       ) : isMobile ? (
         <MobileOrderDetails
           order={detalleOrden}
-          onDownloadXLS={handleDownloadXLS}
-          onDownloadPDF={handleDownloadPDF}
+          onDownloadXLS={() => console.log("Descargando XLS...")}
+          onDownloadPDF={handleDownloadPDF}  // Asigna la función al botón de descarga
         />
       ) : (
         <DesktopOrderDetails
           order={detalleOrden}
-          onDownloadXLS={handleDownloadXLS}
-          onDownloadPDF={handleDownloadPDF}
+          onDownloadXLS={() => console.log("Descargando XLS...")}
+          onDownloadPDF={handleDownloadPDF}  // Asigna la función al botón de descarga
         />
       )}
     </Container>

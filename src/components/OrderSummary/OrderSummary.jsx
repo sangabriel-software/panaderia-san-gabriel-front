@@ -50,6 +50,8 @@ const StyledModal = styled(Modal)`
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    width: 80%; // Reducir el ancho de la tabla
+    margin: 0 auto; // Centrar la tabla
     
     th {
       background: #f8f9fa;
@@ -143,7 +145,7 @@ const OrderSummary = ({ show, handleClose, orderData, trayQuantities, productos,
             <thead>
               <tr>
                 <th>Producto</th>
-                <th className="text-end">Cantidad de bandejas</th>
+                <th className="text-end">Bandejas o Unidades</th>
               </tr>
             </thead>
             <tbody>
