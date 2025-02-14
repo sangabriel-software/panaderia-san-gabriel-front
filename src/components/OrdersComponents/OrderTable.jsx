@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Table, Button, Badge, Container } from "react-bootstrap";
+import { Table, Button, Badge, Container, Spinner } from "react-bootstrap"; // Importa Spinner
 import { formatDateToDisplay } from "../../utils/dateUtils";
 import { FaTrashAlt, FaRegEdit, FaFilePdf } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
@@ -16,7 +16,7 @@ const getColorByName = (name) => {
   return COLORS[hash % COLORS.length];
 };
 
-const OrderTable = ({ orders, onDelete, onViewPdf }) => {
+const OrderTable = ({ orders, onDelete, onViewPdf, loadingViewPdf }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const containerRef = useRef(null);
   const navigate = useNavigate();
@@ -100,6 +100,28 @@ const OrderTable = ({ orders, onDelete, onViewPdf }) => {
                 <div className="d-flex justify-content-center gap-2">
                   <Button
                     variant="link"
+                    className="action-btn pdf-btn"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onViewPdf(order.idOrdenProduccion);
+                    }}
+                    onDoubleClick={(e) => e.stopPropagation()} // Evita el doble clic en el botón
+                    disabled={loadingViewPdf} // Deshabilita el botón mientras se carga
+                  >
+                    {loadingViewPdf ? (
+                      <Spinner
+                        as="span"
+                        animation="border"
+                        size="sm"
+                        role="status"
+                        aria-hidden="true"
+                      />
+                    ) : (
+                      <FaFilePdf className="action-icon" />
+                    )}
+                  </Button>
+                  <Button
+                    variant="link"
                     className="action-btn delete-btn"
                     onClick={(e) => {
                       e.stopPropagation();
@@ -108,17 +130,6 @@ const OrderTable = ({ orders, onDelete, onViewPdf }) => {
                     onDoubleClick={(e) => e.stopPropagation()} // Evita el doble clic en el botón
                   >
                     <FaTrashAlt className="action-icon" />
-                  </Button>
-                  <Button
-                    variant="link"
-                    className="action-btn pdf-btn"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onViewPdf(order.idOrdenProduccion);
-                    }}
-                    onDoubleClick={(e) => e.stopPropagation()} // Evita el doble clic en el botón
-                  >
-                    <FaFilePdf className="action-icon" />
                   </Button>
                 </div>
               </td>

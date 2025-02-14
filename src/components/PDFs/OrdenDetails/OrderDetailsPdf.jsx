@@ -139,8 +139,8 @@ const styles = StyleSheet.create({
 });
 
 const OrderDetailsPdf = ({ detalleOrden, encabezadoOrden, detalleConsumo }) => {
-  const panaderia = detalleOrden.filter(item => item.idCategoria === 1);
-  const reposteria = detalleOrden.filter(item => item.idCategoria === 2);
+  const panaderia = detalleOrden?.filter(item => item.idCategoria === 1);
+  const reposteria = detalleOrden?.filter(item => item.idCategoria === 2);
   const fechaGeneracion = new Date().toLocaleString();
 
   return (

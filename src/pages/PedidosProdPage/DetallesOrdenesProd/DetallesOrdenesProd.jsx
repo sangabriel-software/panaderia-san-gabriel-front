@@ -24,6 +24,7 @@ const DetallesOrdenesProduccionPage = () => {
   const [view, setView] = useState("productos");
 
   const handleDownloadPDF = () => {
+    console.log(detalleOrden.encabezadoOrden)
     const documento = <OrderDetailsPdf detalleOrden={detalleOrden.detalleOrden} encabezadoOrden={detalleOrden.encabezadoOrden || {}} detalleConsumo={detalleConsumo} />;
     const fileName = `orden_produccion_${decryptedIdRol}.pdf`;
     generateAndDownloadPDF(documento, fileName);
