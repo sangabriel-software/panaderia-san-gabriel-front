@@ -3,9 +3,26 @@ import { Badge, Card, Col, Container, Row, Table } from "react-bootstrap";
 import DownloadDropdown from "../DownloadDropdown/DownloadDropdown";
 import { formatDateToDisplay } from "../../utils/dateUtils";
 
-const DesktopMateriaPrimaDetails = ({ order, onDownloadXLS, onDownloadPDF }) => {
+const DesktopMateriaPrimaDetails = ({ order, detalleConsumo, onDownloadXLS, onDownloadPDF }) => {
   const encabezado = order?.encabezadoOrden;
-  const detalles = order?.detalleMateriaPrima;
+
+  // Agrupar los detalles de consumo por producto
+  const groupedConsumo = detalleConsumo?.reduce((acc, item) => {
+    if (!acc[item.Producto]) {
+      acc[item.Producto] = [];
+    }
+    acc[item.Producto].push(item);
+    return acc;
+  }, {});
+
+  // Calcular el total de la cantidad usada por ingrediente
+  const totalPorIngrediente = detalleConsumo?.reduce((acc, item) => {
+    if (!acc[item.Ingrediente]) {
+      acc[item.Ingrediente] = { cantidad: 0, unidad: item.UnidadMedida };
+    }
+    acc[item.Ingrediente].cantidad += item.CantidadUsada;
+    return acc;
+  }, {});
 
   return (
     <Container fluid>
@@ -20,24 +37,58 @@ const DesktopMateriaPrimaDetails = ({ order, onDownloadXLS, onDownloadPDF }) => 
             <thead className="bg-dark text-white">
               <tr>
                 <th className="ps-4 py-3 text-center fw-semibold">Item</th>
-                <th className="py-3 fw-semibold">Materia Prima</th>
-                <th className="py-3 text-center fw-semibold">Cantidad</th>
-                <th className="py-3 text-center fw-semibold">Unidad</th>
+                <th className="py-3 fw-semibold">Producto</th>
+                <th className="py-3 fw-semibold">Ingredientes</th>
+                <th className="py-3 text-center fw-semibold">Cantidad Usada</th>
               </tr>
             </thead>
             <tbody>
-              {detalles?.map((mat, index) => (
-                <TableRow key={mat.idMateriaPrima} materia={mat} index={index} />
+              {Object.entries(groupedConsumo || {}).map(([producto, detalles], index) => (
+                <React.Fragment key={producto}>
+                  <tr style={{ backgroundColor: "#f8f9fa" }}>
+                    <td className="ps-4 text-center">
+                      <span className="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-2">
+                        {index + 1}
+                      </span>
+                    </td>
+                    <td colSpan="2">
+                      <span className="fw-bold">{producto}</span>
+                    </td>
+                    <td></td>
+                  </tr>
+                  {detalles.map((detalle, subIndex) => (
+                    <TableRow key={`${producto}-${subIndex}`} detalle={detalle} subIndex={subIndex} />
+                  ))}
+                </React.Fragment>
               ))}
             </tbody>
           </Table>
         </div>
       </Card>
+
+      {/* Card para mostrar el total por ingrediente */}
+      <Card className="shadow-lg border-0 mb-5" style={{ borderRadius: "15px" }}>
+        <Card.Body className="p-4">
+          <h5 className="mb-4 fw-bold text-primary">Resumen de Ingredientes Usados</h5>
+          <Row>
+            {Object.entries(totalPorIngrediente || {}).map(([ingrediente, { cantidad, unidad }]) => (
+              <Col key={ingrediente} md={4} className="mb-3">
+                <div className="d-flex justify-content-between align-items-center">
+                  <span className="fw-medium">{ingrediente}</span>
+                  <span className="fw-bold">
+                    {cantidad.toFixed(2)} {unidad}
+                  </span>
+                </div>
+              </Col>
+            ))}
+          </Row>
+        </Card.Body>
+      </Card>
     </Container>
   );
 };
 
-// Copia el componente DesktopHeader desde DesktopOrderDetails.js
+// Componente DesktopHeader (copiado desde DesktopOrderDetails)
 const DesktopHeader = ({ encabezado, onDownloadXLS, onDownloadPDF }) => (
   <Card
     className="shadow-lg border-0 mb-4 bg-gradient-primary"
@@ -117,20 +168,19 @@ const DesktopHeader = ({ encabezado, onDownloadXLS, onDownloadPDF }) => (
   </Card>
 );
 
-const TableRow = ({ materia, index }) => {
+// Componente TableRow para mostrar los detalles de los ingredientes
+const TableRow = ({ detalle, subIndex }) => {
   return (
-    <tr className="align-middle" style={{ backgroundColor: index % 2 === 0 ? "#f8f9fa" : "white", borderBottom: "2px solid #f1f1f1" }}>
-      <td className="ps-4 text-center">
-        <span className="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-2">{index + 1}</span>
+    <tr className="align-middle" style={{ backgroundColor: "white", borderBottom: "2px solid #f1f1f1" }}>
+      <td></td>
+      <td></td>
+      <td className="ps-4">
+        <span className="text-muted">{detalle.Ingrediente}</span>
       </td>
-      <td>
-        <div className="d-flex align-items-center gap-3">
-          <span className="fw-medium">{materia.nombreMateriaPrima}</span>
-        </div>
-      </td>
-      <td className="text-center fw-bold text-primary">{materia.cantidad}</td>
       <td className="text-center">
-        <span className="badge bg-secondary bg-opacity-10 text-dark rounded-pill px-3 py-2">{materia.unidad}</span>
+        <span className="fw-bold">
+          {detalle.CantidadUsada} {detalle.UnidadMedida}
+        </span>
       </td>
     </tr>
   );

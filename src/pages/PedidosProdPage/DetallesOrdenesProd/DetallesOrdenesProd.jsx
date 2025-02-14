@@ -12,6 +12,7 @@ import OrderDetailsPdf from "../../../components/PDFs/OrdenDetails/OrderDetailsP
 import { generateAndDownloadPDF } from "../../../utils/PdfUtils/PdfUtils";
 import MobileMateriaPrimaDetails from "../../../components/IngredientesOrden/MobileMateriaPrimaDetails";
 import DesktopMateriaPrimaDetails from "../../../components/IngredientesOrden/DesktopMateriaPrimaDetails";
+import { useGetConsumoIngredientes } from "../../../hooks/consumoIngredientes/useGetConsumoIngredientes";
 
 const DetallesOrdenesProduccionPage = () => {
   const navigate = useNavigate();
@@ -19,6 +20,7 @@ const DetallesOrdenesProduccionPage = () => {
   const { idOrdenProduccion } = useParams();
   const decryptedIdRol = decryptId(decodeURIComponent(idOrdenProduccion));
   const { detalleOrden, loadingDetalleOrdene, showErrorDetalleOrdene, showInfoDetalleOrden } = useGetDetalleOrden(decryptedIdRol);
+  const { detalleConsumo, loadingDetalleConsumo, showErrorDetalleConsumo, showInfoDetalleConsumo } = useGetConsumoIngredientes(decryptedIdRol);
   const [view, setView] = useState("productos");
 
   const handleDownloadPDF = () => {
@@ -47,10 +49,10 @@ const DetallesOrdenesProduccionPage = () => {
       </div>
 
       <ButtonGroup className="mb-4">
-        <Button variant={view === "productos" ? "primary" : "outline-primary"} onClick={() => setView("productos")}>
+        <Button  ps-2 variant={view === "productos" ? "primary" : "outline-primary"} onClick={() => setView("productos")}>
           Detalle Productos
         </Button>
-        <Button variant={view === "materiaPrima" ? "primary" : "outline-primary"} onClick={() => setView("materiaPrima")}>
+        <Button  ps-2 variant={view === "materiaPrima" ? "primary" : "outline-primary"} onClick={() => setView("materiaPrima")}>
           Detalle Materia Prima
         </Button>
       </ButtonGroup>
@@ -71,6 +73,7 @@ const DetallesOrdenesProduccionPage = () => {
         ) : (
           <DesktopOrderDetails
             order={detalleOrden}
+            detalleConsumo={detalleConsumo}
             onDownloadXLS={() => console.log("Descargando XLS...")}
             onDownloadPDF={handleDownloadPDF}
           />
@@ -78,12 +81,14 @@ const DetallesOrdenesProduccionPage = () => {
       ) : isMobile ? (
         <MobileMateriaPrimaDetails
           order={detalleOrden}
+          detalleConsumo={detalleConsumo}
           onDownloadXLS={() => console.log("Descargando XLS...")}
           onDownloadPDF={handleDownloadPDF}
         />
       ) : (
         <DesktopMateriaPrimaDetails
           order={detalleOrden}
+          detalleConsumo={detalleConsumo}
           onDownloadXLS={() => console.log("Descargando XLS...")}
           onDownloadPDF={handleDownloadPDF}
         />
