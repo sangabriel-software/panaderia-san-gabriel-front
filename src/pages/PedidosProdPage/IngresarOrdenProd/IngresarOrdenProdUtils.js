@@ -1,6 +1,9 @@
 import dayjs from "dayjs";
-import { ingresarOrdenProduccionService } from "../../../services/ordenesproduccion/ordenesProduccion.service";
-import { useEffect } from "react";
+import { consultarDetallenOrdenProduccion, ingresarOrdenProduccionService } from "../../../services/ordenesproduccion/ordenesProduccion.service";
+import React, { useEffect } from "react";
+import { generateAndDownloadPDF } from "../../../utils/PdfUtils/PdfUtils";
+import { consultarDetalleConsumoProduccion } from "../../../services/consumoingredientes/consumoingredientesprod.service";
+import OrderDetailsPdf from "../../../components/PDFs/OrdenDetails/OrderDetailsPdf";
 
 export const getInitials = (name) => {
   const names = name.split(" ");
@@ -52,6 +55,25 @@ const crearPyaloadOrdenProduccion = (data, trayQuantities) => {
   };
 };
 
+
+export const descargarPdfDuranteIngresoOrden = async (idOrdenProduccion) => {
+  try {
+    const order = await consultarDetallenOrdenProduccion(idOrdenProduccion);
+    const detalleConsumo = await consultarDetalleConsumoProduccion(idOrdenProduccion);
+    const { encabezadoOrden, detalleOrden } = order.detalleOrden;
+
+    const documento = React.createElement(OrderDetailsPdf, {
+      detalleOrden: detalleOrden,
+      encabezadoOrden: encabezadoOrden || {},
+      detalleConsumo: detalleConsumo.IngredientesConsumidos,
+    });
+    const fileName = `orden_produccion_${encabezadoOrden.idOrdenProduccion}.pdf`;
+    generateAndDownloadPDF(documento, fileName);
+  } catch (error) {
+    console.error("Error al generar el PDF:", error);
+  }
+};
+
 /* Funcion para ingreso de productos */
 export const handleIngresarOrdenProduccionSubmit = async ( data, trayQuantities, setTrayQuantities, setIsPopupOpen, setErrorPopupMessage, setIsPopupErrorOpen, setIsLoading, reset ) => {
   setIsLoading(true); // Activar el loading del input
@@ -67,10 +89,10 @@ export const handleIngresarOrdenProduccionSubmit = async ( data, trayQuantities,
     const payload = crearPyaloadOrdenProduccion(data, trayQuantities);
     const resIngresoOrden = await ingresarOrdenProduccionService(payload);
     if (resIngresoOrden.status === 200) {
-        console.log("exito");
       reset();
       setTrayQuantities([])
       setIsPopupOpen(true);
+      descargarPdfDuranteIngresoOrden(resIngresoOrden.idOrdenProduccion.idOrdenGenerada);
     }
   } catch (error) {
     setErrorPopupMessage(

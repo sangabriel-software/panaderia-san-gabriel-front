@@ -10,16 +10,12 @@ import AddButton from "../../../components/AddButton/AddButton";
 import useFilterOrders from "../../../hooks/ordenesproduccion/useFilterOrders";
 import PaginationComponent from "../../../components/PaginationComponent/PaginationComponent";
 import OrderCardSkeleton from "../../../components/OrderCardSkeleton/OrderCardSkeleton";
-import { getCurrentItems, handleConfirmDeleteOrdenProduccion, handleDeleteOrder } from "./GestionPedidosProdUtils";
 import ConfirmPopUp from "../../../components/Popup/ConfirmPopup";
 import Alert from "../../../components/Alerts/Alert";
 import { BsExclamationTriangleFill, BsFillInfoCircleFill } from "react-icons/bs";
 import { useNavigate } from "react-router";
 import { handleViewDetalle } from "../DetallesOrdenesProd/DetallesOrdenesProdUtils";
-import { consultarDetallenOrdenProduccion } from "../../../services/ordenesproduccion/ordenesProduccion.service";
-import OrderDetailsPdf from "../../../components/PDFs/OrdenDetails/OrderDetailsPdf";
-import { consultarDetalleConsumoProduccion } from "../../../services/consumoingredientes/consumoingredientesprod.service";
-import { generateAndOpenPDF } from "../../../utils/PdfUtils/PdfUtils";
+import { getCurrentItems, handleConfirmDeleteOrdenProduccion, handleDeleteOrder, handleViewPdf } from "./GestionPedidosProdUtils";
 
 const GestionPedidosProd = () => {
   const isMobile = useMediaQuery({ maxWidth: 767 });
@@ -40,30 +36,8 @@ const GestionPedidosProd = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const ordersPerPage = 5;
   const currentOrders = getCurrentItems(filteredOrders, currentPage, ordersPerPage);
+  
   const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
-
-  const handleViewPdf = async (idOrdenProduccion) => {
-    setLoadingViewPdf(idOrdenProduccion); // Establece el ID que está cargando
-    try {
-      const order = await consultarDetallenOrdenProduccion(idOrdenProduccion);
-      const detalleConsumo = await consultarDetalleConsumoProduccion(idOrdenProduccion);
-      const { encabezadoOrden, detalleOrden } = order.detalleOrden;
-
-      const documento = (
-        <OrderDetailsPdf
-          detalleOrden={detalleOrden}
-          encabezadoOrden={encabezadoOrden || {}}
-          detalleConsumo={detalleConsumo.IngredientesConsumidos}
-        />
-      );
-      const fileName = `orden_produccion_${encabezadoOrden.idOrdenProduccion}.pdf`;
-      generateAndOpenPDF(documento, fileName);
-    } catch (error) {
-      console.error("Error al generar el PDF:", error);
-    } finally {
-      setLoadingViewPdf(null); // Restablece a null cuando termine la carga
-    }
-  };
 
   return (
     <Container>
@@ -115,7 +89,7 @@ const GestionPedidosProd = () => {
         <OrderTable
           orders={filteredOrders}
           onDelete={(idOrder) => handleConfirmDeleteOrdenProduccion(idOrder, setOrdenToDelete, setIsPopupOpen)}
-          onViewPdf={(idOrder) => handleViewPdf(idOrder)}
+          onViewPdf={(idOrder) => handleViewPdf(idOrder, setLoadingViewPdf)}
           loadingViewPdf={loadingViewPdf}
         />
       )}

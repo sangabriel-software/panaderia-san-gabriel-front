@@ -13,6 +13,7 @@ import { generateAndDownloadPDF } from "../../../utils/PdfUtils/PdfUtils";
 import MobileMateriaPrimaDetails from "../../../components/IngredientesOrden/MobileMateriaPrimaDetails";
 import DesktopMateriaPrimaDetails from "../../../components/IngredientesOrden/DesktopMateriaPrimaDetails";
 import { useGetConsumoIngredientes } from "../../../hooks/consumoIngredientes/useGetConsumoIngredientes";
+import { handleDownloadPDF } from "./DetallesOrdenesProdUtils";
 
 const DetallesOrdenesProduccionPage = () => {
   const navigate = useNavigate();
@@ -23,12 +24,6 @@ const DetallesOrdenesProduccionPage = () => {
   const { detalleConsumo, loadingDetalleConsumo, showErrorDetalleConsumo, showInfoDetalleConsumo } = useGetConsumoIngredientes(decryptedIdRol);
   const [view, setView] = useState("productos");
 
-  const handleDownloadPDF = () => {
-    console.log(detalleOrden.encabezadoOrden)
-    const documento = <OrderDetailsPdf detalleOrden={detalleOrden.detalleOrden} encabezadoOrden={detalleOrden.encabezadoOrden || {}} detalleConsumo={detalleConsumo} />;
-    const fileName = `orden_produccion_${decryptedIdRol}.pdf`;
-    generateAndDownloadPDF(documento, fileName);
-  };
 
   return (
     <Container className="mt-4">
@@ -69,14 +64,14 @@ const DetallesOrdenesProduccionPage = () => {
           <MobileOrderDetails
             order={detalleOrden}
             onDownloadXLS={() => console.log("Descargando XLS...")}
-            onDownloadPDF={handleDownloadPDF}
+            onDownloadPDF={() => handleDownloadPDF(decryptedIdRol, detalleOrden, detalleConsumo, decryptedIdRol)}
           />
         ) : (
           <DesktopOrderDetails
             order={detalleOrden}
             detalleConsumo={detalleConsumo}
             onDownloadXLS={() => console.log("Descargando XLS...")}
-            onDownloadPDF={handleDownloadPDF}
+            onDownloadPDF={() => handleDownloadPDF(decryptedIdRol, detalleOrden, detalleConsumo, decryptedIdRol)}
           />
         )
       ) : isMobile ? (
@@ -84,14 +79,14 @@ const DetallesOrdenesProduccionPage = () => {
           order={detalleOrden}
           detalleConsumo={detalleConsumo}
           onDownloadXLS={() => console.log("Descargando XLS...")}
-          onDownloadPDF={handleDownloadPDF}
+          onDownloadPDF={() => handleDownloadPDF(decryptedIdRol, detalleOrden, detalleConsumo, decryptedIdRol)}
         />
       ) : (
         <DesktopMateriaPrimaDetails
           order={detalleOrden}
           detalleConsumo={detalleConsumo}
           onDownloadXLS={() => console.log("Descargando XLS...")}
-          onDownloadPDF={handleDownloadPDF}
+          onDownloadPDF={() => handleDownloadPDF(decryptedIdRol, detalleOrden, detalleConsumo, decryptedIdRol)}
         />
       )}
     </Container>
