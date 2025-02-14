@@ -1,5 +1,5 @@
-import React from "react";
-import { Container } from "react-bootstrap";
+import React, { useState } from "react";
+import { Container, Button, ButtonGroup } from "react-bootstrap";
 import { useMediaQuery } from "react-responsive";
 import { BsArrowLeft } from "react-icons/bs";
 import { useNavigate, useParams } from "react-router";
@@ -10,22 +10,22 @@ import useGetDetalleOrden from "../../../hooks/ordenesproduccion/useGetDetalleOr
 import { decryptId } from "../../../utils/CryptoParams";
 import OrderDetailsPdf from "../../../components/PDFs/OrdenDetails/OrderDetailsPdf";
 import { generateAndDownloadPDF } from "../../../utils/PdfUtils/PdfUtils";
+import MobileMateriaPrimaDetails from "../../../components/IngredientesOrden/MobileMateriaPrimaDetails";
+import DesktopMateriaPrimaDetails from "../../../components/IngredientesOrden/DesktopMateriaPrimaDetails";
 
 const DetallesOrdenesProduccionPage = () => {
   const navigate = useNavigate();
   const isMobile = useMediaQuery({ maxWidth: 768 });
   const { idOrdenProduccion } = useParams();
   const decryptedIdRol = decryptId(decodeURIComponent(idOrdenProduccion));
-  const {detalleOrden, loadingDetalleOrdene, showErrorDetalleOrdene, showInfoDetalleOrden} = useGetDetalleOrden(decryptedIdRol);
+  const { detalleOrden, loadingDetalleOrdene, showErrorDetalleOrdene, showInfoDetalleOrden } = useGetDetalleOrden(decryptedIdRol);
+  const [view, setView] = useState("productos");
 
-  // Función para manejar la descarga del PDF
   const handleDownloadPDF = () => {
     const documento = <OrderDetailsPdf detalleOrden={detalleOrden.detalleOrden} encabezadoOrden={detalleOrden.encabezadoOrden || {}} />;
     const fileName = `orden_produccion_${decryptedIdRol}.pdf`;
-  
     generateAndDownloadPDF(documento, fileName);
   };
-  
 
   return (
     <Container className="mt-4">
@@ -46,23 +46,46 @@ const DetallesOrdenesProduccionPage = () => {
         </div>
       </div>
 
+      <ButtonGroup className="mb-4">
+        <Button variant={view === "productos" ? "primary" : "outline-primary"} onClick={() => setView("productos")}>
+          Detalle Productos
+        </Button>
+        <Button variant={view === "materiaPrima" ? "primary" : "outline-primary"} onClick={() => setView("materiaPrima")}>
+          Detalle Materia Prima
+        </Button>
+      </ButtonGroup>
+
       {loadingDetalleOrdene ? (
-        <div className="d-flex justify-content-center  my-5 mt-5">
+        <div className="d-flex justify-content-center my-5 mt-5">
           <div className="spinner-border text-primary my-5 mt-5" role="status">
             <span className="visually-hidden">Cargando...</span>
           </div>
         </div>
+      ) : view === "productos" ? (
+        isMobile ? (
+          <MobileOrderDetails
+            order={detalleOrden}
+            onDownloadXLS={() => console.log("Descargando XLS...")}
+            onDownloadPDF={handleDownloadPDF}
+          />
+        ) : (
+          <DesktopOrderDetails
+            order={detalleOrden}
+            onDownloadXLS={() => console.log("Descargando XLS...")}
+            onDownloadPDF={handleDownloadPDF}
+          />
+        )
       ) : isMobile ? (
-        <MobileOrderDetails
+        <MobileMateriaPrimaDetails
           order={detalleOrden}
           onDownloadXLS={() => console.log("Descargando XLS...")}
-          onDownloadPDF={handleDownloadPDF}  // Asigna la función al botón de descarga
+          onDownloadPDF={handleDownloadPDF}
         />
       ) : (
-        <DesktopOrderDetails
+        <DesktopMateriaPrimaDetails
           order={detalleOrden}
           onDownloadXLS={() => console.log("Descargando XLS...")}
-          onDownloadPDF={handleDownloadPDF}  // Asigna la función al botón de descarga
+          onDownloadPDF={handleDownloadPDF}
         />
       )}
     </Container>
