@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Table, Button, Badge, Container, Spinner } from "react-bootstrap"; // Importa Spinner
+import { Table, Button, Badge, Container, Spinner } from "react-bootstrap";
 import { formatDateToDisplay } from "../../utils/dateUtils";
-import { FaTrashAlt, FaRegEdit, FaFilePdf } from "react-icons/fa";
+import { FaTrashAlt, FaFilePdf } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import PaginationComponent from "../PaginationComponent/PaginationComponent";
 import { handleViewDetalle } from "../../pages/PedidosProdPage/DetallesOrdenesProd/DetallesOrdenesProdUtils";
@@ -54,23 +54,23 @@ const OrderTable = ({ orders, onDelete, onViewPdf, loadingViewPdf }) => {
               key={order.idOrdenProduccion}
               className="table-row"
               onDoubleClick={() => handleRowClick(order.idOrdenProduccion)}
-              style={{ cursor: "pointer" }} // Cambia el cursor a una manita
+              style={{ cursor: "pointer" }}
             >
               <td
                 className="text-center serial-number"
-                title="Doble clic para ver detalles" // Mensaje de tooltip
+                title="Doble clic para ver detalles"
               >
                 #{startIndex + index + 1}
               </td>
               <td
                 className="text-center order-number"
-                title="Doble clic para ver detalles" // Mensaje de tooltip
+                title="Doble clic para ver detalles"
               >
                 ORD-{order.idOrdenProduccion}
               </td>
               <td
                 className="text-center"
-                title="Doble clic para ver detalles" // Mensaje de tooltip
+                title="Doble clic para ver detalles"
               >
                 <Badge pill className="branch-badge text-light" bg={getColorByName(order.nombreSucursal)}>
                   {order.nombreSucursal}
@@ -78,13 +78,13 @@ const OrderTable = ({ orders, onDelete, onViewPdf, loadingViewPdf }) => {
               </td>
               <td
                 className="text-center shift-cell"
-                title="Doble clic para ver detalles" // Mensaje de tooltip
+                title="Doble clic para ver detalles"
               >
                 {order.ordenTurno}
               </td>
               <td
                 className="text-center"
-                title="Doble clic para ver detalles" // Mensaje de tooltip
+                title="Doble clic para ver detalles"
               >
                 <Badge pill className={`status-badge ${order.estadoOrden === "P" ? "status-pending" : "status-completed"}`}>
                   {order.estadoOrden === "P" ? "Pendiente" : "Completado"}
@@ -92,7 +92,7 @@ const OrderTable = ({ orders, onDelete, onViewPdf, loadingViewPdf }) => {
               </td>
               <td
                 className="text-center production-date"
-                title="Doble clic para ver detalles" // Mensaje de tooltip
+                title="Doble clic para ver detalles"
               >
                 {formatDateToDisplay(order.fechaAProducir)}
               </td>
@@ -105,10 +105,10 @@ const OrderTable = ({ orders, onDelete, onViewPdf, loadingViewPdf }) => {
                       e.stopPropagation();
                       onViewPdf(order.idOrdenProduccion);
                     }}
-                    onDoubleClick={(e) => e.stopPropagation()} // Evita el doble clic en el botón
-                    disabled={loadingViewPdf} // Deshabilita el botón mientras se carga
+                    onDoubleClick={(e) => e.stopPropagation()}
+                    disabled={loadingViewPdf === order.idOrdenProduccion} // Deshabilita el botón mientras se carga
                   >
-                    {loadingViewPdf ? (
+                    {loadingViewPdf === order.idOrdenProduccion ? (
                       <Spinner
                         as="span"
                         animation="border"
@@ -127,7 +127,7 @@ const OrderTable = ({ orders, onDelete, onViewPdf, loadingViewPdf }) => {
                       e.stopPropagation();
                       onDelete(order.idOrdenProduccion);
                     }}
-                    onDoubleClick={(e) => e.stopPropagation()} // Evita el doble clic en el botón
+                    onDoubleClick={(e) => e.stopPropagation()}
                   >
                     <FaTrashAlt className="action-icon" />
                   </Button>

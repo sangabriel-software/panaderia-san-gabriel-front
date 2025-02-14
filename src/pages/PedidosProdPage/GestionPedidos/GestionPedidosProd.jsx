@@ -10,10 +10,10 @@ import AddButton from "../../../components/AddButton/AddButton";
 import useFilterOrders from "../../../hooks/ordenesproduccion/useFilterOrders";
 import PaginationComponent from "../../../components/PaginationComponent/PaginationComponent";
 import OrderCardSkeleton from "../../../components/OrderCardSkeleton/OrderCardSkeleton";
-import { getCurrentItems, handleConfirmDeleteOrdenProduccion, handleDeleteOrder, } from "./GestionPedidosProdUtils";
+import { getCurrentItems, handleConfirmDeleteOrdenProduccion, handleDeleteOrder } from "./GestionPedidosProdUtils";
 import ConfirmPopUp from "../../../components/Popup/ConfirmPopup";
 import Alert from "../../../components/Alerts/Alert";
-import { BsExclamationTriangleFill, BsFillInfoCircleFill, } from "react-icons/bs";
+import { BsExclamationTriangleFill, BsFillInfoCircleFill } from "react-icons/bs";
 import { useNavigate } from "react-router";
 import { handleViewDetalle } from "../DetallesOrdenesProd/DetallesOrdenesProdUtils";
 import { consultarDetallenOrdenProduccion } from "../../../services/ordenesproduccion/ordenesProduccion.service";
@@ -23,8 +23,8 @@ import { generateAndOpenPDF } from "../../../utils/PdfUtils/PdfUtils";
 
 const GestionPedidosProd = () => {
   const isMobile = useMediaQuery({ maxWidth: 767 });
-  const {ordenesProduccion, loadingOrdenes, showErrorOrdenes, showInfoOrdenes, setOrdenesProduccion,} = useGetOrdenesProduccion();
-  const [filters, setFilters] = useState({search: "", date: "", sucursal: "", });
+  const { ordenesProduccion, loadingOrdenes, showErrorOrdenes, showInfoOrdenes, setOrdenesProduccion } = useGetOrdenesProduccion();
+  const [filters, setFilters] = useState({ search: "", date: "", sucursal: "" });
   const filteredOrders = useFilterOrders(ordenesProduccion, filters);
   const navigate = useNavigate();
 
@@ -34,29 +34,34 @@ const GestionPedidosProd = () => {
   const [isPopupErrorOpen, setIsPopupErrorOpen] = useState(false);
   const [ordenToDelete, setOrdenToDelete] = useState(null);
 
-  const [loadingViewPdf, setloadingViewPdf] = useState(false);
+  const [loadingViewPdf, setLoadingViewPdf] = useState(null); // Cambia a null o un ID específico
 
   /* Variables para la paginacion */
   const [currentPage, setCurrentPage] = useState(1);
   const ordersPerPage = 5;
-  const currentOrders = getCurrentItems(filteredOrders, currentPage, ordersPerPage  );
+  const currentOrders = getCurrentItems(filteredOrders, currentPage, ordersPerPage);
   const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
 
   const handleViewPdf = async (idOrdenProduccion) => {
-    setloadingViewPdf(true);
+    setLoadingViewPdf(idOrdenProduccion); // Establece el ID que está cargando
     try {
       const order = await consultarDetallenOrdenProduccion(idOrdenProduccion);
       const detalleConsumo = await consultarDetalleConsumoProduccion(idOrdenProduccion);
       const { encabezadoOrden, detalleOrden } = order.detalleOrden;
 
-      const documento = <OrderDetailsPdf detalleOrden={detalleOrden} encabezadoOrden={encabezadoOrden || {}} detalleConsumo={detalleConsumo.IngredientesConsumidos} />;
+      const documento = (
+        <OrderDetailsPdf
+          detalleOrden={detalleOrden}
+          encabezadoOrden={encabezadoOrden || {}}
+          detalleConsumo={detalleConsumo.IngredientesConsumidos}
+        />
+      );
       const fileName = `orden_produccion_${encabezadoOrden.idOrdenProduccion}.pdf`;
       generateAndOpenPDF(documento, fileName);
-
     } catch (error) {
       console.error("Error al generar el PDF:", error);
-    }finally{
-      setloadingViewPdf(false);
+    } finally {
+      setLoadingViewPdf(null); // Restablece a null cuando termine la carga
     }
   };
 
@@ -66,7 +71,7 @@ const GestionPedidosProd = () => {
         title="Órdenes de Producción"
         description="Gestiona los pedidos de la producción a realizar"
       />
-      <AddButton buttonText="Ingresar Orden" onRedirect={() => navigate("ingresar-orden")}/>
+      <AddButton buttonText="Ingresar Orden" onRedirect={() => navigate("ingresar-orden")} />
       <FilterBar
         filters={filters}
         onFilterChange={setFilters}
@@ -82,7 +87,7 @@ const GestionPedidosProd = () => {
               <OrderCard
                 key={order.idOrdenProduccion}
                 order={order}
-                onViewDetails={()=> {handleViewDetalle(order.idOrdenProduccion, navigate)}}
+                onViewDetails={() => { handleViewDetalle(order.idOrdenProduccion, navigate) }}
                 onDeleteOrder={() =>
                   handleConfirmDeleteOrdenProduccion(
                     order.idOrdenProduccion,
@@ -101,15 +106,15 @@ const GestionPedidosProd = () => {
           </>
         )
       ) : loadingOrdenes ? (
-        <div className="d-flex justify-content-center  my-5">
-          <div className="spinner-border text-primary my-5 my-5" role="status">
+        <div className="d-flex justify-content-center my-5">
+          <div className="spinner-border text-primary my-5" role="status">
             <span className="visually-hidden">Cargando...</span>
           </div>
         </div>
       ) : (
         <OrderTable
           orders={filteredOrders}
-          onDelete={(idOrder) =>handleConfirmDeleteOrdenProduccion(idOrder, setOrdenToDelete, setIsPopupOpen)}
+          onDelete={(idOrder) => handleConfirmDeleteOrdenProduccion(idOrder, setOrdenToDelete, setIsPopupOpen)}
           onViewPdf={(idOrder) => handleViewPdf(idOrder)}
           loadingViewPdf={loadingViewPdf}
         />

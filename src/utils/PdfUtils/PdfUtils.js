@@ -38,7 +38,7 @@ export const generateAndDownloadPDF = async (documento, fileName) => {
       }
   
       // Limpia la URL del Blob después de abrir el PDF
-      setTimeout(() => URL.revokeObjectURL(url), 500); // Limpia después de 1 segundo
+      setTimeout(() => URL.revokeObjectURL(url), 2); // Limpia después de 1 segundo
     } catch (error) {
       console.error("Error al generar o abrir el PDF:", error);
     }
