@@ -24,7 +24,7 @@ const DetallesOrdenesProduccionPage = () => {
   const [view, setView] = useState("productos");
 
   const handleDownloadPDF = () => {
-    const documento = <OrderDetailsPdf detalleOrden={detalleOrden.detalleOrden} encabezadoOrden={detalleOrden.encabezadoOrden || {}} />;
+    const documento = <OrderDetailsPdf detalleOrden={detalleOrden.detalleOrden} encabezadoOrden={detalleOrden.encabezadoOrden || {}} detalleConsumo={detalleConsumo} />;
     const fileName = `orden_produccion_${decryptedIdRol}.pdf`;
     generateAndDownloadPDF(documento, fileName);
   };
@@ -49,10 +49,10 @@ const DetallesOrdenesProduccionPage = () => {
       </div>
 
       <ButtonGroup className="mb-4">
-        <Button  ps-2 variant={view === "productos" ? "primary" : "outline-primary"} onClick={() => setView("productos")}>
+        <Button variant={view === "productos" ? "primary" : "outline-primary"} onClick={() => setView("productos")}>
           Detalle Productos
         </Button>
-        <Button  ps-2 variant={view === "materiaPrima" ? "primary" : "outline-primary"} onClick={() => setView("materiaPrima")}>
+        <Button variant={view === "materiaPrima" ? "primary" : "outline-primary"} onClick={() => setView("materiaPrima")}>
           Detalle Materia Prima
         </Button>
       </ButtonGroup>

@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Table, Button, Badge, Container } from "react-bootstrap";
 import { formatDateToDisplay } from "../../utils/dateUtils";
-import { FaTrashAlt, FaRegEdit } from "react-icons/fa";
+import { FaTrashAlt, FaRegEdit, FaFilePdf } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import PaginationComponent from "../PaginationComponent/PaginationComponent";
 import { handleViewDetalle } from "../../pages/PedidosProdPage/DetallesOrdenesProd/DetallesOrdenesProdUtils";
@@ -16,7 +16,7 @@ const getColorByName = (name) => {
   return COLORS[hash % COLORS.length];
 };
 
-const OrderTable = ({ orders, onDelete }) => {
+const OrderTable = ({ orders, onDelete, onViewPdf }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const containerRef = useRef(null);
   const navigate = useNavigate();
@@ -54,32 +54,73 @@ const OrderTable = ({ orders, onDelete }) => {
               key={order.idOrdenProduccion}
               className="table-row"
               onDoubleClick={() => handleRowClick(order.idOrdenProduccion)}
+              style={{ cursor: "pointer" }} // Cambia el cursor a una manita
             >
-              <td className="text-center serial-number">#{startIndex + index + 1}</td>
-              <td className="text-center order-number">ORD-{order.idOrdenProduccion}</td>
-              <td className="text-center">
+              <td
+                className="text-center serial-number"
+                title="Doble clic para ver detalles" // Mensaje de tooltip
+              >
+                #{startIndex + index + 1}
+              </td>
+              <td
+                className="text-center order-number"
+                title="Doble clic para ver detalles" // Mensaje de tooltip
+              >
+                ORD-{order.idOrdenProduccion}
+              </td>
+              <td
+                className="text-center"
+                title="Doble clic para ver detalles" // Mensaje de tooltip
+              >
                 <Badge pill className="branch-badge text-light" bg={getColorByName(order.nombreSucursal)}>
                   {order.nombreSucursal}
                 </Badge>
               </td>
-              <td className="text-center shift-cell">{order.ordenTurno}</td>
-              <td className="text-center">
+              <td
+                className="text-center shift-cell"
+                title="Doble clic para ver detalles" // Mensaje de tooltip
+              >
+                {order.ordenTurno}
+              </td>
+              <td
+                className="text-center"
+                title="Doble clic para ver detalles" // Mensaje de tooltip
+              >
                 <Badge pill className={`status-badge ${order.estadoOrden === "P" ? "status-pending" : "status-completed"}`}>
                   {order.estadoOrden === "P" ? "Pendiente" : "Completado"}
                 </Badge>
               </td>
-              <td className="text-center production-date">{formatDateToDisplay(order.fechaAProducir)}</td>
-              <td className="text-center actions-cell">
-                <Button
-                  variant="link"
-                  className="action-btn delete-btn"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onDelete(order.idOrdenProduccion);
-                  }}
-                >
-                  <FaTrashAlt className="action-icon" />
-                </Button>
+              <td
+                className="text-center production-date"
+                title="Doble clic para ver detalles" // Mensaje de tooltip
+              >
+                {formatDateToDisplay(order.fechaAProducir)}
+              </td>
+              <td className="text-center actions-cell" onDoubleClick={(e) => e.stopPropagation()}>
+                <div className="d-flex justify-content-center gap-2">
+                  <Button
+                    variant="link"
+                    className="action-btn delete-btn"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDelete(order.idOrdenProduccion);
+                    }}
+                    onDoubleClick={(e) => e.stopPropagation()} // Evita el doble clic en el botón
+                  >
+                    <FaTrashAlt className="action-icon" />
+                  </Button>
+                  <Button
+                    variant="link"
+                    className="action-btn pdf-btn"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onViewPdf(order.idOrdenProduccion);
+                    }}
+                    onDoubleClick={(e) => e.stopPropagation()} // Evita el doble clic en el botón
+                  >
+                    <FaFilePdf className="action-icon" />
+                  </Button>
+                </div>
               </td>
             </tr>
           ))}

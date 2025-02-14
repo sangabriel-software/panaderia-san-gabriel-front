@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
   },
 });
 
-const OrderDetailsPdf = ({ detalleOrden, encabezadoOrden }) => {
+const OrderDetailsPdf = ({ detalleOrden, encabezadoOrden, detalleConsumo }) => {
   const panaderia = detalleOrden.filter(item => item.idCategoria === 1);
   const reposteria = detalleOrden.filter(item => item.idCategoria === 2);
   const fechaGeneracion = new Date().toLocaleString();
@@ -197,12 +197,14 @@ const OrderDetailsPdf = ({ detalleOrden, encabezadoOrden }) => {
                 <Text style={styles.tableCellItem}>#</Text>
                 <Text style={styles.tableHeader}>Producto</Text>
                 <Text style={styles.tableHeader}>Bandejas</Text>
+                <Text style={styles.tableHeader}>Unidades</Text>
               </View>
               {panaderia.map((item, index) => (
                 <View style={styles.tableRow} key={index}>
                   <Text style={styles.tableCellItem}>{index + 1}</Text>
                   <Text style={styles.tableCell}>{item.nombreProducto}</Text>
                   <Text style={styles.tableCell}>{item.cantidadBandejas || 'N/A'}</Text>
+                  <Text style={styles.tableCell}>{item.cantidadUnidades || 'N/A'}</Text>
                 </View>
               ))}
             </View>
@@ -218,7 +220,7 @@ const OrderDetailsPdf = ({ detalleOrden, encabezadoOrden }) => {
               <View style={styles.tableRow}>
                 <Text style={styles.tableCellItem}>#</Text>
                 <Text style={styles.tableHeader}>Producto</Text>
-                <Text style={styles.tableHeader}>Bandejas</Text>
+                <Text style={styles.tableHeader}>Unidades</Text>
               </View>
               {reposteria.map((item, index) => (
                 <View style={styles.tableRow} key={index}>
@@ -226,6 +228,32 @@ const OrderDetailsPdf = ({ detalleOrden, encabezadoOrden }) => {
                   <Text style={styles.tableCell}>{item.nombreProducto}</Text>
                   <Text style={styles.tableCell}>{item.cantidadBandejas || 'N/A'}</Text>
                 </View>
+              ))}
+            </View>
+          </View>
+        )}
+
+        {detalleConsumo && detalleConsumo.length > 0 && (
+          <View style={styles.tableContainer}>
+            <View style={styles.tableTitleContainer}>
+              <Text style={styles.tableTitle}>Detalles de Ingredientes Utilizados</Text>
+            </View>
+                              <View style={styles.tableRow}>
+                    <Text style={styles.tableCellItem}>#</Text>
+                    <Text style={styles.tableHeader}>Producto</Text>
+                    <Text style={styles.tableHeader}>Ingrediente</Text>
+                    <Text style={styles.tableHeader}>Cantidad Usada</Text>
+                  </View>
+            <View style={styles.table}>
+              {detalleConsumo.map((item, index) => (
+                <React.Fragment key={index}>
+                  <View style={styles.tableRow}>
+                    <Text style={styles.tableCellItem}>{index + 1}</Text>
+                    <Text style={styles.tableCell}>{item.Producto}</Text>
+                    <Text style={styles.tableCell}>{item.Ingrediente}</Text>
+                    <Text style={styles.tableCell}>{`${item.CantidadUsada} ${item.UnidadMedida}`}</Text>
+                  </View>
+                </React.Fragment>
               ))}
             </View>
           </View>
