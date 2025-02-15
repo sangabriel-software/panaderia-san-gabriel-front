@@ -1,12 +1,12 @@
 import { useRef, useState } from "react";
-import { Container, Form, Row, Col, Button, Card, InputGroup, } from "react-bootstrap";
+import { Container, Form, Row, Col, Button, Card, InputGroup } from "react-bootstrap";
 import { useForm } from "react-hook-form";
 import useGetProductosYPrecios from "../../../hooks/productosprecios/useGetProductosYprecios";
 import { useGetSucursales } from "../../../hooks/sucursales/useGetSucursales";
 import { BsArrowLeft, BsExclamationTriangleFill } from "react-icons/bs";
 import { useNavigate } from "react-router";
 import Title from "../../../components/Title/Title";
-import { getInitials, getUniqueColor, handleIngresarOrdenProduccionSubmit, scrollToAlert, } from "./IngresarOrdenProdUtils";
+import { getInitials, getUniqueColor, handleIngresarOrdenProduccionSubmit, scrollToAlert } from "./IngresarOrdenProdUtils";
 import Alert from "../../../components/Alerts/Alert";
 import SuccessPopup from "../../../components/Popup/SuccessPopup";
 import OrderSummary from "../../../components/OrderSummary/OrderSummary";
@@ -14,16 +14,16 @@ import dayjs from "dayjs";
 import "./ordenes.css";
 import ErrorPopup from "../../../components/Popup/ErrorPopUp";
 
-
 const IngresarOrdenProd = () => {
   const alertRef = useRef(null);
   const navigate = useNavigate();
   const { sucursales, loadingSucursales, showErrorSucursales } = useGetSucursales();
-  const { productos, loadigProducts, showErrorProductos, } = useGetProductosYPrecios(); 
+  const { productos, loadigProducts, showErrorProductos } = useGetProductosYPrecios();
   const tomorrow = dayjs().add(1, "day").format("YYYY-MM-DD");
 
-  const { register, handleSubmit, formState: { errors }, setValue, watch, reset, getValues, } = useForm({
-          defaultValues: { sucursal: "", turno: "AM", fechaAProducir: tomorrow, nombrePanadero: "", }, });
+  const { register, handleSubmit, formState: { errors }, setValue, watch, reset, getValues } = useForm({
+    defaultValues: { sucursal: "", turno: "AM", fechaAProducir: tomorrow, nombrePanadero: "" },
+  });
 
   const turnoValue = watch("turno");
   const [activeCategory, setActiveCategory] = useState("Panadería");
@@ -33,16 +33,25 @@ const IngresarOrdenProd = () => {
   const [errorPopupMessage, setErrorPopupMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showOrderSummary, setShowOrderSummary] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const handleShowOrderSummary = () => setShowOrderSummary(true);
   const handleCloseOrderSummary = () => setShowOrderSummary(false);
 
-  const panaderiaProducts = productos.filter(
-    (p) => p.nombreCategoria === "Panadería"
-  );
-  const reposteriaProducts = productos.filter(
-    (p) => p.nombreCategoria === "Repostería"
-  );
+  const panaderiaProducts = productos.filter((p) => p.nombreCategoria === "Panadería");
+  const reposteriaProducts = productos.filter((p) => p.nombreCategoria === "Repostería");
+
+  const filterProductsByName = (products, searchTerm) => {
+    if (!searchTerm) return products;
+    return products.filter((producto) =>
+      producto.nombreProducto.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  };
+
+  const filteredProducts = filterProductsByName(productos, searchTerm);
+  const filteredPanaderiaProducts = searchTerm? filteredProducts.filter((p) => p.nombreCategoria === "Panadería") : panaderiaProducts;
+  const filteredReposteriaProducts = searchTerm ? filteredProducts.filter((p) => p.nombreCategoria === "Repostería") : reposteriaProducts;
+  const productsToShow = searchTerm ? filteredProducts : activeCategory === "Panadería" ? filteredPanaderiaProducts : filteredReposteriaProducts;
 
   const onSubmit = async (data) => {
     setShowOrderSummary(true);
@@ -50,8 +59,16 @@ const IngresarOrdenProd = () => {
 
   const handleConfirmOrder = async () => {
     const data = getValues();
-    await handleIngresarOrdenProduccionSubmit( data, trayQuantities, setTrayQuantities, setIsPopupOpen, setErrorPopupMessage, setIsPopupErrorOpen,
-                                               setIsLoading, reset );
+    await handleIngresarOrdenProduccionSubmit(
+      data,
+      trayQuantities,
+      setTrayQuantities,
+      setIsPopupOpen,
+      setErrorPopupMessage,
+      setIsPopupErrorOpen,
+      setIsLoading,
+      reset
+    );
     setShowOrderSummary(false);
   };
 
@@ -128,18 +145,14 @@ const IngresarOrdenProd = () => {
                       </label>
                       <div className="d-flex gap-2 shift-selector">
                         <Button
-                          variant={
-                            turnoValue === "AM" ? "primary" : "outline-primary"
-                          }
+                          variant={turnoValue === "AM" ? "primary" : "outline-primary"}
                           className="shift-btn"
                           onClick={() => setValue("turno", "AM")}
                         >
                           🌅 AM
                         </Button>
                         <Button
-                          variant={
-                            turnoValue === "PM" ? "primary" : "outline-primary"
-                          }
+                          variant={turnoValue === "PM" ? "primary" : "outline-primary"}
                           className="shift-btn"
                           onClick={() => setValue("turno", "PM")}
                         >
@@ -161,10 +174,7 @@ const IngresarOrdenProd = () => {
                       </label>
                       {loadingSucursales ? (
                         <div className="loading-spinner">
-                          <div
-                            className="spinner-border text-primary"
-                            role="status"
-                          />
+                          <div className="spinner-border text-primary" role="status" />
                         </div>
                       ) : (
                         <Form.Select
@@ -228,10 +238,7 @@ const IngresarOrdenProd = () => {
                 }
               >
                 {isLoading ? (
-                  <span
-                    className="spinner-border spinner-border-sm"
-                    role="status"
-                  />
+                  <span className="spinner-border spinner-border-sm" role="status" />
                 ) : (
                   <>
                     <span className="btn-icon">🚀</span>
@@ -251,50 +258,53 @@ const IngresarOrdenProd = () => {
         </div>
       ) : (
         <div className="products-section">
+          {/* Barra de búsqueda */}
+          <div className="mb-4">
+            <Form.Control
+              type="text"
+              outline
+              placeholder="Buscar producto por nombre..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="search-bar"
+            />
+          </div>
+
+          {/* Selector de categoría */}
           <div className="category-selector mb-4">
             <Button
-              variant={
-                activeCategory === "Panadería" ? "primary" : "outline-primary"
-              }
+              variant={activeCategory === "Panadería" ? "primary" : "outline-primary"}
               onClick={() => setActiveCategory("Panadería")}
               className="category-btn"
             >
-              Panadería ({panaderiaProducts.length})
+              Panadería ({searchTerm ? filteredProducts.length : filteredPanaderiaProducts.length})
             </Button>
             <Button
-              variant={
-                activeCategory === "Repostería" ? "primary" : "outline-primary"
-              }
+              variant={activeCategory === "Repostería" ? "primary" : "outline-primary"}
               onClick={() => setActiveCategory("Repostería")}
               className="category-btn"
             >
-              Repostería ({reposteriaProducts.length})
+              Repostería ({searchTerm ? filteredProducts.length : filteredReposteriaProducts.length})
             </Button>
           </div>
 
+          {/* Lista de productos filtrados */}
           <Row className="g-4 product-grid">
-            {(activeCategory === "Panadería"
-              ? panaderiaProducts
-              : reposteriaProducts
-            ).map((producto) => (
+            {productsToShow.map((producto) => (
               <Col key={producto.idProducto} xs={12} md={6} lg={4} xl={3}>
                 <Card className="product-card">
                   <Card.Body className="product-card-body">
                     <div
                       className="product-badge"
                       style={{
-                        backgroundColor: getUniqueColor(
-                          producto.nombreProducto
-                        ),
+                        backgroundColor: getUniqueColor(producto.nombreProducto),
                       }}
                     >
                       {getInitials(producto.nombreProducto)}
                     </div>
                     <h3 className="product-title">{producto.nombreProducto}</h3>
                     <p className="product-category">
-                      {producto.nombreCategoria === "Panadería"
-                        ? "Bandejas"
-                        : "Unidades"}
+                      {producto.nombreCategoria === "Panadería" ? "Bandejas" : "Unidades"}
                     </p>
                     <InputGroup className="product-input-group">
                       <Form.Control
@@ -304,8 +314,7 @@ const IngresarOrdenProd = () => {
                         onChange={(e) =>
                           setTrayQuantities({
                             ...trayQuantities,
-                            [producto.idProducto]:
-                              parseInt(e.target.value) || 0,
+                            [producto.idProducto]: parseInt(e.target.value) || 0,
                           })
                         }
                         className="product-input"
@@ -355,7 +364,7 @@ const IngresarOrdenProd = () => {
         }}
       />
 
-        {/* Popup errores */}
+      {/* Popup errores */}
       <ErrorPopup
         isOpen={isPopupErrorOpen}
         onClose={() => setIsPopupErrorOpen(false)}
