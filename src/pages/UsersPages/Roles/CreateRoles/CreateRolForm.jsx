@@ -143,8 +143,8 @@ function CreateRolForm() {
         onClose={() => setIsPopupOpen(false)} // Cierra el popup
         title="¡Rol creado con éxito!"
         message="El rol y sus permisos han sido asignados correctamente."
-        onViewRoles={() => navigate("/users/roles")} // Redirige a Ver Roles
-        onNewRole={() => {
+        onView={()=> navigate("/users/roles")} // Redirige a Ver Roles
+        onNew={() => {
           setIsPopupOpen(false); // Cierra el popup
           resetForm(); // Limpia el formulario
         }}
@@ -156,8 +156,8 @@ function CreateRolForm() {
         onClose={() => setIsPopupErrorOpen(false)} // Cierra el popup
         title="¡Error!"
         message={errorPopupMessage}
-        onViewRoles={() => navigate("/users/roles")} // Redirige a Ver Roles
-        onNewRole={() => {
+        onViews={() => navigate("/users/roles")} // Redirige a Ver Roles
+        onNew={() => {
           setIsPopupOpen(false); // Cierra el popup
           resetForm(); // Limpia el formulario
         }}
@@ -169,8 +169,8 @@ function CreateRolForm() {
         onClose={() => setIsPopupWarOpen(false)} // Cierra el popup
         title="!Alerta!"
         message={errorPopupMessage}
-        onViewRoles={() => navigate("/users/roles")} // Redirige a Ver Roles
-        onNewRole={() => {
+        onViews={() => navigate("/users/roles")} // Redirige a Ver Roles
+        onNew={() => {
           setIsPopupWarOpen(false); // Cierra el popup
           resetForm(); // Limpia el formulario
         }}

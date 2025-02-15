@@ -1,5 +1,6 @@
 import PropTypes from "prop-types";
-import "bootstrap/dist/css/bootstrap.min.css"; // Asegúrate de importar Bootstrap
+import { Modal, Button } from "react-bootstrap";
+import "bootstrap/dist/css/bootstrap.min.css";
 import "./Popups.css";
 
 const SuccessPopup = ({
@@ -7,48 +8,60 @@ const SuccessPopup = ({
   onClose,
   title,
   message,
-  onViewRoles,
-  onNewRole,
+  onView,
+  onNew,
   nombreBotonVolver,
   nombreBotonNuevo,
 }) => {
-  if (!isOpen) return null;
-
   return (
-    <div className="popup-overlay">
-      <div className="popup-content">
-        <button className="close-button" onClick={onClose}>
-          <svg width="24" height="24" viewBox="0 0 24 24">
-            <path
-              fill="currentColor"
-              d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
-            />
-          </svg>
-        </button>
-        <div className="success-icon">
-          <svg width="40" height="40" viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="10" fill="#28a745" />
-            <path
-              fill="white"
-              d="M9.86 18a1 1 0 01-.73-.32l-4.86-5.17a1 1 0 111.46-1.37l4.12 4.39 8.41-9.2a1 1 0 111.48 1.34l-9.14 10a1 1 0 01-.73.33h-.01z"
-            />
-          </svg>
+    <Modal show={isOpen} onHide={onClose} centered>
+      {/* Eliminamos la prop "closeButton" y creamos la estructura manualmente */}
+      <Modal.Header className="header-modal position-relative">
+        {/* Contenedor centrado para el ícono y el título */}
+        <div className="w-100 text-center">
+          <div className="success-icon">
+            <svg width="40" height="40" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="10" fill="#28a745" />
+              <path
+                fill="white"
+                d="M9.86 18a1 1 0 01-.73-.32l-4.86-5.17a1 1 0 111.46-1.37l4.12 4.39 8.41-9.2a1 1 0 111.48 1.34l-9.14 10a1 1 0 01-.73.33h-.01z"
+              />
+            </svg>
+          </div>
+          <Modal.Title className="popup-title">{title}</Modal.Title>
         </div>
-        <h2 className="popup-title">{title}</h2>
+        {/* Botón de cerrar posicionado en la esquina superior derecha */}
+        <Button
+          variant="close"
+          onClick={onClose}
+          aria-label="Close"
+          className="position-absolute top-0 end-0 m-2"
+        />
+      </Modal.Header>
+      <Modal.Body className="body-modal text-center">
         <p className="popup-message">{message}</p>
-        <div className="d-flex flex-wrap justify-content-center gap-2">
-          {/* Botón para redirigir a "Ver Roles" */}
-          <button className="btn btn-success" onClick={onViewRoles}>
-            {nombreBotonVolver || "Ver Roles"}
-          </button>
-          {/* Botón para crear un nuevo rol */}
-          <button className="btn btn-primary nuevo-bt" onClick={onNewRole}>
-            {nombreBotonNuevo || "Nuevo Rol"}
-          </button>
-        </div>
-      </div>
-    </div>
+      </Modal.Body>
+      <Modal.Footer className="footer-modal d-flex flex-wrap justify-content-center gap-2">
+        <Button className="btn btn-success" onClick={onView}>
+          {nombreBotonVolver || "Ver Roles"}
+        </Button>
+        <Button className="btn btn-primary nuevo-bt" onClick={onNew}>
+          {nombreBotonNuevo || "Nuevo Rol"}
+        </Button>
+      </Modal.Footer>
+    </Modal>
   );
+};
+
+SuccessPopup.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  title: PropTypes.string.isRequired,
+  message: PropTypes.string.isRequired,
+  onView: PropTypes.func.isRequired,
+  onNew: PropTypes.func.isRequired,
+  nombreBotonVolver: PropTypes.string,
+  nombreBotonNuevo: PropTypes.string,
 };
 
 export default SuccessPopup;

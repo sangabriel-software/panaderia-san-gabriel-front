@@ -13,8 +13,8 @@ function Sidebar({ show }) {
         <Nav.Link as={NavLink} to="/dashboard" className="text-light">
           <FaHome size={25} className="me-2" /> Dashboard
         </Nav.Link>
-        <Nav.Link as={NavLink} to="/schedule" className="text-light">
-          <FaCalendar size={25} className="me-2" /> Pedidos
+        <Nav.Link as={NavLink} to="/ordenes-produccion" className="text-light">
+          <FaCalendar size={25} className="me-2" /> Pedidos a produccion
         </Nav.Link>
         <Nav.Link as={NavLink} to="/projects" className="text-light">
           <FaFolder size={25} className="me-2" /> Ventas
@@ -24,7 +24,7 @@ function Sidebar({ show }) {
         </Nav.Link>
 
         <Nav.Link as={NavLink} to="/productos" className="text-light">
-        <MdOutlineBakeryDining size={25} className="me-2"  color="#FFC107" /> Productos
+        <MdOutlineBakeryDining size={25} className="me-2" /> Productos
         </Nav.Link>
         
 
@@ -56,15 +56,12 @@ function Sidebar({ show }) {
             >
               <FaUsersCog className="me-2" /> Control de Roles
             </Nav.Link>
-            <Nav.Link 
-              as={NavLink} 
-              to="/users/reset-password" 
-              className="text-light ps-4 submenu-item"
-            >
-              <FaKey className="me-2" /> Reiniciar Contraseñas
-            </Nav.Link>
           </div>
         </Collapse>
+
+        <Nav.Link as={NavLink} to="/config" className="text-light">
+        <FaCog className="me-2" size={25} /> Configuraciones
+        </Nav.Link>
       </Nav>
     </div>
   );

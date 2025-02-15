@@ -33,7 +33,7 @@ const PrivateRoute = () => {
       navigate("/login", { state: { from: "unauthorized" }, replace: true });
     } else if (isTokenExpired(TokenExpired)) {
       // Si el token existe pero ha expirado, mostrar un mensaje y redirigir al login
-      toast.error("Tu sesión ha expirado. Por favor, inicia sesión nuevamente.", {
+      toast.error("Tu sesión ha expirado.", {
         autoClose: 5000,
       });
       removeLocalStorage("token"); // Elimina el token expirado

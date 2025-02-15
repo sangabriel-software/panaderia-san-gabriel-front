@@ -5,11 +5,13 @@
     font-size: 1.2rem;
     border-radius: 10px;
     width: 180px;
+    border-color: #DA1A32;
   }
 
   .bt-cancelar:hover {
     background-color: #AC1528;
     color: #FEFEFE;
+    border-color: #DA1A32;
   }
 /*Boton para cancelar procesos*/
 
@@ -93,4 +95,53 @@
 .btn-simple:hover {
   background-color:  #005BA8 ; /* Fondo al pasar el cursor */
   color: #fefefe;
+}
+
+.btn-type-category{
+  background-color: #0f4d8b; /* Fondo al pasar el cursor */
+  color: #fefefe;
+  font-size: 1.2rem;
+  border-radius: 10px;
+  width: 180px;
+}
+
+.btn-type-category:hover {
+  background-color:  #005BA8 ; /* Fondo al pasar el cursor */
+  color: #fefefe;
+}
+
+.btnReports{
+  background-color: #FEFEFE;
+  border: 1.5px solid #1463C2 ;
+  color: #1463C2;
+  font-size: 1rem;
+  /* background-color: rgb(20, 99, 180); */
+}
+
+.btnReports:hover {
+  background-color: #0F4D8B; /* Fondo al pasar el cursor */
+  color: #FEFEFE;
+}
+
+
+.btnAgregarUsuario {
+  background-color: #fefefe;
+  border: 2px solid #1463c2;
+  color: #1463c2;
+  font-size: 1.09rem;
+  /* background-color: rgb(20, 99, 180); */
+}
+
+.btnAgregarUsuario:hover {
+  background-color: #0f4d8b; /* Fondo al pasar el cursor */
+  color: #fefefe;
+}
+
+@media (max-width: 768px) {
+  .mobile-optimized {
+    font-size: 0.9rem;
+  }
+  .mobile-optimized h6 {
+    font-size: 0.95rem;
+  }
 }

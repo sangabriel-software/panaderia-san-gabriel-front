@@ -1,0 +1,31 @@
+/* Contenedor de los inputs */
+.input-wrapper {
+    position: relative;
+    width: 100%;
+  }
+  
+  /* Input estándar con padding derecho extra y altura definida */
+  .input-field {
+    width: 100%;
+    height: 40px;             /* Altura definida */
+    padding-right: 35px;       /* Espacio para el ícono */
+    padding-left: 10px;        /* Opcional, para separar el texto del borde */
+    box-sizing: border-box;    /* Incluye paddings en el cálculo de la altura */
+  }
+  
+  /* Icono dentro del input */
+  .input-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 18px;
+    color: #666;
+    cursor: pointer;
+  }
+  
+  /* Efecto hover en el ícono */
+  .input-icon:hover {
+    color: #000;
+  }
+  

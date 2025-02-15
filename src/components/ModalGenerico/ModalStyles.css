@@ -1,0 +1,19 @@
+/* Para dispositivos pequeños: los botones se extienden a todo el ancho del contenedor */
+.modal-ingreso-btn {
+    width: 100%;
+  }
+  
+  /* Para dispositivos grandes (por ejemplo, a partir de 992px de ancho) */
+  @media (min-width: 992px) {
+    .modal-ingreso-btn {
+      max-width: 150px; /* Ajusta este valor según tus necesidades */
+      width: auto; /* Permite que se adapte al contenido sin ocupar todo el ancho */
+    }
+  }
+
+
+  .modal-header{
+    background-color: #005BA8;
+    color: whitesmoke;
+  }
+  

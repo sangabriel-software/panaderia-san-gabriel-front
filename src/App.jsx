@@ -7,6 +7,7 @@ import "./styles/globalStyles.css";
 import { ToastContainer } from "react-toastify"; // Para mostrar notificaciones
 import "react-toastify/dist/ReactToastify.css";
 
+
 // Lazy-loaded components
 const MainLayout = lazy(() => import("./layouts/MainLayout"));
 const LoginPage = lazy(() => import("./pages/LoginPages/LoginPage"));
@@ -19,8 +20,9 @@ const CreateUsers = lazy(() => import("./pages/UsersPages/Users/createUsers/Crea
 const PrivateRoute = lazy(() => import("./components/PrivateRoute/PrivateRoute"));
 const ManageProducts = lazy(() => import("./pages/ProductosPage/ManageProducts/ManageProducts"));
 const IngresarProductos = lazy(() => import("./pages/ProductosPage/IngresarProductos/IngresarProductos"));
-
-
+const GestionPedidosProd = lazy(() => import("./pages/PedidosProdPage/GestionPedidos/GestionPedidosProd"));
+const DetallesOrdenesProduccionPage = lazy(() => import("./pages/PedidosProdPage/DetallesOrdenesProd/DetallesOrdenesProd"));
+const IngresarOrdenProd = lazy(() => import("./pages/PedidosProdPage/IngresarOrdenProd/IngresarOrdenProd"));
 
 
 function App() {
@@ -48,6 +50,11 @@ function App() {
               <Route path="ingresar-producto" element={<IngresarProductos />} />
             </Route>
 
+            <Route path="/ordenes-produccion">
+              <Route index element={<GestionPedidosProd/>} />
+              <Route path="detalle-orden/:idOrdenProduccion" element={<DetallesOrdenesProduccionPage />} />
+              <Route path="ingresar-orden" element={<IngresarOrdenProd />} />
+            </Route>
           </Route>
         </Route>
       </Routes>

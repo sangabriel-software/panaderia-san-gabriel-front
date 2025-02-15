@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { consultarCategoriasService } from "../../services/categorias/categorias.service";
 
 /* Consulta a BD los permisoso */
 export const useGetCategorias = () => {
@@ -8,15 +9,25 @@ export const useGetCategorias = () => {
     const [showInfoCategorias, setShowInfoCategorias] = useState(false);
   
     useEffect(() => {
-        setTimeout(() => {
-          const data = [
-            { idCategoria: 1, nombreCategoria: "Panadería" },
-            { idCategoria: 2, nombreCategoria: "Reposteria" },
-          ];
-          setCategorias(data);
+      const fetchCategorias = async () => {
+        try {
+          const response = await consultarCategoriasService();
+          const data = response;
+          if (data.status === 200) {
+            setCategorias(data.categorias);
+
+          } else {
+            setShowInfoCategorias(true);
+          }
+        } catch (error) {
+          setShowErrorCtegorias(true);
+        } finally {
           setLoadingCategorias(false);
-        }, 500);
-      }, []);
+        }
+      };
+
+      fetchCategorias();
+    }, []);
   
     return { categorias, loadingCategorias, showErrorCategorias, showInfoCategorias };
   };

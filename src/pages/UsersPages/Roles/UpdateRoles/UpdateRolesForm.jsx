@@ -230,8 +230,8 @@ function UpdateRolesForm() {
         onClose={() => setIsPopupErrorOpen(false)}
         title="¡Error!"
         message={errorPopupMessage}
-        onViewRoles={() => navigate("/users/roles")}
-        onNewRole={() => {
+        onView={ ()=> navigate("/users/roles")}
+        onNew={() => {
           setIsPopupOpen(false);
           resetForm();
         }}
@@ -242,8 +242,8 @@ function UpdateRolesForm() {
         onClose={() => setIsPopupWarOpen(false)}
         title="¡Alerta!"
         message={errorPopupMessage}
-        onViewRoles={() => navigate("/users/roles")}
-        onNewRole={() => {
+        onView={()=> navigate("/users/roles")}
+        onNew={() => {
           setIsPopupWarOpen(false);
           resetForm();
         }}
