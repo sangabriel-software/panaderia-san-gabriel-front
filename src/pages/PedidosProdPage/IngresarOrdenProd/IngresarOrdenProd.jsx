@@ -262,7 +262,6 @@ const IngresarOrdenProd = () => {
           <div className="mb-4">
             <Form.Control
               type="text"
-              outline
               placeholder="Buscar producto por nombre..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
