@@ -8,8 +8,6 @@ import MobileOrderDetails from "../../../components/OrdenesDetalle/MobileOrderDe
 import DesktopOrderDetails from "../../../components/OrdenesDetalle/DesktopOrderDetails/DesktopOrderDetails";
 import useGetDetalleOrden from "../../../hooks/ordenesproduccion/useGetDetalleOrden";
 import { decryptId } from "../../../utils/CryptoParams";
-import OrderDetailsPdf from "../../../components/PDFs/OrdenDetails/OrderDetailsPdf";
-import { generateAndDownloadPDF } from "../../../utils/PdfUtils/PdfUtils";
 import MobileMateriaPrimaDetails from "../../../components/IngredientesOrden/MobileMateriaPrimaDetails";
 import DesktopMateriaPrimaDetails from "../../../components/IngredientesOrden/DesktopMateriaPrimaDetails";
 import { useGetConsumoIngredientes } from "../../../hooks/consumoIngredientes/useGetConsumoIngredientes";

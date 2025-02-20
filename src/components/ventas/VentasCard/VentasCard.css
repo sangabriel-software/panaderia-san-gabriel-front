@@ -1,0 +1,149 @@
+/* OrderCard.css */
+.order-card {
+    background: rgba(255, 255, 255, 0.95);
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    backdrop-filter: blur(8px);
+    margin-bottom: 1.5rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .order-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
+  }
+  
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+    position: relative;
+  }
+  
+  .card-header::after {
+    content: '';
+    position: absolute;
+    bottom: -0.75rem;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.1) 50%, transparent 100%);
+  }
+  
+  .order-badge {
+    background: #b520b5 !important;
+    color: white !important;
+    font-size: 0.80rem;
+    font-weight: 400;
+    padding: 0.5rem 0.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    letter-spacing: 0.5px;
+  }
+  
+  .order-number {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin: 0.5rem 0 0 0;
+  }
+  
+  .status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+  
+  .status-dot.pending {
+    background: #ff9f43;
+  }
+  
+  .status-dot.completed {
+    background: #2ecc71;
+  }
+  
+  .card-details {
+    display: grid;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .detail-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.9rem;
+    color: #4a5568;
+  }
+  
+  .detail-icon {
+    color: #3498db;
+    font-size: 1.1rem;
+    min-width: 20px;
+  }
+  
+  .card-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+  
+  .action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    padding: 0.75rem;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    border: none;
+  }
+  
+  .detail-btn {
+    background: #6a01ac;
+    color: white !important;
+  }
+  
+  .detail-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+  }
+  
+  .action-btn:active {
+    transform: scale(0.98);
+  }
+  
+  .btn-icon {
+    font-size: 0.9rem;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 480px) {
+    .order-card {
+      border-radius: 12px;
+    }
+    
+    .card-actions {
+      grid-template-columns: 1fr;
+    }
+    
+    .order-number {
+      font-size: 1rem;
+    }
+    
+    .detail-item {
+      font-size: 0.85rem;
+    }
+  }
