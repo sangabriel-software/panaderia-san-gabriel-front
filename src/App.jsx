@@ -6,6 +6,7 @@ import "./styles/App.css";
 import "./styles/globalStyles.css";
 import { ToastContainer } from "react-toastify"; // Para mostrar notificaciones
 import "react-toastify/dist/ReactToastify.css";
+import IngresarVentaPage from "./pages/VentasPage/IngresarVenta/IngresarVentaPage";
 
 
 // Lazy-loaded components
@@ -54,6 +55,11 @@ function App() {
               <Route index element={<GestionPedidosProd/>} />
               <Route path="detalle-orden/:idOrdenProduccion" element={<DetallesOrdenesProduccionPage />} />
               <Route path="ingresar-orden" element={<IngresarOrdenProd />} />
+            </Route>
+
+            <Route path="/ventas">
+              <Route index element={<IngresarVentaPage/>} />
+
             </Route>
           </Route>
         </Route>

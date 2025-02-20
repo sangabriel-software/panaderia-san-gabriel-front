@@ -3,6 +3,7 @@ import { Nav, Collapse } from 'react-bootstrap';
 import { NavLink } from 'react-router-dom';
 import { FaHome, FaUsers, FaChartBar, FaCalendar, FaFolder, FaUserPlus, FaUsersCog, FaKey, FaChevronRight, FaCog, FaBox } from 'react-icons/fa';
 import { MdOutlineBakeryDining } from 'react-icons/md';
+import "./Sidebar.css";
 
 function Sidebar({ show, onClose }) {
   const [usersOpen, setUsersOpen] = useState(false);
@@ -20,9 +21,9 @@ function Sidebar({ show, onClose }) {
           <FaHome size={25} className="me-2" /> Dashboard
         </Nav.Link>
         <Nav.Link as={NavLink} to="/ordenes-produccion" className="text-light" onClick={handleNavLinkClick}>
-          <FaCalendar size={25} className="me-2" /> Pedidos a produccion
+          <FaCalendar size={25} className="me-2" /> Ordens de produccion
         </Nav.Link>
-        <Nav.Link as={NavLink} to="/projects" className="text-light" onClick={handleNavLinkClick}>
+        <Nav.Link as={NavLink} to="/ventas" className="text-light" onClick={handleNavLinkClick}>
           <FaFolder size={25} className="me-2" /> Ventas
         </Nav.Link>
         <Nav.Link as={NavLink} to="/reports" className="text-light" onClick={handleNavLinkClick}>
