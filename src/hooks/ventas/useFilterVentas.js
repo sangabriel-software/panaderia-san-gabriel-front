@@ -28,7 +28,7 @@ const useFilterVentas = (ventasData, filters) => {
     }
 
     setFilteredVemtas(filtered);
-  }, [ordersData, filters]);
+  }, [ventasData, filters]);
 
   return filteredVentas;
 };

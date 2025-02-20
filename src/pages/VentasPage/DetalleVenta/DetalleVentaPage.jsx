@@ -12,6 +12,8 @@ import PaginationComponent from "../../../components/PaginationComponent/Paginat
 import useFilterOrders from "../../../hooks/ordenesproduccion/useFilterOrders";
 import { getCurrentItems } from "./DetallesVentas.utils";
 import OrderCardSkeleton from "../../../components/OrderCardSkeleton/OrderCardSkeleton";
+import FilterBarVentas from "../../../components/ventas/FilterBar/FilterBarVentas";
+import useFilterVentas from "../../../hooks/ventas/useFilterVentas";
 
 const VentaDetallePage = () => {
   const navigate = useNavigate();
@@ -22,13 +24,13 @@ const VentaDetallePage = () => {
     date: "",
     sucursal: "",
   });
-  const filteredOrders = useFilterOrders(ventas, filters);
+  const filteredVentas = useFilterVentas(ventas, filters);
 
   /* Variables para la paginacion */
   const [currentPage, setCurrentPage] = useState(1);
   const ventasPerPage = 5;
-  const currentOrders = getCurrentItems(
-    filteredOrders,
+  const currentSales = getCurrentItems(
+    filteredVentas,
     currentPage,
     ventasPerPage
   );
@@ -66,13 +68,19 @@ const VentaDetallePage = () => {
         onRedirect={() => navigate("ingresar-venta")}
       />
 
+      <FilterBarVentas
+        filters={filters}
+        onFilterChange={setFilters}
+        ventas={ventas}
+      />
+
       {isMobile ? (
         // Vista para móviles con SaleCard
         loadingVentas ? (
           [...Array(5)].map((_, index) => <OrderCardSkeleton key={index} />)
         ) : (
           <>
-            {ventas.map((venta) => (
+            {currentSales.map((venta) => (
               <VentasCard
                 key={venta.idVenta}
                 sale={venta}
@@ -82,17 +90,23 @@ const VentaDetallePage = () => {
             ))}
 
             <PaginationComponent
-              totalItems={filteredOrders.length}
+              totalItems={filteredVentas.length}
               itemsPerPage={ventasPerPage}
               currentPage={currentPage}
               onPageChange={handlePageChange}
             />
           </>
         )
+      ) : loadingVentas ? (
+        <div className="d-flex justify-content-center my-5">
+          <div className="spinner-border text-primary my-5" role="status">
+            <span className="visually-hidden">Cargando...</span>
+          </div>
+        </div>
       ) : (
         // Usar el componente VentasTable para la vista de PC
         <VentasTable
-          sales={ventas}
+          sales={filteredVentas}
           onDelete={handleDelete}
           onViewPdf={handleViewPdf}
           loadingViewPdf={null} // Puedes manejar el estado de carga aquí
