@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Container } from "react-bootstrap";
 import Title from "../../../components/Title/Title";
 import AddButton from "../../../components/AddButton/AddButton";
@@ -7,15 +8,35 @@ import { useMediaQuery } from "react-responsive";
 import "./DetalleVentaPage.css";
 import VentasTable from "../../../components/ventas/VentasTable/VentasTable";
 import VentasCard from "../../../components/ventas/VentasCard/VentasCard";
+import PaginationComponent from "../../../components/PaginationComponent/PaginationComponent";
+import useFilterOrders from "../../../hooks/ordenesproduccion/useFilterOrders";
+import { getCurrentItems } from "./DetallesVentas.utils";
+import OrderCardSkeleton from "../../../components/OrderCardSkeleton/OrderCardSkeleton";
 
 const VentaDetallePage = () => {
   const navigate = useNavigate();
-  const { ventas, loadingVentas, showErrorVentas, showInfoVentas, setVentas } = useGetVentas();
+  const { ventas, loadingVentas, showErrorVentas, showInfoVentas, setVentas } =
+    useGetVentas();
+  const [filters, setFilters] = useState({
+    search: "",
+    date: "",
+    sucursal: "",
+  });
+  const filteredOrders = useFilterOrders(ventas, filters);
+
+  /* Variables para la paginacion */
+  const [currentPage, setCurrentPage] = useState(1);
+  const ventasPerPage = 5;
+  const currentOrders = getCurrentItems(
+    filteredOrders,
+    currentPage,
+    ventasPerPage
+  );
+  const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
 
   // Usamos useMediaQuery para detectar si es un dispositivo móvil
   const isMobile = useMediaQuery({ query: "(max-width: 768px)" });
 
-  if (loadingVentas) return <div>Cargando...</div>;
   if (showErrorVentas) return <div>Error al cargar las ventas</div>;
 
   const handleDelete = (idVenta) => {
@@ -47,16 +68,27 @@ const VentaDetallePage = () => {
 
       {isMobile ? (
         // Vista para móviles con SaleCard
-        <div>
-          {ventas.map((venta) => (
-            <VentasCard
-              key={venta.idVenta}
-              sale={venta}
-              onViewDetails={handleViewDetails}
-              onDeleteSale={handleDelete}
+        loadingVentas ? (
+          [...Array(5)].map((_, index) => <OrderCardSkeleton key={index} />)
+        ) : (
+          <>
+            {ventas.map((venta) => (
+              <VentasCard
+                key={venta.idVenta}
+                sale={venta}
+                onViewDetails={handleViewDetails}
+                onDeleteSale={handleDelete}
+              />
+            ))}
+
+            <PaginationComponent
+              totalItems={filteredOrders.length}
+              itemsPerPage={ventasPerPage}
+              currentPage={currentPage}
+              onPageChange={handlePageChange}
             />
-          ))}
-        </div>
+          </>
+        )
       ) : (
         // Usar el componente VentasTable para la vista de PC
         <VentasTable

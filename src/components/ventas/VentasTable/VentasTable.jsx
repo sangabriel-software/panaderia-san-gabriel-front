@@ -65,7 +65,7 @@ const VentasTable = ({ sales, onDelete, onViewPdf, loadingViewPdf }) => {
                 className="text-center sale-number"
                 title="Doble clic para ver detalles"
               >
-                VENTA-{sale.idVenta}
+                VNT-{sale.idVenta}
               </td>
               <td
                 className="text-center"
