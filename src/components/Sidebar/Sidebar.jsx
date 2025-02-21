@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Nav, Collapse } from 'react-bootstrap';
 import { NavLink } from 'react-router-dom';
 import { 
@@ -6,18 +6,19 @@ import {
   FaUsersCog, FaChevronRight, FaCog, FaSun, FaMoon 
 } from 'react-icons/fa';
 import { MdOutlineBakeryDining } from 'react-icons/md';
-import * as DarkReader from 'darkreader'; // Importamos Dark Reader
+import * as DarkReader from 'darkreader';
 import "./Sidebar.css";
 
 function Sidebar({ show, onClose }) {
   const [usersOpen, setUsersOpen] = useState(false);
   const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
+  const [isChangingTheme, setIsChangingTheme] = useState(false);
 
-  // Efecto para aplicar el tema y DarkReader al cargar el componente
+  // Efecto para aplicar el tema al cargar el componente
   useEffect(() => {
     if (theme === 'dark') {
       DarkReader.enable({
-        brightness: 99,
+        brightness: 95,
         contrast: 90,
         sepia: 10
       });
@@ -27,30 +28,43 @@ function Sidebar({ show, onClose }) {
   }, [theme]);
 
   // Función para cambiar el tema
-  const toggleTheme = () => {
+  const toggleTheme = useCallback(() => {
+    if (isChangingTheme) return; // Evitar múltiples clics
+    setIsChangingTheme(true);
+
     const newTheme = theme === 'light' ? 'dark' : 'light';
     setTheme(newTheme);
     localStorage.setItem('theme', newTheme);
 
-    if (newTheme === 'dark') {
-      DarkReader.enable({
-        brightness: 100,
-        contrast: 90,
-        sepia: 10
-      });
-    } else {
-      DarkReader.disable();
-    }
-  };
+    // Usar requestIdleCallback para diferir la ejecución de DarkReader
+    const applyDarkReader = () => {
+      if (newTheme === 'dark') {
+        DarkReader.enable({
+          brightness: 99,
+          contrast: 90,
+          sepia: 10
+        });
+      } else {
+        DarkReader.disable();
+      }
+      setIsChangingTheme(false); // Habilitar el interruptor después de aplicar el tema
+    };
 
-  const handleNavLinkClick = () => {
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(applyDarkReader);
+    } else {
+      setTimeout(applyDarkReader, 0); // Fallback para navegadores que no soportan requestIdleCallback
+    }
+  }, [theme, isChangingTheme]);
+
+  const handleNavLinkClick = useCallback(() => {
     if (window.innerWidth <= 768) {
       onClose();
     }
-  };
+  }, [onClose]);
 
   return (
-    <div className={`sidebar bg-dark ${show ? 'show' : 'hide'}`}>
+    <div className={`sidebar bg-dark ${show ? 'show' : 'hide'} ${isChangingTheme ? 'disable-selection' : ''}`}>
       <Nav className="flex-column pt-3">
         <Nav.Link as={NavLink} to="/dashboard" className="text-light" onClick={handleNavLinkClick}>
           <FaHome size={25} className="me-2" /> Dashboard
@@ -110,15 +124,23 @@ function Sidebar({ show, onClose }) {
             type="checkbox" 
             checked={theme === 'dark'} 
             onChange={toggleTheme} 
+            disabled={isChangingTheme} // Deshabilitar durante el cambio
           />
           <span className="slider round">
-            {theme === 'dark' ? <FaMoon size={14} /> : <FaSun size={14} />}
+            {isChangingTheme ? (
+              <div className="spinner-border spinner-border-sm text-light" role="status">
+                <span className="visually-hidden">Loading...</span>
+              </div>
+            ) : theme === 'dark' ? (
+              <FaMoon size={14} />
+            ) : (
+              <FaSun size={14} />
+            )}
           </span>
         </label>
       </div>
-
     </div>
   );
 }
 
-export default Sidebar;
+export default React.memo(Sidebar);
