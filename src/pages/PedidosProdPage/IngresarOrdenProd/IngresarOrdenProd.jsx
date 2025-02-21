@@ -265,7 +265,7 @@ const IngresarOrdenProd = () => {
               placeholder="Buscar producto por nombre..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="search-bar"
+              className="input-data search-bar"
             />
           </div>
 

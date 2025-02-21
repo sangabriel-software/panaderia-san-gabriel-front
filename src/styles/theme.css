@@ -62,9 +62,12 @@ body {
 }
 
 /* Estilos generales para la Card */
+.h3{
+    color: var(--text-color) !important;
+}
 .card {
     background-color: var(--card-background);
-    color: var(--text-color);
+    color: var(--text-color) !important;
     border: 1px solid var(--card-border-color);
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
     transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
@@ -121,8 +124,6 @@ body {
 /* Nombre de usuario */
 .user-name {
     color: #4caf50; /* Verde más suave */
-    font-size: 1rem;
-    font-weight: bold;
 }
 
 /* Nombre de usuario en tema oscuro */
@@ -286,3 +287,805 @@ body {
     background-color: #dc3545 !important; /* Fondo rojo al hacer hover */
     color: #ffffff !important; /* Texto blanco al hacer hover */
   }
+
+
+  /* Tema oscuro para las tarjetas del dashboard */
+[data-theme="dark"] .card {
+    background-color: #1E1E1E !important; /* Fondo oscuro */
+    border: 1px solid #333333 !important; /* Borde oscuro */
+    color: #ffffff !important; /* Texto blanco */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3) !important; /* Sombra oscura */
+
+  }
+  
+  [data-theme="dark"] .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4) !important; /* Sombra más intensa al hacer hover */
+    border-color: #6d28d9 !important; /* Borde morado al hacer hover */
+  }
+  
+  [data-theme="dark"] .card .card-body {
+    color: #ffffff !important; /* Texto blanco en el cuerpo de la tarjeta */
+  }
+  
+  [data-theme="dark"] .card .text-uppercase {
+    color: #e0e0e0 !important; /* Texto del mensaje en gris claro */
+  }
+  
+  [data-theme="dark"] .card .h5 {
+    color: #ffffff !important; /* Texto del monto en blanco */
+  }
+  
+  [data-theme="dark"] .card .progress {
+    background-color: #333333 !important; /* Fondo oscuro para la barra de progreso */
+  }
+  
+  [data-theme="dark"] .card .progress-bar {
+    background-color: #6d28d9 !important; /* Barra de progreso en morado vibrante */
+  }
+  
+  [data-theme="dark"] .card .fa {
+    color: #6d28d9 !important; /* Ícono en morado vibrante */
+  }
+  
+  [data-theme="dark"] .card .text-secondary {
+    color: #6d28d9 !important; /* Texto secundario en morado vibrante */
+  }
+
+  /* Tema oscuro para las tarjetas del dashboard */
+[data-theme="dark"] .card {
+    background-color: #1E1E1E !important; /* Fondo oscuro */
+    border: 1px solid #333333 !important; /* Borde oscuro */
+    color: #ffffff !important; /* Texto blanco */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3) !important; /* Sombra oscura */
+    transition: all 0.3s ease; /* Transición suave para efectos */
+  }
+  
+  [data-theme="dark"] .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 12px rgba(109, 40, 217, 0.4) !important; /* Sombra morada más intensa al hacer hover */
+    border-color: #6d28d9 !important; /* Borde morado al hacer hover */
+    background: linear-gradient(145deg, #1E1E1E, #2c2c2c) !important; /* Degradado sutil al hacer hover */
+  }
+  
+  [data-theme="dark"] .card .card-body {
+    color: #ffffff !important; /* Texto blanco en el cuerpo de la tarjeta */
+  }
+  
+  [data-theme="dark"] .card .text-uppercase {
+    color: #e0e0e0 !important; /* Texto del mensaje en gris claro */
+
+  }
+  
+  [data-theme="dark"] .card .h5 {
+    color: #ffffff !important; /* Texto del monto en blanco */
+  }
+  
+  [data-theme="dark"] .card .progress {
+    background-color: #333333 !important; /* Fondo oscuro para la barra de progreso */
+    border-radius: 10px; /* Bordes redondeados */
+    height: 10px; /* Altura de la barra de progreso */
+  }
+  
+  [data-theme="dark"] .card .progress-bar {
+    background-color: #6d28d9 !important; /* Barra de progreso en morado vibrante */
+    border-radius: 10px; /* Bordes redondeados */
+    box-shadow: 0 2px 4px rgba(109, 40, 217, 0.3); /* Sombra sutil en la barra de progreso */
+  }
+  
+  [data-theme="dark"] .card .fa {
+    color: #6d28d9 !important; /* Ícono en morado vibrante */
+    font-size: 2rem; /* Tamaño más grande para el ícono */
+    transition: color 0.3s ease; /* Transición suave para el ícono */
+  }
+  
+  [data-theme="dark"] .card:hover .fa {
+    color: #8a63d2 !important; /* Cambio de color del ícono al hacer hover */
+  }
+  
+  [data-theme="dark"] .card .text-secondary {
+    color: #6d28d9 !important; /* Texto secundario en morado vibrante */
+  }
+  
+  /* Colores personalizados para el borde izquierdo */
+  [data-theme="dark"] .card.border-primary {
+    border-left: 4px solid #6d28d9 !important; /* Morado vibrante */
+  }
+  
+  [data-theme="dark"] .card.border-success {
+    border-left: 4px solid #4CAF50 !important; /* Verde vibrante */
+  }
+  
+  [data-theme="dark"] .card.border-warning {
+    border-left: 4px solid #FFC107 !important; /* Amarillo vibrante */
+  }
+  
+  [data-theme="dark"] .card.border-info {
+    border-left: 4px solid #2196F3 !important; /* Azul vibrante */
+  }
+  
+  [data-theme="dark"] .card.border-danger {
+    border-left: 4px solid #F44336 !important; /* Rojo vibrante */
+  }
+  
+  /* Efecto hover para los bordes izquierdos */
+  [data-theme="dark"] .card.border-primary:hover {
+    border-left: 4px solid #8a63d2 !important; /* Morado más claro al hacer hover */
+  }
+  
+  [data-theme="dark"] .card.border-success:hover {
+    border-left: 4px solid #66BB6A !important; /* Verde más claro al hacer hover */
+  }
+  
+  [data-theme="dark"] .card.border-warning:hover {
+    border-left: 4px solid #FFD54F !important; /* Amarillo más claro al hacer hover */
+  }
+  
+  [data-theme="dark"] .card.border-info:hover {
+    border-left: 4px solid #64B5F6 !important; /* Azul más claro al hacer hover */
+  }
+  
+  [data-theme="dark"] .card.border-danger:hover {
+    border-left: 4px solid #EF5350 !important; /* Rojo más claro al hacer hover */
+  }
+
+
+  /*FilterBar - ordenes*/
+  /* Tema oscuro para el FilterBar */
+[data-theme="dark"] .modern-filter {
+    background-color: #1E1E1E; /* Fondo oscuro */
+    padding: 1rem; /* Espaciado interno */
+    border-radius: 10px; /* Bordes redondeados */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Sombra oscura */
+  }
+  
+  [data-theme="dark"] .filter-input-group {
+    background-color: #2c2c2c; /* Fondo oscuro para los grupos de entrada */
+    border: 1px solid #444; /* Borde oscuro */
+    border-radius: 8px; /* Bordes redondeados */
+    transition: all 0.3s ease; /* Transición suave */
+  }
+  
+  [data-theme="dark"] .filter-input-group:hover {
+    border-color: #6d28d9; /* Borde morado al hacer hover */
+    box-shadow: 0 0 8px rgba(109, 40, 217, 0.3); /* Sombra morada al hacer hover */
+  }
+  
+  [data-theme="dark"] .filter-prefix {
+    background-color: #333; /* Fondo oscuro para el prefijo */
+    border: none; /* Sin borde */
+    color: #e0e0e0; /* Texto gris claro */
+  }
+  
+  [data-theme="dark"] .filter-input {
+    background-color: #2c2c2c; /* Fondo oscuro para los inputs */
+    border: none; /* Sin borde */
+    color: #ffffff; /* Texto blanco */
+  }
+  
+  [data-theme="dark"] .filter-input:focus {
+    background-color: #333; /* Fondo más oscuro al enfocar */
+    color: #ffffff; /* Texto blanco */
+    box-shadow: 0 0 8px rgba(109, 40, 217, 0.3); /* Sombra morada al enfocar */
+  }
+  
+  [data-theme="dark"] .filter-input::placeholder {
+    color: #888; /* Color del placeholder */
+  }
+  
+  [data-theme="dark"] .clear-btn {
+    color: #e0e0e0; /* Color del ícono de limpiar */
+    transition: color 0.3s ease; /* Transición suave */
+  }
+  
+  [data-theme="dark"] .clear-btn:hover {
+    color: #6d28d9; /* Color morado al hacer hover */
+  }
+  
+  [data-theme="dark"] .form-select {
+    background-color: #2c2c2c; /* Fondo oscuro para el select */
+    border: none; /* Sin borde */
+    color: #ffffff; /* Texto blanco */
+  }
+  
+  [data-theme="dark"] .form-select:focus {
+    background-color: #333; /* Fondo más oscuro al enfocar */
+    color: #ffffff; /* Texto blanco */
+    box-shadow: 0 0 8px rgba(109, 40, 217, 0.3); /* Sombra morada al enfocar */
+  }
+  
+  [data-theme="dark"] .form-select option {
+    background-color: #2c2c2c; /* Fondo oscuro para las opciones */
+    color: #ffffff; /* Texto blanco */
+  }
+  
+  [data-theme="dark"] .form-select option:hover {
+    background-color: #6d28d9; /* Fondo morado al hacer hover */
+  }
+
+
+  /*Orders tables*/
+  /* Tema oscuro para la tabla */
+[data-theme="dark"] .table-container {
+    background-color: #1E1E1E; /* Fondo oscuro */
+    border-radius: 10px; /* Bordes redondeados */
+    padding: 1rem; /* Espaciado interno */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Sombra oscura */
+  }
+  
+  [data-theme="dark"] .modern-table {
+    background-color: #1E1E1E; /* Fondo oscuro */
+    color: #ffffff; /* Texto blanco */
+    border-collapse: separate; /* Bordes separados para las filas */
+    border-spacing: 0 8px; /* Espaciado entre filas */
+  }
+  
+  [data-theme="dark"] .modern-table th {
+    background-color: #2c2c2c; /* Fondo oscuro para los encabezados */
+    color: #ffffff; /* Texto blanco */
+    border-bottom: 2px solid #6d28d9; /* Borde morado fosforescente */
+    padding: 12px; /* Espaciado interno */
+  }
+  
+  [data-theme="dark"] .modern-table td {
+    background-color: #2c2c2c; /* Fondo oscuro para las celdas */
+    color: #ffffff; /* Texto blanco */
+    border-bottom: 1px solid #444; /* Borde gris oscuro entre filas */
+    padding: 12px; /* Espaciado interno */
+  }
+  
+  [data-theme="dark"] .modern-table tr:hover td {
+    background-color: #333; /* Fondo más oscuro al hacer hover */
+    border-bottom: 1px solid #6d28d9; /* Borde morado fosforescente al hacer hover */
+  }
+  
+  [data-theme="dark"] .modern-table .table-row {
+    transition: all 0.3s ease; /* Transición suave para efectos */
+  }
+  
+  [data-theme="dark"] .modern-table .table-row:hover {
+    transform: translateY(-2px); /* Elevación al hacer hover */
+    box-shadow: 0 4px 8px rgba(109, 40, 217, 0.3); /* Sombra morada al hacer hover */
+  }
+  
+  [data-theme="dark"] .modern-table .serial-number,
+  [data-theme="dark"] .modern-table .order-number,
+  [data-theme="dark"] .modern-table .shift-cell,
+  [data-theme="dark"] .modern-table .production-date {
+    color: #ffffff; /* Texto blanco */
+  }
+  
+  [data-theme="dark"] .modern-table .branch-badge {
+    background-color: #6d28d9; /* Fondo morado fosforescente */
+    color: #ffffff; /* Texto blanco */
+    font-size: 0.9rem; /* Tamaño de fuente */
+    padding: 6px 12px; /* Espaciado interno */
+    border-radius: 20px; /* Bordes redondeados */
+  }
+  
+  [data-theme="dark"] .modern-table .status-badge {
+    font-size: 0.9rem; /* Tamaño de fuente */
+    padding: 6px 12px; /* Espaciado interno */
+    border-radius: 20px; /* Bordes redondeados */
+  }
+  
+  [data-theme="dark"] .modern-table .status-pending {
+    background-color: #FFC107; /* Fondo amarillo para estado pendiente */
+    color: #000000; /* Texto negro */
+  }
+  
+  [data-theme="dark"] .modern-table .status-completed {
+    background-color: #4CAF50; /* Fondo verde para estado completado */
+    color: #ffffff; /* Texto blanco */
+  }
+  
+  [data-theme="dark"] .modern-table .actions-cell {
+    text-align: center; /* Centrar acciones */
+  }
+  
+  [data-theme="dark"] .modern-table .action-btn {
+    color: #e0e0e0; /* Color del ícono */
+    transition: color 0.3s ease; /* Transición suave */
+  }
+  
+  [data-theme="dark"] .modern-table .action-btn:hover {
+    color: #6d28d9; /* Color morado fosforescente al hacer hover */
+  }
+  
+  [data-theme="dark"] .modern-table .action-icon {
+    font-size: 1.2rem; /* Tamaño del ícono */
+  }
+  
+  [data-theme="dark"] .modern-table .pdf-btn:disabled {
+    opacity: 0.6; /* Opacidad reducida cuando está deshabilitado */
+  }
+  
+  [data-theme="dark"] .modern-table .pdf-btn:disabled .action-icon {
+    color: #888; /* Color gris cuando está deshabilitado */
+  }
+  
+  [data-theme="dark"] .modern-table .delete-btn:hover {
+    color: #F44336; /* Color rojo al hacer hover */
+  }
+
+  /*VEntas table*/
+  /* Tema oscuro para VentasTable */
+[data-theme="dark"] .ventas-table-container {
+    background: #1E1E1E !important; /* Fondo oscuro */
+    border-radius: 18px !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important; /* Sombra oscura */
+    overflow: hidden !important;
+    padding: 2rem !important;
+  }
+  
+  [data-theme="dark"] .ventas-table {
+    --table-accent-color: #2c2c2c !important; /* Fondo oscuro para las filas */
+    --table-hover-color: #333333 !important; /* Fondo más oscuro al hacer hover */
+    margin-bottom: 2rem !important;
+    border-collapse: separate !important;
+    border-spacing: 0 8px !important;
+  }
+  
+  [data-theme="dark"] .ventas-table-header {
+    background: linear-gradient(135deg, #6d28d9 0%, #8a63d2 100%) !important; /* Degradado morado */
+    color: white !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+  }
+  
+  [data-theme="dark"] .ventas-table-header th {
+    border: none !important;
+    font-weight: 600 !important;
+    padding: 1.2rem 1rem !important;
+    font-size: 0.95rem !important;
+    letter-spacing: 0.5px !important;
+    position: relative !important;
+    white-space: nowrap !important;
+  }
+  
+  [data-theme="dark"] .ventas-table-header th:not(:last-child)::after {
+    content: "" !important;
+    position: absolute !important;
+    right: 0 !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    height: 60% !important;
+    width: 1px !important;
+    background: rgba(255, 255, 255, 0.2) !important; /* Línea divisoria sutil */
+  }
+  
+  [data-theme="dark"] .ventas-table-row {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    background: #2c2c2c !important; /* Fondo oscuro para las filas */
+    border-radius: 12px !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1) !important;
+  }
+  
+  [data-theme="dark"] .ventas-table-row:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(109, 40, 217, 0.3) !important; /* Sombra morada al hacer hover */
+    background: #333333 !important; /* Fondo más oscuro al hacer hover */
+  }
+  
+  [data-theme="dark"] .ventas-table-row td {
+    border: none !important;
+    padding: 1.2rem 1.5rem !important;
+    vertical-align: middle !important;
+    position: relative !important;
+    font-size: 0.95rem !important;
+    white-space: nowrap !important;
+    color: #e0e0e0 !important; /* Texto gris claro */
+  }
+  
+  [data-theme="dark"] .ventas-table-row td:first-child {
+    border-radius: 12px 0 0 12px !important;
+  }
+  
+  [data-theme="dark"] .ventas-table-row td:last-child {
+    border-radius: 0 12px 12px 0 !important;
+  }
+  
+  [data-theme="dark"] .ventas-branch-badge {
+    background: rgba(109, 40, 217, 0.1) !important; /* Fondo morado con transparencia */
+    color: #8a63d2 !important; /* Texto morado claro */
+    font-weight: 600 !important;
+    padding: 0.5rem 1rem !important;
+    font-size: 0.85rem !important;
+    border-radius: 20px !important;
+  }
+  
+  [data-theme="dark"] .ventas-status-badge {
+    font-weight: 500 !important;
+    font-size: 0.85rem !important;
+    border-radius: 20px !important;
+  }
+  
+  [data-theme="dark"] .ventas-status-pending {
+    background: rgba(255, 193, 7, 0.1) !important; /* Fondo amarillo con transparencia */
+    color: #FFC107 !important; /* Texto amarillo */
+  }
+  
+  [data-theme="dark"] .ventas-status-completed {
+    background: rgba(76, 175, 80, 0.1) !important; /* Fondo verde con transparencia */
+    color: #4CAF50 !important; /* Texto verde */
+  }
+  
+  [data-theme="dark"] .ventas-action-btn {
+    padding: 0.5rem !important;
+    border-radius: 8px !important;
+    transition: all 0.3s ease !important;
+    color: #e0e0e0 !important; /* Texto gris claro */
+  }
+  
+  [data-theme="dark"] .ventas-delete-btn {
+    color: #F44336 !important; /* Texto rojo */
+  }
+  
+  [data-theme="dark"] .ventas-delete-btn:hover {
+    background: rgba(244, 67, 54, 0.1) !important; /* Fondo rojo con transparencia */
+    transform: scale(1.1) !important;
+  }
+  
+  [data-theme="dark"] .ventas-action-icon {
+    font-size: 1.1rem !important;
+    vertical-align: middle !important;
+  }
+  
+  [data-theme="dark"] .ventas-serial-number {
+    font-weight: 600 !important;
+    color: #8a63d2 !important; /* Texto morado claro */
+  }
+  
+  [data-theme="dark"] .ventas-sale-number {
+    font-weight: 600 !important;
+    color: #6d28d9 !important; /* Texto morado vibrante */
+  }
+  
+  [data-theme="dark"] .ventas-sale-date {
+    color: #888 !important; /* Texto gris */
+    font-weight: 500 !important;
+  }
+
+  /* Tema oscuro para la tabla de ventas */
+[data-theme="dark"] .ventas-table-container {
+    background-color: #1E1E1E; /* Fondo oscuro */
+    border-radius: 10px; /* Bordes redondeados */
+    padding: 1rem; /* Espaciado interno */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Sombra oscura */
+  }
+  
+  [data-theme="dark"] .ventas-table {
+    background-color: #1E1E1E; /* Fondo oscuro */
+    color: #ffffff; /* Texto blanco */
+    border-collapse: separate; /* Bordes separados para las filas */
+    border-spacing: 0 8px; /* Espaciado entre filas */
+  }
+  
+  [data-theme="dark"] .ventas-table th {
+    background-color: #2c2c2c; /* Fondo oscuro para los encabezados */
+    color: #ffffff; /* Texto blanco */
+    border-bottom: 2px solid #6d28d9; /* Borde morado fosforescente */
+    padding: 12px; /* Espaciado interno */
+  }
+  
+  [data-theme="dark"] .ventas-table td {
+    background-color: #2c2c2c; /* Fondo oscuro para las celdas */
+    color: #ffffff; /* Texto blanco */
+    border-bottom: 1px solid #444; /* Borde gris oscuro entre filas */
+    padding: 12px; /* Espaciado interno */
+  }
+  
+  [data-theme="dark"] .ventas-table tr:hover td {
+    background-color: #333; /* Fondo más oscuro al hacer hover */
+    border-bottom: 1px solid #6d28d9; /* Borde morado fosforescente al hacer hover */
+  }
+  
+  [data-theme="dark"] .ventas-table .ventas-table-row {
+    transition: all 0.3s ease; /* Transición suave para efectos */
+  }
+  
+  [data-theme="dark"] .ventas-table .ventas-table-row:hover {
+    transform: translateY(-2px); /* Elevación al hacer hover */
+    box-shadow: 0 4px 8px rgba(109, 40, 217, 0.3); /* Sombra morada al hacer hover */
+  }
+  
+  [data-theme="dark"] .ventas-table .ventas-serial-number,
+  [data-theme="dark"] .ventas-table .ventas-sale-number,
+  [data-theme="dark"] .ventas-table .ventas-user-cell,
+  [data-theme="dark"] .ventas-table .ventas-sale-date {
+    color: #ffffff; /* Texto blanco */
+  }
+  
+  [data-theme="dark"] .ventas-table .ventas-branch-badge {
+    background-color: #6d28d9; /* Fondo morado fosforescente */
+    color: #ffffff; /* Texto blanco */
+    font-size: 0.9rem; /* Tamaño de fuente */
+    padding: 6px 12px; /* Espaciado interno */
+    border-radius: 20px; /* Bordes redondeados */
+  }
+  
+  [data-theme="dark"] .ventas-table .ventas-status-badge {
+    font-size: 0.9rem; /* Tamaño de fuente */
+    padding: 6px 12px; /* Espaciado interno */
+    border-radius: 20px; /* Bordes redondeados */
+  }
+  
+  [data-theme="dark"] .ventas-table .ventas-status-completed {
+    background-color: #4CAF50; /* Fondo verde para estado completado */
+    color: #ffffff; /* Texto blanco */
+  }
+  
+  [data-theme="dark"] .ventas-table .ventas-status-pending {
+    background-color: #FFC107; /* Fondo amarillo para estado pendiente */
+    color: #000000; /* Texto negro */
+  }
+  
+  [data-theme="dark"] .ventas-table .ventas-actions-cell {
+    text-align: center; /* Centrar acciones */
+  }
+  
+  [data-theme="dark"] .ventas-table .ventas-action-btn {
+    color: #e0e0e0; /* Color del ícono */
+    transition: color 0.3s ease; /* Transición suave */
+  }
+  
+  [data-theme="dark"] .ventas-table .ventas-action-btn:hover {
+    color: #6d28d9; /* Color morado fosforescente al hacer hover */
+  }
+  
+  [data-theme="dark"] .ventas-table .ventas-action-icon {
+    font-size: 1.2rem; /* Tamaño del ícono */
+  }
+  
+  [data-theme="dark"] .ventas-table .ventas-pdf-btn:disabled {
+    opacity: 0.6; /* Opacidad reducida cuando está deshabilitado */
+  }
+  
+  [data-theme="dark"] .ventas-table .ventas-pdf-btn:disabled .ventas-action-icon {
+    color: #888; /* Color gris cuando está deshabilitado */
+  }
+  
+  [data-theme="dark"] .ventas-table .ventas-delete-btn:hover {
+    color: #F44336; /* Color rojo al hacer hover */
+  }
+
+  /* Tema Oscuro ingresar orden producción */
+[data-theme="dark"] .glassmorphism-container {
+    background: rgba(30, 30, 30, 0.95) !important; /* Fondo oscuro */
+    color: #e0e0e0 !important; /* Texto claro */
+    min-height: 100vh !important;
+    backdrop-filter: blur(10px) !important;
+}
+
+[data-theme="dark"] .glass-card {
+    background: rgba(40, 40, 40, 0.7) !important; /* Fondo oscuro para tarjetas */
+    border: 1px solid rgba(255, 255, 255, 0.1) !important; /* Borde claro con transparencia */
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5) !important; /* Sombra más oscura */
+    font-size: 0.9rem !important; /* Tamaño de letra más pequeño */
+}
+
+[data-theme="dark"] .gradient-text {
+    background: linear-gradient(135deg, #3498db, #8e44ad) !important; /* Gradiente para texto */
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    color: transparent !important;
+}
+
+/* Componentes del Formulario */
+[data-theme="dark"] .modern-input-group {
+    background: rgba(50, 50, 50, 0.5) !important; /* Fondo oscuro para grupos de entrada */
+}
+
+[data-theme="dark"] .modern-input-group:hover {
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.2) !important; /* Sombra al hacer hover */
+}
+
+[data-theme="dark"] .modern-datepicker,
+[data-theme="dark"] .modern-select,
+[data-theme="dark"] .modern-input {
+    background: rgba(50, 50, 50, 0.5) !important; /* Fondo oscuro para inputs */
+    color: #e0e0e0 !important; /* Texto claro */
+    border: none !important;
+}
+
+[data-theme="dark"] .modern-input:focus {
+    border-color: #3498db !important; /* Borde azul al enfocar */
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2) !important; /* Sombra al enfocar */
+}
+
+[data-theme="dark"] .shift-selector .shift-btn {
+    background: rgba(50, 50, 50, 0.5) !important; /* Fondo oscuro para botones de turno */
+    color: #e0e0e0 !important; /* Texto claro */
+    border: 2px solid rgba(255, 255, 255, 0.1) !important; /* Borde claro */
+}
+
+[data-theme="dark"] .shift-selector .shift-btn:hover {
+    background: rgba(60, 60, 60, 0.7) !important; /* Fondo más claro al hacer hover */
+}
+
+[data-theme="dark"] .submit-btn {
+    background: #8e44ad !important; /* Fondo morado para botón de envío */
+    color: #e0e0e0 !important; /* Texto claro */
+}
+
+[data-theme="dark"] .submit-btn:hover {
+    background: #9b59b6 !important; /* Fondo morado más claro al hacer hover */
+}
+
+[data-theme="dark"] .submit-btn::after {
+    background: rgba(255, 255, 255, 0.1) !important; /* Efecto de brillo */
+}
+
+/* Tarjetas de Productos */
+[data-theme="dark"] .product-card {
+    background: rgba(40, 40, 40, 0.7) !important; /* Fondo oscuro para tarjetas de productos */
+    color: #e0e0e0 !important; /* Texto claro */
+    font-size: 0.9rem !important; /* Tamaño de letra más pequeño */
+}
+
+[data-theme="dark"] .product-card:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5) !important; /* Sombra al hacer hover */
+}
+
+[data-theme="dark"] .product-card::before {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05)) !important; /* Gradiente claro */
+}
+
+[data-theme="dark"] .product-badge {
+    background: rgba(60, 60, 60, 0.7) !important; /* Fondo oscuro para badges */
+    color: #e0e0e0 !important; /* Texto claro */
+    font-size: 0.8rem !important; /* Tamaño de letra más pequeño */
+}
+
+[data-theme="dark"] .product-title {
+    color: #e0e0e0 !important; /* Texto claro para títulos */
+    font-size: 1rem !important; /* Tamaño de letra más pequeño */
+}
+
+[data-theme="dark"] .product-input {
+    background: rgba(50, 50, 50, 0.5) !important; /* Fondo oscuro para inputs */
+    color: #e0e0e0 !important; /* Texto claro */
+    border: 2px solid rgba(255, 255, 255, 0.1) !important; /* Borde claro */
+    font-size: 0.9rem !important; /* Tamaño de letra más pequeño */
+}
+
+[data-theme="dark"] .product-input:focus {
+    border-color: #3498db !important; /* Borde azul al enfocar */
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2) !important; /* Sombra al enfocar */
+}
+
+/* Botón Flotante */
+[data-theme="dark"] .floating-scroll-btn {
+    background: #8e44ad !important; /* Fondo morado para botón flotante */
+    color: #e0e0e0 !important; /* Texto claro */
+    font-size: 0.9rem !important; /* Tamaño de letra más pequeño */
+}
+
+[data-theme="dark"] .floating-scroll-btn:hover {
+    background: #9b59b6 !important; /* Fondo morado más claro al hacer hover */
+}
+
+/* Animaciones */
+[data-theme="dark"] .product-card {
+    animation: fadeIn 0.6s ease forwards !important;
+}
+
+[data-theme="dark"] .submit-btn {
+    background-size: 200% auto !important;
+    animation: gradientFlow 4s ease infinite !important;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    [data-theme="dark"] .glass-card {
+        border-radius: 15px !important;
+        margin-left: -15px !important;
+        margin-right: -15px !important;
+    }
+
+    [data-theme="dark"] .modern-input-group {
+        margin-bottom: 1rem !important;
+    }
+
+    [data-theme="dark"] .shift-selector {
+        flex-direction: column !important;
+    }
+
+    [data-theme="dark"] .product-grid {
+        margin-top: 1rem !important;
+    }
+
+    [data-theme="dark"] .floating-scroll-btn {
+        width: 45px !important;
+        height: 45px !important;
+        bottom: 20px !important;
+        right: 20px !important;
+    }
+}
+
+/* Tema oscuro para las tarjetas de productos */
+[data-theme="dark"] .product-card {
+    background-color: #1E1E1E !important; /* Fondo oscuro */
+    color: #e0e0e0 !important; /* Texto claro */
+}
+
+[data-theme="dark"] .product-card:hover {
+    background-color: #2c2c2c !important; /* Fondo más claro al hacer hover */
+}
+
+[data-theme="dark"] .product-badge {
+    background-color: #6d28d9 !important; /* Fondo morado para el avatar */
+    color: #ffffff !important; /* Texto blanco */
+}
+
+/* Tema oscuro para la tarjeta de ingreso */
+[data-theme="dark"] .glass-card {
+    background-color: #1E1E1E !important; /* Fondo oscuro */
+    color: #e0e0e0 !important; /* Texto claro */
+    border: 1px solid #333333 !important; /* Borde oscuro */
+}
+
+[data-theme="dark"] .glass-card .form-label {
+    color: #e0e0e0 !important; /* Texto claro para las etiquetas */
+    font-size: 0.85rem !important; /* Tamaño de letra más pequeño */
+}
+
+[data-theme="dark"] .glass-card .modern-input-group {
+    background-color: #2c2c2c !important; /* Fondo oscuro para grupos de entrada */
+    border: 1px solid #444444 !important; /* Borde oscuro */
+}
+
+[data-theme="dark"] .glass-card .modern-input-group .form-control {
+    background-color: #2c2c2c !important; /* Fondo oscuro para inputs */
+    color: #e0e0e0 !important; /* Texto claro */
+    border: none !important; /* Sin borde */
+    font-size: 0.9rem !important; /* Tamaño de letra más pequeño */
+}
+
+[data-theme="dark"] .glass-card .modern-input-group .form-control:focus {
+    background-color: #333333 !important; /* Fondo más oscuro al enfocar */
+    box-shadow: 0 0 0 3px rgba(109, 40, 217, 0.2) !important; /* Sombra morada al enfocar */
+}
+
+[data-theme="dark"] .glass-card .modern-select {
+    background-color: #2c2c2c !important; /* Fondo oscuro para selects */
+    color: #e0e0e0 !important; /* Texto claro */
+    border: none !important; /* Sin borde */
+    font-size: 0.9rem !important; /* Tamaño de letra más pequeño */
+}
+
+[data-theme="dark"] .glass-card .modern-select:focus {
+    background-color: #333333 !important; /* Fondo más oscuro al enfocar */
+    box-shadow: 0 0 0 3px rgba(109, 40, 217, 0.2) !important; /* Sombra morada al enfocar */
+}
+
+[data-theme="dark"] .glass-card .shift-selector .shift-btn {
+    background-color: #2c2c2c !important; /* Fondo oscuro para botones de turno */
+    color: #e0e0e0 !important; /* Texto claro */
+    border: 1px solid #444444 !important; /* Borde oscuro */
+    font-size: 0.9rem !important; /* Tamaño de letra más pequeño */
+}
+
+[data-theme="dark"] .glass-card .shift-selector .shift-btn:hover {
+    background-color: #333333 !important; /* Fondo más oscuro al hacer hover */
+    border-color: #6d28d9 !important; /* Borde morado al hacer hover */
+}
+
+[data-theme="dark"] .glass-card .text-danger {
+    color: #ff6b6b !important; /* Color rojo para mensajes de error */
+    font-size: 0.8rem !important; /* Tamaño de letra más pequeño */
+}
+
+[data-theme="dark"] .glass-card .submit-btn {
+    background-color: #6d28d9 !important; /* Fondo morado para botón de envío */
+    color: #e0e0e0 !important; /* Texto claro */
+    font-size: 0.9rem !important; /* Tamaño de letra más pequeño */
+}
+
+[data-theme="dark"] .glass-card .submit-btn:hover {
+    background-color: #8a63d2 !important; /* Fondo morado más claro al hacer hover */
+}
+
+/*Card detalles orden*/
+
+
