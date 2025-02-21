@@ -4,7 +4,7 @@ import { FaTrashAlt, FaFilePdf } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { formatDateToDisplay } from "../../../utils/dateUtils";
 import PaginationComponent from "../../PaginationComponent/PaginationComponent";
-import "./VentasTable.css";
+import "./VentasTable.css"; // Importa el CSS personalizado
 
 const ITEMS_PER_PAGE = 5;
 
@@ -26,7 +26,7 @@ const VentasTable = ({ sales, onDelete, onViewPdf, loadingViewPdf }) => {
   const handlePageChange = (newPage) => setCurrentPage(newPage);
 
   const handleRowClick = (idVenta) => {
-    console.log("Detalles")
+    console.log("Detalles");
   };
 
   useEffect(() => {
@@ -34,16 +34,16 @@ const VentasTable = ({ sales, onDelete, onViewPdf, loadingViewPdf }) => {
   }, [currentPage]);
 
   return (
-    <Container className="p-4 table-container" ref={containerRef}>
-      <Table hover responsive className="modern-table">
-        <thead className="table-header">
+    <Container className="p-4 ventas-table-container" ref={containerRef}>
+      <Table hover responsive className="ventas-table">
+        <thead className="ventas-table-header">
           <tr>
             <th className="text-center">#</th>
-            <th className="text-center">No. de Venta</th>
+            <th className="text-center">Venta</th>
             <th className="text-center">Sucursal</th>
             <th className="text-center">Usuario</th>
             <th className="text-center">Estado</th>
-            <th className="text-center">Fecha Venta</th>
+            <th className="text-center">Fecha</th> {/* Cambiado de "Fecha Venta" a "Fecha" */}
             <th className="text-center">Acciones</th>
           </tr>
         </thead>
@@ -51,32 +51,32 @@ const VentasTable = ({ sales, onDelete, onViewPdf, loadingViewPdf }) => {
           {paginatedSales.map((sale, index) => (
             <tr
               key={sale.idVenta}
-              className="table-row"
+              className="ventas-table-row"
               onDoubleClick={() => handleRowClick(sale.idVenta)}
               style={{ cursor: "pointer" }}
             >
               <td
-                className="text-center serial-number"
+                className="text-center ventas-serial-number"
                 title="Doble clic para ver detalles"
               >
                 #{startIndex + index + 1}
               </td>
               <td
-                className="text-center sale-number"
+                className="text-center ventas-sale-number"
                 title="Doble clic para ver detalles"
               >
-                VNT-{sale.idVenta}
+                VNT-{sale.idVenta} {/* Aquí se muestra "VNT-" seguido del número de venta */}
               </td>
               <td
                 className="text-center"
                 title="Doble clic para ver detalles"
               >
-                <Badge pill className="branch-badge text-light" bg={getColorByName(sale.nombreSucursal)}>
+                <Badge pill className="ventas-branch-badge text-light" bg={getColorByName(sale.nombreSucursal)}>
                   {sale.nombreSucursal}
                 </Badge>
               </td>
               <td
-                className="text-center user-cell"
+                className="text-center ventas-user-cell"
                 title="Doble clic para ver detalles"
               >
                 {sale.nombreUsuario}
@@ -85,21 +85,21 @@ const VentasTable = ({ sales, onDelete, onViewPdf, loadingViewPdf }) => {
                 className="text-center"
                 title="Doble clic para ver detalles"
               >
-                <Badge pill className={`status-badge ${sale.estadoVenta === "C" ? "status-completed" : "status-pending"}`}>
+                <Badge pill className={`ventas-status-badge ${sale.estadoVenta === "C" ? "ventas-status-completed" : "ventas-status-pending"}`}>
                   {sale.estadoVenta === "C" ? "Cerrada" : "Pendiente"}
                 </Badge>
               </td>
               <td
-                className="text-center sale-date"
+                className="text-center ventas-sale-date"
                 title="Doble clic para ver detalles"
               >
                 {formatDateToDisplay(sale.fechaVenta)}
               </td>
-              <td className="text-center actions-cell" onDoubleClick={(e) => e.stopPropagation()}>
+              <td className="text-center ventas-actions-cell" onDoubleClick={(e) => e.stopPropagation()}>
                 <div className="d-flex justify-content-center gap-2">
                   <Button
                     variant="link"
-                    className="action-btn pdf-btn"
+                    className="ventas-action-btn ventas-pdf-btn"
                     onClick={(e) => {
                       e.stopPropagation();
                       onViewPdf(sale.idVenta);
@@ -116,19 +116,19 @@ const VentasTable = ({ sales, onDelete, onViewPdf, loadingViewPdf }) => {
                         aria-hidden="true"
                       />
                     ) : (
-                      <FaFilePdf className="action-icon" />
+                      <FaFilePdf className="ventas-action-icon" />
                     )}
                   </Button>
                   <Button
                     variant="link"
-                    className="action-btn delete-btn"
+                    className="ventas-action-btn ventas-delete-btn"
                     onClick={(e) => {
                       e.stopPropagation();
                       onDelete(sale.idVenta);
                     }}
                     onDoubleClick={(e) => e.stopPropagation()}
                   >
-                    <FaTrashAlt className="action-icon" />
+                    <FaTrashAlt className="ventas-action-icon" />
                   </Button>
                 </div>
               </td>

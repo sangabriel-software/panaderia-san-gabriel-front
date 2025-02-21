@@ -1,151 +1,132 @@
-/* OrderTable.css */
-.table-container {
-    background: #ffffff;
-    border-radius: 18px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    padding: 2rem;
-  }
-  
-  .modern-table {
-    --table-accent-color: #f8f9fa;
-    --table-hover-color: #f1f4f7;
-    margin-bottom: 2rem;
-    border-collapse: separate;
-    border-spacing: 0 8px;
-  }
-  
-  .table-header {
-    background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
-    color: white;
-    border-radius: 12px;
-    overflow: hidden;
-  }
-  
-  .table-header th {
-    border: none;
-    font-weight: 600;
-    padding: 1.2rem 1.5rem;
-    font-size: 0.95rem;
-    letter-spacing: 0.5px;
-    position: relative;
-  }
-  
-  .table-header th:not(:last-child)::after {
-    content: "";
-    position: absolute;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    height: 60%;
-    width: 1px;
-    background: rgba(255, 255, 255, 0.2);
-  }
-  
-  .table-row {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    background: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-  }
-  
-  .table-row:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    background: var(--table-hover-color);
-  }
-  
-  .table-row td {
-    border: none;
-    padding: 1.2rem 1.5rem;
-    vertical-align: middle;
-    position: relative;
-    font-size: 0.95rem;
-  }
-  
-  .table-row td:first-child {
-    border-radius: 12px 0 0 12px;
-  }
-  
-  .table-row td:last-child {
-    border-radius: 0 12px 12px 0;
-  }
-  
-  .branch-badge {
-    background: #e3f2fd;
-    color: #1976d2;
-    font-weight: 600;
-    padding: 0.5rem 1rem;
-    font-size: 0.85rem;
-  }
-  
-  .status-badge {
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    padding: 0.6rem 1.2rem;
-    font-size: 0.85rem;
-  }
-  
-  .status-pending {
-    background: #fff3e0 !important;
-    color: #FF5252 !important;
-  }
-  
-  .status-completed {
-    background: #e8f5e9 !important;
-    color: #2e7d32 !important;
-  }
-  
-  .action-btn {
-    padding: 0.5rem;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-  }
-  
-  .delete-btn {
-    color: #ff5252 !important;
-  }
-  
-  .delete-btn:hover {
-    background: #ffebee !important;
-    transform: scale(1.1);
-  }
-  
-  .action-icon {
-    font-size: 1.1rem;
-    vertical-align: middle;
-  }
-  
-  .serial-number {
-    font-weight: 600;
-    color: #607d8b;
-  }
-  
-  .order-number {
-    font-weight: 600;
-    color: #2c3e50;
-  }
-  
-  .production-date {
-    color: #666;
-    font-weight: 500;
-  }
-  
-  /* Paginación personalizada */
-  .pagination .page-item .page-link {
-    border-radius: 8px;
-    margin: 0 3px;
-    border: none;
-    color: #2c3e50;
-    transition: all 0.3s ease;
-  }
-  
-  .pagination .page-item.active .page-link {
-    background: linear-gradient(135deg, #3498db 0%, #2c3e50 100%);
-    color: white;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  }
-  
-  .pagination .page-item:hover .page-link {
-    background: #f1f4f7;
-  }
+/* VentasTable.css */
+.ventas-table-container {
+  background: #ffffff !important;
+  border-radius: 18px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+  overflow: hidden !important;
+  padding: 2rem !important;
+}
+
+.ventas-table {
+  --table-accent-color: #f8f9fa !important;
+  --table-hover-color: #f1f4f7 !important;
+  margin-bottom: 2rem !important;
+  border-collapse: separate !important;
+  border-spacing: 0 8px !important;
+}
+
+.ventas-table-header {
+  background: linear-gradient(135deg, #6a1b9a 0%, #ab47bc 100%) !important;
+  color: white !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+}
+
+.ventas-table-header th {
+  border: none !important;
+  font-weight: 600 !important;
+  padding: 1.2rem 1.5rem !important;
+  font-size: 0.95rem !important;
+  letter-spacing: 0.5px !important;
+  position: relative !important;
+}
+
+.ventas-table-header th:not(:last-child)::after {
+  content: "" !important;
+  position: absolute !important;
+  right: 0 !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  height: 60% !important;
+  width: 1px !important;
+  background: rgba(255, 255, 255, 0.2) !important;
+}
+
+.ventas-table-row {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  background: #ffffff !important;
+  border-radius: 12px !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05) !important;
+}
+
+.ventas-table-row:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+  background: var(--table-hover-color) !important;
+}
+
+.ventas-table-row td {
+  border: none !important;
+  padding: 1.2rem 1.5rem !important;
+  vertical-align: middle !important;
+  position: relative !important;
+  font-size: 0.95rem !important;
+}
+
+.ventas-table-row td:first-child {
+  border-radius: 12px 0 0 12px !important;
+}
+
+.ventas-table-row td:last-child {
+  border-radius: 0 12px 12px 0 !important;
+}
+
+.ventas-branch-badge {
+  background: #f3e5f5 !important;
+  color: #8e24aa !important;
+  font-weight: 600 !important;
+  padding: 0.5rem 1rem !important;
+  font-size: 0.85rem !important;
+}
+
+.ventas-status-badge {
+  font-weight: 600 !important;
+  letter-spacing: 0.5px !important;
+  padding: 0.6rem 1.2rem !important;
+  font-size: 0.85rem !important;
+}
+
+.ventas-status-pending {
+  background: #fff3e0 !important;
+  color: #ff6f00 !important;
+}
+
+.ventas-status-completed {
+  background: #e8f5e9 !important;
+  color: #1b5e20 !important;
+}
+
+.ventas-action-btn {
+  padding: 0.5rem !important;
+  border-radius: 8px !important;
+  transition: all 0.3s ease !important;
+}
+
+.ventas-delete-btn {
+  color: #d32f2f !important;
+}
+
+.ventas-delete-btn:hover {
+  background: #ffebee !important;
+  transform: scale(1.1) !important;
+}
+
+.ventas-action-icon {
+  font-size: 1.1rem !important;
+  vertical-align: middle !important;
+}
+
+.ventas-serial-number {
+  font-weight: 600 !important;
+  color: #6a1b9a !important;
+}
+
+.ventas-sale-number {
+  font-weight: 600 !important;
+  color: #4a148c !important;
+}
+
+.ventas-sale-date {
+  color: #666 !important;
+  font-weight: 500 !important;
+}

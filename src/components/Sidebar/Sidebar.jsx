@@ -26,9 +26,9 @@ function Sidebar({ show, onClose }) {
         <Nav.Link as={NavLink} to="/ventas" className="text-light" onClick={handleNavLinkClick}>
           <FaFolder size={25} className="me-2" /> Ventas
         </Nav.Link>
-        <Nav.Link as={NavLink} to="/reports" className="text-light" onClick={handleNavLinkClick}>
+        {/* <Nav.Link as={NavLink} to="/reports" className="text-light" onClick={handleNavLinkClick}>
           <FaChartBar size={25} className="me-2" /> Reportes
-        </Nav.Link>
+        </Nav.Link> */}
 
         <Nav.Link as={NavLink} to="/productos" className="text-light" onClick={handleNavLinkClick}>
           <MdOutlineBakeryDining size={25} className="me-2" /> Productos
@@ -66,10 +66,10 @@ function Sidebar({ show, onClose }) {
             </Nav.Link>
           </div>
         </Collapse>
-
+{/* 
         <Nav.Link as={NavLink} to="/config" className="text-light" onClick={handleNavLinkClick}>
           <FaCog className="me-2" size={25} /> Configuraciones
-        </Nav.Link>
+        </Nav.Link> */}
       </Nav>
     </div>
   );

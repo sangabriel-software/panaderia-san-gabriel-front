@@ -1,5 +1,6 @@
 import React from "react";
 import { Pagination } from "react-bootstrap";
+import "./PaginationComponent.css"; // Importa el CSS personalizado
 
 const PaginationComponent = ({ totalItems, itemsPerPage, currentPage, onPageChange }) => {
   const totalPages = Math.ceil(totalItems / itemsPerPage);
@@ -8,20 +9,28 @@ const PaginationComponent = ({ totalItems, itemsPerPage, currentPage, onPageChan
 
   return (
     <div className="d-flex justify-content-center mt-3">
-      <Pagination>
-        <Pagination.Prev disabled={currentPage === 1} onClick={() => onPageChange(currentPage - 1)} />
+      <Pagination className="custom-pagination">
+        <Pagination.Prev
+          className="custom-pagination-prev"
+          disabled={currentPage === 1}
+          onClick={() => onPageChange(currentPage - 1)}
+        />
         
         {[...Array(totalPages)].map((_, index) => (
           <Pagination.Item
             key={index + 1}
-            active={index + 1 === currentPage}
+            className={`custom-pagination-item ${index + 1 === currentPage ? "custom-pagination-active" : ""}`}
             onClick={() => onPageChange(index + 1)}
           >
             {index + 1}
           </Pagination.Item>
         ))}
 
-        <Pagination.Next disabled={currentPage === totalPages} onClick={() => onPageChange(currentPage + 1)} />
+        <Pagination.Next
+          className="custom-pagination-next"
+          disabled={currentPage === totalPages}
+          onClick={() => onPageChange(currentPage + 1)}
+        />
       </Pagination>
     </div>
   );
