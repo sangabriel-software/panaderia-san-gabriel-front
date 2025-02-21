@@ -18,9 +18,9 @@ function Sidebar({ show, onClose }) {
   useEffect(() => {
     if (theme === 'dark') {
       DarkReader.enable({
-        brightness: 95,
-        contrast: 90,
-        sepia: 10
+        brightness: 100,
+        contrast: 100,
+        sepia: 0
       });
     } else {
       DarkReader.disable();
