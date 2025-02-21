@@ -1087,5 +1087,32 @@ body {
 }
 
 /*Card detalles orden*/
+[data-theme="dark"] .card {
+    background-color: #1E1E1E !important; /* Fondo oscuro */
+    color: #e0e0e0 !important; /* Texto claro */
+    border: 1px solid #333333 !important; /* Borde oscuro */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3) !important; /* Sombra oscura */
+}
 
+[data-theme="dark"] .card:hover {
+    background-color: #2c2c2c !important; /* Fondo más claro al hacer hover */
+    border-color: #6d28d9 !important; /* Borde morado al hacer hover */
+}
+
+[data-theme="dark"] .card .card-body {
+    color: #e0e0e0 !important; /* Texto claro en el cuerpo de la tarjeta */
+}
+
+[data-theme="dark"] .card .card-title {
+    color: #6d28d9 !important; /* Texto morado para los títulos */
+}
+
+[data-theme="dark"] .card .text-muted {
+    color: #888 !important; /* Texto gris para elementos secundarios */
+}
+
+[data-theme="dark"] .badge {
+    background-color: #6d28d9 !important; /* Fondo morado para badges */
+    color: #ffffff !important; /* Texto blanco */
+}
 
