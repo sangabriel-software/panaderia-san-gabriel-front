@@ -25,8 +25,8 @@
 .table-header th {
   border: none !important;
   font-weight: 600 !important;
-  padding: 1.2rem 1.5rem !important;
-  font-size: 0.95rem !important;
+  padding: 1.2rem 1rem !important;
+  font-size: 0.80rem !important;
   letter-spacing: 0.5px !important;
   position: relative !important;
   white-space: nowrap; /* Evita que el texto se divida en varias líneas */
