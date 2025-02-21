@@ -6,15 +6,24 @@ import {
   FaUsersCog, FaChevronRight, FaCog, FaSun, FaMoon 
 } from 'react-icons/fa';
 import { MdOutlineBakeryDining } from 'react-icons/md';
+import * as DarkReader from 'darkreader'; // Importamos Dark Reader
 import "./Sidebar.css";
 
 function Sidebar({ show, onClose }) {
   const [usersOpen, setUsersOpen] = useState(false);
   const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
 
-  // Efecto para aplicar el tema al cargar el componente
+  // Efecto para aplicar el tema y DarkReader al cargar el componente
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
+    if (theme === 'dark') {
+      DarkReader.enable({
+        brightness: 100,
+        contrast: 90,
+        sepia: 10
+      });
+    } else {
+      DarkReader.disable();
+    }
   }, [theme]);
 
   // Función para cambiar el tema
@@ -22,6 +31,16 @@ function Sidebar({ show, onClose }) {
     const newTheme = theme === 'light' ? 'dark' : 'light';
     setTheme(newTheme);
     localStorage.setItem('theme', newTheme);
+
+    if (newTheme === 'dark') {
+      DarkReader.enable({
+        brightness: 100,
+        contrast: 90,
+        sepia: 10
+      });
+    } else {
+      DarkReader.disable();
+    }
   };
 
   const handleNavLinkClick = () => {
@@ -84,7 +103,7 @@ function Sidebar({ show, onClose }) {
         </Nav.Link>
       </Nav>
 
-      {/* Toggle Switch para el tema
+      {/* Toggle Switch para el tema */}
       <div className="theme-toggle-container">
         <label className="theme-switch">
           <input 
@@ -96,7 +115,7 @@ function Sidebar({ show, onClose }) {
             {theme === 'dark' ? <FaMoon size={14} /> : <FaSun size={14} />}
           </span>
         </label>
-      </div> */}
+      </div>
 
     </div>
   );
