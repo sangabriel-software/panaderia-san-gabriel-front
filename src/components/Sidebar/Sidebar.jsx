@@ -1,12 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Nav, Collapse } from 'react-bootstrap';
 import { NavLink } from 'react-router-dom';
-import { FaHome, FaUsers, FaChartBar, FaCalendar, FaFolder, FaUserPlus, FaUsersCog, FaKey, FaChevronRight, FaCog, FaBox } from 'react-icons/fa';
+import { 
+  FaHome, FaUsers, FaCalendar, FaFolder, FaUserPlus, 
+  FaUsersCog, FaChevronRight, FaCog, FaSun, FaMoon 
+} from 'react-icons/fa';
 import { MdOutlineBakeryDining } from 'react-icons/md';
 import "./Sidebar.css";
 
 function Sidebar({ show, onClose }) {
   const [usersOpen, setUsersOpen] = useState(false);
+  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
+
+  // Efecto para aplicar el tema al cargar el componente
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+  }, [theme]);
+
+  // Función para cambiar el tema
+  const toggleTheme = () => {
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
+    localStorage.setItem('theme', newTheme);
+  };
 
   const handleNavLinkClick = () => {
     if (window.innerWidth <= 768) {
@@ -21,15 +37,11 @@ function Sidebar({ show, onClose }) {
           <FaHome size={25} className="me-2" /> Dashboard
         </Nav.Link>
         <Nav.Link as={NavLink} to="/ordenes-produccion" className="text-light" onClick={handleNavLinkClick}>
-          <FaCalendar size={25} className="me-2" /> Ordens de produccion
+          <FaCalendar size={25} className="me-2" /> Ordenes de producción
         </Nav.Link>
         <Nav.Link as={NavLink} to="/ventas" className="text-light" onClick={handleNavLinkClick}>
           <FaFolder size={25} className="me-2" /> Ventas
         </Nav.Link>
-        {/* <Nav.Link as={NavLink} to="/reports" className="text-light" onClick={handleNavLinkClick}>
-          <FaChartBar size={25} className="me-2" /> Reportes
-        </Nav.Link> */}
-
         <Nav.Link as={NavLink} to="/productos" className="text-light" onClick={handleNavLinkClick}>
           <MdOutlineBakeryDining size={25} className="me-2" /> Productos
         </Nav.Link>
@@ -54,7 +66,7 @@ function Sidebar({ show, onClose }) {
               className="text-light ps-4 submenu-item"
               onClick={handleNavLinkClick}
             >
-              <FaUserPlus className="me-2" /> Gestion de usuarios
+              <FaUserPlus className="me-2" /> Gestión de usuarios
             </Nav.Link>
             <Nav.Link 
               as={NavLink} 
@@ -71,6 +83,20 @@ function Sidebar({ show, onClose }) {
           <FaCog className="me-2" size={25} /> Configuraciones
         </Nav.Link>
       </Nav>
+
+      {/* Toggle Switch para el tema */}
+      <div className="theme-toggle-container">
+        <label className="theme-switch">
+          <input 
+            type="checkbox" 
+            checked={theme === 'dark'} 
+            onChange={toggleTheme} 
+          />
+          <span className="slider round">
+            {theme === 'dark' ? <FaMoon size={14} /> : <FaSun size={14} />}
+          </span>
+        </label>
+      </div>
     </div>
   );
 }

@@ -4,6 +4,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "./styles/App.css";
 import "./styles/globalStyles.css";
+import "./styles/theme.css";
 import { ToastContainer } from "react-toastify"; // Para mostrar notificaciones
 import "react-toastify/dist/ReactToastify.css";
 

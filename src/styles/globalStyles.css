@@ -115,19 +115,20 @@
 }
 
 .btnAgregarUsuario {
-  background-color: #6d28d9 !important; /* Morado vibrante al hacer hover */
-  color: #ffffff !important;
+  background-color: #6d28d9 !important; /* Morado vibrante */
+  color: #ffffff !important; /* Texto blanco */
   font-size: 1.09rem !important;
   transition: all 0.3s ease !important;
   border-radius: 20px;
+  border: 2px solid transparent !important; /* Borde transparente por defecto */
 }
 
 .btnAgregarUsuario:hover {
-  background-color: #ffffff !important;
-  color: #6d28d9 !important;
-  border: 2px solid #6d28d9 !important; /* Morado vibrante */
+  background-color: #1E1E1E !important; /* Fondo oscuro en hover */
+  color: #BB86FC !important; /* Texto morado claro en hover */
+  border: 2px solid #BB86FC !important; /* Borde morado claro en hover */
   transform: translateY(-2px) !important;
-  box-shadow: 0 6px 8px rgba(109, 40, 217, 0.3) !important;
+  box-shadow: 0 6px 8px rgba(187, 134, 252, 0.3) !important; /* Sombra morada en hover */
 }
 
 /* Inputs y Labels */
@@ -244,4 +245,17 @@
   .sidebar.hide {
     transform: translateX(0);
   }
+}
+
+/* Tema oscuro para el componente Title */
+[data-theme="dark"] .rolText {
+  color: #8A2BE2 !important; /* Morado fuerte para el título */
+  font-size: 2.5rem !important; /* Tamaño del título */
+  text-shadow: 0 0 10px rgba(138, 43, 226, 0.7) !important; /* Sombra morada para resaltar */
+}
+
+[data-theme="dark"] .text-muted {
+  color: #BB86FC !important; /* Morado más claro para la descripción */
+  font-size: 1.2rem !important; /* Tamaño de la descripción */
+  opacity: 0.9 !important; /* Ligera transparencia para suavizar el texto */
 }
