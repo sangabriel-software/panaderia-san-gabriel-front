@@ -28,7 +28,7 @@ const VentasTable = ({ sales, onDelete, onViewPdf, loadingViewPdf }) => {
   const handlePageChange = (newPage) => setCurrentPage(newPage);
 
   const handleRowClick = (idVenta) => {
-    navigate("/ingresar-venta/");
+    navigate("/detalle-venta/");
   };
 
   useEffect(() => {

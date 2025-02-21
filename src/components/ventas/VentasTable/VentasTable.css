@@ -26,7 +26,7 @@
   border: none !important;
   font-weight: 600 !important;
   padding: 1.2rem 1.5rem !important;
-  font-size: 0.95rem !important;
+  font-size: 0.80rem !important;
   letter-spacing: 0.5px !important;
   position: relative !important;
   white-space: nowrap !important; /* Evita que el texto se divida en varias líneas */
@@ -62,6 +62,7 @@
   vertical-align: middle !important;
   position: relative !important;
   font-size: 0.95rem !important;
+  white-space: nowrap !important; /* Evita que el texto se divida en varias líneas */
 }
 
 .ventas-table-row td:first-child {
