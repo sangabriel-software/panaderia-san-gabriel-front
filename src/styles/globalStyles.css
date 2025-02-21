@@ -1,107 +1,134 @@
 /* Botones */
 .bt-cancelar {
-  background-color: #DA1A32;
-  color: #FEF7F8;
-  font-size: 1.2rem;
-  border-radius: 10px;
-  width: 180px;
-  border-color: #DA1A32;
+  background-color: #dc2626 !important; /* Rojo vibrante */
+  color: #ffffff !important;
+  font-size: 1.2rem !important;
+  border-radius: 10px !important;
+  width: 180px !important;
+  border: none !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 4px 6px rgba(220, 38, 38, 0.2) !important;
 }
 
 .bt-cancelar:hover {
-  background-color: #AC1528;
-  color: #FEFEFE;
-  border-color: #DA1A32;
+  background-color: #ef4444 !important; /* Rojo más claro al hacer hover */
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 8px rgba(220, 38, 38, 0.3) !important;
 }
 
+
 .bt-general {
-  background-color: #FEFEFE;
-  border: 2px solid #1463C2;
-  color: #1463C2;
-  font-size: 1.2rem;
-  border-radius: 10px;
-  width: 180px;
+  background-color: #5913c6 !important;
+  border: 2px solid #ffffff !important; /* Morado vibrante */
+  color: #ffffff !important;
+  font-size: 1.2rem !important;
+  border-radius: 10px !important;
+  width: 180px !important;
+  transition: all 0.3s ease !important;
 }
 
 .bt-general:hover {
-  background-color: #0F4D8B;
-  color: #FEFEFE;
+  background-color: #6d28d9 !important; /* Morado vibrante al hacer hover */
+  color: #ffffff !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 8px rgba(109, 40, 217, 0.3) !important;
 }
-
 .bt-return {
-  border: 2px solid #28a745;
-  color: #28a745;
-  font-size: 1.2rem;
+  border: 2px solid #6d28d9 !important; /* Morado vibrante */
+  color: #6d28d9 !important;
+  font-size: 1.2rem !important;
+  background-color: transparent !important;
+  transition: all 0.3s ease !important;
 }
 
 .bt-return:hover {
-  background-color: #FEFEFE;
-  border-color: #0F4D8B;
+  background-color: #6d28d9 !important; /* Morado vibrante al hacer hover */
+  color: #ffffff !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 8px rgba(109, 40, 217, 0.3) !important;
 }
 
 .btn-crear {
-  background-color: #fefefe;
-  border: 2px solid #1463c2;
-  color: #1463c2;
-  font-size: 1.09rem;
+  background-color: #ffffff !important;
+  border: 2px solid #6d28d9 !important; /* Morado vibrante */
+  color: #6d28d9 !important;
+  font-size: 1.09rem !important;
+  transition: all 0.3s ease !important;
 }
 
 .btn-crear:hover {
-  background-color: #0f4d8b;
-  color: #fefefe;
+  background-color: #6d28d9 !important; /* Morado vibrante al hacer hover */
+  color: #ffffff !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 8px rgba(109, 40, 217, 0.3) !important;
 }
 
 .btn-simple {
-  background-color: #0f4d8b;
-  color: #fefefe;
+  background-color: #6d28d9 !important; /* Morado vibrante */
+  color: #ffffff !important;
+  border: none !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 4px 6px rgba(109, 40, 217, 0.2) !important;
 }
 
 .btn-simple:hover {
-  background-color: #005BA8;
-  color: #fefefe;
+  background-color: #7c3aed !important; /* Morado más claro al hacer hover */
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 8px rgba(109, 40, 217, 0.3) !important;
 }
 
 .btn-type-category {
-  background-color: #0f4d8b;
-  color: #fefefe;
-  font-size: 1.2rem;
-  border-radius: 10px;
-  width: 180px;
+  background-color: #6d28d9 !important; /* Morado vibrante */
+  color: #ffffff !important;
+  font-size: 1.2rem !important;
+  border-radius: 10px !important;
+  width: 180px !important;
+  border: none !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 4px 6px rgba(109, 40, 217, 0.2) !important;
 }
 
 .btn-type-category:hover {
-  background-color: #005BA8;
-  color: #fefefe;
+  background-color: #7c3aed !important; /* Morado más claro al hacer hover */
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 8px rgba(109, 40, 217, 0.3) !important;
 }
 
+
 .btnReports {
-  background-color: #FEFEFE;
-  border: 1.5px solid #1463C2;
-  color: #1463C2;
-  font-size: 1rem;
+  background-color: #ffffff !important;
+  border: 1.5px solid #6d28d9 !important; /* Morado vibrante */
+  color: #6d28d9 !important;
+  font-size: 1rem !important;
+  transition: all 0.3s ease !important;
 }
 
 .btnReports:hover {
-  background-color: #0F4D8B;
-  color: #FEFEFE;
+  background-color: #6d28d9 !important; /* Morado vibrante al hacer hover */
+  color: #ffffff !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 8px rgba(109, 40, 217, 0.3) !important;
 }
 
 .btnAgregarUsuario {
-  background-color: #fefefe;
-  border: 2px solid #1463c2;
-  color: #1463c2;
-  font-size: 1.09rem;
+  background-color: #6d28d9 !important; /* Morado vibrante al hacer hover */
+  color: #ffffff !important;
+  font-size: 1.09rem !important;
+  transition: all 0.3s ease !important;
 }
 
 .btnAgregarUsuario:hover {
-  background-color: #0f4d8b;
-  color: #fefefe;
+  background-color: #ffffff !important;
+  color: #6d28d9 !important;
+  border: 2px solid #6d28d9 !important; /* Morado vibrante */
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 8px rgba(109, 40, 217, 0.3) !important;
 }
 
 /* Inputs y Labels */
 .input-data {
-  border: 2px solid #5B5859 !important;
-  color: #43405A !important;
+  border: 2px solid #6d28d9 !important; /* Borde morado vibrante */
+  color: #4c1d95 !important; /* Texto morado oscuro */
   font-size: 1.1rem !important;
   margin-bottom: 1rem !important;
   border-radius: 6px;
@@ -148,18 +175,7 @@
   min-height: 100vh;
 }
 
-.topbar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 1050;
-  background-color: #dc3545;
-  height: 60px;
-  display: flex;
-  align-items: center;
-  padding: 0 20px;
-}
+
 
 .sidebar {
   width: 250px;
