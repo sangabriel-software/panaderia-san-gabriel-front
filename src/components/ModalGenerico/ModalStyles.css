@@ -1,19 +1,94 @@
-/* Para dispositivos pequeños: los botones se extienden a todo el ancho del contenedor */
-.modal-ingreso-btn {
+/* Estilos generales del modal */
+.modal-content{
+  border: none;
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+/* Encabezado del modal */
+.modal-ingreso-header {
+  background: linear-gradient(135deg, #6a11cb, #c65be7); /* Degradado morado a azul */
+  color: white;
+  border-bottom: none;
+  padding: 1.5rem;
+}
+
+.modal-ingreso-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* Cuerpo del modal */
+.modal-ingreso-body {
+  padding: 1.5rem;
+  background-color: #f8f9fa; /* Fondo claro para el cuerpo */
+  color: #333;
+}
+
+/* Pie del modal */
+.modal-ingreso-footer {
+  border-top: none;
+  padding: 1.5rem;
+  background-color: #ffffff;
+}
+
+/* Botón de cancelar */
+.modal-ingreso-cancelar {
+  background-color: #e0e0e0; /* Gris claro */
+  color: #333;
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.modal-ingreso-cancelar:hover {
+  background-color: #bdbdbd; /* Gris más oscuro al pasar el mouse */
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+
+/* Spinner dentro del botón de confirmar */
+.modal-ingreso-confirmar .spinner-border {
+  vertical-align: middle;
+}
+
+/* Alertas de error */
+.modal-ingreso-alert {
+  background-color: #ffebee; /* Fondo rojo claro */
+  color: #c62828; /* Texto rojo oscuro */
+  border: none;
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-ingreso-alert .BsExclamationTriangleFill {
+  color: #c62828; /* Icono rojo oscuro */
+  margin-right: 0.5rem;
+}
+
+/* Estilos responsivos para botones */
+@media (max-width: 991.98px) {
+  .modal-ingreso-btn {
     width: 100%;
+    margin-bottom: 0.5rem;
   }
-  
-  /* Para dispositivos grandes (por ejemplo, a partir de 992px de ancho) */
-  @media (min-width: 992px) {
-    .modal-ingreso-btn {
-      max-width: 150px; /* Ajusta este valor según tus necesidades */
-      width: auto; /* Permite que se adapte al contenido sin ocupar todo el ancho */
-    }
-  }
+}
 
-
-  .modal-header{
-    background-color: #005BA8;
-    color: whitesmoke;
+@media (min-width: 992px) {
+  .modal-ingreso-btn {
+    max-width: 150px;
+    width: auto;
   }
-  
+}

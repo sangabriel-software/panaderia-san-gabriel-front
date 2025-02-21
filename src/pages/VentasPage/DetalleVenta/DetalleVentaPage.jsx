@@ -60,7 +60,7 @@ const VentaDetallePage = () => {
   return (
     <Container>
       <Title
-        title="Ventas Diarias"
+        title="Ventas"
         description="Gestiona las ventas realizadas en el día"
       />
       <AddButton

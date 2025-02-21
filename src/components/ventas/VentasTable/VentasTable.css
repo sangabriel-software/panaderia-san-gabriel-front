@@ -29,6 +29,7 @@
   font-size: 0.95rem !important;
   letter-spacing: 0.5px !important;
   position: relative !important;
+  white-space: nowrap !important; /* Evita que el texto se divida en varias líneas */
 }
 
 .ventas-table-header th:not(:last-child)::after {
@@ -80,9 +81,7 @@
 }
 
 .ventas-status-badge {
-  font-weight: 600 !important;
-  letter-spacing: 0.5px !important;
-  padding: 0.6rem 1.2rem !important;
+  font-weight: 500 !important;
   font-size: 0.85rem !important;
 }
 

@@ -11,7 +11,9 @@ const ITEMS_PER_PAGE = 5;
 const getColorByName = (name) => {
   const COLORS = ["success", "primary", "info"];
   if (!name) return "warning";
-  const hash = name.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  const hash = name
+    .split("")
+    .reduce((acc, char) => acc + char.charCodeAt(0), 0);
   return COLORS[hash % COLORS.length];
 };
 
@@ -26,7 +28,7 @@ const VentasTable = ({ sales, onDelete, onViewPdf, loadingViewPdf }) => {
   const handlePageChange = (newPage) => setCurrentPage(newPage);
 
   const handleRowClick = (idVenta) => {
-    console.log("Detalles");
+    navigate("/ingresar-venta/");
   };
 
   useEffect(() => {
@@ -39,11 +41,11 @@ const VentasTable = ({ sales, onDelete, onViewPdf, loadingViewPdf }) => {
         <thead className="ventas-table-header">
           <tr>
             <th className="text-center">#</th>
-            <th className="text-center">Venta</th>
+            <th className="text-center">No. de venta</th>
             <th className="text-center">Sucursal</th>
             <th className="text-center">Usuario</th>
-            <th className="text-center">Estado</th>
-            <th className="text-center">Fecha</th> {/* Cambiado de "Fecha Venta" a "Fecha" */}
+            <th className="text-center">Total Venta</th>
+            <th className="text-center">Fecha venta</th>
             <th className="text-center">Acciones</th>
           </tr>
         </thead>
@@ -65,13 +67,15 @@ const VentasTable = ({ sales, onDelete, onViewPdf, loadingViewPdf }) => {
                 className="text-center ventas-sale-number"
                 title="Doble clic para ver detalles"
               >
-                VNT-{sale.idVenta} {/* Aquí se muestra "VNT-" seguido del número de venta */}
+                VNT-{sale.idVenta}{" "}
+                {/* Aquí se muestra "VNT-" seguido del número de venta */}
               </td>
-              <td
-                className="text-center"
-                title="Doble clic para ver detalles"
-              >
-                <Badge pill className="ventas-branch-badge text-light" bg={getColorByName(sale.nombreSucursal)}>
+              <td className="text-center" title="Doble clic para ver detalles">
+                <Badge
+                  pill
+                  className="ventas-branch-badge text-light"
+                  bg={getColorByName(sale.nombreSucursal)}
+                >
                   {sale.nombreSucursal}
                 </Badge>
               </td>
@@ -81,12 +85,15 @@ const VentasTable = ({ sales, onDelete, onViewPdf, loadingViewPdf }) => {
               >
                 {sale.nombreUsuario}
               </td>
-              <td
-                className="text-center"
-                title="Doble clic para ver detalles"
-              >
-                <Badge pill className={`ventas-status-badge ${sale.estadoVenta === "C" ? "ventas-status-completed" : "ventas-status-pending"}`}>
-                  {sale.estadoVenta === "C" ? "Cerrada" : "Pendiente"}
+              <td className="text-center" title="Doble clic para ver detalles">
+                <Badge
+                  className={`ventas-status-badge ${
+                    sale.estadoVenta === "C"
+                      ? "ventas-status-completed"
+                      : "ventas-status-pending"
+                  }`}
+                >
+                  {`Q.${sale.totalVenta ? Number(sale.totalVenta).toFixed(2) : '0.00'}`}
                 </Badge>
               </td>
               <td
@@ -95,7 +102,10 @@ const VentasTable = ({ sales, onDelete, onViewPdf, loadingViewPdf }) => {
               >
                 {formatDateToDisplay(sale.fechaVenta)}
               </td>
-              <td className="text-center ventas-actions-cell" onDoubleClick={(e) => e.stopPropagation()}>
+              <td
+                className="text-center ventas-actions-cell"
+                onDoubleClick={(e) => e.stopPropagation()}
+              >
                 <div className="d-flex justify-content-center gap-2">
                   <Button
                     variant="link"

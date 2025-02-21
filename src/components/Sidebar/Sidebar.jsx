@@ -66,10 +66,10 @@ function Sidebar({ show, onClose }) {
             </Nav.Link>
           </div>
         </Collapse>
-{/* 
+
         <Nav.Link as={NavLink} to="/config" className="text-light" onClick={handleNavLinkClick}>
           <FaCog className="me-2" size={25} /> Configuraciones
-        </Nav.Link> */}
+        </Nav.Link>
       </Nav>
     </div>
   );

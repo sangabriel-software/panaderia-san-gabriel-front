@@ -1,4 +1,3 @@
-// ModalIngreso.js
 import React from "react";
 import { Modal, Button, Spinner, Alert } from "react-bootstrap";
 import "./ModalStyles.css";
@@ -17,25 +16,25 @@ const ModalIngreso = ({
   titleCentered = true,
   footerCentered = true,
   isError = false,
-  confirmDisabled, 
+  confirmDisabled,
   ...rest
 }) => {
   return (
-    <Modal show={show} onHide={onHide} centered={centered} {...rest}>
-      <Modal.Header className="modal-header" closeButton>
-        <Modal.Title className={titleCentered ? "w-100 text-center" : ""}>
+    <Modal className="modal-content-ingreso" show={show} onHide={onHide} centered={centered} {...rest}>
+      <Modal.Header className="modal-ingreso-header" closeButton>
+        <Modal.Title className={`${titleCentered ? "w-100 text-center" : ""} modal-ingreso-title`}>
           {title}
         </Modal.Title>
       </Modal.Header>
       {isError && (
-        <Alert variant="danger" className="d-flex align-items-center text-center">
+        <Alert variant="danger" className="modal-ingreso-alert d-flex align-items-center text-center">
           <BsExclamationTriangleFill className="me-2" />
           Hubo un error al guardar la información, intente mas tarde.
         </Alert>
       )}
 
-      <Modal.Body>{children}</Modal.Body>
-      <Modal.Footer className={footerCentered ? "justify-content-center" : ""}>
+      <Modal.Body className="modal-ingreso-body">{children}</Modal.Body>
+      <Modal.Footer className={`${footerCentered ? "justify-content-center" : ""} modal-ingreso-footer`}>
         <div className="w-100 d-flex flex-row justify-content-center">
           <Button
             className="bt-cancelar me-2 flex-fill modal-ingreso-btn"

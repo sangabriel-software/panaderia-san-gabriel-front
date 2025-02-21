@@ -1,9 +1,9 @@
 /* Botones */
 .bt-cancelar {
-  background-color: #dc2626 !important; /* Rojo vibrante */
+  background-color: #c61341 !important; /* Rojo vibrante */
   color: #ffffff !important;
   font-size: 1.2rem !important;
-  border-radius: 10px !important;
+  border-radius: 20px !important;
   width: 180px !important;
   border: none !important;
   transition: all 0.3s ease !important;
@@ -11,7 +11,7 @@
 }
 
 .bt-cancelar:hover {
-  background-color: #ef4444 !important; /* Rojo más claro al hacer hover */
+  background-color: #b8123d !important; /* Rojo más claro al hacer hover */
   transform: translateY(-2px) !important;
   box-shadow: 0 6px 8px rgba(220, 38, 38, 0.3) !important;
 }
@@ -25,6 +25,7 @@
   border-radius: 10px !important;
   width: 180px !important;
   transition: all 0.3s ease !important;
+  border-radius: 15px !important;
 }
 
 .bt-general:hover {
@@ -49,6 +50,7 @@
 }
 
 .btn-crear {
+  border-radius: 20px !important;
   background-color: #ffffff !important;
   border: 2px solid #6d28d9 !important; /* Morado vibrante */
   color: #6d28d9 !important;
@@ -64,6 +66,7 @@
 }
 
 .btn-simple {
+  border-radius: 20px !important;
   background-color: #6d28d9 !important; /* Morado vibrante */
   color: #ffffff !important;
   border: none !important;
@@ -78,7 +81,7 @@
 }
 
 .btn-type-category {
-  background-color: #6d28d9 !important; /* Morado vibrante */
+  background-color: #5221a2 !important; /* Morado vibrante */
   color: #ffffff !important;
   font-size: 1.2rem !important;
   border-radius: 10px !important;
@@ -86,6 +89,7 @@
   border: none !important;
   transition: all 0.3s ease !important;
   box-shadow: 0 4px 6px rgba(109, 40, 217, 0.2) !important;
+  border-radius: 20px !important;
 }
 
 .btn-type-category:hover {
@@ -115,6 +119,7 @@
   color: #ffffff !important;
   font-size: 1.09rem !important;
   transition: all 0.3s ease !important;
+  border-radius: 20px;
 }
 
 .btnAgregarUsuario:hover {
@@ -137,6 +142,7 @@
   text-overflow: ellipsis;
   display: block;
   width: 100%;
+  border-radius: 15px;
 }
 
 .label-title {
