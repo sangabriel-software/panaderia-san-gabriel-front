@@ -84,7 +84,7 @@ function Sidebar({ show, onClose }) {
         </Nav.Link>
       </Nav>
 
-      {/* Toggle Switch para el tema */}
+      {/* Toggle Switch para el tema
       <div className="theme-toggle-container">
         <label className="theme-switch">
           <input 
@@ -96,7 +96,8 @@ function Sidebar({ show, onClose }) {
             {theme === 'dark' ? <FaMoon size={14} /> : <FaSun size={14} />}
           </span>
         </label>
-      </div>
+      </div> */}
+
     </div>
   );
 }
