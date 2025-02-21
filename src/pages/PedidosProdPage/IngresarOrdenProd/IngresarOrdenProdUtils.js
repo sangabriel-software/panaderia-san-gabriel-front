@@ -4,6 +4,7 @@ import React, { useEffect } from "react";
 import { generateAndDownloadPDF } from "../../../utils/PdfUtils/PdfUtils";
 import { consultarDetalleConsumoProduccion } from "../../../services/consumoingredientes/consumoingredientesprod.service";
 import OrderDetailsPdf from "../../../components/PDFs/OrdenDetails/OrderDetailsPdf";
+import { getUserData } from "../../../utils/Auth/decodedata";
 
 export const getInitials = (name) => {
   const names = name.split(" ");
@@ -30,6 +31,7 @@ const assignedColors = {}; // Almacena los colores asignados de manera persisten
 };
 
 const crearPyaloadOrdenProduccion = (data, trayQuantities) => {
+  const {idUsuario} = getUserData();
   const detalleOrden = Object.entries(trayQuantities)
     .filter(([_, cantidad]) => cantidad > 0)
     .map(([idProducto, cantidad]) => ({
@@ -48,7 +50,7 @@ const crearPyaloadOrdenProduccion = (data, trayQuantities) => {
       ordenTurno: data.turno,
       nombrePanadero: data.nombrePanadero,
       fechaAProducir: dayjs(data.fechaAProducir).format("YYYY-MM-DD"),
-      idUsuario: 1, // Se asume que el usuario está logueado
+      idUsuario: idUsuario, // Se asume que el usuario está logueado
       fechaCreacion: dayjs().format("YYYY-MM-DD"),
     },
     detalleOrden,

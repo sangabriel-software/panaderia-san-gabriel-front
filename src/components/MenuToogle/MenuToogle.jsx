@@ -4,12 +4,13 @@ import { FaBars } from 'react-icons/fa';
 
 function MenuToggle({ onMenuClick }) {
   return (
-    <Button 
-
-      className="menutoggle me-2 d-lg-none"
+    <Button
+      variant="link"
+      className="menutoggle me-2 text-light"
       onClick={onMenuClick}
+      aria-label="Toggle sidebar"
     >
-      <FaBars />
+      <FaBars size={20} />
     </Button>
   );
 }

@@ -5,6 +5,16 @@
   box-sizing: border-box;
 }
 
+/* Definición de colores */
+:root {
+  --bg-topbar: #3c3658; /* Un poco más oscuro que el sidebar */
+  --bg-sidebar: #262335; /* Morado oscuro extraído de la imagen */
+  --bg-hover: #332e45; /* Hover en sidebar, un tono más claro */
+  --text-primary: #d8b4fe; /* Morado claro para textos */
+  --text-white: #ffffff; /* Texto blanco */
+  --border-color: #4c1d95; /* Bordes morados */
+}
+
 .app {
   display: flex;
   flex-direction: column;
@@ -17,60 +27,70 @@
   margin-top: 56px; /* Height of navbar */
 }
 
-.topbar{
-  background-color: #0F4D8B !important;
+/* Navbar (Topbar) */
+.topbar {
+  background-color: var(--bg-topbar) !important;
+  color: var(--text-white);
+  padding: 10px;
 }
 
-.menutoggle{
-  background-color: #0F4D8B !important;
-  border-color: #197FE6 !important;
+/* Botón Menú Toggle */
+.menutoggle {
+  background-color: var(--bg-topbar) !important;
+  border-color: var(--bg-topbar) !important;
 }
 
+/* Sidebar */
 .sidebar {
   width: 250px;
   min-height: calc(100vh - 56px);
   padding-top: 1rem;
-  border-right: 1px solid #197FE6;
+  border-right: 1px solid var(--border-color);
   transition: transform 0.3s ease;
-  background-color: #005BA8 !important;
+  background-color: var(--bg-sidebar) !important;
 }
 
 .main-content {
   flex: 1;
   padding: 20px;
-  background-color: #f8f9fc;
+  background-color: #f8f9fc; /* Fondo gris claro */
   transition: margin-left 0.3s ease;
 }
 
 /* Active link styles */
 .nav-link.active {
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: rgba(124, 58, 237, 0.2) !important; /* Fondo morado claro moderno */
 }
 
-/* Sidebar styles */
+/* Sidebar links */
 .sidebar .nav-link {
   padding: 0.8rem 1rem;
   transition: background-color 0.3s;
+  color: var(--text-primary);
 }
 
 .sidebar .nav-link:hover {
-  background-color: #0F4D8B;
+  background-color: var(--bg-hover) !important;
+  color: var(--text-white);
 }
 
-/* Submenu styles */
+/* Submenu */
 .submenu-item {
-  background-color: #0F4D8B;
-  border-left: 3px #197FE6 !important;
-  border-right: #197FE6 !important;
+  background-color: var(--border-color) !important;
+  border-left: 3px solid var(--text-primary) !important;
+  border-right: 1px solid var(--border-color) !important;
   margin: 2px 2px;
+  color: var(--text-white);
 }
 
 .submenu-item:hover {
-  background-color: #216483;
+  background-color: #9333ea !important; /* Fondo morado más oscuro al hacer hover */
 }
 
+/* Dropdown arrow */
 .dropdown-arrow {
   transition: transform 0.3s ease;
+  color: var(--text-primary);
 }
 
 .dropdown-arrow.open {
@@ -100,4 +120,3 @@
     width: 100%;
   }
 }
-

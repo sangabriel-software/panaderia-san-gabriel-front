@@ -67,7 +67,7 @@ const MobileMateriaPrimaDetails = ({ order, detalleConsumo, onDownloadXLS, onDow
           <div className="d-flex justify-content-between align-items-center py-2">
             <span className="text-muted">Estado orden:</span>
             <Badge bg={encabezado?.estadoOrden === "P" ? "danger" : "success"} className="px-1 py-1">
-              {encabezado?.estadoOrden === "P" ? "Venta Pendiente" : "Venta Cerrada"}
+              {encabezado?.estadoOrden === "P" ? "Orden Pendiente" : "Orden Cerrada"}
             </Badge>
           </div>
         </div>

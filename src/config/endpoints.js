@@ -9,6 +9,7 @@ const getEndpoints = {
     CONSULTAR_DETALLES_ORDENES_PRODUCCION: "/consultar-detalle-ordenes-produccion",
     CONSULTAR_SUCURSALES: "/getSucursales",
     CONSULTAR_CONSUMO_INGREDIENTES: "/consultar-consumo-ingredientes",
+    CONSULTAR_VENTAS_USUARIO: "/consultar-venta-por-usuario",
 };
 
 const postEndpoints = {

@@ -130,7 +130,7 @@ const DesktopHeader = ({ encabezado, onDownloadXLS, onDownloadPDF }) => (
                 >
                   {encabezado?.estadoOrden === "P"
                     ? "Venta Pendiente"
-                    : "Venta Cerrada"}
+                    : "Orden Cerrada"}
                 </Badge>
               </h4>
             </div>

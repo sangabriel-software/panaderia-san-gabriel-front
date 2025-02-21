@@ -7,14 +7,14 @@ function MainLayout() {
   const [showSidebar, setShowSidebar] = useState(window.innerWidth > 768);
   const location = useLocation();
 
-  // Close sidebar on mobile when route changes
+  // Cerrar el Sidebar en móviles cuando cambia la ruta
   useEffect(() => {
     if (window.innerWidth <= 768) {
       setShowSidebar(false);
     }
   }, [location]);
 
-  // Update sidebar visibility on window resize
+  // Actualizar la visibilidad del Sidebar al cambiar el tamaño de la ventana
   useEffect(() => {
     const handleResize = () => {
       setShowSidebar(window.innerWidth > 768);
@@ -31,9 +31,9 @@ function MainLayout() {
   return (
     <div className="app">
       <NavigationBar onMenuClick={toggleSidebar} />
-      <div className="content-wrapper">
-        <Sidebar show={showSidebar} />
-        <main className={`main-content ${!showSidebar ? 'expanded' : ''}`}>
+      <Sidebar show={showSidebar} onClose={() => setShowSidebar(false)} />
+      <div className={`content-wrapper ${!showSidebar ? 'sidebar-closed' : ''}`}>
+        <main className="main-content">
           <Outlet />
         </main>
       </div>

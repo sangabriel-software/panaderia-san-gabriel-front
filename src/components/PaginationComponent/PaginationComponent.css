@@ -1,0 +1,46 @@
+/* PaginationComponent.css */
+.custom-pagination {
+    display: flex !important;
+    gap: 0.5rem !important;
+    align-items: center !important;
+  }
+  
+  .custom-pagination .page-item {
+    margin: 0 !important;
+  }
+  
+  .custom-pagination .page-link {
+    border: none !important;
+    border-radius: 8px !important;
+    padding: 0.5rem 1rem !important;
+    font-size: 0.9rem !important;
+    font-weight: 600 !important;
+    color: #6a1b9a !important; /* Color morado oscuro */
+    background-color: #f8f9fa !important; /* Fondo gris claro */
+    transition: all 0.3s ease !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  }
+  
+  .custom-pagination .page-link:hover {
+    background-color: #e9ecef !important; /* Fondo gris más oscuro al pasar el mouse */
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15) !important;
+  }
+  
+  .custom-pagination .custom-pagination-active .page-link {
+    background: linear-gradient(135deg, #6a1b9a 0%, #ab47bc 100%) !important; /* Degradado morado */
+    color: white !important;
+    box-shadow: 0 4px 8px rgba(106, 27, 154, 0.3) !important;
+  }
+  
+  .custom-pagination .page-item.disabled .page-link {
+    color: #adb5bd !important; /* Color gris para botones deshabilitados */
+    background-color: #f8f9fa !important;
+    box-shadow: none !important;
+    cursor: not-allowed !important;
+  }
+  
+  .custom-pagination .page-item.disabled .page-link:hover {
+    transform: none !important;
+    box-shadow: none !important;
+  }

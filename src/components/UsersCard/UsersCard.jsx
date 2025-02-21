@@ -60,14 +60,50 @@ const UsersCard = ({
 
   const getRandomColor = (name) => {
     const colors = [
-      "#F44336", "#2196F3", "#4CAF50", "#FF9800", "#9C27B0", "#3F51B5",
-      "#E91E63", "#00BCD4", "#8BC34A", "#FFC107", "#673AB7", "#607D8B",
-      "#C2185B", "#512DA8", "#388E3C", "#F57C00", "#7B1FA2", "#1976D2",
-      "#689F38", "#FBC02D", "#0288D1", "#D32F2F", "#388E3C", "#FFA000",
-      "#5D4037", "#303F9F", "#0288D1", "#C62828", "#1565C0", "#AD1457",
-      "#FF7043", "#558B2F", "#FFCA28", "#E64A19", "#5E35B1", "#0288D1",
-      "#283593", "#00796B", "#F06292", "#FF9800", "#6D4C41", "#1B5E20",
-      "#827717", "#8E24AA",
+      "#F44336",
+      "#2196F3",
+      "#4CAF50",
+      "#FF9800",
+      "#9C27B0",
+      "#3F51B5",
+      "#E91E63",
+      "#00BCD4",
+      "#8BC34A",
+      "#FFC107",
+      "#673AB7",
+      "#607D8B",
+      "#C2185B",
+      "#512DA8",
+      "#388E3C",
+      "#F57C00",
+      "#7B1FA2",
+      "#1976D2",
+      "#689F38",
+      "#FBC02D",
+      "#0288D1",
+      "#D32F2F",
+      "#388E3C",
+      "#FFA000",
+      "#5D4037",
+      "#303F9F",
+      "#0288D1",
+      "#C62828",
+      "#1565C0",
+      "#AD1457",
+      "#FF7043",
+      "#558B2F",
+      "#FFCA28",
+      "#E64A19",
+      "#5E35B1",
+      "#0288D1",
+      "#283593",
+      "#00796B",
+      "#F06292",
+      "#FF9800",
+      "#6D4C41",
+      "#1B5E20",
+      "#827717",
+      "#8E24AA",
     ];
 
     const index = name.length % colors.length;
@@ -187,6 +223,7 @@ const UsersCard = ({
               className="btn btn-light w-100 text-start mb-1"
               onClick={(e) => handleOptionClick("delete", e)}
               style={{ color: "#dc3545" }}
+              disabled={role === "Admin" || !role} // Deshabilitar si el rol es "Admin" o no está definido
             >
               <FaTrash className="me-2" />
               Eliminar
@@ -194,6 +231,7 @@ const UsersCard = ({
             <button
               className="btn btn-light w-100 text-start fw-b"
               onClick={(e) => handleOptionClick("block", e)}
+              disabled={role === "Admin" || !role} // Deshabilitar si el rol es "Admin" o no está definido
               style={{
                 color:
                   status === "Activo" || status === "A" ? "#FF9800" : "#0d6efd",
