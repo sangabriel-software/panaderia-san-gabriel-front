@@ -34,6 +34,17 @@
   padding: 10px;
 }
 
+.custom-dropdown-toggle {
+  background-color: var(--bg-topbar) !important;
+  color: var(--text-white);
+  transition: box-shadow 0.3s ease; /* Agrega una transición suave */
+}
+
+.custom-dropdown-toggle:hover {
+  box-shadow: 0 0 15px 5px rgba(255, 255, 255, 0.7); /* Sombra más grande y pronunciada */
+}
+
+
 /* Botón Menú Toggle */
 .menutoggle {
   background-color: var(--bg-topbar) !important;
