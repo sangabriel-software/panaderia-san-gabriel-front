@@ -87,7 +87,7 @@ const IngresarVentaPage = () => {
         aria-labelledby="contained-modal-title-vcenter"
         centered
         fullscreen // Hace que el modal ocupe toda la pantalla
-        className="custom-modal" // Clase CSS personalizada para el modal
+        className="ingresar-venta-modal" // Clase CSS personalizada para el modal
       >
         <Modal.Header className="bg-purple text-white">
           <Modal.Title className="w-100 text-center">
@@ -111,12 +111,12 @@ const IngresarVentaPage = () => {
                     <label className="form-label small text-uppercase text-muted fw-bold mb-2">
                       Turno
                     </label>
-                    <div className="d-flex justify-content-center gap-3 shift-selector">
+                    <div className="d-flex flex-column flex-md-row justify-content-center gap-3 ingresar-venta-shift-selector">
                       <Button
                         variant={
                           turnoValue === "AM" ? "primary" : "outline-primary"
                         }
-                        className="shift-btn shadow"
+                        className="ingresar-venta-shift-btn shadow w-100 w-md-auto"
                         onClick={() => setValue("turno", "AM")}
                       >
                         🌅 AM
@@ -125,14 +125,14 @@ const IngresarVentaPage = () => {
                         variant={
                           turnoValue === "PM" ? "primary" : "outline-primary"
                         }
-                        className="shift-btn shadow"
+                        className="ingresar-venta-shift-btn shadow w-100 w-md-auto"
                         onClick={() => setValue("turno", "PM")}
                       >
                         🌇 PM
                       </Button>
                     </div>
                     {errors.turno && (
-                      <span className="text-danger small">
+                      <span className="ingresar-venta-text-danger small">
                         Selecciona un turno
                       </span>
                     )}
@@ -153,7 +153,7 @@ const IngresarVentaPage = () => {
                     ) : (
                       <Form.Select
                         {...register("sucursal", { required: true })}
-                        className={`custom-select shadow ${
+                        className={`ingresar-venta-custom-select shadow w-100 ${
                           errors.sucursal ? "is-invalid" : ""
                         }`}
                       >
@@ -169,7 +169,7 @@ const IngresarVentaPage = () => {
                       </Form.Select>
                     )}
                     {errors.sucursal && (
-                      <span className="text-danger small">
+                      <span className="ingresar-venta-text-danger small">
                         No se pudieron cargar las sucursales. Intente más tarde.
                       </span>
                     )}
@@ -200,33 +200,16 @@ const IngresarVentaPage = () => {
 
       {/* Encabezado de la orden */}
       {!showModal && (
-        <Card className="order-header-card mt-4 shadow-lg">
+        <Card className="ingresar-venta-order-header-card mt-4 shadow-lg">
           <Card.Body>
             <Row className="text-center">
-              <Col xs={12} md={3}>
-                <div className="order-header-item">
-                  <span className="order-header-label">
-                    <FaCalendarAlt /> Fecha:
+              {/* Sucursal */}
+              <Col xs={12} md={3} className="mb-3 mb-md-0">
+                <div className="ingresar-venta-order-header-item text-start">
+                  <span className="ingresar-venta-order-header-label text-secondary">
+                    <FaStore className="text-primary" /> Sucursal:
                   </span>
-                  <span className="order-header-value">
-                    {dayjs().format("DD/MM/YYYY")}
-                  </span>
-                </div>
-              </Col>
-              <Col xs={12} md={3}>
-                <div className="order-header-item">
-                  <span className="order-header-label">
-                    <FaClock /> Turno:
-                  </span>
-                  <span className="order-header-value">{turnoValue}</span>
-                </div>
-              </Col>
-              <Col xs={12} md={3}>
-                <div className="order-header-item">
-                  <span className="order-header-label">
-                    <FaStore /> Sucursal:
-                  </span>
-                  <span className="order-header-value">
+                  <span className="ingresar-venta-order-header-value">
                     {
                       sucursales.find((s) => s.idSucursal == sucursalValue)
                         ?.nombreSucursal
@@ -234,19 +217,45 @@ const IngresarVentaPage = () => {
                   </span>
                 </div>
               </Col>
-              <Col xs={12} md={3}>
-                <div className="order-header-item">
-                  <span className="order-header-label">
-                    <FaUser /> Usuario:
+
+              {/* Fecha */}
+              <Col xs={6} md={3} className="mb-3 mb-md-0">
+                <div className="ingresar-venta-order-header-item">
+                  <span className="ingresar-venta-order-header-label text-secondary">
+                    <FaCalendarAlt className="text-primary" /> Fecha:
                   </span>
-                  <span className="order-header-value">Usuario Ficticio</span>
+                  <span className="ingresar-venta-order-header-value">
+                    {dayjs().format("DD/MM/YYYY")}
+                  </span>
+                </div>
+              </Col>
+
+              {/* Turno */}
+              <Col xs={6} md={3} className="mb-3 mb-md-0">
+                <div className="ingresar-venta-order-header-item">
+                  <span className="ingresar-venta-order-header-label text-secondary">
+                    <FaClock className="text-primary" /> Turno:
+                  </span>
+                  <span className="ingresar-venta-order-header-value">{turnoValue}</span>
+                </div>
+              </Col>
+
+              {/* Usuario */}
+              <Col xs={12} md={3} className="mb-3 mb-md-0">
+                <div className="ingresar-venta-order-header-item text-start">
+                  <span className="ingresar-venta-order-header-label text-secondary">
+                    <FaUser className="text-primary" /> Usuario:
+                  </span>
+                  <span className="ingresar-venta-order-header-value">Usuario Ficticio</span>
                 </div>
               </Col>
             </Row>
+
+            {/* Botón "Guardar Venta" */}
             <Row className="text-center justify-content-center mt-4">
-              <Col xs={12} md={4}>
+              <Col xs={8} md={4}>
                 <div className="d-flex justify-content-center">
-                  <Button className="save-venta-btn shadow-lg">
+                  <Button className="ingresar-venta-save-venta-btn shadow-lg w-100 w-md-auto">
                     <i className="fas fa-save"></i> Guardar Venta
                   </Button>
                 </div>

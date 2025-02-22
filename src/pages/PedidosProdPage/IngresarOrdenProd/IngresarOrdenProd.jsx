@@ -146,14 +146,14 @@ const IngresarOrdenProd = () => {
                       <div className="d-flex gap-2 shift-selector">
                         <Button
                           variant={turnoValue === "AM" ? "primary" : "outline-primary"}
-                          className="shift-btn"
+                          className="shift-btn-ventas"
                           onClick={() => setValue("turno", "AM")}
                         >
                           🌅 AM
                         </Button>
                         <Button
                           variant={turnoValue === "PM" ? "primary" : "outline-primary"}
-                          className="shift-btn"
+                          className="shift-btn-ventas"
                           onClick={() => setValue("turno", "PM")}
                         >
                           🌇 PM
