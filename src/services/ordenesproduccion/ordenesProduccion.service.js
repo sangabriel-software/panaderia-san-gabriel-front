@@ -39,9 +39,10 @@ export const ingresarOrdenProduccionService = async (dataOrden) => {
 }
 
 
-export const consultarDetallenOrdenPorCriterio = async (ordenData) => {
+export const consultarDetallenOrdenPorCriterio = async (ordenTurno, fechaAprducir, idSucursal) => {
   try {
-    const response = await api.get(`${getEndpoints.CONSULTAR_ORDEN_POR_CRITERIOS}?ordenTurno=${ordenData.ordenTurno}&fechaAproducir=${ordenData.fechaAprducir}&idSucursal${ordenData.idsucursl}`);
+    const response = await api.get(`${getEndpoints.CONSULTAR_ORDEN_POR_CRITERIOS}?ordenTurno=${ordenTurno}&fechaAproducir=${fechaAprducir}&idSucursal=${idSucursal}`);
+    console.log(response)
     return response.data;
   } catch (error) {
     throw error;

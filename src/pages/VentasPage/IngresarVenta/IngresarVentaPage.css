@@ -60,3 +60,117 @@
     font-size: 0.875rem; /* Tamaño del texto de error */
     margin-top: 5px; /* Espaciado superior */
   }
+/* Estilos para el encabezado de la orden */
+.order-header-card {
+  background: rgba(255, 255, 255, 0.95);
+  border: none;
+  border-radius: 15px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  padding: 20px;
+  margin-top: 20px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.order-header-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+}
+
+.order-header-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #6c757d;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.order-header-label i {
+  font-size: 1.2rem;
+  color: #6c757d;
+}
+
+.order-header-value {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-top: 5px;
+}
+
+/* Iconos para el encabezado */
+.order-header-item .fa-calendar-alt,
+.order-header-item .fa-clock,
+.order-header-item .fa-store,
+.order-header-item .fa-user {
+  font-size: 1.2rem;
+  color: #6c757d;
+}
+
+/* Estilos para el botón "Guardar Venta" */
+.save-venta-btn {
+  background: linear-gradient(135deg, #6a01ac, #8e44ad);
+  border: none;
+  border-radius: 12px;
+  padding: 12px 24px;
+  font-weight: 600;
+  color: white;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(106, 1, 172, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.save-venta-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(106, 1, 172, 0.4);
+}
+
+.save-venta-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 12px rgba(106, 1, 172, 0.3);
+}
+
+.save-venta-btn i {
+  font-size: 1.2rem;
+}
+
+/* Sombras y efectos modernos */
+.shadow-sm {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.shadow-md {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.shadow-lg {
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.3);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .order-header-card {
+    margin-top: 10px;
+    padding: 15px;
+  }
+
+  .order-header-label {
+    font-size: 0.8rem;
+  }
+
+  .order-header-value {
+    font-size: 1rem;
+  }
+
+  .save-venta-btn {
+    padding: 10px 20px;
+    font-size: 0.9rem;
+  }
+}
