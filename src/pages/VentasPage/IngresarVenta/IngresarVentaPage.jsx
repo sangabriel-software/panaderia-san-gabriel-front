@@ -228,7 +228,7 @@ const IngresarVentaPage = () => {
                   </span>
                   <span className="order-header-value">
                     {
-                      sucursales.find((s) => s.idSucursal === sucursalValue)
+                      sucursales.find((s) => s.idSucursal == sucursalValue)
                         ?.nombreSucursal
                     }
                   </span>

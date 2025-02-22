@@ -174,3 +174,33 @@
     font-size: 0.9rem;
   }
 }
+
+/* Estilos para el botón "Guardar Venta" */
+.save-venta-btn {
+  background: linear-gradient(135deg, #6a01ac, #8e44ad);
+  border: none;
+  border-radius: 12px;
+  padding: 12px 24px;
+  font-weight: 600;
+  color: white;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(106, 1, 172, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.save-venta-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(106, 1, 172, 0.4);
+}
+
+.save-venta-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 12px rgba(106, 1, 172, 0.3);
+}
+
+.save-venta-btn i {
+  font-size: 1.2rem;
+}
