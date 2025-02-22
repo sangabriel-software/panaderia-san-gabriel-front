@@ -124,9 +124,9 @@
 }
 
 .btnAgregarUsuario:hover {
-  background-color: #1E1E1E !important; /* Fondo oscuro en hover */
-  color: #BB86FC !important; /* Texto morado claro en hover */
-  border: 2px solid #BB86FC !important; /* Borde morado claro en hover */
+  background-color: #ffffff !important; /* Fondo oscuro en hover */
+  color: #6d28d9 !important; /* Texto morado claro en hover */
+  border: 2px solid #6d28d9 !important; /* Borde morado claro en hover */
   transform: translateY(-2px) !important;
   box-shadow: 0 6px 8px rgba(187, 134, 252, 0.3) !important; /* Sombra morada en hover */
 }

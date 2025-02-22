@@ -1,111 +1,62 @@
-/* Estilos generales */
-.ingresar-venta-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-    font-family: 'Poppins', sans-serif;
+/* Estilos generales para el modal */
+.custom-modal .modal-content {
+    background-color: #262335; /* Fondo oscuro moderno */
+    color: #ecf0f1; /* Texto claro */
+    border-radius: 15px; /* Bordes redondeados */
+    border: none; /* Sin bordes */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); /* Sombra suave */
   }
   
-  .titulo {
-    text-align: center;
-    color: #1E3032;
-    margin-bottom: 30px;
-    font-size: 2rem;
+  .custom-modal .modal-header {
+    border-bottom: none; /* Sin borde inferior */
+    padding: 20px; /* Espaciado interno */
   }
   
-  /* Modal personalizado */
-  .modal-content {
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  .custom-modal .modal-footer {
+    border-top: none; /* Sin borde superior */
+    padding: 20px; /* Espaciado interno */
   }
   
-  .modal-header {
-    background-color: #1E3032;
-    color: #ffffff;
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
+  .custom-modal .modal-title {
+    font-size: 1.5rem; /* Tamaño del título */
+    font-weight: bold; /* Texto en negrita */
   }
   
-  .modal-title {
-    font-weight: 600;
+  /* Estilos para los inputs */
+  .custom-select {
+    color: #262335; /* Texto claro */
+    border: none; /* Sin bordes */
+    border-radius: 10px; /* Bordes redondeados */
+    padding: 10px; /* Espaciado interno */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Sombra suave */
+    transition: all 0.3s ease; /* Transición suave */
   }
   
-  .modal-body {
-    padding: 20px;
+  .custom-select:focus {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3); /* Sombra más pronunciada al enfocar */
   }
   
-  .modal-footer {
-    border-bottom-left-radius: 10px;
-    border-bottom-right-radius: 10px;
-  }
-  
-  /* Botones de turno */
-  .shift-selector {
-    display: flex;
-    gap: 10px;
-  }
-  
+  /* Estilos para los botones de turno */
   .shift-btn {
-    flex: 1;
-    padding: 10px;
-    font-size: 1rem;
-    border-radius: 8px;
-    transition: all 0.3s ease;
+    width: 100px; /* Ancho fijo para los botones de turno */
+    border-radius: 10px; /* Bordes redondeados */
+    padding: 10px; /* Espaciado interno */
+    transition: all 0.3s ease; /* Transición suave */
   }
   
-  /* Listado de productos */
-  .listado-productos {
-    margin-top: 30px;
+  .shift-btn:hover {
+    transform: scale(1.05); /* Efecto de escala al hacer hover */
   }
   
-  .listado-productos h2 {
-    color: #1E3032;
-    margin-bottom: 20px;
-    font-size: 1.5rem;
+  /* Estilos para el contenedor de los botones de turno */
+  .shift-selector {
+    gap: 10px; /* Espacio entre los botones de turno */
+    display: flex;
+    justify-content: center; /* Centrar los botones */
   }
   
-  .tabla-productos {
-    width: 100%;
-    border-collapse: collapse;
-    background-color: #ffffff;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    overflow: hidden;
-  }
-  
-  .tabla-productos th,
-  .tabla-productos td {
-    padding: 12px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-  }
-  
-  .tabla-productos th {
-    background-color: #1E3032;
-    color: #ffffff;
-    font-weight: 600;
-  }
-  
-  .tabla-productos tbody tr:hover {
-    background-color: #f5f5f5;
-  }
-  
-  /* Mensaje si no hay productos */
-  .mensaje-vacio {
-    text-align: center;
-    color: #666;
-    font-size: 1.2rem;
-    margin-top: 20px;
-  }
-  
-  /* Diseño responsive */
-  @media (max-width: 768px) {
-    .tabla-productos {
-      display: block;
-      overflow-x: auto;
-    }
-  
-    .modal-content {
-      margin: 10px;
-    }
+  /* Estilos para el texto de error */
+  .text-danger {
+    font-size: 0.875rem; /* Tamaño del texto de error */
+    margin-top: 5px; /* Espaciado superior */
   }
