@@ -2,22 +2,44 @@ import React, { useState, useEffect } from "react";
 import dayjs from "dayjs";
 import { consultarDetallenOrdenPorCriterio } from "../../../services/ordenesproduccion/ordenesProduccion.service";
 import useGetSucursales from "../../../hooks/sucursales/useGetSucursales";
-import { Modal, Button, Form, Spinner, Container, Row,  Col, Card, } from "react-bootstrap"; // Componentes de Bootstrap
-import { FaTimes, FaCalendarAlt, FaClock, FaStore, FaUser, } from "react-icons/fa"; // Iconos modernos
+import {
+  Modal,
+  Button,
+  Form,
+  Spinner,
+  Container,
+  Row,
+  Col,
+  Card,
+} from "react-bootstrap"; // Componentes de Bootstrap
+import {
+  FaTimes,
+  FaCalendarAlt,
+  FaClock,
+  FaStore,
+  FaUser,
+} from "react-icons/fa"; // Iconos modernos
 import { useNavigate } from "react-router-dom"; // Para redirigir
 import "./IngresarVentaPage.css"; // Estilos CSS
 import { useForm } from "react-hook-form";
 import { getUserData } from "../../../utils/Auth/decodedata";
+import { handleCloseModal } from "./IngresarVenta.Utils";
+import DotsMove from "../../../components/Spinners/DotsMove";
 
 const IngresarVentaPage = () => {
   const usuario = getUserData(); //Informacion del usuario conectado
-  const [detalleOrden, setDetalleOrden] = useState([]); // Estado para almacenar los detalles de la orden
+  const [orden, setOrden] = useState([]); // Estado para almacenar los detalles de la orden
   const [isLoading, setIsLoading] = useState(false); // Estado para el loading
   const [showModal, setShowModal] = useState(true); // Estado para mostrar/ocultar el modal
   const { sucursales, loadingSucursales } = useGetSucursales(); // Custom hook para obtener sucursales
   const navigate = useNavigate(); // Hook para redirigir
 
-  const { register, watch, setValue, formState: { errors }, } = useForm({ defaultValues: { turno: "AM", sucursal: "" } });
+  const {
+    register,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm({ defaultValues: { turno: "AM", sucursal: "" } });
   const turnoValue = watch("turno");
   const sucursalValue = watch("sucursal");
 
@@ -37,8 +59,7 @@ const IngresarVentaPage = () => {
         dayjs().format("YYYY-MM-DD"),
         sucursalValue
       );
-      console.log(resultado)
-      setDetalleOrden(resultado);
+      setOrden(resultado);
       setShowModal(false); // Cerrar el modal después de la búsqueda
     } catch (error) {
       console.error("Error al buscar ventas:", error);
@@ -49,12 +70,6 @@ const IngresarVentaPage = () => {
       setIsLoading(false);
     }
   };
-
-  // Función para cerrar el modal y redirigir a /ventas
-  const handleCloseModal = () => {
-    navigate("/ventas");
-  };
-
 
   return (
     <Container>
@@ -73,7 +88,9 @@ const IngresarVentaPage = () => {
           </Modal.Title>
           <Button
             variant="link"
-            onClick={handleCloseModal}
+            onClick={() => {
+              handleCloseModal(navigate);
+            }}
             className="text-white"
           >
             <FaTimes />
@@ -152,6 +169,11 @@ const IngresarVentaPage = () => {
                       </span>
                     )}
                   </Form.Group>
+                  {isLoading && (
+                    <div className="d-flex justify-content-center mt-3">
+                      <DotsMove />
+                    </div>
+                  )}
                 </Form>
               </Col>
             </Row>
@@ -160,21 +182,15 @@ const IngresarVentaPage = () => {
         <Modal.Footer className="bg-purple">
           <Button
             variant="light"
-            onClick={handleCloseModal}
+            onClick={() => {
+              handleCloseModal(navigate);
+            }}
             className="bt-cancelar shadow"
           >
             Cancelar
           </Button>
         </Modal.Footer>
       </Modal>
-
-      {isLoading && !showModal && (
-        <div className="text-center mt-5">
-          <Spinner animation="border" role="status">
-            <span className="visually-hidden">Cargando...</span>
-          </Spinner>
-        </div>
-      )}
 
       {/* Encabezado de la orden */}
       {!showModal && !isLoading && (
