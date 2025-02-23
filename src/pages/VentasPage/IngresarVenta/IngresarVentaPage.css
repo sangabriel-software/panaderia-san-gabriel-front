@@ -175,3 +175,30 @@ box-shadow: 0 12px 36px rgba(0, 0, 0, 0.3);
   font-size: 0.9rem;
 }
 }
+
+.submit-btn {
+  background: #6a01ac;
+  border: none;
+  border-radius: 15px;
+  padding: 1rem 2.5rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(52, 152, 219, 0.3);
+}
+
+.submit-btn::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: rgba(255, 255, 255, 0.1);
+  transform: rotate(45deg);
+}

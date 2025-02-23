@@ -2,46 +2,22 @@ import React, { useState, useEffect } from "react";
 import dayjs from "dayjs";
 import { consultarDetallenOrdenPorCriterio } from "../../../services/ordenesproduccion/ordenesProduccion.service";
 import useGetSucursales from "../../../hooks/sucursales/useGetSucursales";
-import {
-  Modal,
-  Button,
-  Form,
-  Spinner,
-  Container,
-  Row,
-  Col,
-  Card,
-} from "react-bootstrap"; // Componentes de Bootstrap
-import {
-  FaTimes,
-  FaCalendarAlt,
-  FaClock,
-  FaStore,
-  FaUser,
-} from "react-icons/fa"; // Iconos modernos
+import { Modal, Button, Form, Spinner, Container, Row,  Col, Card, } from "react-bootstrap"; // Componentes de Bootstrap
+import { FaTimes, FaCalendarAlt, FaClock, FaStore, FaUser, } from "react-icons/fa"; // Iconos modernos
 import { useNavigate } from "react-router-dom"; // Para redirigir
 import "./IngresarVentaPage.css"; // Estilos CSS
 import { useForm } from "react-hook-form";
+import { getUserData } from "../../../utils/Auth/decodedata";
 
 const IngresarVentaPage = () => {
+  const usuario = getUserData(); //Informacion del usuario conectado
   const [detalleOrden, setDetalleOrden] = useState([]); // Estado para almacenar los detalles de la orden
   const [isLoading, setIsLoading] = useState(false); // Estado para el loading
   const [showModal, setShowModal] = useState(true); // Estado para mostrar/ocultar el modal
   const { sucursales, loadingSucursales } = useGetSucursales(); // Custom hook para obtener sucursales
   const navigate = useNavigate(); // Hook para redirigir
 
-  const {
-    register,
-    watch,
-    setValue,
-    formState: { errors },
-  } = useForm({
-    defaultValues: {
-      turno: "AM", // Valor inicial del turno
-      sucursal: "", // Valor inicial de la sucursal
-    },
-  });
-
+  const { register, watch, setValue, formState: { errors }, } = useForm({ defaultValues: { turno: "AM", sucursal: "" } });
   const turnoValue = watch("turno");
   const sucursalValue = watch("sucursal");
 
@@ -61,6 +37,7 @@ const IngresarVentaPage = () => {
         dayjs().format("YYYY-MM-DD"),
         sucursalValue
       );
+      console.log(resultado)
       setDetalleOrden(resultado);
       setShowModal(false); // Cerrar el modal después de la búsqueda
     } catch (error) {
@@ -77,6 +54,7 @@ const IngresarVentaPage = () => {
   const handleCloseModal = () => {
     navigate("/ventas");
   };
+
 
   return (
     <Container>
@@ -190,7 +168,7 @@ const IngresarVentaPage = () => {
         </Modal.Footer>
       </Modal>
 
-      {isLoading && (
+      {isLoading && !showModal && (
         <div className="text-center mt-5">
           <Spinner animation="border" role="status">
             <span className="visually-hidden">Cargando...</span>
@@ -199,7 +177,7 @@ const IngresarVentaPage = () => {
       )}
 
       {/* Encabezado de la orden */}
-      {!showModal && (
+      {!showModal && !isLoading && (
         <Card className="ingresar-venta-order-header-card mt-4 shadow-lg">
           <Card.Body>
             <Row className="text-center">
@@ -236,7 +214,9 @@ const IngresarVentaPage = () => {
                   <span className="ingresar-venta-order-header-label text-secondary">
                     <FaClock className="text-primary" /> Turno:
                   </span>
-                  <span className="ingresar-venta-order-header-value">{turnoValue}</span>
+                  <span className="ingresar-venta-order-header-value">
+                    {turnoValue}
+                  </span>
                 </div>
               </Col>
 
@@ -246,7 +226,9 @@ const IngresarVentaPage = () => {
                   <span className="ingresar-venta-order-header-label text-secondary">
                     <FaUser className="text-primary" /> Usuario:
                   </span>
-                  <span className="ingresar-venta-order-header-value">Usuario Ficticio</span>
+                  <span className="ingresar-venta-order-header-value">
+                    {usuario.usuario}
+                  </span>
                 </div>
               </Col>
             </Row>
@@ -255,8 +237,22 @@ const IngresarVentaPage = () => {
             <Row className="text-center justify-content-center mt-4">
               <Col xs={8} md={4}>
                 <div className="d-flex justify-content-center">
-                  <Button className="ingresar-venta-save-venta-btn shadow-lg w-100 w-md-auto">
-                    <i className="fas fa-save"></i> Guardar Venta
+                  <Button
+                    variant="primary"
+                    className="submit-btn"
+                    type="submit"
+                  >
+                    {isLoading ? (
+                      <span
+                        className="spinner-border spinner-border-sm"
+                        role="status"
+                      />
+                    ) : (
+                      <>
+                        <span className="btn-icon">🚀</span>
+                        Guardar Orden
+                      </>
+                    )}
                   </Button>
                 </div>
               </Col>
