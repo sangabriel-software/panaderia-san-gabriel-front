@@ -9,6 +9,9 @@ import { useForm } from "react-hook-form";
 import { getUserData } from "../../../utils/Auth/decodedata";
 import { handleBuscarVentas, handleCloseModal } from "./IngresarVenta.Utils";
 import DotsMove from "../../../components/Spinners/DotsMove";
+import SalesSummary from "../../../components/ventas/SalesSumamary/SalesSummary";
+import Title from "../../../components/Title/Title";
+import { BsArrowLeft } from "react-icons/bs";
 
 // Función para obtener las iniciales de un nombre
 const getInitials = (name) => {
@@ -45,6 +48,7 @@ const IngresarVentaPage = () => {
   const [activeCategory, setActiveCategory] = useState("");
   const [trayQuantities, setTrayQuantities] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
+  const [showSalesSummary, setShowSalesSummary] = useState(false); // Estado para controlar la visibilidad del SalesSummary
 
   useEffect(() => {
     if (turnoValue && sucursalValue) {
@@ -83,8 +87,14 @@ const IngresarVentaPage = () => {
     setShowModal(true); // Abrir el modal
   };
 
+  // Función para manejar el clic en "Guardar Venta"
+  const handleGuardarVenta = () => {
+    setShowSalesSummary(true); // Mostrar el modal de SalesSummary
+  };
+
   return (
     <Container>
+      {/* Modal para ingreso de datos para la consulta de ordenes */}
       <Modal
         show={showModal}
         onHide={handleCloseModal}
@@ -186,6 +196,24 @@ const IngresarVentaPage = () => {
         </Modal.Footer>
       </Modal>
 
+
+      {/* Encabezado */}
+      <div className="text-center mb-">
+        <div className="d-flex align-items-center justify-content-center gap-5">
+          <button
+            className="btn btn-return rounded-circle shadow-sm"
+            onClick={() => navigate("/ventas")}
+          >
+            <BsArrowLeft size={20} />
+          </button>
+          <Title
+            title="Ingresar venta"
+            className="gradient-text"
+            icon="🍞"
+          />
+        </div>
+      </div>
+
       {!showModal && !isLoading && (
         <Card className="ingresar-venta-order-header-card mt-1 shadow-lg">
           <Card.Body>
@@ -247,7 +275,7 @@ const IngresarVentaPage = () => {
               </Col>
             </Row>
 
-            {/* Botón "Guardar Orden" */}
+            {/* Botón "Guardar Venta" */}
             <Row className="text-center justify-content-center mt-4">
               <Col xs={12} md={6} lg={3}>
                 <div className="d-flex justify-content-center">
@@ -255,6 +283,7 @@ const IngresarVentaPage = () => {
                     variant="primary"
                     className="submit-btn w-100"
                     type="submit"
+                    onClick={handleGuardarVenta} // Mostrar el SalesSummary al hacer clic
                   >
                     {isLoading ? (
                       <span className="spinner-border spinner-border-sm" role="status" />
@@ -343,6 +372,32 @@ const IngresarVentaPage = () => {
           </Row>
         </div>
       )}
+
+      {/* Modal de SalesSummary */}
+      <SalesSummary
+        show={showSalesSummary}
+        handleClose={() => setShowSalesSummary(false)}
+        orderData={{
+          sucursal: sucursalValue,
+          turno: turnoValue,
+          fechaAProducir: dayjs().format("YYYY-MM-DD"),
+          nombrePanadero: usuario.usuario,
+        }}
+        trayQuantities={trayQuantities}
+        productos={productos}
+        sucursales={sucursales}
+        isLoading={isLoading}
+        onConfirm={() => {
+          // Aquí puedes agregar la lógica para guardar la venta
+          console.log("Venta guardada");
+          setShowSalesSummary(false); // Cerrar el modal después de confirmar
+        }}
+        paymentData={{
+          montoTotal: 0, // Aquí puedes calcular el monto total
+          metodoPago: "Efectivo", // Método de pago por defecto
+          estadoPago: "Pendiente", // Estado de pago por defecto
+        }}
+      />
     </Container>
   );
 };
