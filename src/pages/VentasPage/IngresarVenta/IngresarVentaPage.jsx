@@ -12,6 +12,7 @@ import DotsMove from "../../../components/Spinners/DotsMove";
 import SalesSummary from "../../../components/ventas/SalesSumamary/SalesSummary";
 import Title from "../../../components/Title/Title";
 import { BsArrowLeft } from "react-icons/bs";
+import { ingresarVentaService } from "../../../services/ventas/ventas.service";
 
 // Función para obtener las iniciales de un nombre
 const getInitials = (name) => {
@@ -48,7 +49,7 @@ const IngresarVentaPage = () => {
   const [activeCategory, setActiveCategory] = useState("");
   const [trayQuantities, setTrayQuantities] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
-  const [showSalesSummary, setShowSalesSummary] = useState(false); // Estado para controlar la visibilidad del SalesSummary
+  const [showSalesSummary, setShowSalesSummary] = useState(false);
 
   useEffect(() => {
     if (turnoValue && sucursalValue) {
@@ -56,17 +57,14 @@ const IngresarVentaPage = () => {
     }
   }, [turnoValue, sucursalValue]);
 
-  // Obtener categorías únicas de ordenYProductos
   const categorias = [...new Set(ordenYProductos.map((p) => p.nombreCategoria))];
 
-  // Establecer la primera categoría como activa si no hay una seleccionada
   useEffect(() => {
     if (categorias.length > 0 && !activeCategory) {
       setActiveCategory(categorias[0]);
     }
   }, [categorias, activeCategory]);
 
-  // Filtrar productos por nombre
   const filterProductsByName = (products, searchTerm) => {
     if (!searchTerm) return products;
     return products.filter((producto) =>
@@ -74,23 +72,71 @@ const IngresarVentaPage = () => {
     );
   };
 
-  // Filtrar productos por categoría y búsqueda
   const filteredProducts = filterProductsByName(ordenYProductos, searchTerm);
   const productsToShow = searchTerm
     ? filteredProducts
     : filteredProducts.filter((p) => p.nombreCategoria === activeCategory);
 
-  // Función para limpiar datos y abrir el modal
   const handleModificarDatos = () => {
-    setValue("sucursal", ""); // Limpiar sucursal
-    setValue("turno", "AM"); // Reiniciar turno a "AM"
-    setShowModal(true); // Abrir el modal
+    setValue("sucursal", "");
+    setValue("turno", "AM");
+    setShowModal(true);
   };
 
-  // Función para manejar el clic en "Guardar Venta"
-  const handleGuardarVenta = () => {
-    setShowSalesSummary(true); // Mostrar el modal de SalesSummary
+  const handleGuardarVenta = async () => {
+    setIsLoading(true);
+  
+    const fechaActual = dayjs().format("YYYY-MM-DD");
+  
+    // Acceder al idOrdenProduccion desde encabezadoOrden
+    const idOrdenProduccion = orden.encabezadoOrden ? orden.encabezadoOrden.idOrdenProduccion : null;
+  
+    const encabezadoVenta = {
+      idOrdenProduccion: idOrdenProduccion, // Usar el idOrdenProduccion correcto
+      idUsuario: usuario.idUsuario,
+      idSucursal: sucursalValue,
+      fechaVenta: fechaActual,
+      fechaCreacion: fechaActual,
+    };
+  
+    const detalleVenta = Object.keys(trayQuantities)
+    .filter((idProducto) => trayQuantities[idProducto] > 0) // Solo productos con cantidad > 0
+    .map((idProducto) => {
+      const producto = productos.find((p) => p.idProducto === parseInt(idProducto));
+      return {
+        idProducto: producto.idProducto,
+        idCategoria: producto.idCategoria,
+        unidadesNoVendidas:
+          producto.idCategoria === 1 && idOrdenProduccion ? trayQuantities[idProducto] : null, // Solo si es categoría 1 y hay orden
+        cantidadVendida:
+          !idOrdenProduccion || (idOrdenProduccion &&  producto.idCategoria) ? trayQuantities[idProducto] : null, // Solo si no hay orden
+        fechaCreacion: fechaActual,
+      };
+    });
+  
+    const payload = {
+      encabezadoVenta,
+      detalleVenta,
+    };
+
+    console.log(payload)
+  
+    try {
+      const resIngrearVenta = await ingresarVentaService(payload);
+      setShowSalesSummary(false); // Cerrar el modal después de guardar
+      setIsLoading(false);
+      navigate("/ventas");
+    } catch (error) {
+      if(error.status === 422){
+        alert("Has ingrsado mas unidades restantes que las producidad en algun producto")
+      }
+      setIsLoading(false);
+      setErrorPopupMessage("Error al guardar la venta. Intente nuevamente.");
+      setIsPopupErrorOpen(true);
+    }
   };
+
+
 
   return (
     <Container>
@@ -196,7 +242,6 @@ const IngresarVentaPage = () => {
         </Modal.Footer>
       </Modal>
 
-
       {/* Encabezado */}
       <div className="text-center mb-">
         <div className="d-flex align-items-center justify-content-center gap-5">
@@ -283,7 +328,7 @@ const IngresarVentaPage = () => {
                     variant="primary"
                     className="submit-btn w-100"
                     type="submit"
-                    onClick={handleGuardarVenta} // Mostrar el SalesSummary al hacer clic
+                    onClick={() => setShowSalesSummary(true)} // Solo abre el modal
                   >
                     {isLoading ? (
                       <span className="spinner-border spinner-border-sm" role="status" />
@@ -387,11 +432,7 @@ const IngresarVentaPage = () => {
         productos={productos}
         sucursales={sucursales}
         isLoading={isLoading}
-        onConfirm={() => {
-          // Aquí puedes agregar la lógica para guardar la venta
-          console.log("Venta guardada");
-          setShowSalesSummary(false); // Cerrar el modal después de confirmar
-        }}
+        onConfirm={handleGuardarVenta} // Lógica de guardado aquí
         paymentData={{
           montoTotal: 0, // Aquí puedes calcular el monto total
           metodoPago: "Efectivo", // Método de pago por defecto

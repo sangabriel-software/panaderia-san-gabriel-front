@@ -11,3 +11,13 @@ export const consultarVentasPorUsuarioService = async (usuario) => {
     throw error;
   }
 };
+
+export const ingresarVentaService = async (dateVenta) => {
+  try {
+      const response = await api.post(`${postEndpoints.INGRESAR_VENTA}`, dateVenta); 
+      return response.data;
+  } catch (error) {
+  
+    throw error;
+  }
+}

@@ -22,7 +22,8 @@ const postEndpoints = {
     INGRESAR_PRECIOPRODUCTO: "/ingresarPrecio",
     INGRESAR_IMAGEN_PRODUCTO: "/ingresar-img-producto",
     INGRESAR_CATEGORIA: "/ingresarcategoria",
-    INGRESAR_ORDEN_PRODUCCION: "/ingresar-orden"
+    INGRESAR_ORDEN_PRODUCCION: "/ingresar-orden",
+    INGRESAR_VENTA: "/ingresar-venta",
 };
 
 const putEndpoints = {
