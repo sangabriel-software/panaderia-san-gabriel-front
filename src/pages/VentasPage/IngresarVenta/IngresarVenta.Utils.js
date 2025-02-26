@@ -1,12 +1,19 @@
 import dayjs from "dayjs";
 import { consultarDetalleOrdenPorCriterio } from "../../../services/ordenesproduccion/ordenesProduccion.service";
-import useGetProductosYPrecios from "../../../hooks/productosprecios/useGetProductosYprecios";
 import { consultarProductosService } from "../../../services/productos/productos.service";
-
+import { getUserData } from "../../../utils/Auth/decodedata";
+import { ingresarVentaService } from "../../../services/ventas/ventas.service";
 
 // Función para cerrar el modal y redirigir a /ventas
 export const handleCloseModal = (navigate) => {
     navigate("/ventas");
+};
+
+//funcion para la modificacion de datos ingresados (turno o sucursal)
+export const handleModificarDatos = (setValue, setShowModal) => {
+  setValue("sucursal", "");
+  setValue("turno", "AM");
+  setShowModal(true);
 };
 
 
@@ -77,5 +84,83 @@ export const handleBuscarVentas = async ( setIsLoading, turnoValue, sucursalValu
     setIsPopupErrorOpen(true);
   } finally {
     setIsLoading(false);
+  }
+};
+
+
+// IngresarVenta.utils.js
+export const handleGuardarVenta = async (setIsLoading, orden, sucursalValue, usuario, productos, trayQuantities, setShowSalesSummary, navigate, setErrorPopupMessage, setIsPopupErrorOpen ) => {
+  setIsLoading(true);
+
+  const fechaActual = dayjs().format("YYYY-MM-DD");
+
+  // Acceder al idOrdenProduccion desde encabezadoOrden
+  const idOrdenProduccion = orden.encabezadoOrden ? orden.encabezadoOrden.idOrdenProduccion : null;
+
+  const encabezadoVenta = {
+    idOrdenProduccion: idOrdenProduccion, // Usar el idOrdenProduccion correcto
+    idUsuario: usuario.idUsuario,
+    idSucursal: sucursalValue,
+    fechaVenta: fechaActual,
+    fechaCreacion: fechaActual,
+  };
+
+  // Lógica para construir detalleVenta
+  const detalleVenta = productos
+    .map((producto) => {
+      const cantidadIngresada = trayQuantities[producto.idProducto] || 0; // Si no hay valor, se establece en 0
+
+      // Solo para la categoría 1 (Panadería) y si hay idOrdenProduccion
+      if (producto.idCategoria === 1 && idOrdenProduccion) {
+        // Verificar si el producto está en la orden
+        const productoEnOrden = orden.detalleOrden.some(
+          (detalle) => detalle.idProducto === producto.idProducto
+        );
+
+        if (productoEnOrden) {
+          return {
+            idProducto: producto.idProducto,
+            idCategoria: producto.idCategoria,
+            unidadesNoVendidas: cantidadIngresada, // Siempre se incluye, incluso si es 0
+            cantidadVendida: null, // No se usa para la categoría 1 cuando hay orden
+            fechaCreacion: fechaActual,
+          };
+        } else {
+          return null; // No se incluye si no está en la orden
+        }
+      } else {
+        // Para otras categorías o si no hay idOrdenProduccion
+        if (cantidadIngresada > 0) {
+          return {
+            idProducto: producto.idProducto,
+            idCategoria: producto.idCategoria,
+            unidadesNoVendidas: null, // No aplica
+            cantidadVendida: cantidadIngresada, // Solo si se ingresó una cantidad
+            fechaCreacion: fechaActual,
+          };
+        } else {
+          return null; // No se incluye en el payload si no se ingresó cantidad
+        }
+      }
+    })
+    .filter(Boolean); // Filtrar elementos nulos (productos no incluidos)
+
+  const payload = {
+    encabezadoVenta,
+    detalleVenta,
+  };
+
+  try {
+    const resIngrearVenta = await ingresarVentaService(payload);
+    setShowSalesSummary(false); // Cerrar el modal después de guardar
+    setIsLoading(false);
+    navigate("/ventas");
+  } catch (error) {
+    if (error.status === 422) {
+      alert("Has ingresado más unidades restantes que las producidas en algún producto");
+    }
+    setIsLoading(false);
+    setErrorPopupMessage("Error al guardar la venta. Intente nuevamente.");
+    setIsPopupErrorOpen(true);
   }
 };

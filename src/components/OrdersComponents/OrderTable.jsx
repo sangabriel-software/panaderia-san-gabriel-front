@@ -86,7 +86,7 @@ const OrderTable = ({ orders, onDelete, onViewPdf, loadingViewPdf }) => {
                 className="text-center"
                 title="Doble clic para ver detalles"
               >
-                <Badge pill className={`status-badge ${order.estadoOrden === "P" ? "status-pending" : "status-completed"}`}>
+                <Badge className={`status-badge ${order.estadoOrden === "P" ? "status-pending" : "status-completed"}`}>
                   {order.estadoOrden === "P" ? "Pendiente" : "Completado"}
                 </Badge>
               </td>

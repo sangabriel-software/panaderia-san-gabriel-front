@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import "./IngresarVentaPage.css";
 import { useForm } from "react-hook-form";
 import { getUserData } from "../../../utils/Auth/decodedata";
-import { handleBuscarVentas, handleCloseModal } from "./IngresarVenta.Utils";
+import { handleBuscarVentas, handleCloseModal, handleModificarDatos } from "./IngresarVenta.Utils";
 import DotsMove from "../../../components/Spinners/DotsMove";
 import SalesSummary from "../../../components/ventas/SalesSumamary/SalesSummary";
 import Title from "../../../components/Title/Title";
@@ -77,87 +77,15 @@ const IngresarVentaPage = () => {
     ? filteredProducts
     : filteredProducts.filter((p) => p.nombreCategoria === activeCategory);
 
-  const handleModificarDatos = () => {
-    setValue("sucursal", "");
-    setValue("turno", "AM");
-    setShowModal(true);
+
+  const handleModificarDatosWrapper = () => {
+    handleModificarDatos(setValue, setShowModal);
   };
 
-  const handleGuardarVenta = async () => {
-    setIsLoading(true);
-  
-    const fechaActual = dayjs().format("YYYY-MM-DD");
-  
-    // Acceder al idOrdenProduccion desde encabezadoOrden
-    const idOrdenProduccion = orden.encabezadoOrden ? orden.encabezadoOrden.idOrdenProduccion : null;
-  
-    const encabezadoVenta = {
-      idOrdenProduccion: idOrdenProduccion, // Usar el idOrdenProduccion correcto
-      idUsuario: usuario.idUsuario,
-      idSucursal: sucursalValue,
-      fechaVenta: fechaActual,
-      fechaCreacion: fechaActual,
-    };
-  
-    // Lógica para construir detalleVenta
-    const detalleVenta = productos.map((producto) => {
-      const cantidadIngresada = trayQuantities[producto.idProducto] || 0; // Si no hay valor, se establece en 0
-  
-      // Solo para la categoría 1 (Panadería) y si hay idOrdenProduccion
-      if (producto.idCategoria === 1 && idOrdenProduccion) {
-        // Verificar si el producto está en la orden
-        const productoEnOrden = orden.detalleOrden.some(
-          (detalle) => detalle.idProducto === producto.idProducto
-        );
-  
-        if (productoEnOrden) {
-          return {
-            idProducto: producto.idProducto,
-            idCategoria: producto.idCategoria,
-            unidadesNoVendidas: cantidadIngresada, // Siempre se incluye, incluso si es 0
-            cantidadVendida: null, // No se usa para la categoría 1 cuando hay orden
-            fechaCreacion: fechaActual,
-          };
-        } else {
-          return null; // No se incluye si no está en la orden
-        }
-      } else {
-        // Para otras categorías o si no hay idOrdenProduccion
-        if (cantidadIngresada > 0) {
-          return {
-            idProducto: producto.idProducto,
-            idCategoria: producto.idCategoria,
-            unidadesNoVendidas: null, // No aplica
-            cantidadVendida: cantidadIngresada, // Solo si se ingresó una cantidad
-            fechaCreacion: fechaActual,
-          };
-        } else {
-          return null; // No se incluye en el payload si no se ingresó cantidad
-        }
-      }
-    }).filter(Boolean); // Filtrar elementos nulos (productos no incluidos)
-  
-    const payload = {
-      encabezadoVenta,
-      detalleVenta,
-    };
-  
-    try {
-      const resIngrearVenta = await ingresarVentaService(payload);
-      setShowSalesSummary(false); // Cerrar el modal después de guardar
-      setIsLoading(false);
-      navigate("/ventas");
-    } catch (error) {
-      if (error.status === 422) {
-        alert("Has ingresado más unidades restantes que las producidas en algún producto");
-      }
-      setIsLoading(false);
-      setErrorPopupMessage("Error al guardar la venta. Intente nuevamente.");
-      setIsPopupErrorOpen(true);
-    }
+  const handleGuardarVentaWrapper = async () => {
+    await handleGuardarVenta(setIsLoading, orden, sucursalValue, usuario, productos, trayQuantities, setShowSalesSummary,
+                             navigate, setErrorPopupMessage, setIsPopupErrorOpen );
   };
-
-
 
   return (
     <Container>
@@ -288,7 +216,7 @@ const IngresarVentaPage = () => {
               <Button
                 variant="warning"
                 className="modificar-btn"
-                onClick={handleModificarDatos}
+                onClick={handleModificarDatosWrapper}
                 style={{ fontSize: "1rem", padding: "0.3rem 0.5rem" }}
               >
                 <FaEdit />
@@ -453,7 +381,7 @@ const IngresarVentaPage = () => {
         productos={productos}
         sucursales={sucursales}
         isLoading={isLoading}
-        onConfirm={handleGuardarVenta} // Lógica de guardado aquí
+        onConfirm={handleGuardarVentaWrapper} // Lógica de guardado aquí
         paymentData={{
           montoTotal: 0, // Aquí puedes calcular el monto total
           metodoPago: "Efectivo", // Método de pago por defecto
