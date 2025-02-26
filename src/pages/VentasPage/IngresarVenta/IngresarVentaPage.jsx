@@ -105,13 +105,22 @@ const IngresarVentaPage = () => {
   
       // Solo para la categoría 1 (Panadería) y si hay idOrdenProduccion
       if (producto.idCategoria === 1 && idOrdenProduccion) {
-        return {
-          idProducto: producto.idProducto,
-          idCategoria: producto.idCategoria,
-          unidadesNoVendidas: cantidadIngresada, // Siempre se incluye, incluso si es 0
-          cantidadVendida: null, // No se usa para la categoría 1 cuando hay orden
-          fechaCreacion: fechaActual,
-        };
+        // Verificar si el producto está en la orden
+        const productoEnOrden = orden.detalleOrden.some(
+          (detalle) => detalle.idProducto === producto.idProducto
+        );
+  
+        if (productoEnOrden) {
+          return {
+            idProducto: producto.idProducto,
+            idCategoria: producto.idCategoria,
+            unidadesNoVendidas: cantidadIngresada, // Siempre se incluye, incluso si es 0
+            cantidadVendida: null, // No se usa para la categoría 1 cuando hay orden
+            fechaCreacion: fechaActual,
+          };
+        } else {
+          return null; // No se incluye si no está en la orden
+        }
       } else {
         // Para otras categorías o si no hay idOrdenProduccion
         if (cantidadIngresada > 0) {
@@ -132,8 +141,6 @@ const IngresarVentaPage = () => {
       encabezadoVenta,
       detalleVenta,
     };
-  
-    console.log(payload);
   
     try {
       const resIngrearVenta = await ingresarVentaService(payload);
