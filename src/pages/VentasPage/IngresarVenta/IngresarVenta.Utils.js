@@ -164,7 +164,7 @@ const crearDetalleVenta = (productos, trayQuantities, orden, fechaActual) => {
 
 
 // IngresarVenta.utils.js
-export const handleGuardarVenta = async (setIsLoading, orden, sucursalValue, usuario, productos, trayQuantities, setShowSalesSummary, navigate, setErrorPopupMessage, setIsPopupErrorOpen ) => {
+export const handleGuardarVenta = async (setIsLoading, orden, sucursalValue, usuario, productos, trayQuantities, setShowSalesSummary, navigate, setErrorPopupMessage, setIsPopupErrorOpen, setIsPopupSuccessOpen, reset, setTrayQuantities) => {
   setIsLoading(true);
 
   const fechaActual = dayjs().format("YYYY-MM-DD");
@@ -186,15 +186,20 @@ export const handleGuardarVenta = async (setIsLoading, orden, sucursalValue, usu
 
   try {
     const resIngrearVenta = await ingresarVentaService(payload);
-    setShowSalesSummary(false); // Cerrar el modal después de guardar
-    setIsLoading(false);
-    navigate("/ventas");
+    if(resIngrearVenta.status === 200){
+      setTrayQuantities([])
+      reset();
+      setIsPopupSuccessOpen(true);
+    }
   } catch (error) {
     if (error.status === 422) {
-      alert("Has ingresado más unidades restantes que las producidas en algún producto");
+      setErrorPopupMessage("Has ingresado más unidades restantes que las producidas en algún producto");
+    }else{
+      setErrorPopupMessage("Error al guardar la venta. Intente nuevamente.");
     }
-    setIsLoading(false);
-    setErrorPopupMessage("Error al guardar la venta. Intente nuevamente.");
     setIsPopupErrorOpen(true);
+  }finally{
+    setShowSalesSummary(false); // Cerrar el modal después de guardar o en algun error
+    setIsLoading(false);
   }
 };

@@ -1,26 +1,28 @@
 import React, { useState, useEffect } from "react";
 import dayjs from "dayjs";
 import useGetSucursales from "../../../hooks/sucursales/useGetSucursales";
-import { Modal, Button, Form, Spinner, Container, Row, Col, Card, InputGroup } from "react-bootstrap";
-import { FaTimes, FaCalendarAlt, FaClock, FaStore, FaUser, FaEdit } from "react-icons/fa";
+import { Container} from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import DotsMove from "../../../components/Spinners/DotsMove";
 import SalesSummary from "../../../components/ventas/SalesSumamary/SalesSummary";
 import Title from "../../../components/Title/Title";
 import { BsArrowLeft } from "react-icons/bs";
 import { getUserData } from "../../../utils/Auth/decodedata";
-import { filterProductsByName, getInitials, getUniqueColor, handleBuscarVentas, handleCloseModal, handleGuardarVenta, handleModificarDatos } from "./IngresarVenta.Utils";
+import { filterProductsByName, handleGuardarVenta, handleModificarDatos } from "./IngresarVenta.Utils";
 import "./IngresarVentaPage.css";
 import { useBuscarOrden } from "../../../hooks/ventas/useBuscarOrden";
 import { useCategoriasActivas } from "../../../hooks/ventas/useCategoriasActivas";
 import ModalSeleccionarSucursalTurno from "../../../components/ventas/ModalInicio/ModalSeleccionarSucursalTurno";
 import CardResumenVenta from "../../../components/ventas/CardResumenVenta/CardResumenVenta";
 import SeccionProductos from "../../../components/ventas/SeccionProductos/SeccionProductos";
+import ErrorPopup from "../../../components/Popup/ErrorPopUp";
+import SuccessPopup from "../../../components/Popup/SuccessPopup";
+import DotsMove from "../../../components/Spinners/DotsMove";
 
 const IngresarVentaPage = () => {
   const [isPopupErrorOpen, setIsPopupErrorOpen] = useState(false);
   const [errorPopupMessage, setErrorPopupMessage] = useState("");
+  const [isPopupSuccessOpen, setIsPopupSuccessOpen] = useState(false);
   const usuario = getUserData();
   const [orden, setOrden] = useState([]);
   const [productos, setProductos] = useState([]);
@@ -29,7 +31,7 @@ const IngresarVentaPage = () => {
   const [showModal, setShowModal] = useState(true);
   const navigate = useNavigate();
 
-  const { register, watch, setValue, formState: { errors } } = useForm({ defaultValues: { turno: "AM", sucursal: "" } });
+  const { register, watch, setValue, formState: { errors }, reset} = useForm({ defaultValues: { turno: "AM", sucursal: "" } });
   const turnoValue = watch("turno");
   const sucursalValue = watch("sucursal");
   const [trayQuantities, setTrayQuantities] = useState({});
@@ -57,8 +59,9 @@ const IngresarVentaPage = () => {
   //Guardar Venta
   const handleGuardarVentaWrapper = async () => {
     await handleGuardarVenta(setIsLoading, orden, sucursalValue, usuario, productos, trayQuantities, setShowSalesSummary,
-                             navigate, setErrorPopupMessage, setIsPopupErrorOpen );
+                             navigate, setErrorPopupMessage, setIsPopupErrorOpen, setIsPopupSuccessOpen, reset, setTrayQuantities);
   };
+
 
   return (
     <Container>
@@ -89,7 +92,7 @@ const IngresarVentaPage = () => {
         </div>
       </div>
 
-      {!showModal && !isLoading && (
+      {!showModal && (
         // Encabezado de la venta
         <CardResumenVenta
           sucursales={sucursales}
@@ -103,7 +106,7 @@ const IngresarVentaPage = () => {
       )}
 
       {/* Sección de Productos */}
-      {!showModal && !isLoading && (
+      {!showModal && (
         <SeccionProductos
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
@@ -137,6 +140,30 @@ const IngresarVentaPage = () => {
           metodoPago: "Efectivo", // Método de pago por defecto
           estadoPago: "Pendiente", // Estado de pago por defecto
         }}
+      />
+
+      {/* Popup de Éxito */}
+      <SuccessPopup
+        isOpen={isPopupSuccessOpen}
+        onClose={() => setIsPopupSuccessOpen(false)}
+        title="¡Éxito!"
+        message="La Venta se agrego correctamente"
+        nombreBotonVolver="Ver Ventas"
+        nombreBotonNuevo="Ingresar venta"
+        onView={() => navigate("/ventas")}
+        onNew={() => {
+          setShowModal(true);
+          setIsPopupSuccessOpen(false);
+          reset();
+        }}
+      />
+
+      {/* Popup errores */}
+      <ErrorPopup
+        isOpen={isPopupErrorOpen}
+        onClose={() => setIsPopupErrorOpen(false)}
+        title="¡Error!"
+        message={errorPopupMessage}
       />
     </Container>
   );

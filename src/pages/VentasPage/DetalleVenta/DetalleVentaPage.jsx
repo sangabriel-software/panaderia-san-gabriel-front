@@ -9,11 +9,15 @@ import "./DetalleVentaPage.css";
 import VentasTable from "../../../components/ventas/VentasTable/VentasTable";
 import VentasCard from "../../../components/ventas/VentasCard/VentasCard";
 import PaginationComponent from "../../../components/PaginationComponent/PaginationComponent";
-import useFilterOrders from "../../../hooks/ordenesproduccion/useFilterOrders";
 import { getCurrentItems } from "./DetallesVentas.utils";
 import OrderCardSkeleton from "../../../components/OrderCardSkeleton/OrderCardSkeleton";
 import FilterBarVentas from "../../../components/ventas/FilterBar/FilterBarVentas";
 import useFilterVentas from "../../../hooks/ventas/useFilterVentas";
+import {
+  BsFillInfoCircleFill,
+  BsExclamationTriangleFill,
+} from "react-icons/bs";
+import Alert from "../../../components/Alerts/Alert";
 
 const VentaDetallePage = () => {
   const navigate = useNavigate();
@@ -39,7 +43,6 @@ const VentaDetallePage = () => {
   // Usamos useMediaQuery para detectar si es un dispositivo móvil
   const isMobile = useMediaQuery({ query: "(max-width: 768px)" });
 
-  if (showErrorVentas) return <div>Error al cargar las ventas</div>;
 
   const handleDelete = (idVenta) => {
     // Lógica para eliminar una venta
@@ -57,6 +60,11 @@ const VentaDetallePage = () => {
     navigate(`detalle-venta/${venta.idVenta}`);
   };
 
+  // {filteredVentas.length === 0 &&
+  //   !loadingVentas &&
+  //   !showErrorVentas &&
+  //   showInfoVentas &&
+  console.log(showInfoVentas);
   return (
     <Container>
       <Title
@@ -111,6 +119,48 @@ const VentaDetallePage = () => {
           onViewPdf={handleViewPdf}
           loadingViewPdf={null} // Puedes manejar el estado de carga aquí
         />
+      )}
+
+      {/* Alertas mostrar error y notificacion de informacion */}
+      {filteredVentas.length === 0 &&
+        (filters.search || filters.date || filters.sucursal) && (
+          <div className="row justify-content-center my-3">
+            <div className="col-md-6 text-center">
+              <Alert
+                type="primary"
+                message="No se encontraron productos que coincidan con la búsqueda."
+                icon={<BsFillInfoCircleFill />}
+              />
+            </div>
+          </div>
+        )}
+
+      {/* Mensaje cuando no hay ventas */}
+      {filteredVentas.length === 0 &&
+        !loadingVentas &&
+        !showErrorVentas &&
+        showInfoVentas && (
+          <div className="row justify-content-center my-2">
+            <div className="col-md-6 text-center">
+              <Alert
+                type="primary"
+                message="No se han ingresado Ventas."
+                icon={<BsFillInfoCircleFill />}
+              />
+            </div>
+          </div>
+        )}
+
+      {showErrorVentas && (
+        <div className="row justify-content-center my-2">
+          <div className="col-md-6 text-center">
+            <Alert
+              type="danger"
+              message="Hubo un error al consultar las ventas. Intenta más tarde..."
+              icon={<BsExclamationTriangleFill />}
+            />
+          </div>
+        </div>
       )}
     </Container>
   );
