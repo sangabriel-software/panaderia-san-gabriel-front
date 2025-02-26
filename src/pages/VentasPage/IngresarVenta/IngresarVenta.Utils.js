@@ -69,15 +69,20 @@ const filtrarProductosPanaderia = (productos, detalleOrden) => {
 };
 
 // Función principal para manejar la búsqueda de ventas
-export const handleBuscarVentas = async ( setIsLoading, turnoValue, sucursalValue, setOrden, setProductos, setOrdenYProductos, setShowModal, setErrorPopupMessage, setIsPopupErrorOpen ) => {
+export const handleBuscarVentas = async ( setIsLoading, turnoValue, sucursalValue, setOrden, setProductos, setOrdenYProductos, setShowModal, setErrorPopupMessage, setIsPopupErrorOpen, setHasOrdenes ) => {
   setIsLoading(true);
   const today = dayjs().format("YYYY-MM-DD");
 
   try {
     // Consultar la orden
     const orden = await fetchOrden(turnoValue, today, sucursalValue);
+
     if (orden) {
       setOrden(orden); // Guardar la orden en el estado
+    }else{
+      setShowModal(true);
+      setHasOrdenes(false);
+      return;
     }
 
     // Consultar los productos

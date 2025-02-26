@@ -3,9 +3,11 @@ import React from "react";
 import { Modal, Button, Form, Container, Row, Col } from "react-bootstrap";
 import { FaTimes } from "react-icons/fa";
 import DotsMove from "../../../components/Spinners/DotsMove";
+import Alert from "../../Alerts/Alert";
+import { BsFillInfoCircleFill } from "react-icons/bs";
 
 const ModalSeleccionarSucursalTurno = ({ showModal, handleCloseModal, turnoValue, setValue, errors, loadingSucursales, 
-                                         sucursales, register, isLoading, navigate, }) => {
+                                         sucursales, register, isLoading, navigate, hasOrdenes }) => {
   return (
     <Modal
       show={showModal}
@@ -39,14 +41,18 @@ const ModalSeleccionarSucursalTurno = ({ showModal, handleCloseModal, turnoValue
                   </label>
                   <div className="d-flex flex-column flex-md-row justify-content-center gap-3 ingresar-venta-shift-selector">
                     <Button
-                      variant={turnoValue === "AM" ? "primary" : "outline-primary"}
+                      variant={
+                        turnoValue === "AM" ? "primary" : "outline-primary"
+                      }
                       className="ingresar-venta-shift-btn shadow w-100 w-md-auto"
                       onClick={() => setValue("turno", "AM")}
                     >
                       🌅 AM
                     </Button>
                     <Button
-                      variant={turnoValue === "PM" ? "primary" : "outline-primary"}
+                      variant={
+                        turnoValue === "PM" ? "primary" : "outline-primary"
+                      }
                       className="ingresar-venta-shift-btn shadow w-100 w-md-auto"
                       onClick={() => setValue("turno", "PM")}
                     >
@@ -66,16 +72,24 @@ const ModalSeleccionarSucursalTurno = ({ showModal, handleCloseModal, turnoValue
                   </label>
                   {loadingSucursales ? (
                     <div className="loading-spinner">
-                      <div className="spinner-border text-primary" role="status" />
+                      <div
+                        className="spinner-border text-primary"
+                        role="status"
+                      />
                     </div>
                   ) : (
                     <Form.Select
                       {...register("sucursal", { required: true })}
-                      className={`ingresar-venta-custom-select shadow w-100 ${errors.sucursal ? "is-invalid" : ""}`}
+                      className={`ingresar-venta-custom-select shadow w-100 ${
+                        errors.sucursal ? "is-invalid" : ""
+                      }`}
                     >
                       <option value="">Selecciona una sucursal</option>
                       {sucursales.map((sucursal) => (
-                        <option key={sucursal.idSucursal} value={sucursal.idSucursal}>
+                        <option
+                          key={sucursal.idSucursal}
+                          value={sucursal.idSucursal}
+                        >
                           {sucursal.nombreSucursal}
                         </option>
                       ))}
@@ -90,6 +104,18 @@ const ModalSeleccionarSucursalTurno = ({ showModal, handleCloseModal, turnoValue
                 {isLoading && (
                   <div className="d-flex justify-content-center mt-3">
                     <DotsMove />
+                  </div>
+                )}
+
+                {!isLoading && showModal && !hasOrdenes && (
+                  <div className="row justify-content-center my-3">
+                    <div className="col-md-12 text-center">
+                      <Alert
+                        type="danger"
+                        message="No se encontraron ordenes para ingresar una venta."
+                        icon={<BsFillInfoCircleFill />}
+                      />
+                    </div>
                   </div>
                 )}
               </Form>

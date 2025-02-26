@@ -17,7 +17,6 @@ import CardResumenVenta from "../../../components/ventas/CardResumenVenta/CardRe
 import SeccionProductos from "../../../components/ventas/SeccionProductos/SeccionProductos";
 import ErrorPopup from "../../../components/Popup/ErrorPopUp";
 import SuccessPopup from "../../../components/Popup/SuccessPopup";
-import DotsMove from "../../../components/Spinners/DotsMove";
 
 const IngresarVentaPage = () => {
   const [isPopupErrorOpen, setIsPopupErrorOpen] = useState(false);
@@ -29,6 +28,7 @@ const IngresarVentaPage = () => {
   const [ordenYProductos, setOrdenYProductos] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showModal, setShowModal] = useState(true);
+  const [hasOrdenes, setHasOrdenes] = useState(true);
   const navigate = useNavigate();
 
   const { register, watch, setValue, formState: { errors }, reset} = useForm({ defaultValues: { turno: "AM", sucursal: "" } });
@@ -42,7 +42,7 @@ const IngresarVentaPage = () => {
   const { sucursales, loadingSucursales } = useGetSucursales();
 
   // Custom hook para manejar la búsqueda de ventas
-  useBuscarOrden( turnoValue, sucursalValue, setIsLoading, setOrden, setProductos, setOrdenYProductos, setShowModal, setErrorPopupMessage, setIsPopupErrorOpen );
+  useBuscarOrden( turnoValue, sucursalValue, setIsLoading, setOrden, setProductos, setOrdenYProductos, setShowModal, setErrorPopupMessage, setIsPopupErrorOpen, setHasOrdenes );
 
   // custom hook para manejar categorías
   const { activeCategory, setActiveCategory, categorias } = useCategoriasActivas(ordenYProductos);
@@ -77,6 +77,7 @@ const IngresarVentaPage = () => {
         register={register}
         isLoading={isLoading}
         navigate={navigate}
+        hasOrdenes={hasOrdenes}
       />
 
       {/* Encabezado */}
