@@ -99,27 +99,41 @@ const IngresarVentaPage = () => {
       fechaCreacion: fechaActual,
     };
   
-    const detalleVenta = Object.keys(trayQuantities)
-    .filter((idProducto) => trayQuantities[idProducto] > 0) // Solo productos con cantidad > 0
-    .map((idProducto) => {
-      const producto = productos.find((p) => p.idProducto === parseInt(idProducto));
-      return {
-        idProducto: producto.idProducto,
-        idCategoria: producto.idCategoria,
-        unidadesNoVendidas:
-          producto.idCategoria === 1 && idOrdenProduccion ? trayQuantities[idProducto] : null, // Solo si es categoría 1 y hay orden
-        cantidadVendida:
-          !idOrdenProduccion || (idOrdenProduccion &&  producto.idCategoria) ? trayQuantities[idProducto] : null, // Solo si no hay orden
-        fechaCreacion: fechaActual,
-      };
-    });
+    // Lógica para construir detalleVenta
+    const detalleVenta = productos.map((producto) => {
+      const cantidadIngresada = trayQuantities[producto.idProducto] || 0; // Si no hay valor, se establece en 0
+  
+      // Solo para la categoría 1 (Panadería) y si hay idOrdenProduccion
+      if (producto.idCategoria === 1 && idOrdenProduccion) {
+        return {
+          idProducto: producto.idProducto,
+          idCategoria: producto.idCategoria,
+          unidadesNoVendidas: cantidadIngresada, // Siempre se incluye, incluso si es 0
+          cantidadVendida: null, // No se usa para la categoría 1 cuando hay orden
+          fechaCreacion: fechaActual,
+        };
+      } else {
+        // Para otras categorías o si no hay idOrdenProduccion
+        if (cantidadIngresada > 0) {
+          return {
+            idProducto: producto.idProducto,
+            idCategoria: producto.idCategoria,
+            unidadesNoVendidas: null, // No aplica
+            cantidadVendida: cantidadIngresada, // Solo si se ingresó una cantidad
+            fechaCreacion: fechaActual,
+          };
+        } else {
+          return null; // No se incluye en el payload si no se ingresó cantidad
+        }
+      }
+    }).filter(Boolean); // Filtrar elementos nulos (productos no incluidos)
   
     const payload = {
       encabezadoVenta,
       detalleVenta,
     };
-
-    console.log(payload)
+  
+    console.log(payload);
   
     try {
       const resIngrearVenta = await ingresarVentaService(payload);
@@ -127,8 +141,8 @@ const IngresarVentaPage = () => {
       setIsLoading(false);
       navigate("/ventas");
     } catch (error) {
-      if(error.status === 422){
-        alert("Has ingrsado mas unidades restantes que las producidad en algun producto")
+      if (error.status === 422) {
+        alert("Has ingresado más unidades restantes que las producidas en algún producto");
       }
       setIsLoading(false);
       setErrorPopupMessage("Error al guardar la venta. Intente nuevamente.");
@@ -322,7 +336,7 @@ const IngresarVentaPage = () => {
 
             {/* Botón "Guardar Venta" */}
             <Row className="text-center justify-content-center mt-4">
-              <Col xs={12} md={6} lg={3}>
+              <Col xs={12} md={6} lg={4}>
                 <div className="d-flex justify-content-center">
                   <Button
                     variant="primary"
