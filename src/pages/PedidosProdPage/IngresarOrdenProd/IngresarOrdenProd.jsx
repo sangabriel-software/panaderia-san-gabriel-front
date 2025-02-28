@@ -301,11 +301,14 @@ const IngresarOrdenProd = () => {
                       <Form.Control
                         type="number"
                         min="0"
-                        value={trayQuantities[producto.idProducto] || ""}
+                        value={trayQuantities[producto.idProducto]?.cantidad || ""}
                         onChange={(e) =>
                           setTrayQuantities({
                             ...trayQuantities,
-                            [producto.idProducto]: parseInt(e.target.value) || 0,
+                            [producto.idProducto]: {
+                              cantidad: parseInt(e.target.value) || 0,
+                              idCategoria: producto.idCategoria, // Incluye la categoría
+                            },
                           })
                         }
                         className="product-input"

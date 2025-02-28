@@ -56,15 +56,9 @@ const VentaDetallePage = () => {
 
   const handleViewDetails = (venta) => {
     // Lógica para ver detalles de la venta
-    console.log("Ver detalles de la venta:", venta);
     navigate(`detalle-venta/${venta.idVenta}`);
   };
 
-  // {filteredVentas.length === 0 &&
-  //   !loadingVentas &&
-  //   !showErrorVentas &&
-  //   showInfoVentas &&
-  console.log(showInfoVentas);
   return (
     <Container>
       <Title

@@ -33,10 +33,12 @@ const assignedColors = {}; // Almacena los colores asignados de manera persisten
 const crearPyaloadOrdenProduccion = (data, trayQuantities) => {
   const {idUsuario} = getUserData();
   const detalleOrden = Object.entries(trayQuantities)
-    .filter(([_, cantidad]) => cantidad > 0)
-    .map(([idProducto, cantidad]) => ({
+    .filter(([_, { cantidad }]) => cantidad > 0) // Filtra por cantidad > 0
+    .map(([idProducto, { cantidad, idCategoria }]) => ({
       idProducto: Number(idProducto),
-      cantidadBandejas: cantidad,
+      idCategoria: idCategoria,
+      cantidadBandejas: idCategoria === 1 ? cantidad : 0,
+      cantidadUnidades: idCategoria !== 1 ? cantidad : 0,
       fechaCreacion: dayjs().format("YYYY-MM-DD"),
     }));
 
@@ -97,7 +99,6 @@ export const handleIngresarOrdenProduccionSubmit = async ( data, trayQuantities,
       descargarPdfDuranteIngresoOrden(resIngresoOrden.idOrdenProduccion.idOrdenGenerada);
     }
   } catch (error) {
-    console.log(error)
     if(error.status === 409){
     setErrorPopupMessage(error.response.data.error.message);
     }else{
