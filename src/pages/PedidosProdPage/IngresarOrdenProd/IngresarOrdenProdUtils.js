@@ -97,9 +97,12 @@ export const handleIngresarOrdenProduccionSubmit = async ( data, trayQuantities,
       descargarPdfDuranteIngresoOrden(resIngresoOrden.idOrdenProduccion.idOrdenGenerada);
     }
   } catch (error) {
-    setErrorPopupMessage(
-      "Hubo un error al ingresar la orden. Inténtelo mas tarde."
-    );
+    console.log(error)
+    if(error.status === 409){
+    setErrorPopupMessage(error.response.data.error.message);
+    }else{
+    setErrorPopupMessage("Hubo un error al ingresar la orden. Inténtelo mas tarde.");
+    }
     setIsPopupErrorOpen(true);
   } finally {
     setIsLoading(false); // Desactivar el loading del input

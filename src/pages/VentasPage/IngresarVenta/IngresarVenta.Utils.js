@@ -77,7 +77,7 @@ export const handleBuscarVentas = async ( setIsLoading, turnoValue, sucursalValu
     // Consultar la orden
     const orden = await fetchOrden(turnoValue, today, sucursalValue);
 
-    if (orden) {
+    if (orden.encabezadoOrden !== null) {
       setOrden(orden); // Guardar la orden en el estado
     }else{
       setShowModal(true);

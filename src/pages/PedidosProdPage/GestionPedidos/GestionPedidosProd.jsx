@@ -101,7 +101,7 @@ const GestionPedidosProd = () => {
             <div className="col-md-6 text-center">
               <Alert
                 type="primary"
-                message="No se encontraron productos que coincidan con la búsqueda."
+                message="No se encontraron ordenes que coincidan con la búsqueda."
                 icon={<BsFillInfoCircleFill />}
               />
             </div>

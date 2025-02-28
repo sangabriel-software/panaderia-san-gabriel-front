@@ -128,7 +128,7 @@ const VentaDetallePage = () => {
             <div className="col-md-6 text-center">
               <Alert
                 type="primary"
-                message="No se encontraron productos que coincidan con la búsqueda."
+                message="No se encontraron ventas que coincidan con la búsqueda."
                 icon={<BsFillInfoCircleFill />}
               />
             </div>
@@ -140,7 +140,7 @@ const VentaDetallePage = () => {
         !loadingVentas &&
         !showErrorVentas &&
         showInfoVentas && (
-          <div className="row justify-content-center my-2">
+          <div className="row justify-content-center my-3">
             <div className="col-md-6 text-center">
               <Alert
                 type="primary"

@@ -59,16 +59,8 @@ const IngresarOrdenProd = () => {
 
   const handleConfirmOrder = async () => {
     const data = getValues();
-    await handleIngresarOrdenProduccionSubmit(
-      data,
-      trayQuantities,
-      setTrayQuantities,
-      setIsPopupOpen,
-      setErrorPopupMessage,
-      setIsPopupErrorOpen,
-      setIsLoading,
-      reset
-    );
+    await handleIngresarOrdenProduccionSubmit( data, trayQuantities, setTrayQuantities, setIsPopupOpen, setErrorPopupMessage, setIsPopupErrorOpen,
+                                               setIsLoading, reset );
     setShowOrderSummary(false);
   };
 
