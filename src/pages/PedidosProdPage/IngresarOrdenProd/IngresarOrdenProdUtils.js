@@ -30,6 +30,40 @@ const assignedColors = {}; // Almacena los colores asignados de manera persisten
     return color;
 };
 
+// filterLogic.js
+
+export const filterProductsByName = (products, searchTerm, usuario) => {
+  if (!searchTerm) return products;
+
+  // Si el usuario no es admin, excluir los productos de "Panadería"
+  const filteredProducts = usuario.idRol === 1 && usuario.rol === "Admin"
+    ? products
+    : products.filter((p) => p.nombreCategoria !== "Panadería");
+
+  return filteredProducts.filter((producto) =>
+    producto.nombreProducto.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+};
+
+export const getFilteredProductsByCategory = (productos, searchTerm, activeCategory, usuario) => {
+  const panaderiaProducts = productos.filter((p) => p.nombreCategoria === "Panadería");
+  const reposteriaProducts = productos.filter((p) => p.nombreCategoria === "Repostería");
+
+  const filteredProducts = filterProductsByName(productos, searchTerm, usuario);
+  const filteredPanaderiaProducts = searchTerm
+    ? filteredProducts.filter((p) => p.nombreCategoria === "Panadería")
+    : panaderiaProducts;
+  const filteredReposteriaProducts = searchTerm
+    ? filteredProducts.filter((p) => p.nombreCategoria === "Repostería")
+    : reposteriaProducts;
+
+  return searchTerm
+    ? filteredProducts
+    : activeCategory === "Panadería"
+    ? filteredPanaderiaProducts
+    : filteredReposteriaProducts;
+};
+
 const crearPyaloadOrdenProduccion = (data, trayQuantities) => {
   const {idUsuario} = getUserData();
   const detalleOrden = Object.entries(trayQuantities)
