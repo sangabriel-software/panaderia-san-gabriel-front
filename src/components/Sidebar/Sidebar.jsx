@@ -9,11 +9,24 @@ import {
 import { MdOutlineBakeryDining } from 'react-icons/md';
 import * as DarkReader from 'darkreader';
 import "./Sidebar.css";
+import { getUserPermissions } from '../../utils/Auth/decodedata';
 
 function Sidebar({ show, onClose }) {
   const [usersOpen, setUsersOpen] = useState(false);
   const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
   const [isChangingTheme, setIsChangingTheme] = useState(false);
+  const permisosUsuario = getUserPermissions();
+
+  // Convertir los permisos en un objeto para facilitar la búsqueda
+  const permissionsMap = permisosUsuario.reduce((acc, perm) => {
+    acc[perm.rutaAcceso] = true;
+    return acc;
+  }, {});
+
+  // Función para verificar si una ruta está permitida
+  const isRouteAllowed = (route) => {
+    return permissionsMap[route];
+  };
 
   // Efecto para aplicar el tema al cargar el componente
   useEffect(() => {
@@ -67,60 +80,82 @@ function Sidebar({ show, onClose }) {
   return (
     <div className={`sidebar bg-dark ${show ? 'show' : 'hide'} ${isChangingTheme ? 'disable-selection' : ''}`}>
       <Nav className="flex-column pt-3">
-        <Nav.Link as={NavLink} to="/dashboard" className="text-light" onClick={handleNavLinkClick}>
-          <FaHome size={25} className="me-2" /> Dashboard
-        </Nav.Link>
-        <Nav.Link as={NavLink} to="/ordenes-produccion" className="text-light" onClick={handleNavLinkClick}>
-          <FaCalendar size={25} className="me-2" /> Ordenes de producción
-        </Nav.Link>
+        {isRouteAllowed('/dashboard') && (
+          <Nav.Link as={NavLink} to="/dashboard" className="text-light" onClick={handleNavLinkClick}>
+            <FaHome size={25} className="me-2" /> Dashboard
+          </Nav.Link>
+        )}
 
-        <Nav.Link as={NavLink} to="/pedido-especial" className="text-light" onClick={handleNavLinkClick}>
-          <FaShoppingBag size={25} className="me-2" /> Pedido Especial
-        </Nav.Link>
-        
-        <Nav.Link as={NavLink} to="/ventas" className="text-light" onClick={handleNavLinkClick}>
-          <FaFolder size={25} className="me-2" /> Ventas
-        </Nav.Link>
-        <Nav.Link as={NavLink} to="/productos" className="text-light" onClick={handleNavLinkClick}>
-          <MdOutlineBakeryDining size={25} className="me-2" /> Productos
-        </Nav.Link>
+        {isRouteAllowed('/ordenes-produccion') && (
+          <Nav.Link as={NavLink} to="/ordenes-produccion" className="text-light" onClick={handleNavLinkClick}>
+            <FaCalendar size={25} className="me-2" /> Ordenes de producción
+          </Nav.Link>
+        )}
+
+        {isRouteAllowed('/pedido-especial') && (
+          <Nav.Link as={NavLink} to="/pedido-especial" className="text-light" onClick={handleNavLinkClick}>
+            <FaShoppingBag size={25} className="me-2" /> Pedido Especial
+          </Nav.Link>
+        )}
+
+        {isRouteAllowed('/ventas') && (
+          <Nav.Link as={NavLink} to="/ventas" className="text-light" onClick={handleNavLinkClick}>
+            <FaFolder size={25} className="me-2" /> Ventas
+          </Nav.Link>
+        )}
+
+        {isRouteAllowed('/productos') && (
+          <Nav.Link as={NavLink} to="/productos" className="text-light" onClick={handleNavLinkClick}>
+            <MdOutlineBakeryDining size={25} className="me-2" /> Productos
+          </Nav.Link>
+        )}
 
         {/* Users Dropdown */}
-        <Nav.Link 
-          className="text-light d-flex justify-content-between align-items-center"
-          onClick={() => setUsersOpen(!usersOpen)}
-          style={{ cursor: 'pointer' }}
-        >
-          <span>
-            <FaUsers size={25} className="me-2"  /> Usuarios
-          </span>
-          <FaChevronRight className={`dropdown-arrow ${usersOpen ? 'open' : ''}`} />
-        </Nav.Link>
-        
-        <Collapse in={usersOpen}>
-          <div>
+        {(isRouteAllowed('/users/users') || isRouteAllowed('/users/roles')) && (
+          <>
             <Nav.Link 
-              as={NavLink} 
-              to="/users/users" 
-              className="text-light ps-4 submenu-item"
-              onClick={handleNavLinkClick}
+              className="text-light d-flex justify-content-between align-items-center"
+              onClick={() => setUsersOpen(!usersOpen)}
+              style={{ cursor: 'pointer' }}
             >
-              <FaUserPlus className="me-2" /> Gestión de usuarios
+              <span>
+                <FaUsers size={25} className="me-2"  /> Usuarios
+              </span>
+              <FaChevronRight className={`dropdown-arrow ${usersOpen ? 'open' : ''}`} />
             </Nav.Link>
-            <Nav.Link 
-              as={NavLink} 
-              to="/users/roles" 
-              className="text-light ps-4 submenu-item"
-              onClick={handleNavLinkClick}
-            >
-              <FaUsersCog className="me-2" /> Control de Roles
-            </Nav.Link>
-          </div>
-        </Collapse>
+            
+            <Collapse in={usersOpen}>
+              <div>
+                {isRouteAllowed('/users/users') && (
+                  <Nav.Link 
+                    as={NavLink} 
+                    to="/users/users" 
+                    className="text-light ps-4 submenu-item"
+                    onClick={handleNavLinkClick}
+                  >
+                    <FaUserPlus className="me-2" /> Gestión de usuarios
+                  </Nav.Link>
+                )}
+                {isRouteAllowed('/users/roles') && (
+                  <Nav.Link 
+                    as={NavLink} 
+                    to="/users/roles" 
+                    className="text-light ps-4 submenu-item"
+                    onClick={handleNavLinkClick}
+                  >
+                    <FaUsersCog className="me-2" /> Control de Roles
+                  </Nav.Link>
+                )}
+              </div>
+            </Collapse>
+          </>
+        )}
 
-        <Nav.Link as={NavLink} to="/config" className="text-light" onClick={handleNavLinkClick}>
-          <FaCog className="me-2" size={25} /> Configuraciones
-        </Nav.Link>
+        {isRouteAllowed('/config') && (
+          <Nav.Link as={NavLink} to="/config" className="text-light" onClick={handleNavLinkClick}>
+            <FaCog className="me-2" size={25} /> Configuraciones
+          </Nav.Link>
+        )}
       </Nav>
 
       {/* Toggle Switch para el tema */}

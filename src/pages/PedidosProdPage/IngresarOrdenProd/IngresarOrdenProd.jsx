@@ -12,12 +12,11 @@ import ErrorPopup from "../../../components/Popup/ErrorPopUp";
 import useGetProductosYPrecios from "../../../hooks/productosprecios/useGetProductosYprecios";
 import { useGetSucursales } from "../../../hooks/sucursales/useGetSucursales";
 import { filterProductsByName, getFilteredProductsByCategory, getInitials, getUniqueColor, handleIngresarOrdenProduccionSubmit, scrollToAlert } from "./IngresarOrdenProdUtils";
-import { getUserData, getUserPermissions } from "../../../utils/Auth/decodedata";
+import { getUserData } from "../../../utils/Auth/decodedata";
 import "./ordenes.css";
 
 const IngresarOrdenProd = () => {
   const usuario = getUserData(); // Información de usuario conectado.
-  const { permisosUsuario } = getUserPermissions();
   const alertRef = useRef(null);
   const navigate = useNavigate();
   const { sucursales, loadingSucursales, showErrorSucursales } = useGetSucursales();

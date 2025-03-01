@@ -55,7 +55,7 @@ const ManageProducts = () => {
       <Title title="Productos" description="Administración de productos existentes" />
       <div className="row mb-4">
 
-          <AddButton buttonText="Ingresar Producto" onRedirect={() => navigate("/productos/ingresar-producto")} />
+          <AddButton buttonText="Ingresar Producto" onRedirect={() => navigate("ingresar-producto")} />
 
         <div className="col-12 col-md-6">
           <SearchInput
