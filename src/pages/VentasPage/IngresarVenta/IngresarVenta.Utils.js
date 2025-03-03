@@ -126,17 +126,34 @@ const crearEncabezadoVenta = (idOrdenProduccion, usuario, sucursalValue, fechaAc
   };
 };
 
+// Función para obtener las cantidades ingresadas
+const obtenerCantidadesIngresadas = (productos, trayQuantities) => {
+  return productos.map((producto) => {
+    const cantidadIngresada = trayQuantities[producto.idProducto]?.cantidad || 0; // Si no hay valor, se establece en 0
+    return {
+      ...producto, // Mantener todas las propiedades del producto original
+      cantidadIngresada, // Agregar la cantidad ingresada
+    };
+  });
+};
+
 // Función para crear el detalle de la venta
 const crearDetalleVenta = (productos, trayQuantities, orden, fechaActual) => {
   const idOrdenProduccion = orden.encabezadoOrden ? orden.encabezadoOrden.idOrdenProduccion : null;
 
-  return productos
-    .map((producto) => {const cantidadIngresada = trayQuantities[producto.idProducto] || 0; // Si no hay valor, se establece en 0
+  // Obtener las cantidades ingresadas para cada producto
+  const productosConCantidad = obtenerCantidadesIngresadas(productos, trayQuantities);
+
+  return productosConCantidad
+    .map((producto) => {
+      const cantidadIngresada = producto.cantidadIngresada; // Usar la cantidad obtenida
 
       // Solo para la categoría 1 (Panadería) y si hay idOrdenProduccion
       if (producto.idCategoria === 1 && idOrdenProduccion) {
         // Verificar si el producto está en la orden
-        const productoEnOrden = orden.detalleOrden.some( (detalle) => detalle.idProducto === producto.idProducto);
+        const productoEnOrden = orden.detalleOrden.some(
+          (detalle) => detalle.idProducto === producto.idProducto
+        );
 
         if (productoEnOrden) {
           return {

@@ -1,4 +1,3 @@
-// IngresarVentaPage.js
 import React, { useState } from "react";
 import dayjs from "dayjs";
 import useGetSucursales from "../../../hooks/sucursales/useGetSucursales";
@@ -18,6 +17,7 @@ import CardResumenVenta from "../../../components/ventas/CardResumenVenta/CardRe
 import SeccionProductos from "../../../components/ventas/SeccionProductos/SeccionProductos";
 import ErrorPopup from "../../../components/Popup/ErrorPopUp";
 import SuccessPopup from "../../../components/Popup/SuccessPopup";
+import ModalVentaEsperada from "../../../components/ventas/ModalVentaEsperada/ModalVentaEsperad";
 
 const IngresarVentaPage = () => {
   const [isPopupErrorOpen, setIsPopupErrorOpen] = useState(false);
@@ -71,11 +71,6 @@ const IngresarVentaPage = () => {
     setShowSalesSummary(true); // Abre el modal de SalesSummary
   };
 
-  // Función para abrir el modal de venta esperada
-  const handleOpenVentaEsperadaModal = () => {
-    setShowVentaEsperadaModal(true);
-  };
-
   return (
     <Container>
       {/* Modal para ingreso de datos para la consulta de ordenes */}
@@ -122,7 +117,7 @@ const IngresarVentaPage = () => {
           usuario={usuario}
           handleModificarDatosWrapper={handleModificarDatosWrapper}
           isLoading={isLoading}
-          handleOpenVentaEsperadaModal={handleOpenVentaEsperadaModal} // Pasa la función para abrir el modal de venta esperada
+          setShowSalesSummary={() => setShowVentaEsperadaModal(true)} // Abre el modal de venta esperada
         />
       )}
 
