@@ -4,7 +4,7 @@ import { NavLink } from 'react-router-dom';
 import { 
   FaHome, FaUsers, FaCalendar, FaFolder, FaUserPlus, 
   FaUsersCog, FaChevronRight, FaCog, FaSun, FaMoon, 
-  FaShoppingBag
+  FaShoppingBag, FaPlus
 } from 'react-icons/fa';
 import { MdOutlineBakeryDining } from 'react-icons/md';
 import * as DarkReader from 'darkreader';
@@ -111,7 +111,7 @@ function Sidebar({ show, onClose }) {
         )}
 
         {/* Users Dropdown */}
-        {(isRouteAllowed('/users/users') || isRouteAllowed('/users/roles')) && (
+        {(isRouteAllowed('/users') || isRouteAllowed('/users/roles')) && (
           <>
             <Nav.Link 
               className="text-light d-flex justify-content-between align-items-center"
@@ -126,10 +126,10 @@ function Sidebar({ show, onClose }) {
             
             <Collapse in={usersOpen}>
               <div>
-                {isRouteAllowed('/users/users') && (
+                {isRouteAllowed('/users') && (
                   <Nav.Link 
                     as={NavLink} 
-                    to="/users/users" 
+                    to="/users" 
                     className="text-light ps-4 submenu-item"
                     onClick={handleNavLinkClick}
                   >
