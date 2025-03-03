@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
+// IngresarVentaPage.js
+import React, { useState } from "react";
 import dayjs from "dayjs";
 import useGetSucursales from "../../../hooks/sucursales/useGetSucursales";
-import { Container} from "react-bootstrap";
+import { Container } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import SalesSummary from "../../../components/ventas/SalesSumamary/SalesSummary";
@@ -29,39 +30,51 @@ const IngresarVentaPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showModal, setShowModal] = useState(true);
   const [hasOrdenes, setHasOrdenes] = useState(true);
+  const [showVentaEsperadaModal, setShowVentaEsperadaModal] = useState(false); // Estado para el modal de venta esperada
+  const [showSalesSummary, setShowSalesSummary] = useState(false);
   const navigate = useNavigate();
 
-  const { register, watch, setValue, formState: { errors }, reset} = useForm({ defaultValues: { turno: "AM", sucursal: "" } });
+  const { register, watch, setValue, formState: { errors }, reset } = useForm({ defaultValues: { turno: "AM", sucursal: "" } });
   const turnoValue = watch("turno");
   const sucursalValue = watch("sucursal");
   const [trayQuantities, setTrayQuantities] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
-  const [showSalesSummary, setShowSalesSummary] = useState(false);
 
-  //Custom Hook para consultar las sucursales
+  // Custom Hook para consultar las sucursales
   const { sucursales, loadingSucursales } = useGetSucursales();
 
   // Custom hook para manejar la búsqueda de ventas
-  useBuscarOrden( turnoValue, sucursalValue, setIsLoading, setOrden, setProductos, setOrdenYProductos, setShowModal, setErrorPopupMessage, setIsPopupErrorOpen, setHasOrdenes );
+  useBuscarOrden(turnoValue, sucursalValue, setIsLoading, setOrden, setProductos, setOrdenYProductos, setShowModal, setErrorPopupMessage, setIsPopupErrorOpen, setHasOrdenes);
 
-  // custom hook para manejar categorías
+  // Custom hook para manejar categorías
   const { activeCategory, setActiveCategory, categorias } = useCategoriasActivas(ordenYProductos);
 
-  //Filtrar productos por nombre
+  // Filtrar productos por nombre
   const filteredProducts = filterProductsByName(ordenYProductos, searchTerm);
-  const productsToShow = searchTerm ? filteredProducts : filteredProducts.filter((p) => p.nombreCategoria === activeCategory); 
+  const productsToShow = searchTerm ? filteredProducts : filteredProducts.filter((p) => p.nombreCategoria === activeCategory);
 
-  //Modifcar datos ingreasdos
+  // Modificar datos ingresados
   const handleModificarDatosWrapper = () => {
     handleModificarDatos(setValue, setShowModal);
   };
 
-  //Guardar Venta
+  // Guardar Venta
   const handleGuardarVentaWrapper = async () => {
     await handleGuardarVenta(setIsLoading, orden, sucursalValue, usuario, productos, trayQuantities, setShowSalesSummary,
-                             navigate, setErrorPopupMessage, setIsPopupErrorOpen, setIsPopupSuccessOpen, reset, setTrayQuantities);
+      navigate, setErrorPopupMessage, setIsPopupErrorOpen, setIsPopupSuccessOpen, reset, setTrayQuantities);
   };
 
+  // Manejar la acción de continuar desde el modal de venta esperada
+  const handleContinuarVentaEsperada = (ventaReal) => {
+    console.log("Venta Real ingresada:", ventaReal);
+    setShowVentaEsperadaModal(false); // Cierra el modal de venta esperada
+    setShowSalesSummary(true); // Abre el modal de SalesSummary
+  };
+
+  // Función para abrir el modal de venta esperada
+  const handleOpenVentaEsperadaModal = () => {
+    setShowVentaEsperadaModal(true);
+  };
 
   return (
     <Container>
@@ -78,6 +91,13 @@ const IngresarVentaPage = () => {
         isLoading={isLoading}
         navigate={navigate}
         hasOrdenes={hasOrdenes}
+      />
+
+      {/* Modal de Venta Esperada */}
+      <ModalVentaEsperada
+        show={showVentaEsperadaModal}
+        handleClose={() => setShowVentaEsperadaModal(false)}
+        onContinue={handleContinuarVentaEsperada}
       />
 
       {/* Encabezado */}
@@ -102,7 +122,7 @@ const IngresarVentaPage = () => {
           usuario={usuario}
           handleModificarDatosWrapper={handleModificarDatosWrapper}
           isLoading={isLoading}
-          setShowSalesSummary={setShowSalesSummary}
+          handleOpenVentaEsperadaModal={handleOpenVentaEsperadaModal} // Pasa la función para abrir el modal de venta esperada
         />
       )}
 
@@ -135,7 +155,7 @@ const IngresarVentaPage = () => {
         productos={productos}
         sucursales={sucursales}
         isLoading={isLoading}
-        onConfirm={handleGuardarVentaWrapper} // Lógica de guardado aquí
+        onConfirm={handleGuardarVentaWrapper}
         paymentData={{
           montoTotal: 0, // Aquí puedes calcular el monto total
           metodoPago: "Efectivo", // Método de pago por defecto
@@ -148,7 +168,7 @@ const IngresarVentaPage = () => {
         isOpen={isPopupSuccessOpen}
         onClose={() => setIsPopupSuccessOpen(false)}
         title="¡Éxito!"
-        message="La Venta se agrego correctamente"
+        message="La Venta se agregó correctamente"
         nombreBotonVolver="Ver Ventas"
         nombreBotonNuevo="Ingresar venta"
         onView={() => navigate("/ventas")}

@@ -92,13 +92,14 @@ const SalesSummary = ({ show, handleClose, orderData, trayQuantities, productos,
   };
 
   // Filtrar solo los productos con cantidad mayor a 0
-  const filteredProducts = Object.entries(trayQuantities)
-    .filter(([_, cantidad]) => cantidad > 0)
-    .map(([idProducto, cantidad]) => ({
-      idProducto: Number(idProducto),
-      nombreProducto: getProductName(Number(idProducto)),
-      cantidad,
-    }));
+const filteredProducts = Object.entries(trayQuantities)
+  .filter(([_, { cantidad }]) => cantidad > 0) // Filtra productos con cantidad > 0
+  .map(([idProducto, { cantidad, precioPorUnidad }]) => ({
+    idProducto: Number(idProducto), // Convierte el idProducto a número
+    nombreProducto: getProductName(Number(idProducto)), // Obtiene el nombre del producto
+    cantidad, // Cantidad de unidades vendidas
+    precioPorUnidad, // Precio por unidad del producto
+  }));
 
   return (
     <StyledModal show={show} onHide={handleClose} centered size="lg">
