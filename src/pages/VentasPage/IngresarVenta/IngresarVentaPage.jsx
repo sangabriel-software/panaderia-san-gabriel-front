@@ -55,35 +55,74 @@ const IngresarVentaPage = () => {
   const productsToShow = searchTerm ? filteredProducts : filteredProducts.filter((p) => p.nombreCategoria === activeCategory);
 
   // Función para calcular la venta total
-  const calcularVentaTotal = (trayQuantities, orden) => {
+  const calcularVentaTotal = (trayQuantities, orden, productos) => {
     let subTotal = 0;
-
+  
+    if (!orden || !productos) {
+      console.error("La orden o los productos no están definidos.");
+      return subTotal;
+    }
+  
     const detalleOrden = orden.detalleOrden;
-
+  
+    // Caso 1: Si trayQuantities está vacío
+    if (!trayQuantities || Object.keys(trayQuantities).length === 0) {
+      detalleOrden.forEach((item) => {
+        const producto = productos.find((p) => p.idProducto === item.idProducto);
+        if (producto) {
+          subTotal += producto.precioPorUnidad * item.cantidadUnidades;
+        }
+      });
+      return parseFloat(subTotal.toFixed(2));
+    }
+  
+    // Caso 2 y 3: Si trayQuantities no está vacío
     for (const key in trayQuantities) {
       if (trayQuantities.hasOwnProperty(key)) {
         const productoEnTray = trayQuantities[key];
         const idProducto = key;
-
+  
+        const producto = productos.find((p) => p.idProducto == idProducto);
+        if (!producto) continue;
+  
         const productoEnOrden = detalleOrden.find(
-          (producto) => producto.idProducto == idProducto
+          (item) => item.idProducto == idProducto
         );
-
-        if (productoEnOrden) {
-          subTotal += (productoEnOrden.cantidadUnidades - productoEnTray.cantidad) * productoEnTray.precioPorUnidad;
-        } else {
+  
+        if (producto.categoria === 2) {
+          // Categoría 2: Calcular basado en la cantidad ingresada en trayQuantities
           subTotal += productoEnTray.cantidad * productoEnTray.precioPorUnidad;
+        } else if (producto.categoria === 1) {
+          // Categoría 1: Calcular basado en la cantidad de la orden o la resta
+          if (productoEnOrden) {
+            if (productoEnTray.cantidad === 0 || !productoEnTray.cantidad) {
+              // Si no se ingresó cantidad, tomar la cantidad de la orden
+              subTotal += productoEnOrden.cantidadUnidades * producto.precioPorUnidad;
+            } else {
+              // Si se ingresó cantidad, restar y calcular
+              const cantidadRestante = productoEnOrden.cantidadUnidades - productoEnTray.cantidad;
+              subTotal += cantidadRestante * producto.precioPorUnidad;
+            }
+          }
         }
       }
     }
-
+  
+    // Para productos de categoría 1 que no están en trayQuantities
+    detalleOrden.forEach((item) => {
+      const producto = productos.find((p) => p.idProducto === item.idProducto);
+      if (producto && producto.categoria === 1 && !trayQuantities[item.idProducto]) {
+        subTotal += producto.precioPorUnidad * item.cantidadUnidades;
+      }
+    });
+  
     return parseFloat(subTotal.toFixed(2));
   };
 
   // Calcular la venta total cuando cambien trayQuantities u orden
   useEffect(() => {
     if (showVentaEsperadaModal) {
-      const total = calcularVentaTotal(trayQuantities, orden);
+      const total = calcularVentaTotal(trayQuantities, orden, productos);
       setVentaTotal(total);
     }
   }, [showVentaEsperadaModal, trayQuantities, orden]);
@@ -106,6 +145,8 @@ const IngresarVentaPage = () => {
     setShowSalesSummary(true); // Abre el modal de SalesSummary
   };
 
+
+  // console.log(productos);
   return (
     <Container>
       {/* Modal para ingreso de datos para la consulta de ordenes */}
