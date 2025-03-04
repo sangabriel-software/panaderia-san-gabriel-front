@@ -3,7 +3,7 @@ import { Modal, Button, Form, Container, Row, Col } from "react-bootstrap";
 import { FaTimes } from "react-icons/fa";
 import { BsCashCoin } from "react-icons/bs";
 
-const ModalVentaEsperada = ({ show, handleClose, onContinue }) => {
+const ModalVentaEsperada = ({ show, handleClose, onContinue, ventaTotal }) => {
   const [ventaReal, setVentaReal] = useState(""); // Estado para almacenar la venta real
 
   // Manejar el cambio en el input de la venta real
@@ -46,7 +46,7 @@ const ModalVentaEsperada = ({ show, handleClose, onContinue }) => {
               <div className="venta-esperada-card p-4 shadow-sm rounded">
                 <h3 className="text-primary mb-4">Venta Esperada</h3>
                 <div className="display-4 text-success fw-bold mb-4">
-                  Q.1230.00
+                  Q.{ventaTotal.toFixed(2)} {/* Mostrar la venta esperada */}
                 </div>
                 <Form.Group className="mb-4">
                   <Form.Label className="small text-uppercase text-muted fw-bold">

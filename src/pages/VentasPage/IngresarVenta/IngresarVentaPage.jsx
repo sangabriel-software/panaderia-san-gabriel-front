@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import dayjs from "dayjs";
 import useGetSucursales from "../../../hooks/sucursales/useGetSucursales";
 import { Container } from "react-bootstrap";
@@ -30,8 +30,9 @@ const IngresarVentaPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showModal, setShowModal] = useState(true);
   const [hasOrdenes, setHasOrdenes] = useState(true);
-  const [showVentaEsperadaModal, setShowVentaEsperadaModal] = useState(false); // Estado para el modal de venta esperada
+  const [showVentaEsperadaModal, setShowVentaEsperadaModal] = useState(false);
   const [showSalesSummary, setShowSalesSummary] = useState(false);
+  const [ventaTotal, setVentaTotal] = useState(0); // Estado para almacenar la venta total
   const navigate = useNavigate();
 
   const { register, watch, setValue, formState: { errors }, reset } = useForm({ defaultValues: { turno: "AM", sucursal: "" } });
@@ -52,6 +53,40 @@ const IngresarVentaPage = () => {
   // Filtrar productos por nombre
   const filteredProducts = filterProductsByName(ordenYProductos, searchTerm);
   const productsToShow = searchTerm ? filteredProducts : filteredProducts.filter((p) => p.nombreCategoria === activeCategory);
+
+  // Función para calcular la venta total
+  const calcularVentaTotal = (trayQuantities, orden) => {
+    let subTotal = 0;
+
+    const detalleOrden = orden.detalleOrden;
+
+    for (const key in trayQuantities) {
+      if (trayQuantities.hasOwnProperty(key)) {
+        const productoEnTray = trayQuantities[key];
+        const idProducto = key;
+
+        const productoEnOrden = detalleOrden.find(
+          (producto) => producto.idProducto == idProducto
+        );
+
+        if (productoEnOrden) {
+          subTotal += (productoEnOrden.cantidadUnidades - productoEnTray.cantidad) * productoEnTray.precioPorUnidad;
+        } else {
+          subTotal += productoEnTray.cantidad * productoEnTray.precioPorUnidad;
+        }
+      }
+    }
+
+    return parseFloat(subTotal.toFixed(2));
+  };
+
+  // Calcular la venta total cuando cambien trayQuantities u orden
+  useEffect(() => {
+    if (showVentaEsperadaModal) {
+      const total = calcularVentaTotal(trayQuantities, orden);
+      setVentaTotal(total);
+    }
+  }, [showVentaEsperadaModal, trayQuantities, orden]);
 
   // Modificar datos ingresados
   const handleModificarDatosWrapper = () => {
@@ -93,6 +128,7 @@ const IngresarVentaPage = () => {
         show={showVentaEsperadaModal}
         handleClose={() => setShowVentaEsperadaModal(false)}
         onContinue={handleContinuarVentaEsperada}
+        ventaTotal={ventaTotal} // Pasar la venta total como prop
       />
 
       {/* Encabezado */}
