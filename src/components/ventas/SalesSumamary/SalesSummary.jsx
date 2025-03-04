@@ -146,7 +146,7 @@ const filteredProducts = Object.entries(trayQuantities)
           <div className="detail-item">
             <BsCash />
             <span>
-            <strong>Monto Total:</strong> Q.{ventaReal.toFixed(2)}
+            <strong>Monto Total:</strong> Q.{ventaReal ? ventaReal.toFixed(2) : "0.00"}
             </span>
           </div>
         </div>

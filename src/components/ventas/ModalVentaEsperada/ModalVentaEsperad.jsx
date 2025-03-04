@@ -3,12 +3,12 @@ import { Modal, Button, Form, Container, Row, Col } from "react-bootstrap";
 import { FaTimes } from "react-icons/fa";
 import { BsCashCoin } from "react-icons/bs";
 
-const ModalVentaEsperada = ({ show, handleClose, onContinue, ventaTotal }) => {
+const ModalVentaEsperada = ({ show, handleClose, onContinue }) => {
   const [ventaReal, setVentaReal] = useState(""); // Estado para almacenar la venta real
 
   // Manejar el cambio en el input de la venta real
   const handleVentaRealChange = (e) => {
-    setVentaReal(e.target.value);
+    setVentaReal(e.target.value); // Actualizar el estado con el valor ingresado
   };
 
   // Manejar la acción de continuar
@@ -19,13 +19,19 @@ const ModalVentaEsperada = ({ show, handleClose, onContinue, ventaTotal }) => {
     } else {
       onContinue(0); // Si no es un número válido, pasar 0
     }
+    handleCloseModal(); // Cerrar el modal y limpiar el input
+  };
+
+  // Función para cerrar el modal y limpiar el input
+  const handleCloseModal = () => {
+    setVentaReal(""); // Limpiar el input
     handleClose(); // Cerrar el modal
   };
 
   return (
     <Modal
       show={show}
-      onHide={handleClose}
+      onHide={handleCloseModal} // Usar handleCloseModal para cerrar y limpiar
       size="lg"
       aria-labelledby="contained-modal-title-vcenter"
       centered
@@ -38,7 +44,7 @@ const ModalVentaEsperada = ({ show, handleClose, onContinue, ventaTotal }) => {
         </Modal.Title>
         <Button
           variant="link"
-          onClick={handleClose}
+          onClick={handleCloseModal} // Usar handleCloseModal para cerrar y limpiar
           className="text-white"
         >
           <FaTimes />
@@ -50,8 +56,9 @@ const ModalVentaEsperada = ({ show, handleClose, onContinue, ventaTotal }) => {
             <Col xs={12} md={8} className="text-center">
               <div className="venta-esperada-card p-4 shadow-sm rounded">
                 <h3 className="text-primary mb-4">Ingresar Venta</h3>
+                {/* Mostrar el valor de ventaReal dinámicamente */}
                 <div className="display-4 text-success fw-bold mb-4">
-                  Q.{ventaTotal.toFixed(2)} {/* Mostrar la venta esperada */}
+                  Q.{ventaReal ? parseFloat(ventaReal).toFixed(2) : "0.00"}
                 </div>
                 <Form.Group className="mb-4">
                   <Form.Label className="small text-uppercase text-muted fw-bold">
@@ -73,7 +80,7 @@ const ModalVentaEsperada = ({ show, handleClose, onContinue, ventaTotal }) => {
       <Modal.Footer className="bg-gradient-primary">
         <Button
           variant="light"
-          onClick={handleClose}
+          onClick={handleCloseModal} // Usar handleCloseModal para cerrar y limpiar
           className="btn-cancelar shadow"
         >
           Cancelar
