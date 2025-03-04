@@ -19,6 +19,7 @@ import ErrorPopup from "../../../components/Popup/ErrorPopUp";
 import SuccessPopup from "../../../components/Popup/SuccessPopup";
 import ModalVentaEsperada from "../../../components/ventas/ModalVentaEsperada/ModalVentaEsperad";
 
+
 const IngresarVentaPage = () => {
   const [isPopupErrorOpen, setIsPopupErrorOpen] = useState(false);
   const [errorPopupMessage, setErrorPopupMessage] = useState("");
@@ -32,7 +33,8 @@ const IngresarVentaPage = () => {
   const [hasOrdenes, setHasOrdenes] = useState(true);
   const [showVentaEsperadaModal, setShowVentaEsperadaModal] = useState(false);
   const [showSalesSummary, setShowSalesSummary] = useState(false);
-  const [ventaTotal, setVentaTotal] = useState(0); // Estado para almacenar la venta total
+  const [ventaTotal, setVentaTotal] = useState(0);
+  const [ventaReal, setVentaReal] = useState(null); // Nuevo estado para la venta real
   const navigate = useNavigate();
 
   const { register, watch, setValue, formState: { errors }, reset } = useForm({ defaultValues: { turno: "AM", sucursal: "" } });
@@ -54,79 +56,6 @@ const IngresarVentaPage = () => {
   const filteredProducts = filterProductsByName(ordenYProductos, searchTerm);
   const productsToShow = searchTerm ? filteredProducts : filteredProducts.filter((p) => p.nombreCategoria === activeCategory);
 
-  // Función para calcular la venta total
-  const calcularVentaTotal = (trayQuantities, orden, productos) => {
-    let subTotal = 0;
-  
-    if (!orden || !productos) {
-      console.error("La orden o los productos no están definidos.");
-      return subTotal;
-    }
-  
-    const detalleOrden = orden.detalleOrden;
-  
-    // Caso 1: Si trayQuantities está vacío
-    if (!trayQuantities || Object.keys(trayQuantities).length === 0) {
-      detalleOrden.forEach((item) => {
-        const producto = productos.find((p) => p.idProducto === item.idProducto);
-        if (producto) {
-          subTotal += producto.precioPorUnidad * item.cantidadUnidades;
-        }
-      });
-      return parseFloat(subTotal.toFixed(2));
-    }
-  
-    // Caso 2 y 3: Si trayQuantities no está vacío
-    for (const key in trayQuantities) {
-      if (trayQuantities.hasOwnProperty(key)) {
-        const productoEnTray = trayQuantities[key];
-        const idProducto = key;
-  
-        const producto = productos.find((p) => p.idProducto == idProducto);
-        if (!producto) continue;
-  
-        const productoEnOrden = detalleOrden.find(
-          (item) => item.idProducto == idProducto
-        );
-  
-        if (producto.categoria === 2) {
-          // Categoría 2: Calcular basado en la cantidad ingresada en trayQuantities
-          subTotal += productoEnTray.cantidad * productoEnTray.precioPorUnidad;
-        } else if (producto.categoria === 1) {
-          // Categoría 1: Calcular basado en la cantidad de la orden o la resta
-          if (productoEnOrden) {
-            if (productoEnTray.cantidad === 0 || !productoEnTray.cantidad) {
-              // Si no se ingresó cantidad, tomar la cantidad de la orden
-              subTotal += productoEnOrden.cantidadUnidades * producto.precioPorUnidad;
-            } else {
-              // Si se ingresó cantidad, restar y calcular
-              const cantidadRestante = productoEnOrden.cantidadUnidades - productoEnTray.cantidad;
-              subTotal += cantidadRestante * producto.precioPorUnidad;
-            }
-          }
-        }
-      }
-    }
-  
-    // Para productos de categoría 1 que no están en trayQuantities
-    detalleOrden.forEach((item) => {
-      const producto = productos.find((p) => p.idProducto === item.idProducto);
-      if (producto && producto.categoria === 1 && !trayQuantities[item.idProducto]) {
-        subTotal += producto.precioPorUnidad * item.cantidadUnidades;
-      }
-    });
-  
-    return parseFloat(subTotal.toFixed(2));
-  };
-
-  // Calcular la venta total cuando cambien trayQuantities u orden
-  useEffect(() => {
-    if (showVentaEsperadaModal) {
-      const total = calcularVentaTotal(trayQuantities, orden, productos);
-      setVentaTotal(total);
-    }
-  }, [showVentaEsperadaModal, trayQuantities, orden]);
-
   // Modificar datos ingresados
   const handleModificarDatosWrapper = () => {
     handleModificarDatos(setValue, setShowModal);
@@ -140,13 +69,11 @@ const IngresarVentaPage = () => {
 
   // Manejar la acción de continuar desde el modal de venta esperada
   const handleContinuarVentaEsperada = (ventaReal) => {
-    console.log("Venta Real ingresada:", ventaReal);
+    setVentaReal(ventaReal); // Guardar la venta real en el estado
     setShowVentaEsperadaModal(false); // Cierra el modal de venta esperada
     setShowSalesSummary(true); // Abre el modal de SalesSummary
   };
 
-
-  // console.log(productos);
   return (
     <Container>
       {/* Modal para ingreso de datos para la consulta de ordenes */}
@@ -169,7 +96,7 @@ const IngresarVentaPage = () => {
         show={showVentaEsperadaModal}
         handleClose={() => setShowVentaEsperadaModal(false)}
         onContinue={handleContinuarVentaEsperada}
-        ventaTotal={ventaTotal} // Pasar la venta total como prop
+        ventaTotal={ventaTotal}
       />
 
       {/* Encabezado */}
@@ -194,7 +121,7 @@ const IngresarVentaPage = () => {
           usuario={usuario}
           handleModificarDatosWrapper={handleModificarDatosWrapper}
           isLoading={isLoading}
-          setShowSalesSummary={() => setShowVentaEsperadaModal(true)} // Abre el modal de venta esperada
+          setShowSalesSummary={() => setShowVentaEsperadaModal(true)}
         />
       )}
 
@@ -228,11 +155,7 @@ const IngresarVentaPage = () => {
         sucursales={sucursales}
         isLoading={isLoading}
         onConfirm={handleGuardarVentaWrapper}
-        paymentData={{
-          montoTotal: 0, // Aquí puedes calcular el monto total
-          metodoPago: "Efectivo", // Método de pago por defecto
-          estadoPago: "Pendiente", // Estado de pago por defecto
-        }}
+        ventaReal={ventaReal}
       />
 
       {/* Popup de Éxito */}

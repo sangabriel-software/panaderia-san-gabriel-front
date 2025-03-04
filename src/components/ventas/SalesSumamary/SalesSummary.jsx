@@ -78,7 +78,7 @@ const StyledModal = styled(Modal)`
   }
 `;
 
-const SalesSummary = ({ show, handleClose, orderData, trayQuantities, productos, sucursales, isLoading, onConfirm, paymentData }) => {
+const SalesSummary = ({ show, handleClose, orderData, trayQuantities, productos, sucursales, isLoading, onConfirm, ventaReal }) => {
   // Función para obtener el nombre del producto basado en el idProducto
   const getProductName = (idProducto) => {
     const product = productos.find((p) => p.idProducto === idProducto);
@@ -142,23 +142,11 @@ const filteredProducts = Object.entries(trayQuantities)
 
         {/* Sección de Cobro */}
         <div className="mb-4">
-          <h5 className="mb-3 fw-semibold text-primary">Detalles de Cobro</h5>
+          <h5 className="mb-3 fw-semibold text-primary">Ingreso de la venta</h5>
           <div className="detail-item">
             <BsCash />
             <span>
-              <strong>Monto Total:</strong> ${paymentData.montoTotal.toFixed(2)}
-            </span>
-          </div>
-          <div className="detail-item">
-            <BsCash />
-            <span>
-              <strong>Método de Pago:</strong> {paymentData.metodoPago}
-            </span>
-          </div>
-          <div className="detail-item">
-            <BsCash />
-            <span>
-              <strong>Estado de Pago:</strong> {paymentData.estadoPago}
+            <strong>Monto Total:</strong> Q.{ventaReal.toFixed(2)}
             </span>
           </div>
         </div>

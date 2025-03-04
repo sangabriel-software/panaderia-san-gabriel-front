@@ -13,7 +13,12 @@ const ModalVentaEsperada = ({ show, handleClose, onContinue, ventaTotal }) => {
 
   // Manejar la acción de continuar
   const handleContinuar = () => {
-    onContinue(ventaReal); // Pasar la venta real a la función onContinue
+    const ventaRealNumber = parseFloat(ventaReal); // Convertir a número
+    if (!isNaN(ventaRealNumber)) {
+      onContinue(ventaRealNumber); // Pasar la venta real como número
+    } else {
+      onContinue(0); // Si no es un número válido, pasar 0
+    }
     handleClose(); // Cerrar el modal
   };
 
@@ -44,7 +49,7 @@ const ModalVentaEsperada = ({ show, handleClose, onContinue, ventaTotal }) => {
           <Row className="justify-content-center">
             <Col xs={12} md={8} className="text-center">
               <div className="venta-esperada-card p-4 shadow-sm rounded">
-                <h3 className="text-primary mb-4">Venta Esperada</h3>
+                <h3 className="text-primary mb-4">Ingresar Venta</h3>
                 <div className="display-4 text-success fw-bold mb-4">
                   Q.{ventaTotal.toFixed(2)} {/* Mostrar la venta esperada */}
                 </div>
@@ -57,7 +62,7 @@ const ModalVentaEsperada = ({ show, handleClose, onContinue, ventaTotal }) => {
                     placeholder="Ingrese la venta real"
                     value={ventaReal}
                     onChange={handleVentaRealChange}
-                    className="text-center fs-5"
+                    className="input-data text-center fs-5"
                   />
                 </Form.Group>
               </div>
