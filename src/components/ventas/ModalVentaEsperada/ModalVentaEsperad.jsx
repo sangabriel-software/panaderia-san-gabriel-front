@@ -40,7 +40,7 @@ const ModalVentaEsperada = ({ show, handleClose, onContinue }) => {
       <Modal.Header className="bg-gradient-primary text-white">
         <Modal.Title className="w-100 text-center">
           <BsCashCoin size={28} className="me-2" />
-          Venta Esperada vs Venta Real
+          Ingresos del Turno
         </Modal.Title>
         <Button
           variant="link"

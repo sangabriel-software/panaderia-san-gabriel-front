@@ -1,5 +1,5 @@
 // SeccionProductos.js
-import React from "react";
+import React, { useState } from "react";
 import { Form, Row, Col, Card, InputGroup, Button } from "react-bootstrap";
 import { filterProductsByName, getInitials, getUniqueColor } from "../../../pages/VentasPage/IngresarVenta/IngresarVenta.Utils";
 
@@ -14,6 +14,28 @@ const SeccionProductos = ({
   trayQuantities,
   setTrayQuantities,
 }) => {
+  // Estado para manejar el foco de los inputs
+  const [focusedInput, setFocusedInput] = useState(null);
+
+  // Función para manejar el foco
+  const handleFocus = (idProducto) => {
+    setFocusedInput(idProducto);
+  };
+
+  // Función para manejar la pérdida de foco
+  const handleBlur = (idProducto, value) => {
+    if (value === "" || isNaN(value)) {
+      setTrayQuantities({
+        ...trayQuantities,
+        [idProducto]: {
+          cantidad: 0,
+          precioPorUnidad: productsToShow.find((p) => p.idProducto === idProducto).precioPorUnidad,
+        },
+      });
+    }
+    setFocusedInput(null);
+  };
+
   return (
     <div className="products-section mt-4">
       {/* Barra de búsqueda */}
@@ -71,16 +93,24 @@ const SeccionProductos = ({
                   <Form.Control
                     type="number"
                     min="0"
-                    value={trayQuantities[producto.idProducto]?.cantidad || ""}
-                    onChange={(e) =>
+                    value={
+                      producto.nombreCategoria === "Panadería" && focusedInput !== producto.idProducto
+                        ? trayQuantities[producto.idProducto]?.cantidad ?? 0
+                        : trayQuantities[producto.idProducto]?.cantidad ?? ""
+                    }
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      const cantidad = Math.max(0, parseInt(value, 10) || 0);
                       setTrayQuantities({
                         ...trayQuantities,
                         [producto.idProducto]: {
-                          cantidad: parseInt(e.target.value) || 0,
-                          precioPorUnidad: producto.precioPorUnidad, // Incluye la categoría
+                          cantidad: cantidad,
+                          precioPorUnidad: producto.precioPorUnidad,
                         },
-                      })
-                    }
+                      });
+                    }}
+                    onFocus={() => handleFocus(producto.idProducto)}
+                    onBlur={(e) => handleBlur(producto.idProducto, e.target.value)}
                     className="product-input"
                   />
                 </InputGroup>
