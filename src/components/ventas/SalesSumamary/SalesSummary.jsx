@@ -91,17 +91,33 @@ const SalesSummary = ({ show, handleClose, orderData, trayQuantities, productos,
     return sucursal ? sucursal.nombreSucursal : "Desconocida";
   };
 
-  // Filtrar solo los productos con cantidad mayor a 0
-const filteredProducts = Object.entries(trayQuantities)
-  .filter(([_, { cantidad }]) => cantidad > 0) // Filtra productos con cantidad > 0
-  .map(([idProducto, { cantidad, precioPorUnidad }]) => ({
-    idProducto: Number(idProducto), // Convierte el idProducto a número
-    nombreProducto: getProductName(Number(idProducto)), // Obtiene el nombre del producto
-    cantidad, // Cantidad de unidades vendidas
-    precioPorUnidad, // Precio por unidad del producto
-  }));
+  // Filtrar y separar productos por categoría
+  const productosPanaderia = productos.filter((p) => p.nombreCategoria === "Panadería");
+  const productosOtros = productos.filter((p) => p.nombreCategoria !== "Panadería");
 
-  console.log(trayQuantities)
+  // Obtener la cantidad no vendida para productos de Panadería
+  const productosPanaderiaConCantidad = productosPanaderia.map((producto) => {
+    const cantidadNoVendida = trayQuantities[producto.idProducto]?.cantidad || 0;
+    return {
+      ...producto,
+      cantidadNoVendida,
+    };
+  });
+
+  // Obtener la cantidad vendida para productos de otras categorías
+  const productosOtrosConCantidad = productosOtros.map((producto) => {
+    const cantidadVendida = trayQuantities[producto.idProducto]?.cantidad || 0;
+    return {
+      ...producto,
+      cantidadVendida,
+    };
+  });
+
+  // Verificar si todos los productos de Panadería fueron vendidos
+  const todosProductosPanaderiaVendidos = productosPanaderiaConCantidad.every(
+    (producto) => producto.cantidadNoVendida === 0
+  );
+
   return (
     <StyledModal show={show} onHide={handleClose} centered size="lg">
       <Modal.Header closeButton>
@@ -147,37 +163,57 @@ const filteredProducts = Object.entries(trayQuantities)
           <div className="detail-item">
             <BsCash />
             <span>
-            <strong>Monto Total:</strong> Q.{ventaReal ? ventaReal.toFixed(2) : "0.00"}
+              <strong>Monto Total:</strong> Q.{ventaReal ? ventaReal.toFixed(2) : "0.00"}
             </span>
           </div>
         </div>
 
-        <h5 className="mb-3 fw-semibold text-primary">Productos Vendidos</h5>
+        {/* Sección de Panadería */}
+        <h5 className="mb-3 fw-semibold text-primary">Panadería</h5>
+        {todosProductosPanaderiaVendidos ? (
+          <p className="text-center text-muted">Todos los productos de Panadería fueron vendidos.</p>
+        ) : (
+          <div className="table-responsive">
+            <Table hover>
+              <thead>
+                <tr>
+                  <th>Producto</th>
+                  <th className="text-end">Cantidad no vendida</th>
+                </tr>
+              </thead>
+              <tbody>
+                {productosPanaderiaConCantidad.map((producto) => (
+                  producto.cantidadNoVendida > 0 && (
+                    <tr key={producto.idProducto}>
+                      <td>{producto.nombreProducto}</td>
+                      <td className="text-end fw-semibold">{producto.cantidadNoVendida}</td>
+                    </tr>
+                  )
+                ))}
+              </tbody>
+            </Table>
+          </div>
+        )}
+
+        {/* Sección de Otros productos */}
+        <h5 className="mb-3 fw-semibold text-primary">Otros productos</h5>
         <div className="table-responsive">
           <Table hover>
             <thead>
               <tr>
                 <th>Producto</th>
-                <th className="text-end">Cantidad</th>
+                <th className="text-end">Cantidad vendida</th>
               </tr>
             </thead>
             <tbody>
-              {filteredProducts.length > 0 ? (
-                filteredProducts.map(
-                  ({ idProducto, nombreProducto, cantidad }) => (
-                    <tr key={idProducto}>
-                      <td>{nombreProducto}</td>
-                      <td className="text-end fw-semibold">{cantidad}</td>
-                    </tr>
-                  )
+              {productosOtrosConCantidad.map((producto) => (
+                producto.cantidadVendida > 0 && (
+                  <tr key={producto.idProducto}>
+                    <td>{producto.nombreProducto}</td>
+                    <td className="text-end fw-semibold">{producto.cantidadVendida}</td>
+                  </tr>
                 )
-              ) : (
-                <tr>
-                  <td colSpan="2" className="text-center text-muted py-3">
-                    No se han seleccionado productos
-                  </td>
-                </tr>
-              )}
+              ))}
             </tbody>
           </Table>
         </div>
@@ -198,7 +234,7 @@ const filteredProducts = Object.entries(trayQuantities)
             handleClose();
           }}
           className="px-4 rounded-pill"
-          disabled={filteredProducts.length === 0 || isLoading}
+          disabled={isLoading}
         >
           {isLoading ? (
             <>
