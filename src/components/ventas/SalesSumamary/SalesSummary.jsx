@@ -101,6 +101,7 @@ const filteredProducts = Object.entries(trayQuantities)
     precioPorUnidad, // Precio por unidad del producto
   }));
 
+  console.log(trayQuantities)
   return (
     <StyledModal show={show} onHide={handleClose} centered size="lg">
       <Modal.Header closeButton>
