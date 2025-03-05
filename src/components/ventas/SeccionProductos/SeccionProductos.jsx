@@ -17,26 +17,24 @@ const SeccionProductos = ({
   // Estado para manejar el foco de los inputs
   const [focusedInput, setFocusedInput] = useState(null);
 
-  // Inicializar trayQuantities con 0 para productos de Panadería
+  // Inicializar trayQuantities con 0 solo para productos de Panadería
   useEffect(() => {
     const productosPanaderia = ordenYProductos.filter(
       (producto) => producto.nombreCategoria === "Panadería"
     );
 
-    const necesitaInicializacion = productosPanaderia.some(
-      (producto) => trayQuantities[producto.idProducto] === undefined
-    );
+    const initialQuantities = {};
+    productosPanaderia.forEach((producto) => {
+      if (trayQuantities[producto.idProducto] === undefined) {
+        initialQuantities[producto.idProducto] = {
+          cantidad: 0, // Valor predeterminado para Panadería
+          precioPorUnidad: producto.precioPorUnidad,
+        };
+      }
+    });
 
-    if (necesitaInicializacion) {
-      const initialQuantities = {};
-      productosPanaderia.forEach((producto) => {
-        if (trayQuantities[producto.idProducto] === undefined) {
-          initialQuantities[producto.idProducto] = {
-            cantidad: 0, // Valor predeterminado para Panadería
-            precioPorUnidad: producto.precioPorUnidad,
-          };
-        }
-      });
+    // Solo actualizar si hay productos de Panadería para inicializar
+    if (Object.keys(initialQuantities).length > 0) {
       setTrayQuantities((prev) => ({ ...prev, ...initialQuantities }));
     }
   }, [ordenYProductos]); // Dependencia: ordenYProductos
@@ -73,8 +71,8 @@ const SeccionProductos = ({
         return cantidad.toString();
       }
     } else {
-      // Para otras categorías, mostrar el valor directamente
-      return cantidad.toString();
+      // Para otras categorías, mostrar el valor vacío si no se ha ingresado nada
+      return cantidad === 0 ? "" : cantidad.toString();
     }
   };
 
