@@ -1,5 +1,5 @@
 // SeccionProductos.js
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Form, Row, Col, Card, InputGroup, Button } from "react-bootstrap";
 import { filterProductsByName, getInitials, getUniqueColor } from "../../../pages/VentasPage/IngresarVenta/IngresarVenta.Utils";
 
@@ -17,6 +17,30 @@ const SeccionProductos = ({
   // Estado para manejar el foco de los inputs
   const [focusedInput, setFocusedInput] = useState(null);
 
+  // Inicializar trayQuantities con 0 para productos de Panadería
+  useEffect(() => {
+    const productosPanaderia = ordenYProductos.filter(
+      (producto) => producto.nombreCategoria === "Panadería"
+    );
+
+    const necesitaInicializacion = productosPanaderia.some(
+      (producto) => trayQuantities[producto.idProducto] === undefined
+    );
+
+    if (necesitaInicializacion) {
+      const initialQuantities = {};
+      productosPanaderia.forEach((producto) => {
+        if (trayQuantities[producto.idProducto] === undefined) {
+          initialQuantities[producto.idProducto] = {
+            cantidad: 0, // Valor predeterminado para Panadería
+            precioPorUnidad: producto.precioPorUnidad,
+          };
+        }
+      });
+      setTrayQuantities((prev) => ({ ...prev, ...initialQuantities }));
+    }
+  }, [ordenYProductos]); // Dependencia: ordenYProductos
+
   // Función para manejar el foco
   const handleFocus = (idProducto) => {
     setFocusedInput(idProducto);
@@ -28,12 +52,30 @@ const SeccionProductos = ({
       setTrayQuantities({
         ...trayQuantities,
         [idProducto]: {
-          cantidad: 0, // Cantidad no vendida
+          cantidad: 0, // Restablecer a 0 si el input está vacío
           precioPorUnidad: productsToShow.find((p) => p.idProducto === idProducto).precioPorUnidad,
         },
       });
     }
     setFocusedInput(null);
+  };
+
+  // Función para obtener el valor del input
+  const getInputValue = (producto) => {
+    const cantidad = trayQuantities[producto.idProducto]?.cantidad ?? 0;
+
+    if (producto.nombreCategoria === "Panadería") {
+      if (focusedInput === producto.idProducto) {
+        // Si el input está enfocado, mostrar el valor sin el 0
+        return cantidad === 0 ? "" : cantidad.toString();
+      } else {
+        // Si no está enfocado, mostrar el valor (incluyendo 0)
+        return cantidad.toString();
+      }
+    } else {
+      // Para otras categorías, mostrar el valor directamente
+      return cantidad.toString();
+    }
   };
 
   return (
@@ -93,9 +135,7 @@ const SeccionProductos = ({
                   <Form.Control
                     type="number"
                     min="0"
-                    value={
-                      trayQuantities[producto.idProducto]?.cantidad ?? ""
-                    }
+                    value={getInputValue(producto)}
                     onChange={(e) => {
                       const value = e.target.value;
                       const cantidadNoVendida = Math.max(0, parseInt(value, 10) || 0);
