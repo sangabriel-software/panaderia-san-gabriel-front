@@ -53,19 +53,36 @@ const fetchProductos = async () => {
 
 // Función para filtrar productos de Panadería que estén en la orden
 const filtrarProductosPanaderia = (productos, detalleOrden) => {
+  // Obtener los productos de Panadería que están en la orden
   const productosPanaderiaEnOrden = detalleOrden
     .filter((item) => item.idCategoria === 1) // Filtrar por categoría 1 (Panadería)
-    .map((item) => item.idProducto); // Obtener solo los IDs de los productos
+    .map((item) => ({
+      idProducto: item.idProducto,
+      cantidadUnidades: item.cantidadUnidades, // Incluir el campo cantidadUnidades
+    }));
 
-  return productos.filter((producto) => {
+  return productos.map((producto) => {
     if (producto.idCategoria === 1) {
-      // Si es de la categoría "Panadería", solo incluir si está en la orden
-      return productosPanaderiaEnOrden.includes(producto.idProducto);
+      // Si es de la categoría "Panadería", buscar si está en la orden
+      const productoEnOrden = productosPanaderiaEnOrden.find(
+        (item) => item.idProducto === producto.idProducto
+      );
+
+      if (productoEnOrden) {
+        // Si está en la orden, agregar el campo cantidadUnidades
+        return {
+          ...producto,
+          cantidadUnidades: productoEnOrden.cantidadUnidades,
+        };
+      } else {
+        // Si no está en la orden, no incluirlo
+        return null;
+      }
     } else {
-      // Incluir todos los productos de otras categorías
-      return true;
+      // Incluir todos los productos de otras categorías sin cambios
+      return producto;
     }
-  });
+  }).filter((producto) => producto !== null); // Filtrar los productos nulos (Panadería no incluidos en la orden)
 };
 
 // Función principal para manejar la búsqueda de ventas

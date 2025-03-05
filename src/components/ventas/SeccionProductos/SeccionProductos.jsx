@@ -14,6 +14,8 @@ const SeccionProductos = ({
   trayQuantities,
   setTrayQuantities,
 }) => {
+
+  console.log(ordenYProductos);
   // Estado para manejar el foco de los inputs
   const [focusedInput, setFocusedInput] = useState(null);
 
