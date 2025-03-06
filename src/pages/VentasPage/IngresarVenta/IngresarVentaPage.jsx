@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import dayjs from "dayjs";
 import useGetSucursales from "../../../hooks/sucursales/useGetSucursales";
 import { Container } from "react-bootstrap";
@@ -17,7 +17,7 @@ import CardResumenVenta from "../../../components/ventas/CardResumenVenta/CardRe
 import SeccionProductos from "../../../components/ventas/SeccionProductos/SeccionProductos";
 import ErrorPopup from "../../../components/Popup/ErrorPopUp";
 import SuccessPopup from "../../../components/Popup/SuccessPopup";
-import ModalVentaEsperada from "../../../components/ventas/ModalVentaEsperada/ModalVentaEsperad";
+import ModalVentaEsperada from "../../../components/ventas/ModalVentaEsperada/ModalVentaEsperada";
 
 
 const IngresarVentaPage = () => {
@@ -34,7 +34,7 @@ const IngresarVentaPage = () => {
   const [showVentaEsperadaModal, setShowVentaEsperadaModal] = useState(false);
   const [showSalesSummary, setShowSalesSummary] = useState(false);
   const [ventaTotal, setVentaTotal] = useState(0);
-  const [ventaReal, setVentaReal] = useState(null); // Nuevo estado para la venta real
+  const [ventaReal, setVentaReal] = useState(null); // Estado para la venta real
   const navigate = useNavigate();
 
   const { register, watch, setValue, formState: { errors }, reset } = useForm({ defaultValues: { turno: "AM", sucursal: "" } });
@@ -64,7 +64,7 @@ const IngresarVentaPage = () => {
   // Guardar Venta
   const handleGuardarVentaWrapper = async () => {
     await handleGuardarVenta(setIsLoading, orden, sucursalValue, usuario, productos, trayQuantities, setShowSalesSummary,
-      navigate, setErrorPopupMessage, setIsPopupErrorOpen, setIsPopupSuccessOpen, reset, setTrayQuantities);
+      navigate, setErrorPopupMessage, setIsPopupErrorOpen, setIsPopupSuccessOpen, reset, setTrayQuantities, ventaReal);
   };
 
   // Manejar la acción de continuar desde el modal de venta esperada
@@ -155,7 +155,7 @@ const IngresarVentaPage = () => {
         sucursales={sucursales}
         isLoading={isLoading}
         onConfirm={handleGuardarVentaWrapper}
-        ventaReal={ventaReal}
+        ventaReal={ventaReal} // Pasar la venta real a SalesSummary
       />
 
       {/* Popup de Éxito */}

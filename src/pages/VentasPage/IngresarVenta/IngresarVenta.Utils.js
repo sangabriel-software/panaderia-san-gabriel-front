@@ -201,9 +201,18 @@ const crearDetalleVenta = (productos, trayQuantities, orden, fechaActual) => {
     .filter(Boolean); // Filtrar elementos nulos (productos no incluidos)
 };
 
+const crearPayloadDetalleIngreso = (montoTotalIngresado, fechaActual) => {
+  const detalleingreso = {
+    montoTotalIngresado: montoTotalIngresado,
+    fechaIngreso: fechaActual,
+  }
+
+  return detalleingreso;
+}
+
 
 // IngresarVenta.utils.js
-export const handleGuardarVenta = async (setIsLoading, orden, sucursalValue, usuario, productos, trayQuantities, setShowSalesSummary, navigate, setErrorPopupMessage, setIsPopupErrorOpen, setIsPopupSuccessOpen, reset, setTrayQuantities) => {
+export const handleGuardarVenta = async (setIsLoading, orden, sucursalValue, usuario, productos, trayQuantities, setShowSalesSummary, navigate, setErrorPopupMessage, setIsPopupErrorOpen, setIsPopupSuccessOpen, reset, setTrayQuantities, ventaReal) => {
   setIsLoading(true);
 
   const fechaActual = dayjs().format("YYYY-MM-DD");
@@ -217,10 +226,13 @@ export const handleGuardarVenta = async (setIsLoading, orden, sucursalValue, usu
   // Crear el detalle de la venta
   const detalleVenta = crearDetalleVenta(productos, trayQuantities, orden, fechaActual);
 
+  const detalleIngreso = crearPayloadDetalleIngreso(ventaReal, fechaActual); 
+
   // Construir el payload
   const payload = {
     encabezadoVenta,
     detalleVenta,
+    detalleIngreso,
   };
 
   try {
