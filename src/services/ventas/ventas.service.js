@@ -21,3 +21,12 @@ export const ingresarVentaService = async (dateVenta) => {
     throw error;
   }
 }
+
+export const eliminarVentaService = async (idVenta) => {
+  try {
+    const response = await api.delete(`${deleteEndpoints.ELMINAR_VENTA}/${idVenta}`); 
+      return response.data;
+  } catch (error) {
+    throw error;
+  }
+}

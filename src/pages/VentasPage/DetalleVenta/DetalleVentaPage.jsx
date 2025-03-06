@@ -9,7 +9,7 @@ import "./DetalleVentaPage.css";
 import VentasTable from "../../../components/ventas/VentasTable/VentasTable";
 import VentasCard from "../../../components/ventas/VentasCard/VentasCard";
 import PaginationComponent from "../../../components/PaginationComponent/PaginationComponent";
-import { getCurrentItems } from "./DetallesVentas.utils";
+import { getCurrentItems, handleConfirmDeleteVenta, handleDeleteVenta } from "./DetallesVentas.utils";
 import OrderCardSkeleton from "../../../components/OrderCardSkeleton/OrderCardSkeleton";
 import FilterBarVentas from "../../../components/ventas/FilterBar/FilterBarVentas";
 import useFilterVentas from "../../../hooks/ventas/useFilterVentas";
@@ -18,27 +18,26 @@ import {
   BsExclamationTriangleFill,
 } from "react-icons/bs";
 import Alert from "../../../components/Alerts/Alert";
+import ConfirmPopUp from "../../../components/Popup/ConfirmPopup";
+import ErrorPopup from "../../../components/Popup/ErrorPopUp";
 
 const VentaDetallePage = () => {
   const navigate = useNavigate();
-  const { ventas, loadingVentas, showErrorVentas, showInfoVentas, setVentas } =
-    useGetVentas();
-  const [filters, setFilters] = useState({
-    search: "",
-    date: "",
-    sucursal: "",
-  });
+  const { ventas, loadingVentas, showErrorVentas, showInfoVentas, setVentas } = useGetVentas();
+  const [filters, setFilters] = useState({ search: "", date: "", sucursal: "", });
   const filteredVentas = useFilterVentas(ventas, filters);
 
   /* Variables para la paginacion */
   const [currentPage, setCurrentPage] = useState(1);
   const ventasPerPage = 5;
-  const currentSales = getCurrentItems(
-    filteredVentas,
-    currentPage,
-    ventasPerPage
-  );
+  const currentSales = getCurrentItems( filteredVentas, currentPage, ventasPerPage );
   const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
+
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [ventaToDelete, setVentaToDelete] = useState(null);
+  const [errorPopupMessage, setErrorPopupMessage] = useState(false);
+  const [isPopupErrorOpen, setIsPopupErrorOpen] = useState(false);
+  const [isLoading, setIsloading] = useState(false);
 
   // Usamos useMediaQuery para detectar si es un dispositivo móvil
   const isMobile = useMediaQuery({ query: "(max-width: 768px)" });
@@ -87,7 +86,13 @@ const VentaDetallePage = () => {
                 key={venta.idVenta}
                 sale={venta}
                 onViewDetails={handleViewDetails}
-                onDeleteSale={handleDelete}
+                onDeleteSale={() =>
+                  handleConfirmDeleteVenta(
+                    venta.idVenta,
+                    setVentaToDelete,
+                    setIsPopupOpen
+                  )
+                }
               />
             ))}
 
@@ -109,7 +114,9 @@ const VentaDetallePage = () => {
         // Usar el componente VentasTable para la vista de PC
         <VentasTable
           sales={filteredVentas}
-          onDelete={handleDelete}
+          onDelete={(idVenta) =>
+            handleConfirmDeleteVenta(idVenta, setVentaToDelete, setIsPopupOpen)
+          }
           onViewPdf={handleViewPdf}
           loadingViewPdf={null} // Puedes manejar el estado de carga aquí
         />
@@ -156,6 +163,34 @@ const VentaDetallePage = () => {
           </div>
         </div>
       )}
+
+      {/* Popup confirmacion de eliminación */}
+      <ConfirmPopUp
+        isOpen={isPopupOpen}
+        onClose={() => setIsPopupOpen(false)}
+        title="Confirmar Eliminación"
+        message="¿Está seguro de eliminar la orden?"
+        isLoading={isLoading}
+        onConfirm={() => {
+          handleDeleteVenta(
+            ventaToDelete,
+            setVentas,
+            setIsPopupOpen,
+            setErrorPopupMessage,
+            setIsPopupErrorOpen,
+            setIsloading,
+          );
+        }}
+        onCancel={() => setIsPopupOpen(false)}
+      />
+
+      {/* Error popup */}
+      <ErrorPopup
+        isOpen={isPopupErrorOpen}
+        onClose={() => setIsPopupErrorOpen(false)}
+        title="¡Error!"
+        message={errorPopupMessage}
+      />
     </Container>
   );
 };

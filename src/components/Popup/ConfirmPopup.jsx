@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import { Modal, Button } from "react-bootstrap";
+import { Modal, Button, Spinner } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./Popups.css";
 
@@ -10,6 +10,7 @@ const ConfirmPopUp = ({
   message,
   onConfirm,
   onCancel,
+  isLoading, // Nuevo prop para controlar el estado de carga
 }) => {
   return (
     <Modal show={isOpen} onHide={onClose} centered>
@@ -50,21 +51,30 @@ const ConfirmPopUp = ({
         <Button className="btn btn-modal-erro" onClick={onCancel}>
           Cancelar
         </Button>
-        <Button className="btn btn-confirm" onClick={onConfirm}>
-          Eliminar
+        <Button
+          className="btn btn-confirm"
+          onClick={onConfirm}
+          disabled={isLoading} // Deshabilitar el botón durante la carga
+        >
+          {isLoading ? (
+            <>
+              <Spinner
+                as="span"
+                animation="border"
+                size="sm"
+                role="status"
+                aria-hidden="true"
+                className="me-2" // Margen a la derecha del spinner
+              />
+              Eliminando...
+            </>
+          ) : (
+            "Eliminar"
+          )}
         </Button>
       </Modal.Footer>
     </Modal>
   );
-};
-
-ConfirmPopUp.propTypes = {
-  isOpen: PropTypes.bool.isRequired,
-  onClose: PropTypes.func.isRequired,
-  title: PropTypes.string.isRequired,
-  message: PropTypes.string.isRequired,
-  onConfirm: PropTypes.func.isRequired,
-  onCancel: PropTypes.func.isRequired,
 };
 
 export default ConfirmPopUp;

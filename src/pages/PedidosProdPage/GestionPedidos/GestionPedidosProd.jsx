@@ -16,6 +16,7 @@ import { BsExclamationTriangleFill, BsFillInfoCircleFill } from "react-icons/bs"
 import { useNavigate } from "react-router";
 import { handleViewDetalle } from "../DetallesOrdenesProd/DetallesOrdenesProdUtils";
 import { getCurrentItems, handleConfirmDeleteOrdenProduccion, handleDeleteOrder, handleViewPdf } from "./GestionPedidosProdUtils";
+import ErrorPopup from "../../../components/Popup/ErrorPopUp";
 
 const GestionPedidosProd = () => {
   const isMobile = useMediaQuery({ maxWidth: 767 });
@@ -45,7 +46,10 @@ const GestionPedidosProd = () => {
         title="Órdenes de Producción"
         description="Gestiona los pedidos de la producción a realizar"
       />
-      <AddButton buttonText="Ingresar Orden" onRedirect={() => navigate("ingresar-orden")} />
+      <AddButton
+        buttonText="Ingresar Orden"
+        onRedirect={() => navigate("ingresar-orden")}
+      />
       <FilterBar
         filters={filters}
         onFilterChange={setFilters}
@@ -61,7 +65,9 @@ const GestionPedidosProd = () => {
               <OrderCard
                 key={order.idOrdenProduccion}
                 order={order}
-                onViewDetails={() => { handleViewDetalle(order.idOrdenProduccion, navigate) }}
+                onViewDetails={() => {
+                  handleViewDetalle(order.idOrdenProduccion, navigate);
+                }}
                 onDeleteOrder={() =>
                   handleConfirmDeleteOrdenProduccion(
                     order.idOrdenProduccion,
@@ -88,7 +94,13 @@ const GestionPedidosProd = () => {
       ) : (
         <OrderTable
           orders={filteredOrders}
-          onDelete={(idOrder) => handleConfirmDeleteOrdenProduccion(idOrder, setOrdenToDelete, setIsPopupOpen)}
+          onDelete={(idOrder) =>
+            handleConfirmDeleteOrdenProduccion(
+              idOrder,
+              setOrdenToDelete,
+              setIsPopupOpen
+            )
+          }
           onViewPdf={(idOrder) => handleViewPdf(idOrder, setLoadingViewPdf)}
           loadingViewPdf={loadingViewPdf}
         />
@@ -151,6 +163,14 @@ const GestionPedidosProd = () => {
           );
         }}
         onCancel={() => setIsPopupOpen(false)}
+      />
+      
+      {/* Error popup */}
+      <ErrorPopup
+        isOpen={isPopupErrorOpen}
+        onClose={() => setIsPopupErrorOpen(false)}
+        title="¡Error!"
+        message={errorPopupMessage}
       />
     </Container>
   );
