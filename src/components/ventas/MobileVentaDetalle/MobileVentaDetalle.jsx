@@ -37,7 +37,10 @@ const MobileVentaDetalle = ({ venta, onDownloadXLS, onDownloadPDF }) => {
 
   return (
     <>
-      <Card className="p-3 shadow-lg border-0 rounded-4" style={{ backgroundColor: "#f8f9fa" }}>
+      <Card
+        className="p-3 shadow-lg border-0 rounded-4"
+        style={{ backgroundColor: "#f8f9fa" }}
+      >
         <Card.Body className="px-2">
           <div className="d-flex align-items-center justify-content-between mb-3">
             <div>
@@ -56,7 +59,9 @@ const MobileVentaDetalle = ({ venta, onDownloadXLS, onDownloadPDF }) => {
           <div className="mb-4">
             <div className="d-flex justify-content-between align-items-center py-2 border-bottom">
               <span className="text-muted">Fecha de Venta:</span>
-              <span className="fw-medium">{formatDateToDisplay(encabezadoVenta?.fechaVenta)}</span>
+              <span className="fw-medium">
+                {formatDateToDisplay(encabezadoVenta?.fechaVenta)}
+              </span>
             </div>
             <div className="d-flex justify-content-between align-items-center py-2 border-bottom">
               <span className="text-muted">Sucursal:</span>
@@ -70,7 +75,9 @@ const MobileVentaDetalle = ({ venta, onDownloadXLS, onDownloadPDF }) => {
             </div>
             <div className="d-flex justify-content-between align-items-center py-2 border-bottom">
               <span className="text-muted">Turno:</span>
-              <span className="fw-medium">{encabezadoVenta?.ordenTurno || "N/A"}</span>
+              <span className="fw-medium">
+                {encabezadoVenta?.ordenTurno || "N/A"}
+              </span>
             </div>
             <div className="d-flex justify-content-between align-items-center py-2">
               <span className="text-muted">Estado:</span>
@@ -93,30 +100,44 @@ const MobileVentaDetalle = ({ venta, onDownloadXLS, onDownloadPDF }) => {
 
           <h6 className="mb-3 text-uppercase text-muted">Productos Vendidos</h6>
           {detallesVenta?.map((prod, index) => (
-            <ProductCardMobile key={prod.idDetalleVenta} product={prod} index={index} />
+            <ProductCardMobile
+              key={prod.idDetalleVenta}
+              product={prod}
+              index={index}
+            />
           ))}
 
           <h6 className="mb-3 text-uppercase text-muted mt-4">Balance</h6>
-          <Card className="mb-3 border-0 rounded-3 shadow-sm" style={{ backgroundColor: "rgba(0,123,255,0.05)" }}>
+          <Card
+            className="mb-3 border-0 rounded-3 shadow-sm"
+            style={{ backgroundColor: "rgba(0,123,255,0.05)" }}
+          >
             <Card.Body className="py-3">
               <div className="d-flex justify-content-between align-items-center mb-2">
                 <span className="text-muted d-flex align-items-center gap-2">
                   <BsCash size={16} /> Monto Esperado
                 </span>
-                <span className="fw-bold">{formatCurrency(detalleIngresos?.montoEsperado)}</span>
+                <span className="fw-bold">
+                  {formatCurrency(detalleIngresos?.montoEsperado)}
+                </span>
               </div>
               <div className="d-flex justify-content-between align-items-center mb-2">
                 <span className="text-muted d-flex align-items-center gap-2">
                   <BsWallet size={16} /> Monto Ingresado
                 </span>
-                <span className="fw-bold">{formatCurrency(detalleIngresos?.montoTotalIngresado)}</span>
+                <span className="fw-bold">
+                  {formatCurrency(detalleIngresos?.montoTotalIngresado)}
+                </span>
               </div>
               <div className="d-flex justify-content-between align-items-center">
                 <span className="text-muted d-flex align-items-center gap-2">
-                  <BsDashCircle size={16} /> Diferencia
+                  <BsDashCircle size={16} className="text-danger" /> Diferencia
                 </span>
                 <span className="fw-bold">
-                  <Badge bg={detalleIngresos?.diferencia >= 0 ? "success" : "danger"} className="px-2 py-1">
+                  <Badge
+                    bg={detalleIngresos?.diferencia >= 0 ? "success" : "danger"}
+                    className="px-2 py-1"
+                  >
                     {formatCurrency(detalleIngresos?.diferencia)}
                   </Badge>
                 </span>
@@ -150,7 +171,10 @@ const MobileVentaDetalle = ({ venta, onDownloadXLS, onDownloadPDF }) => {
 
 const ProductCardMobile = ({ product, index }) => {
   return (
-    <Card className="mb-3 border-0 rounded-3 shadow-sm" style={{ backgroundColor: "rgba(0,123,255,0.05)" }}>
+    <Card
+      className="mb-3 border-0 rounded-3 shadow-sm"
+      style={{ backgroundColor: "rgba(0,123,255,0.05)" }}
+    >
       <Card.Body className="py-3">
         <div className="d-flex justify-content-between align-items-center mb-2">
           <span className="badge bg-primary rounded-pill"># {index + 1}</span>
@@ -159,17 +183,21 @@ const ProductCardMobile = ({ product, index }) => {
 
         <div className="d-flex justify-content-between small">
           <div className="text-center">
-            <div className="text-muted ">Cantidad Vendida</div>
+            <div className="text-muted ">C/Vendida</div>
             <div className="fw-bold">{product.cantidadVendida}</div>
           </div>
           <div className="text-center">
-            <div className="text-muted ">Precio Unitario</div>
-            <div className="fw-bold">{`Q ${product.precioUnitario.toFixed(2)}`}</div>
+            <div className="text-muted ">P/Unitario</div>
+            <div className="fw-bold">{`Q ${product.precioUnitario.toFixed(
+              2
+            )}`}</div>
           </div>
           <div className="text-center">
             <div className="text-muted text-nowrap">Total</div>
             <div className="fw-bold text-success">
-              {`Q ${(product.cantidadVendida * product.precioUnitario).toFixed(2)}`}
+              {`Q ${(product.cantidadVendida * product.precioUnitario).toFixed(
+                2
+              )}`}
             </div>
           </div>
         </div>
