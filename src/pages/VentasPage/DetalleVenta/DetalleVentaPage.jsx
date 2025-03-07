@@ -3,15 +3,22 @@ import { useNavigate, useParams } from "react-router";
 import useGetDetalleVenta from "../../../hooks/ventas/useGetDetalleVenta";
 import { decryptId } from "../../../utils/CryptoParams";
 import DesktopVentaDetalle from "../../../components/ventas/DesktopVentasDetalle/DesktopVentasDetalle";
+import MobileVentaDetalle from "../../../components/ventas/MobileVentaDetalle/MobileVentaDetalle";
 import { Container } from "react-bootstrap";
 import { BsArrowLeft } from "react-icons/bs";
 import Title from "../../../components/Title/Title";
+import { useMediaQuery } from "react-responsive"; // Importar react-responsive
 
 const DetalleVentaPage = () => {
   const { idVenta } = useParams();
   const decryptedIdVenta = decryptId(decodeURIComponent(idVenta));
-  const { detalleVenta, loadingDetalleVenta, showErrorDetalleVenta, showInfoDetalleVenta,  } = useGetDetalleVenta(decryptedIdVenta);
+  const { detalleVenta, loadingDetalleVenta, showErrorDetalleVenta, showInfoDetalleVenta } =
+    useGetDetalleVenta(decryptedIdVenta);
   const navigate = useNavigate();
+
+  // Detectar si es un dispositivo móvil
+  const isMobile = useMediaQuery({ maxWidth: 767 });
+
   // Manejo de estados de carga y errores
   if (loadingDetalleVenta) {
     return <div>Cargando detalles de la venta...</div>;
@@ -56,11 +63,19 @@ const DetalleVentaPage = () => {
       </div>
 
       <div>
-        <DesktopVentaDetalle
-          venta={detalleVenta} // Pasamos los datos de la venta
-          onDownloadXLS={handleDownloadXLS} // Pasamos la función para descargar XLS
-          onDownloadPDF={handleDownloadPDF} // Pasamos la función para descargar PDF
-        />
+        {isMobile ? (
+          <MobileVentaDetalle
+            venta={detalleVenta} // Pasamos los datos de la venta
+            onDownloadXLS={handleDownloadXLS} // Pasamos la función para descargar XLS
+            onDownloadPDF={handleDownloadPDF} // Pasamos la función para descargar PDF
+          />
+        ) : (
+          <DesktopVentaDetalle
+            venta={detalleVenta} // Pasamos los datos de la venta
+            onDownloadXLS={handleDownloadXLS} // Pasamos la función para descargar XLS
+            onDownloadPDF={handleDownloadPDF} // Pasamos la función para descargar PDF
+          />
+        )}
       </div>
     </Container>
   );

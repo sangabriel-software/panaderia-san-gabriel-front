@@ -17,6 +17,7 @@ import { BsFillInfoCircleFill, BsExclamationTriangleFill, } from "react-icons/bs
 import Alert from "../../../components/Alerts/Alert";
 import ConfirmPopUp from "../../../components/Popup/ConfirmPopup";
 import ErrorPopup from "../../../components/Popup/ErrorPopUp";
+import { handleViewDetalleVenta } from "../DetalleVenta/DetalleVenta.utils";
 
 const GestionVentasPage = () => {
   const navigate = useNavigate();
@@ -82,7 +83,9 @@ const GestionVentasPage = () => {
               <VentasCard
                 key={venta.idVenta}
                 sale={venta}
-                onViewDetails={handleViewDetails}
+                onViewDetails={() => {
+                  handleViewDetalleVenta(venta.idVenta, navigate);
+                }}
                 onDeleteSale={() =>
                   handleConfirmDeleteVenta(
                     venta.idVenta,
@@ -175,7 +178,7 @@ const GestionVentasPage = () => {
             setIsPopupOpen,
             setErrorPopupMessage,
             setIsPopupErrorOpen,
-            setIsloading,
+            setIsloading
           );
         }}
         onCancel={() => setIsPopupOpen(false)}
