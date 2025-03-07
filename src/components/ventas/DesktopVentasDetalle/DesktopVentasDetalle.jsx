@@ -55,7 +55,7 @@ const DesktopHeader = ({ encabezadoVenta, onDownloadXLS, onDownloadPDF }) => {
               <h3 className="mb-3 fw-bold">{`VENTA #${encabezadoVenta?.idVenta}`}</h3>
               <div className="mb-3">
                 <span className="text-uppercase small opacity-75 d-flex align-items-center gap-2">
-                  <BsPerson size={16} /> Usuario que ingresó la venta
+                  <BsPerson size={16} /> Venta ingresada Por:
                 </span>
                 <h5 className="mb-0 fw-semibold">{`@${encabezadoVenta?.usuario}`}</h5>
               </div>
@@ -111,7 +111,7 @@ const DesktopHeader = ({ encabezadoVenta, onDownloadXLS, onDownloadPDF }) => {
               </div>
               <div>
                 <span className="text-uppercase small opacity-75 d-flex align-items-center gap-2">
-                  <BsCash size={16} /> Venta Ingresada
+                  <BsCash size={16} /> Total Ingresado
                 </span>
                 <h5 className="mb-0 fw-semibold mb-2">
                   <Badge bg="primary" className="px-2 py-1">
