@@ -5,23 +5,20 @@ import AddButton from "../../../components/AddButton/AddButton";
 import { useNavigate } from "react-router";
 import useGetVentas from "../../../hooks/ventas/useGetVentas";
 import { useMediaQuery } from "react-responsive";
-import "./DetalleVentaPage.css";
+import "./GestionarVentasPage.css";
 import VentasTable from "../../../components/ventas/VentasTable/VentasTable";
 import VentasCard from "../../../components/ventas/VentasCard/VentasCard";
 import PaginationComponent from "../../../components/PaginationComponent/PaginationComponent";
-import { getCurrentItems, handleConfirmDeleteVenta, handleDeleteVenta } from "./DetallesVentas.utils";
+import { getCurrentItems, handleConfirmDeleteVenta, handleDeleteVenta } from "./GestionVentas.utils";
 import OrderCardSkeleton from "../../../components/OrderCardSkeleton/OrderCardSkeleton";
 import FilterBarVentas from "../../../components/ventas/FilterBar/FilterBarVentas";
 import useFilterVentas from "../../../hooks/ventas/useFilterVentas";
-import {
-  BsFillInfoCircleFill,
-  BsExclamationTriangleFill,
-} from "react-icons/bs";
+import { BsFillInfoCircleFill, BsExclamationTriangleFill, } from "react-icons/bs";
 import Alert from "../../../components/Alerts/Alert";
 import ConfirmPopUp from "../../../components/Popup/ConfirmPopup";
 import ErrorPopup from "../../../components/Popup/ErrorPopUp";
 
-const VentaDetallePage = () => {
+const GestionVentasPage = () => {
   const navigate = useNavigate();
   const { ventas, loadingVentas, showErrorVentas, showInfoVentas, setVentas } = useGetVentas();
   const [filters, setFilters] = useState({ search: "", date: "", sucursal: "", });
@@ -195,4 +192,4 @@ const VentaDetallePage = () => {
   );
 };
 
-export default VentaDetallePage;
+export default GestionVentasPage;
