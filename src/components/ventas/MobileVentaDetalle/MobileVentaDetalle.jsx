@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Badge, Card } from "react-bootstrap";
-import DownloadDropdown from "../../DownloadDropdown/DownloadDropdown";
+import { Badge, Card, Button, Dropdown } from "react-bootstrap";
 import { formatDateToDisplay } from "../../../utils/dateUtils";
-import { BsCash, BsWallet, BsDashCircle, BsArrowUp } from "react-icons/bs";
+import { BsCash, BsWallet, BsDashCircle, BsArrowUp, BsDownload, BsFileEarmarkPdf, BsFileEarmarkExcel } from "react-icons/bs";
 
 const MobileVentaDetalle = ({ venta, onDownloadXLS, onDownloadPDF }) => {
   const encabezadoVenta = venta?.encabezadoVenta;
@@ -38,99 +37,117 @@ const MobileVentaDetalle = ({ venta, onDownloadXLS, onDownloadPDF }) => {
   return (
     <>
       <Card
-        className="p-3 shadow-lg border-0 rounded-4"
-        style={{ backgroundColor: "#f8f9fa" }}
+        className="p-3 border-0 rounded-4"
+        style={{ backgroundColor: "rgba(245, 245, 245, 0.9)" }} // Fondo translúcido
       >
         <Card.Body className="px-2">
+          {/* Encabezado */}
           <div className="d-flex align-items-center justify-content-between mb-3">
             <div>
-              <Card.Title className="h4 mb-1 text-primary">
+              <Card.Title className="h4 mb-1 text-dark">
                 Venta #{encabezadoVenta?.idVenta}
               </Card.Title>
-              <small className="text-muted">Detalles de la venta</small>
+              <small className="text-secondary">Detalles de la venta</small>
             </div>
-            <DownloadDropdown
-              onDownloadXLS={onDownloadXLS}
-              onDownloadPDF={onDownloadPDF}
-              variant="outline-primary"
-            />
+            {/* Menú desplegable para descargas */}
+            <Dropdown>
+              <Dropdown.Toggle
+                variant="outline-dark"
+                className="rounded-circle p-2"
+                id="dropdown-download"
+              >
+                <BsDownload size={20} />
+              </Dropdown.Toggle>
+
+              <Dropdown.Menu>
+                <Dropdown.Item onClick={onDownloadPDF}>
+                  <div className="d-flex align-items-center gap-2">
+                    <BsFileEarmarkPdf size={16} className="text-danger" />
+                    <span>Descargar PDF</span>
+                  </div>
+                </Dropdown.Item>
+                <Dropdown.Item onClick={onDownloadXLS}>
+                  <div className="d-flex align-items-center gap-2">
+                    <BsFileEarmarkExcel size={16} className="text-success" />
+                    <span>Descargar Excel</span>
+                  </div>
+                </Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
           </div>
 
+          {/* Información de la Venta */}
           <div className="mb-4">
             <div className="d-flex justify-content-between align-items-center py-2 border-bottom">
-              <span className="text-muted">Fecha de Venta:</span>
-              <span className="fw-medium">
+              <span className="text-secondary">Fecha de Venta:</span>
+              <span className="fw-medium text-dark">
                 {formatDateToDisplay(encabezadoVenta?.fechaVenta)}
               </span>
             </div>
             <div className="d-flex justify-content-between align-items-center py-2 border-bottom">
-              <span className="text-muted">Sucursal:</span>
-              <span className="fw-medium text-end" style={{ maxWidth: "60%" }}>
+              <span className="text-secondary">Sucursal:</span>
+              <span className="fw-medium text-dark text-end" style={{ maxWidth: "60%" }}>
                 {encabezadoVenta?.nombreSucursal}
               </span>
             </div>
             <div className="d-flex justify-content-between align-items-center py-2 border-bottom">
-              <span className="text-muted">Usuario:</span>
-              <span className="fw-medium">{`@${encabezadoVenta?.usuario}`}</span>
+              <span className="text-secondary">Usuario:</span>
+              <span className="fw-medium text-dark">{`@${encabezadoVenta?.usuario}`}</span>
             </div>
             <div className="d-flex justify-content-between align-items-center py-2 border-bottom">
-              <span className="text-muted">Turno:</span>
-              <span className="fw-medium">
+              <span className="text-secondary">Turno:</span>
+              <span className="fw-medium text-dark">
                 {encabezadoVenta?.ordenTurno || "N/A"}
               </span>
             </div>
             <div className="d-flex justify-content-between align-items-center py-2">
-              <span className="text-muted">Estado:</span>
+              <span className="text-secondary">Estado:</span>
               <Badge
                 bg={encabezadoVenta?.estadoVenta === "C" ? "success" : "danger"}
-                className="px-1 py-1"
+                className="px-2 py-1"
               >
                 {encabezadoVenta?.estadoVenta === "C" ? "Cerrada" : "Pendiente"}
               </Badge>
             </div>
             <div className="d-flex justify-content-between align-items-center py-2">
-              <span className="text-muted">Venta Ingresada:</span>
-              <span className="fw-medium">
-                <Badge bg="primary" className="px-2 py-1">
-                  {formatCurrency(encabezadoVenta?.totalVenta)}
-                </Badge>
+              <span className="text-secondary">Venta Ingresada:</span>
+              <span className="fw-medium text-dark">
+                {formatCurrency(encabezadoVenta?.totalVenta)}
               </span>
             </div>
           </div>
 
-          <h6 className="mb-3 text-uppercase text-muted">Productos Vendidos</h6>
+          {/* Productos Vendidos */}
+          <h6 className="mb-3 text-uppercase text-secondary">Productos Vendidos</h6>
           {detallesVenta?.map((prod, index) => (
-            <ProductCardMobile
-              key={prod.idDetalleVenta}
-              product={prod}
-              index={index}
-            />
+            <ProductCardMobile key={prod.idDetalleVenta} product={prod} index={index} />
           ))}
 
-          <h6 className="mb-3 text-uppercase text-muted mt-4">Balance</h6>
+          {/* Balance */}
+          <h6 className="mb-3 text-uppercase text-secondary mt-4">Balance</h6>
           <Card
-            className="mb-3 border-0 rounded-3 shadow-sm"
-            style={{ backgroundColor: "rgba(0,123,255,0.05)" }}
+            className="mb-3 border-0 rounded-3"
+            style={{ backgroundColor: "rgba(230, 230, 250, 0.7)" }} // Fondo morado translúcido
           >
             <Card.Body className="py-3">
               <div className="d-flex justify-content-between align-items-center mb-2">
-                <span className="text-muted d-flex align-items-center gap-2">
+                <span className="text-secondary d-flex align-items-center gap-2">
                   <BsCash size={16} /> Monto Esperado
                 </span>
-                <span className="fw-bold">
+                <span className="fw-bold text-dark">
                   {formatCurrency(detalleIngresos?.montoEsperado)}
                 </span>
               </div>
               <div className="d-flex justify-content-between align-items-center mb-2">
-                <span className="text-muted d-flex align-items-center gap-2">
+                <span className="text-secondary d-flex align-items-center gap-2">
                   <BsWallet size={16} /> Monto Ingresado
                 </span>
-                <span className="fw-bold">
+                <span className="fw-bold text-dark">
                   {formatCurrency(detalleIngresos?.montoTotalIngresado)}
                 </span>
               </div>
               <div className="d-flex justify-content-between align-items-center">
-                <span className="text-muted d-flex align-items-center gap-2">
+                <span className="text-secondary d-flex align-items-center gap-2">
                   <BsDashCircle size={16} className="text-danger" /> Diferencia
                 </span>
                 <span className="fw-bold">
@@ -147,10 +164,11 @@ const MobileVentaDetalle = ({ venta, onDownloadXLS, onDownloadPDF }) => {
         </Card.Body>
       </Card>
 
+      {/* Botón de flecha para volver arriba */}
       {showScrollButton && (
         <button
           onClick={scrollToTop}
-          className="btn btn-primary rounded-circle shadow"
+          className="btn btn-dark rounded-circle shadow"
           style={{
             position: "fixed",
             bottom: "20px",
@@ -172,32 +190,28 @@ const MobileVentaDetalle = ({ venta, onDownloadXLS, onDownloadPDF }) => {
 const ProductCardMobile = ({ product, index }) => {
   return (
     <Card
-      className="mb-3 border-0 rounded-3 shadow-sm"
-      style={{ backgroundColor: "rgba(0,123,255,0.05)" }}
+      className="mb-3 border-0 rounded-3"
+      style={{ backgroundColor: "rgba(230, 230, 250, 0.7)" }} // Fondo morado translúcido
     >
       <Card.Body className="py-3">
         <div className="d-flex justify-content-between align-items-center mb-2">
-          <span className="badge bg-primary rounded-pill"># {index + 1}</span>
-          <span className="h6 mb-0 text-primary">{product.nombreProducto}</span>
+          <span className="badge bg-dark rounded-pill"># {index + 1}</span>
+          <span className="h6 mb-0 text-dark">{product.nombreProducto}</span>
         </div>
 
         <div className="d-flex justify-content-between small">
           <div className="text-center">
-            <div className="text-muted ">C/Vendida</div>
-            <div className="fw-bold">{product.cantidadVendida}</div>
+            <div className="text-secondary">C/Vendida</div>
+            <div className="fw-bold text-dark">{product.cantidadVendida}</div>
           </div>
           <div className="text-center">
-            <div className="text-muted ">P/Unitario</div>
-            <div className="fw-bold">{`Q ${product.precioUnitario.toFixed(
-              2
-            )}`}</div>
+            <div className="text-secondary">P/Unitario</div>
+            <div className="fw-bold text-dark">{`Q ${product.precioUnitario.toFixed(2)}`}</div>
           </div>
           <div className="text-center">
-            <div className="text-muted text-nowrap">Total</div>
+            <div className="text-secondary text-nowrap">Total</div>
             <div className="fw-bold text-success">
-              {`Q ${(product.cantidadVendida * product.precioUnitario).toFixed(
-                2
-              )}`}
+              {`Q ${(product.cantidadVendida * product.precioUnitario).toFixed(2)}`}
             </div>
           </div>
         </div>
