@@ -159,11 +159,11 @@ const ProductCardMobile = ({ product, index }) => {
 
         <div className="d-flex justify-content-between small">
           <div className="text-center">
-            <div className="text-muted text-nowrap">Cantidad Vendida</div>
+            <div className="text-muted ">Cantidad Vendida</div>
             <div className="fw-bold">{product.cantidadVendida}</div>
           </div>
           <div className="text-center">
-            <div className="text-muted text-nowrap">Precio Unitario</div>
+            <div className="text-muted ">Precio Unitario</div>
             <div className="fw-bold">{`Q ${product.precioUnitario.toFixed(2)}`}</div>
           </div>
           <div className="text-center">
