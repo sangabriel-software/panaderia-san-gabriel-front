@@ -1,0 +1,36 @@
+/* Estilos para el Card */
+.shadow-md {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .border-2 {
+    border: 2px solid #e9ecef;
+  }
+  
+  /* Estilos para los íconos */
+  .text-primary {
+    color: #0d6efd !important;
+  }
+  
+  /* Estilos para los textos */
+  .text-muted {
+    color: #6c757d !important;
+  }
+  
+  .text-success {
+    color: #28a745 !important;
+  }
+  
+  /* Espaciado y alineación */
+  .d-flex.align-items-center {
+    padding: 0.5rem 0;
+  }
+  
+  /* Estilos para los títulos */
+  h6.fw-bold {
+    font-size: 1.1rem;
+    color: #2c3e50;
+    border-bottom: 2px solid #e9ecef;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+  }

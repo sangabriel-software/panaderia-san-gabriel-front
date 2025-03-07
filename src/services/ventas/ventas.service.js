@@ -30,3 +30,12 @@ export const eliminarVentaService = async (idVenta) => {
     throw error;
   }
 }
+
+export const consultarDetalleVenta = async (idVenta) => {
+  try {
+    const response = await api.get(`${getEndpoints.CONSULTAR_DETALLE_VENTA}/${idVenta}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};

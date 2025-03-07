@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { formatDateToDisplay } from "../../../utils/dateUtils";
 import PaginationComponent from "../../PaginationComponent/PaginationComponent";
 import "./VentasTable.css"; // Importa el CSS personalizado
+import { handleViewDetalleVenta } from "../../../pages/VentasPage/DetalleVenta/DetalleVenta.utils";
 
 const ITEMS_PER_PAGE = 5;
 
@@ -28,7 +29,7 @@ const VentasTable = ({ sales, onDelete, onViewPdf, loadingViewPdf }) => {
   const handlePageChange = (newPage) => setCurrentPage(newPage);
 
   const handleRowClick = (idVenta) => {
-    navigate("/detalle-venta/");
+    handleViewDetalleVenta(idVenta, navigate)
   };
 
   useEffect(() => {

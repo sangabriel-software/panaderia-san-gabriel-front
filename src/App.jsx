@@ -25,6 +25,7 @@ const DetallesOrdenesProduccionPage = lazy(() => import("./pages/PedidosProdPage
 const IngresarOrdenProd = lazy(() => import("./pages/PedidosProdPage/IngresarOrdenProd/IngresarOrdenProd"));
 const GestionVentasPage = lazy(() => import("./pages/VentasPage/GestionVentas/GestionVentasPage"));
 const IngresarVentaPage = lazy(() => import("./pages/VentasPage/IngresarVenta/IngresarVentaPage"));
+const DetalleVentaPage = lazy(() => import("./pages/VentasPage/DetalleVenta/DetalleVentaPage"));
 
 function App() {
   return (
@@ -62,6 +63,7 @@ function App() {
             <Route path="/ventas">
               <Route index element={<GestionVentasPage />} />
               <Route path="ingresar-venta" element={<IngresarVentaPage />} />
+              <Route path="detalle-venta/:idVenta" element={<DetalleVentaPage />} />
             </Route>
           </Route>
         </Route>
