@@ -47,7 +47,7 @@ const MobileOrderDetails = ({ order, onDownloadXLS, onDownloadPDF }) => {
           {/* Encabezado */}
           <div className="d-flex align-items-center justify-content-between mb-3">
             <div>
-              <Card.Title className="h4 mb-1 text-dark">
+              <Card.Title className="h4 mb-1 text-primary">
                 Orden #{encabezado?.idOrdenProduccion}
               </Card.Title>
               <small className="text-dark fw-bold">Detalles de producción</small>
