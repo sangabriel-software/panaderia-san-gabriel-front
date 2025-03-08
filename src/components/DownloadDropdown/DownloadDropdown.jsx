@@ -1,6 +1,7 @@
 // src/components/Orders/DownloadDropdown.jsx
 import React from "react";
 import { Dropdown, ButtonGroup } from "react-bootstrap";
+import { BsFileEarmarkPdf } from "react-icons/bs";
 import { FaDownload, FaFileExcel, FaFilePdf } from "react-icons/fa";
 
 const DownloadDropdown = ({ onDownloadXLS, onDownloadPDF }) => {
@@ -19,8 +20,10 @@ const DownloadDropdown = ({ onDownloadXLS, onDownloadPDF }) => {
       </Dropdown.Toggle>
       <Dropdown.Menu>
         <Dropdown.Item onClick={onDownloadPDF}>
-          <FaFilePdf className="me-2" style={{ color: "#FF0000" }} /> {/* Rojo para PDF */}
-          Descargar PDF
+          <div className="d-flex align-items-center gap-2">
+            <BsFileEarmarkPdf size={16} className="text-danger" />
+            <span>Descargar PDF</span>
+          </div>
         </Dropdown.Item>
       </Dropdown.Menu>
     </Dropdown>
