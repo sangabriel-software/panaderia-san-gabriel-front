@@ -88,7 +88,7 @@ const MobileVentaDetalle = ({ venta, onDownloadXLS, onDownloadPDF }) => {
                 <BsCalendar size={16} style={{ color: "#4ECDC4" }} /> {/* Ícono de calendario */}
                 Fecha de Venta:
               </span>
-              <span className="fw-medium text-dark">
+              <span className="fw-medium text-dark fw-bold">
                 {formatDateToDisplay(encabezadoVenta?.fechaVenta)}
               </span>
             </div>
@@ -97,7 +97,7 @@ const MobileVentaDetalle = ({ venta, onDownloadXLS, onDownloadPDF }) => {
                 <BsShop size={16} style={{ color: "#4ECDC4" }} /> {/* Ícono de sucursal */}
                 Sucursal:
               </span>
-              <span className="fw-medium text-dark text-end" style={{ maxWidth: "60%" }}>
+              <span className="fw-medium text-dark text-end fw-bold" style={{ maxWidth: "60%" }}>
                 {encabezadoVenta?.nombreSucursal}
               </span>
             </div>
@@ -106,14 +106,14 @@ const MobileVentaDetalle = ({ venta, onDownloadXLS, onDownloadPDF }) => {
                 <BsPerson size={16} style={{ color: "#4ECDC4" }} /> {/* Ícono de usuario */}
                 Usuario:
               </span>
-              <span className="fw-medium text-dark">{`@${encabezadoVenta?.usuario}`}</span>
+              <span className="fw-medium text-dark fw-bold">{`@${encabezadoVenta?.usuario}`}</span>
             </div>
             <div className="d-flex justify-content-between align-items-center py-2 border-bottom">
               <span className="text-secondary d-flex align-items-center gap-2">
                 <BsClock size={16} style={{ color: "#4ECDC4" }} /> {/* Ícono de turno */}
                 Turno:
               </span>
-              <span className="fw-medium text-dark">
+              <span className="fw-medium text-dark fw-bold">
                 {encabezadoVenta?.ordenTurno || "N/A"}
               </span>
             </div>
@@ -135,7 +135,7 @@ const MobileVentaDetalle = ({ venta, onDownloadXLS, onDownloadPDF }) => {
                 <BsCash size={16} style={{ color: "#4ECDC4" }} /> {/* Ícono de efectivo */}
                 Venta Ingresada:
               </span>
-              <span className="fw-medium text-dark">
+              <span className="fw-medium text-dark fw-bold">
                 {formatCurrency(encabezadoVenta?.totalVenta)}
               </span>
             </div>
