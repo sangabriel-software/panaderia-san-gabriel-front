@@ -64,7 +64,7 @@ const MobileMateriaPrimaDetails = ({ order, detalleConsumo, onDownloadXLS, onDow
                 <BsBox size={24} className="text-primary me-2" style={{ color: "#FF6B6B" }} />
                 Orden #{encabezado?.idOrdenProduccion}
               </Card.Title>
-              <small className="text-secondary">
+              <small className="text-secondary fw-bold">
                 <BsClipboard size={16} className="me-2" style={{ color: "#4ECDC4" }} />
                 Detalles de materia prima
               </small>
@@ -103,7 +103,7 @@ const MobileMateriaPrimaDetails = ({ order, detalleConsumo, onDownloadXLS, onDow
                 <BsCalendar size={16} className="me-2" style={{ color: "#FF6B6B" }} />
                 Fecha a producir:
               </span>
-              <span className="fw-medium text-dark">
+              <span className="fw-medium text-dark fw-bold">
                 {formatDateToDisplay(encabezado?.fechaAProducir)}
               </span>
             </div>
@@ -112,7 +112,7 @@ const MobileMateriaPrimaDetails = ({ order, detalleConsumo, onDownloadXLS, onDow
                 <BsBuilding size={16} className="me-2" style={{ color: "#4ECDC4" }} />
                 Sucursal:
               </span>
-              <span className="fw-medium text-dark text-end" style={{ maxWidth: "60%" }}>
+              <span className="fw-medium text-dark text-end fw-bold" style={{ maxWidth: "60%" }}>
                 {encabezado?.nombreSucursal}
               </span>
             </div>
@@ -121,14 +121,14 @@ const MobileMateriaPrimaDetails = ({ order, detalleConsumo, onDownloadXLS, onDow
                 <BsPerson size={16} className="me-2" style={{ color: "#FF6B6B" }} />
                 Solicitado por:
               </span>
-              <span className="fw-medium text-dark">{encabezado?.nombreUsuario}</span>
+              <span className="fw-medium text-dark fw-bold">{encabezado?.nombreUsuario}</span>
             </div>
             <div className="d-flex justify-content-between align-items-center py-2 border-bottom">
               <span className="text-secondary">
                 <BsPersonBadge size={16} className="me-2" style={{ color: "#4ECDC4" }} />
                 Panadero:
               </span>
-              <span className="fw-medium text-dark">{encabezado?.nombrePanadero}</span>
+              <span className="fw-medium text-dark fw-bold">{encabezado?.nombrePanadero}</span>
             </div>
             <div className="d-flex justify-content-between align-items-center py-2">
               <span className="text-secondary">

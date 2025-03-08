@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Badge, Card, Button, Dropdown } from "react-bootstrap";
 import { formatDateToDisplay } from "../../../utils/dateUtils";
-import { BsCash, BsWallet, BsDashCircle, BsArrowUp, BsDownload, BsFileEarmarkPdf, BsFileEarmarkExcel } from "react-icons/bs";
+import { BsCash, BsWallet, BsDashCircle, BsArrowUp, BsDownload, BsFileEarmarkPdf, BsFileEarmarkExcel, BsCalendar, BsShop, BsPerson, BsClock, BsClipboardCheck, BsBox } from "react-icons/bs";
 
 const MobileVentaDetalle = ({ venta, onDownloadXLS, onDownloadPDF }) => {
   const encabezadoVenta = venta?.encabezadoVenta;
@@ -38,13 +38,14 @@ const MobileVentaDetalle = ({ venta, onDownloadXLS, onDownloadPDF }) => {
     <>
       <Card
         className="p-3 border-0 rounded-4"
-        style={{ backgroundColor: "rgba(245, 245, 245, 0.9)" }} // Fondo translúcido
+        style={{ backgroundColor: "#FFFFFF", boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)", fontFamily: "'Consolas', monospace" }} // Fondo blanco con sombra y fuente tipo consola
       >
         <Card.Body className="px-2">
           {/* Encabezado */}
           <div className="d-flex align-items-center justify-content-between mb-3">
             <div>
               <Card.Title className="h4 mb-1 text-dark">
+                <BsBox size={24} className="me-2" style={{ color: "#FF6B6B" }} /> {/* Ícono de caja */}
                 Venta #{encabezadoVenta?.idVenta}
               </Card.Title>
               <small className="text-secondary">Detalles de la venta</small>
@@ -79,38 +80,57 @@ const MobileVentaDetalle = ({ venta, onDownloadXLS, onDownloadPDF }) => {
           {/* Información de la Venta */}
           <div className="mb-4">
             <div className="d-flex justify-content-between align-items-center py-2 border-bottom">
-              <span className="text-secondary">Fecha de Venta:</span>
+              <span className="text-secondary d-flex align-items-center gap-2">
+                <BsCalendar size={16} style={{ color: "#4ECDC4" }} /> {/* Ícono de calendario */}
+                Fecha de Venta:
+              </span>
               <span className="fw-medium text-dark">
                 {formatDateToDisplay(encabezadoVenta?.fechaVenta)}
               </span>
             </div>
             <div className="d-flex justify-content-between align-items-center py-2 border-bottom">
-              <span className="text-secondary">Sucursal:</span>
+              <span className="text-secondary d-flex align-items-center gap-2">
+                <BsShop size={16} style={{ color: "#4ECDC4" }} /> {/* Ícono de sucursal */}
+                Sucursal:
+              </span>
               <span className="fw-medium text-dark text-end" style={{ maxWidth: "60%" }}>
                 {encabezadoVenta?.nombreSucursal}
               </span>
             </div>
             <div className="d-flex justify-content-between align-items-center py-2 border-bottom">
-              <span className="text-secondary">Usuario:</span>
+              <span className="text-secondary d-flex align-items-center gap-2">
+                <BsPerson size={16} style={{ color: "#4ECDC4" }} /> {/* Ícono de usuario */}
+                Usuario:
+              </span>
               <span className="fw-medium text-dark">{`@${encabezadoVenta?.usuario}`}</span>
             </div>
             <div className="d-flex justify-content-between align-items-center py-2 border-bottom">
-              <span className="text-secondary">Turno:</span>
+              <span className="text-secondary d-flex align-items-center gap-2">
+                <BsClock size={16} style={{ color: "#4ECDC4" }} /> {/* Ícono de turno */}
+                Turno:
+              </span>
               <span className="fw-medium text-dark">
                 {encabezadoVenta?.ordenTurno || "N/A"}
               </span>
             </div>
             <div className="d-flex justify-content-between align-items-center py-2">
-              <span className="text-secondary">Estado:</span>
+              <span className="text-secondary d-flex align-items-center gap-2">
+                <BsClipboardCheck size={16} style={{ color: "#4ECDC4" }} /> {/* Ícono de estado */}
+                Estado:
+              </span>
               <Badge
                 bg={encabezadoVenta?.estadoVenta === "C" ? "success" : "danger"}
                 className="px-2 py-1"
+                style={{ backgroundColor: encabezadoVenta?.estadoVenta === "C" ? "#4ECDC4" : "#FF6B6B" }} // Turquesa para cerrada, rojo coral para pendiente
               >
                 {encabezadoVenta?.estadoVenta === "C" ? "Cerrada" : "Pendiente"}
               </Badge>
             </div>
             <div className="d-flex justify-content-between align-items-center py-2">
-              <span className="text-secondary">Venta Ingresada:</span>
+              <span className="text-secondary d-flex align-items-center gap-2">
+                <BsCash size={16} style={{ color: "#4ECDC4" }} /> {/* Ícono de efectivo */}
+                Venta Ingresada:
+              </span>
               <span className="fw-medium text-dark">
                 {formatCurrency(encabezadoVenta?.totalVenta)}
               </span>
@@ -132,7 +152,7 @@ const MobileVentaDetalle = ({ venta, onDownloadXLS, onDownloadPDF }) => {
             <Card.Body className="py-3">
               <div className="d-flex justify-content-between align-items-center mb-2">
                 <span className="text-secondary d-flex align-items-center gap-2">
-                  <BsCash size={16} /> Monto Esperado
+                  <BsCash size={16} style={{ color: "#4ECDC4" }} /> Monto Esperado
                 </span>
                 <span className="fw-bold text-dark">
                   {formatCurrency(detalleIngresos?.montoEsperado)}
@@ -140,7 +160,7 @@ const MobileVentaDetalle = ({ venta, onDownloadXLS, onDownloadPDF }) => {
               </div>
               <div className="d-flex justify-content-between align-items-center mb-2">
                 <span className="text-secondary d-flex align-items-center gap-2">
-                  <BsWallet size={16} /> Monto Ingresado
+                  <BsWallet size={16} style={{ color: "#4ECDC4" }} /> Monto Ingresado
                 </span>
                 <span className="fw-bold text-dark">
                   {formatCurrency(detalleIngresos?.montoTotalIngresado)}
@@ -154,6 +174,7 @@ const MobileVentaDetalle = ({ venta, onDownloadXLS, onDownloadPDF }) => {
                   <Badge
                     bg={detalleIngresos?.diferencia >= 0 ? "success" : "danger"}
                     className="px-2 py-1"
+                    style={{ backgroundColor: detalleIngresos?.diferencia >= 0 ? "#4ECDC4" : "#FF6B6B" }} // Turquesa para positivo, rojo coral para negativo
                   >
                     {formatCurrency(detalleIngresos?.diferencia)}
                   </Badge>
@@ -195,7 +216,7 @@ const ProductCardMobile = ({ product, index }) => {
     >
       <Card.Body className="py-3">
         <div className="d-flex justify-content-between align-items-center mb-2">
-          <span className="badge bg-dark rounded-pill"># {index + 1}</span>
+          <span className="badge rounded-pill" style={{ backgroundColor: "#4ECDC4", color: "#FFFFFF" }}># {index + 1}</span> {/* Badge en turquesa */}
           <span className="h6 mb-0 text-dark">{product.nombreProducto}</span>
         </div>
 
