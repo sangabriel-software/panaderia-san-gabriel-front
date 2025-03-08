@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Container, Button, ButtonGroup } from "react-bootstrap";
+import { Container, Button, ButtonGroup, Row, Col } from "react-bootstrap";
 import { useMediaQuery } from "react-responsive";
 import { BsArrowLeft } from "react-icons/bs";
 import { useNavigate, useParams } from "react-router";
@@ -42,22 +42,27 @@ const DetallesOrdenesProduccionPage = () => {
       </div>
 
       {/* Botones con clases responsivas */}
-      <ButtonGroup className="mb-4">
-        <Button
-          variant={view === "productos" ? "primary" : "outline-primary"}
-          onClick={() => setView("productos")}
-          className="btn-sm py-" // Clase para botones pequeños y padding reducido
-        >
-          Detalle Productos
-        </Button>
-        <Button
-          variant={view === "materiaPrima" ? "primary" : "outline-primary"}
-          onClick={() => setView("materiaPrima")}
-          className="btn-sm py-1" // Clase para botones pequeños y padding reducido
-        >
-          Detalle Materia Prima
-        </Button>
-      </ButtonGroup>
+{/* Botones dentro de columnas para adaptarse a todos los dispositivos */}
+<Row className="mb-4">
+  <Col className="d-flex justify-content-center col-12 col-md-3 mb-2 mb-md-0">
+    <Button
+      variant={view === "productos" ? "primary" : "outline-primary"}
+      onClick={() => setView("productos")}
+      className="btn-sm w-100" // Botón pequeño y ocupa todo el ancho disponible
+    >
+      Detalle Productos
+    </Button>
+  </Col>
+  <Col className="d-flex justify-content-center col-12 col-md-3">
+    <Button
+      variant={view === "materiaPrima" ? "primary" : "outline-primary"}
+      onClick={() => setView("materiaPrima")}
+      className="btn-sm w-100" // Botón pequeño y ocupa todo el ancho disponible
+    >
+      Detalle Materia Prima
+    </Button>
+  </Col>
+</Row>
 
       {loadingDetalleOrdene ? (
         <div className="d-flex justify-content-center my-5 mt-5">
