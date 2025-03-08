@@ -84,7 +84,7 @@ const MobileOrderDetails = ({ order, onDownloadXLS, onDownloadPDF }) => {
             <div className="d-flex justify-content-between align-items-center py-2 border-bottom">
               <span className="text-secondary">
                 <BsCalendar2 size={16} className="me-2" style={{ color: "#9F554D" }} /> {/* Ícono de calendario */}
-                Produccion para Fecha:
+                Fecha a producir:
               </span>
               <span className="fw-medium text-dark fw-bold">
                 {formatDateToDisplay(encabezado?.fechaAProducir)}
