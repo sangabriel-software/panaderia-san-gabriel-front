@@ -135,7 +135,7 @@ const MobileVentaDetalle = ({ venta, onDownloadXLS, onDownloadPDF }) => {
                 <BsCash size={16} style={{ color: "#4ECDC4" }} /> {/* Ícono de efectivo */}
                 Venta Ingresada:
               </span>
-              <span className="fw-medium text-dark fw-bold">
+              <span className="fw-medium text-dark">
                 {formatCurrency(encabezadoVenta?.totalVenta)}
               </span>
             </div>
@@ -155,8 +155,8 @@ const MobileVentaDetalle = ({ venta, onDownloadXLS, onDownloadPDF }) => {
           >
             <Card.Body className="py-3">
               <div className="d-flex justify-content-between align-items-center mb-2">
-                <span className="text-secondary d-flex align-items-center gap-2" style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "50%" }}>
-                  <BsCash size={16} style={{ color: "#4ECDC4" }} /> Monto Esperado
+                <span className="text-secondary d-flex align-items-center gap-1" style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "50%" }}>
+                  <BsCash size={16} style={{ color: "#4ECDC4" }} /> M. Esperado
                 </span>
                 <span className="fw-bold text-dark" style={{ fontSize: isSmallScreen ? "0.875rem" : "1rem" }}>
                   {formatCurrency(detalleIngresos?.montoEsperado)}
@@ -164,7 +164,7 @@ const MobileVentaDetalle = ({ venta, onDownloadXLS, onDownloadPDF }) => {
               </div>
               <div className="d-flex justify-content-between align-items-center mb-2">
                 <span className="text-secondary d-flex align-items-center gap-2" style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "50%" }}>
-                  <BsWallet size={16} style={{ color: "#4ECDC4" }} /> Monto Ingresado
+                  <BsWallet size={16} style={{ color: "#4ECDC4" }} /> M. Ingresado
                 </span>
                 <span className="fw-bold text-dark" style={{ fontSize: isSmallScreen ? "0.875rem" : "1rem" }}>
                   {formatCurrency(detalleIngresos?.montoTotalIngresado)}
