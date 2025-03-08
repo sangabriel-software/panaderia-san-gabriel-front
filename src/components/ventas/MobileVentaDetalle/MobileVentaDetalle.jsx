@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Badge, Card, Button, Dropdown } from "react-bootstrap";
 import { formatDateToDisplay } from "../../../utils/dateUtils";
-import { BsCash, BsWallet, BsDashCircle, BsArrowUp, BsDownload, BsFileEarmarkPdf, BsFileEarmarkExcel, BsCalendar, BsShop, BsPerson, BsClock, BsClipboardCheck, BsBox, BsWallet2 } from "react-icons/bs";
+import { BsCash, BsWallet, BsDashCircle, BsArrowUp, BsDownload, BsFileEarmarkPdf, BsFileEarmarkExcel, BsCalendar, BsShop, BsPerson, BsClock, BsClipboardCheck, BsBox } from "react-icons/bs";
 import { useMediaQuery } from "react-responsive"; // Importamos useMediaQuery
 
 const MobileVentaDetalle = ({ venta, onDownloadXLS, onDownloadPDF }) => {
@@ -88,7 +88,7 @@ const MobileVentaDetalle = ({ venta, onDownloadXLS, onDownloadPDF }) => {
                 <BsCalendar size={16} style={{ color: "#4ECDC4" }} /> {/* Ícono de calendario */}
                 Fecha de Venta:
               </span>
-              <span className="fw-medium text-dark fw-bold">
+              <span className="fw-medium text-dark">
                 {formatDateToDisplay(encabezadoVenta?.fechaVenta)}
               </span>
             </div>
@@ -97,7 +97,7 @@ const MobileVentaDetalle = ({ venta, onDownloadXLS, onDownloadPDF }) => {
                 <BsShop size={16} style={{ color: "#4ECDC4" }} /> {/* Ícono de sucursal */}
                 Sucursal:
               </span>
-              <span className="fw-medium text-dark text-end fw-bold" style={{ maxWidth: "60%" }}>
+              <span className="fw-medium text-dark text-end" style={{ maxWidth: "60%" }}>
                 {encabezadoVenta?.nombreSucursal}
               </span>
             </div>
@@ -106,14 +106,14 @@ const MobileVentaDetalle = ({ venta, onDownloadXLS, onDownloadPDF }) => {
                 <BsPerson size={16} style={{ color: "#4ECDC4" }} /> {/* Ícono de usuario */}
                 Usuario:
               </span>
-              <span className="fw-medium text-dark fw-bold">{`@${encabezadoVenta?.usuario}`}</span>
+              <span className="fw-medium text-dark">{`@${encabezadoVenta?.usuario}`}</span>
             </div>
             <div className="d-flex justify-content-between align-items-center py-2 border-bottom">
               <span className="text-secondary d-flex align-items-center gap-2">
                 <BsClock size={16} style={{ color: "#4ECDC4" }} /> {/* Ícono de turno */}
                 Turno:
               </span>
-              <span className="fw-medium text-dark fw-bold">
+              <span className="fw-medium text-dark">
                 {encabezadoVenta?.ordenTurno || "N/A"}
               </span>
             </div>
@@ -155,16 +155,16 @@ const MobileVentaDetalle = ({ venta, onDownloadXLS, onDownloadPDF }) => {
           >
             <Card.Body className="py-3">
               <div className="d-flex justify-content-between align-items-center mb-2">
-                <span className="text-secondary d-flex align-items-center gap-1" style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "50%" }}>
-                  <BsCash size={16} style={{ color: "#4ECDC4" }} /> M. Esperado
+                <span className="text-secondary d-flex align-items-center gap-2">
+                  <BsCash size={16} style={{ color: "#4ECDC4" }} /> M Esperado.
                 </span>
                 <span className="fw-bold text-dark" style={{ fontSize: isSmallScreen ? "0.875rem" : "1rem" }}>
                   {formatCurrency(detalleIngresos?.montoEsperado)}
                 </span>
               </div>
               <div className="d-flex justify-content-between align-items-center mb-2">
-                <span className="text-secondary d-flex align-items-center gap-1" style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "50%" }}>
-                <BsCash size={16} style={{ color: "#4ECDC4" }} /> M. Ingresado
+                <span className="text-secondary d-flex align-items-center gap-2">
+                  <BsWallet size={16} style={{ color: "#4ECDC4" }} /> M. Ingresado
                 </span>
                 <span className="fw-bold text-dark" style={{ fontSize: isSmallScreen ? "0.875rem" : "1rem" }}>
                   {formatCurrency(detalleIngresos?.montoTotalIngresado)}
@@ -226,7 +226,7 @@ const ProductCardMobile = ({ product, index }) => {
 
         <div className="d-flex justify-content-between small">
           <div className="text-center">
-            <div className="text-secondary">C/Vendida</div>
+            <div className="text-secondary">U/Vendida</div>
             <div className="fw-bold text-dark">{product.cantidadVendida}</div>
           </div>
           <div className="text-center">
