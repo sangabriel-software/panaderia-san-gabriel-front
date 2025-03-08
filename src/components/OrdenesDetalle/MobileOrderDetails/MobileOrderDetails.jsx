@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Badge, Card, Button, Dropdown } from "react-bootstrap";
 import { formatDateToDisplay } from "../../../utils/dateUtils";
-import { BsCash, BsWallet, BsDashCircle, BsArrowUp, BsDownload, BsFileEarmarkPdf, BsFileEarmarkExcel } from "react-icons/bs";
+import { BsArrowUp, BsBuildingAdd, BsCalendar2, BsClipboardCheckFill, BsCloudCheckFill, BsDownload, BsFileEarmarkExcel, BsFileEarmarkPdf, BsPersonAdd, BsPersonBadgeFill } from "react-icons/bs";
 
 const MobileOrderDetails = ({ order, onDownloadXLS, onDownloadPDF }) => {
   const encabezado = order?.encabezadoOrden;
@@ -23,7 +23,11 @@ const MobileOrderDetails = ({ order, onDownloadXLS, onDownloadPDF }) => {
     };
 
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+
+    // Limpiar el event listener cuando el componente se desmonte
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
   }, []);
 
   const scrollToTop = () => {
@@ -51,7 +55,7 @@ const MobileOrderDetails = ({ order, onDownloadXLS, onDownloadPDF }) => {
             {/* Menú desplegable para descargas */}
             <Dropdown>
               <Dropdown.Toggle
-                variant="outline-dark"
+                style={{ backgroundColor: "#2AA355", borderColor: "#000000", color: "#000000" }} // Fondo verde, borde e ícono negro
                 className="rounded-circle p-2"
                 id="dropdown-download"
               >
@@ -78,31 +82,49 @@ const MobileOrderDetails = ({ order, onDownloadXLS, onDownloadPDF }) => {
           {/* Información de la Orden */}
           <div className="mb-4">
             <div className="d-flex justify-content-between align-items-center py-2 border-bottom">
-              <span className="text-secondary">Produccion para Fecha:</span>
+              <span className="text-secondary">
+                <BsCalendar2 size={16} className="me-2" style={{ color: "#9F554D" }} /> {/* Ícono de calendario */}
+                Produccion para Fecha:
+              </span>
               <span className="fw-medium text-dark">
                 {formatDateToDisplay(encabezado?.fechaAProducir)}
               </span>
             </div>
             <div className="d-flex justify-content-between align-items-center py-2 border-bottom">
-              <span className="text-secondary">Sucursal:</span>
+              <span className="text-secondary">
+                <BsBuildingAdd size={16} className="me-2" style={{ color: "#9F554D" }} /> {/* Ícono de sucursal */}
+                Sucursal:
+              </span>
               <span className="fw-medium text-dark text-end" style={{ maxWidth: "60%" }}>
                 {encabezado?.nombreSucursal}
               </span>
             </div>
             <div className="d-flex justify-content-between align-items-center py-2 border-bottom">
-              <span className="text-secondary">Solicitado por:</span>
+              <span className="text-secondary">
+                <BsPersonAdd size={16} className="me-2" style={{ color: "#9F554D" }} /> {/* Ícono de usuario */}
+                Solicitado por:
+              </span>
               <span className="fw-medium text-dark">{encabezado?.nombreUsuario}</span>
             </div>
             <div className="d-flex justify-content-between align-items-center py-2 border-bottom">
-              <span className="text-secondary">Panadero:</span>
+              <span className="text-secondary">
+                <BsPersonBadgeFill size={16} className="me-2" style={{ color: "#9F554D" }} /> {/* Ícono de panadero */}
+                Panadero:
+              </span>
               <span className="fw-medium text-dark">{encabezado?.nombrePanadero}</span>
             </div>
             <div className="d-flex justify-content-between align-items-center py-2">
-              <span className="text-secondary">Turno:</span>
+              <span className="text-secondary">
+                <BsCloudCheckFill size={16} className="me-2" style={{ color: "#9F554D" }} /> {/* Ícono de turno */}
+                Turno:
+              </span>
               <span className="fw-medium text-dark">{encabezado?.ordenTurno}</span>
             </div>
             <div className="d-flex justify-content-between align-items-center py-2">
-              <span className="text-secondary">Estado orden:</span>
+              <span className="text-secondary">
+                <BsClipboardCheckFill size={16} className="me-2" style={{ color: "#9F554D" }} /> {/* Ícono de estado */}
+                Estado orden:
+              </span>
               <Badge
                 bg={encabezado?.estadoOrden === "P" ? "danger" : "success"}
                 className="px-2 py-1"
@@ -136,7 +158,7 @@ const MobileOrderDetails = ({ order, onDownloadXLS, onDownloadPDF }) => {
             justifyContent: "center",
           }}
         >
-          <BsArrowUp size={20} />
+          <BsArrowUp size={20} /> {/* Ahora BsArrowUp está importado correctamente */}
         </button>
       )}
     </>
