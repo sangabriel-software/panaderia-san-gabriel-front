@@ -164,7 +164,7 @@ const MobileVentaDetalle = ({ venta, onDownloadXLS, onDownloadPDF }) => {
               </div>
               <div className="d-flex justify-content-between align-items-center mb-2">
                 <span className="text-secondary d-flex align-items-center gap-1" style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "50%" }}>
-                <BsWallet2 size={16} style={{ color: "#4ECDC4" }} /> M. Ingresado
+                <BsCash size={16} style={{ color: "#4ECDC4" }} /> M. Ingresado
                 </span>
                 <span className="fw-bold text-dark" style={{ fontSize: isSmallScreen ? "0.875rem" : "1rem" }}>
                   {formatCurrency(detalleIngresos?.montoTotalIngresado)}
