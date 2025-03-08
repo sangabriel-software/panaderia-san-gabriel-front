@@ -50,7 +50,7 @@ const MobileOrderDetails = ({ order, onDownloadXLS, onDownloadPDF }) => {
               <Card.Title className="h4 mb-1 text-dark">
                 Orden #{encabezado?.idOrdenProduccion}
               </Card.Title>
-              <small className="text-secondary">Detalles de producción</small>
+              <small className="text-dark fw-bold">Detalles de producción</small>
             </div>
             {/* Menú desplegable para descargas */}
             <Dropdown>
@@ -86,7 +86,7 @@ const MobileOrderDetails = ({ order, onDownloadXLS, onDownloadPDF }) => {
                 <BsCalendar2 size={16} className="me-2" style={{ color: "#9F554D" }} /> {/* Ícono de calendario */}
                 Produccion para Fecha:
               </span>
-              <span className="fw-medium text-dark">
+              <span className="fw-medium text-dark fw-bold">
                 {formatDateToDisplay(encabezado?.fechaAProducir)}
               </span>
             </div>
@@ -95,7 +95,7 @@ const MobileOrderDetails = ({ order, onDownloadXLS, onDownloadPDF }) => {
                 <BsBuildingAdd size={16} className="me-2" style={{ color: "#9F554D" }} /> {/* Ícono de sucursal */}
                 Sucursal:
               </span>
-              <span className="fw-medium text-dark text-end" style={{ maxWidth: "60%" }}>
+              <span className="fw-medium text-dark text-end fw-bold" style={{ maxWidth: "60%" }}>
                 {encabezado?.nombreSucursal}
               </span>
             </div>
@@ -104,21 +104,21 @@ const MobileOrderDetails = ({ order, onDownloadXLS, onDownloadPDF }) => {
                 <BsPersonAdd size={16} className="me-2" style={{ color: "#9F554D" }} /> {/* Ícono de usuario */}
                 Solicitado por:
               </span>
-              <span className="fw-medium text-dark">{encabezado?.nombreUsuario}</span>
+              <span className="fw-medium text-dark fw-bold">{encabezado?.nombreUsuario}</span>
             </div>
             <div className="d-flex justify-content-between align-items-center py-2 border-bottom">
               <span className="text-secondary">
                 <BsPersonBadgeFill size={16} className="me-2" style={{ color: "#9F554D" }} /> {/* Ícono de panadero */}
                 Panadero:
               </span>
-              <span className="fw-medium text-dark">{encabezado?.nombrePanadero}</span>
+              <span className="fw-medium text-dark fw-bold">{encabezado?.nombrePanadero}</span>
             </div>
             <div className="d-flex justify-content-between align-items-center py-2">
               <span className="text-secondary">
                 <BsCloudCheckFill size={16} className="me-2" style={{ color: "#9F554D" }} /> {/* Ícono de turno */}
                 Turno:
               </span>
-              <span className="fw-medium text-dark">{encabezado?.ordenTurno}</span>
+              <span className="fw-medium text-dark fw-bold">{encabezado?.ordenTurno}</span>
             </div>
             <div className="d-flex justify-content-between align-items-center py-2">
               <span className="text-secondary">
