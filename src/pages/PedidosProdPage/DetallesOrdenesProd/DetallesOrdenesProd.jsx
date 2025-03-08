@@ -42,7 +42,7 @@ const DetallesOrdenesProduccionPage = () => {
       </div>
 
       {/* Botones con clases responsivas */}
-      <ButtonGroup className="mb-4 w-100">
+      <ButtonGroup className="mb-4">
         <Button
           variant={view === "productos" ? "primary" : "outline-primary"}
           onClick={() => setView("productos")}
