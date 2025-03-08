@@ -97,7 +97,7 @@ const DesktopHeader = ({ encabezadoVenta, onDownloadXLS, onDownloadPDF }) => {
                 <BsClock size={16} style={{ color: "#4ECDC4" }} />
                 <span className="text-secondary">Turno:</span>
                 <span className="fw-bold text-dark">
-                  {encabezadoVenta?.ordenTurno || "N/A"}
+                  {encabezadoVenta?.ventaTurno || "N/A"}
                 </span>
               </div>
             </div>

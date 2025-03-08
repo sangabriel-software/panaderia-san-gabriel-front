@@ -64,7 +64,7 @@ const IngresarVentaPage = () => {
   // Guardar Venta
   const handleGuardarVentaWrapper = async () => {
     await handleGuardarVenta(setIsLoading, orden, sucursalValue, usuario, productos, trayQuantities, setShowSalesSummary,
-      navigate, setErrorPopupMessage, setIsPopupErrorOpen, setIsPopupSuccessOpen, reset, setTrayQuantities, ventaReal);
+      navigate, setErrorPopupMessage, setIsPopupErrorOpen, setIsPopupSuccessOpen, reset, setTrayQuantities, ventaReal, turnoValue);
   };
 
   // Manejar la acción de continuar desde el modal de venta esperada

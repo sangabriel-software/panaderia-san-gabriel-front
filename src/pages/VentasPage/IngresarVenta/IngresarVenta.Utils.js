@@ -133,11 +133,12 @@ export const handleBuscarVentas = async ( setIsLoading, turnoValue, sucursalValu
 
 
 // Función para crear el encabezado de la venta
-const crearEncabezadoVenta = (idOrdenProduccion, usuario, sucursalValue, fechaActual) => {
+const crearEncabezadoVenta = (idOrdenProduccion, usuario, turnoValue, sucursalValue, fechaActual) => {
   return {
     idOrdenProduccion: idOrdenProduccion, // Usar el idOrdenProduccion correcto
     idUsuario: usuario.idUsuario,
     idSucursal: sucursalValue,
+    ventaTurno: turnoValue,
     fechaVenta: fechaActual,
     fechaCreacion: fechaActual,
   };
@@ -212,7 +213,7 @@ const crearPayloadDetalleIngreso = (montoTotalIngresado, fechaActual) => {
 
 
 // IngresarVenta.utils.js
-export const handleGuardarVenta = async (setIsLoading, orden, sucursalValue, usuario, productos, trayQuantities, setShowSalesSummary, navigate, setErrorPopupMessage, setIsPopupErrorOpen, setIsPopupSuccessOpen, reset, setTrayQuantities, ventaReal) => {
+export const handleGuardarVenta = async (setIsLoading, orden, sucursalValue, usuario, productos, trayQuantities, setShowSalesSummary, navigate, setErrorPopupMessage, setIsPopupErrorOpen, setIsPopupSuccessOpen, reset, setTrayQuantities, ventaReal, turnoValue) => {
   setIsLoading(true);
 
   const fechaActual = dayjs().format("YYYY-MM-DD");
@@ -221,7 +222,7 @@ export const handleGuardarVenta = async (setIsLoading, orden, sucursalValue, usu
   const idOrdenProduccion = orden.encabezadoOrden ? orden.encabezadoOrden.idOrdenProduccion : null;
 
   // Crear el encabezado de la venta
-  const encabezadoVenta = crearEncabezadoVenta(idOrdenProduccion, usuario, sucursalValue, fechaActual);
+  const encabezadoVenta = crearEncabezadoVenta(idOrdenProduccion, usuario, turnoValue, sucursalValue, fechaActual);
 
   // Crear el detalle de la venta
   const detalleVenta = crearDetalleVenta(productos, trayQuantities, orden, fechaActual);

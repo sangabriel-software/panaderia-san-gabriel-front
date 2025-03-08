@@ -114,7 +114,7 @@ const MobileVentaDetalle = ({ venta, onDownloadXLS, onDownloadPDF }) => {
                 Turno:
               </span>
               <span className="fw-medium text-dark fw-bold">
-                {encabezadoVenta?.ordenTurno || "N/A"}
+                {encabezadoVenta?.ventaTurno || "N/A"}
               </span>
             </div>
             <div className="d-flex justify-content-between align-items-center py-2">
