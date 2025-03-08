@@ -22,9 +22,10 @@ const IngresarOrdenProd = () => {
   const { sucursales, loadingSucursales, showErrorSucursales } = useGetSucursales();
   const { productos, loadigProducts, showErrorProductos } = useGetProductosYPrecios();
   const tomorrow = dayjs().add(1, "day").format("YYYY-MM-DD");
+  const today = dayjs().format("YYYY-MM-DD");
 
   const { register, handleSubmit, formState: { errors }, setValue, watch, reset, getValues } = useForm({
-    defaultValues: { sucursal: "", turno: "AM", fechaAProducir: tomorrow, nombrePanadero: "" },
+    defaultValues: { sucursal: "", turno: "AM", fechaAProducir: usuario.idRol === 1 && usuario.rol === "Admin" ? tomorrow : today, nombrePanadero: "" },
   });
 
   const turnoValue = watch("turno");
@@ -109,7 +110,7 @@ const IngresarOrdenProd = () => {
                             required: "Seleccione una fecha",
                           })}
                           className="form-control modern-datepicker"
-                          min={tomorrow}
+                          min={usuario.idRol === 1 && usuario.rol === "Admin" ? tomorrow : today }
                         />
                       </InputGroup>
                       {errors.fechaAProducir && (

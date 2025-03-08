@@ -46,14 +46,14 @@ const DetallesOrdenesProduccionPage = () => {
         <Button
           variant={view === "productos" ? "primary" : "outline-primary"}
           onClick={() => setView("productos")}
-          className="btn-sm py-2" // Clase para botones pequeños y padding reducido
+          className="btn-sm py-" // Clase para botones pequeños y padding reducido
         >
           Detalle Productos
         </Button>
         <Button
           variant={view === "materiaPrima" ? "primary" : "outline-primary"}
           onClick={() => setView("materiaPrima")}
-          className="btn-sm py-2" // Clase para botones pequeños y padding reducido
+          className="btn-sm py-1" // Clase para botones pequeños y padding reducido
         >
           Detalle Materia Prima
         </Button>
