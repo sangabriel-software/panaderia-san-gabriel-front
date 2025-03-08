@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Badge, Card, Button, Dropdown } from "react-bootstrap";
 import { formatDateToDisplay } from "../../../utils/dateUtils";
 import { BsCash, BsWallet, BsDashCircle, BsArrowUp, BsDownload, BsFileEarmarkPdf, BsFileEarmarkExcel, BsCalendar, BsShop, BsPerson, BsClock, BsClipboardCheck, BsBox } from "react-icons/bs";
+import { useMediaQuery } from "react-responsive"; // Importamos useMediaQuery
 
 const MobileVentaDetalle = ({ venta, onDownloadXLS, onDownloadPDF }) => {
   const encabezadoVenta = venta?.encabezadoVenta;
@@ -33,6 +34,9 @@ const MobileVentaDetalle = ({ venta, onDownloadXLS, onDownloadPDF }) => {
       behavior: "smooth",
     });
   };
+
+  // Usamos useMediaQuery para detectar pantallas pequeñas
+  const isSmallScreen = useMediaQuery({ maxWidth: 767 });
 
   return (
     <>
@@ -151,18 +155,18 @@ const MobileVentaDetalle = ({ venta, onDownloadXLS, onDownloadPDF }) => {
           >
             <Card.Body className="py-3">
               <div className="d-flex justify-content-between align-items-center mb-2">
-                <span className="text-secondary d-flex align-items-center gap-2">
+                <span className="text-secondary d-flex align-items-center gap-2" style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "50%" }}>
                   <BsCash size={16} style={{ color: "#4ECDC4" }} /> Monto Esperado
                 </span>
-                <span className="fw-bold text-dark">
+                <span className="fw-bold text-dark" style={{ fontSize: isSmallScreen ? "0.875rem" : "1rem" }}>
                   {formatCurrency(detalleIngresos?.montoEsperado)}
                 </span>
               </div>
               <div className="d-flex justify-content-between align-items-center mb-2">
-                <span className="text-secondary d-flex align-items-center gap-2">
+                <span className="text-secondary d-flex align-items-center gap-2" style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "50%" }}>
                   <BsWallet size={16} style={{ color: "#4ECDC4" }} /> Monto Ingresado
                 </span>
-                <span className="fw-bold text-dark">
+                <span className="fw-bold text-dark" style={{ fontSize: isSmallScreen ? "0.875rem" : "1rem" }}>
                   {formatCurrency(detalleIngresos?.montoTotalIngresado)}
                 </span>
               </div>
