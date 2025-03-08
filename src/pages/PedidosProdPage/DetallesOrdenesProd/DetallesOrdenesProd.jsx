@@ -52,27 +52,31 @@ const DetallesOrdenesProduccionPage = () => {
       </div>
 
       {/* Botones dentro de columnas para adaptarse a todos los dispositivos */}
-{/* Botones dentro de columnas para adaptarse a todos los dispositivos */}
-<Row className="mb-4">
-  <Col className="d-flex justify-content-center col-6 col-md-3">
-    <Button
-      variant={view === "productos" ? "primary" : "outline-primary"}
-      onClick={() => setView("productos")}
-      className="btn-sm w-100" // Botón pequeño y ocupa todo el ancho disponible
-    >
-      Detalle Productos
-    </Button>
-  </Col>
-  <Col className="d-flex justify-content-center col-6 col-md-3">
-    <Button
-      variant={view === "materiaPrima" ? "primary" : "outline-primary"}
-      onClick={() => setView("materiaPrima")}
-      className="btn-sm w-100" // Botón pequeño y ocupa todo el ancho disponible
-    >
-      Detalle Materia Prima
-    </Button>
-  </Col>
-</Row>
+      {/* Botones dentro de columnas para adaptarse a todos los dispositivos */}
+      <Row className="mb-4">
+        <Col className="d-flex justify-content-center col-6 col-md-3 pe-1">
+          {" "}
+          {/* Padding derecho */}
+          <Button
+            variant={view === "productos" ? "primary" : "outline-primary"}
+            onClick={() => setView("productos")}
+            className="btn-sm w-100" // Botón pequeño y ocupa todo el ancho disponible
+          >
+            Detalle Productos
+          </Button>
+        </Col>
+        <Col className="d-flex justify-content-center col-6 col-md-3 ps-1">
+          {" "}
+          {/* Padding izquierdo */}
+          <Button
+            variant={view === "materiaPrima" ? "primary" : "outline-primary"}
+            onClick={() => setView("materiaPrima")}
+            className="btn-sm w-100" // Botón pequeño y ocupa todo el ancho disponible
+          >
+            Detalle Materia Prima
+          </Button>
+        </Col>
+      </Row>
 
       {loadingDetalleOrdene ? (
         <div className="d-flex justify-content-center my-5 mt-5">
