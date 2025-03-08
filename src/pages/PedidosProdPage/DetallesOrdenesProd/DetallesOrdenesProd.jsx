@@ -18,8 +18,18 @@ const DetallesOrdenesProduccionPage = () => {
   const isMobile = useMediaQuery({ maxWidth: 768 });
   const { idOrdenProduccion } = useParams();
   const decryptedIdRol = decryptId(decodeURIComponent(idOrdenProduccion));
-  const { detalleOrden, loadingDetalleOrdene, showErrorDetalleOrdene, showInfoDetalleOrden } = useGetDetalleOrden(decryptedIdRol);
-  const { detalleConsumo, loadingDetalleConsumo, showErrorDetalleConsumo, showInfoDetalleConsumo } = useGetConsumoIngredientes(decryptedIdRol);
+  const {
+    detalleOrden,
+    loadingDetalleOrdene,
+    showErrorDetalleOrdene,
+    showInfoDetalleOrden,
+  } = useGetDetalleOrden(decryptedIdRol);
+  const {
+    detalleConsumo,
+    loadingDetalleConsumo,
+    showErrorDetalleConsumo,
+    showInfoDetalleConsumo,
+  } = useGetConsumoIngredientes(decryptedIdRol);
   const [view, setView] = useState("productos");
 
   return (
@@ -41,10 +51,10 @@ const DetallesOrdenesProduccionPage = () => {
         </div>
       </div>
 
-      {/* Botones con clases responsivas */}
+      {/* Botones dentro de columnas para adaptarse a todos los dispositivos */}
 {/* Botones dentro de columnas para adaptarse a todos los dispositivos */}
 <Row className="mb-4">
-  <Col className="d-flex justify-content-center col-12 col-md-3 mb-2 mb-md-0">
+  <Col className="d-flex justify-content-center col-6 col-md-3">
     <Button
       variant={view === "productos" ? "primary" : "outline-primary"}
       onClick={() => setView("productos")}
@@ -53,7 +63,7 @@ const DetallesOrdenesProduccionPage = () => {
       Detalle Productos
     </Button>
   </Col>
-  <Col className="d-flex justify-content-center col-12 col-md-3">
+  <Col className="d-flex justify-content-center col-6 col-md-3">
     <Button
       variant={view === "materiaPrima" ? "primary" : "outline-primary"}
       onClick={() => setView("materiaPrima")}
@@ -75,14 +85,28 @@ const DetallesOrdenesProduccionPage = () => {
           <MobileOrderDetails
             order={detalleOrden}
             onDownloadXLS={() => console.log("Descargando XLS...")}
-            onDownloadPDF={() => handleDownloadPDF(decryptedIdRol, detalleOrden, detalleConsumo, decryptedIdRol)}
+            onDownloadPDF={() =>
+              handleDownloadPDF(
+                decryptedIdRol,
+                detalleOrden,
+                detalleConsumo,
+                decryptedIdRol
+              )
+            }
           />
         ) : (
           <DesktopOrderDetails
             order={detalleOrden}
             detalleConsumo={detalleConsumo}
             onDownloadXLS={() => console.log("Descargando XLS...")}
-            onDownloadPDF={() => handleDownloadPDF(decryptedIdRol, detalleOrden, detalleConsumo, decryptedIdRol)}
+            onDownloadPDF={() =>
+              handleDownloadPDF(
+                decryptedIdRol,
+                detalleOrden,
+                detalleConsumo,
+                decryptedIdRol
+              )
+            }
           />
         )
       ) : isMobile ? (
@@ -90,14 +114,28 @@ const DetallesOrdenesProduccionPage = () => {
           order={detalleOrden}
           detalleConsumo={detalleConsumo}
           onDownloadXLS={() => console.log("Descargando XLS...")}
-          onDownloadPDF={() => handleDownloadPDF(decryptedIdRol, detalleOrden, detalleConsumo, decryptedIdRol)}
+          onDownloadPDF={() =>
+            handleDownloadPDF(
+              decryptedIdRol,
+              detalleOrden,
+              detalleConsumo,
+              decryptedIdRol
+            )
+          }
         />
       ) : (
         <DesktopMateriaPrimaDetails
           order={detalleOrden}
           detalleConsumo={detalleConsumo}
           onDownloadXLS={() => console.log("Descargando XLS...")}
-          onDownloadPDF={() => handleDownloadPDF(decryptedIdRol, detalleOrden, detalleConsumo, decryptedIdRol)}
+          onDownloadPDF={() =>
+            handleDownloadPDF(
+              decryptedIdRol,
+              detalleOrden,
+              detalleConsumo,
+              decryptedIdRol
+            )
+          }
         />
       )}
     </Container>
