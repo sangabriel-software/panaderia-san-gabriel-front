@@ -22,7 +22,6 @@ const DetallesOrdenesProduccionPage = () => {
   const { detalleConsumo, loadingDetalleConsumo, showErrorDetalleConsumo, showInfoDetalleConsumo } = useGetConsumoIngredientes(decryptedIdRol);
   const [view, setView] = useState("productos");
 
-
   return (
     <Container className="mt-4">
       <div className="text-center">
@@ -42,11 +41,20 @@ const DetallesOrdenesProduccionPage = () => {
         </div>
       </div>
 
-      <ButtonGroup className="mb-4">
-        <Button variant={view === "productos" ? "primary" : "outline-primary"} onClick={() => setView("productos")}>
+      {/* Botones con clases responsivas */}
+      <ButtonGroup className="mb-4 w-100">
+        <Button
+          variant={view === "productos" ? "primary" : "outline-primary"}
+          onClick={() => setView("productos")}
+          className="btn-sm py-1" // Clase para botones pequeños y padding reducido
+        >
           Detalle Productos
         </Button>
-        <Button variant={view === "materiaPrima" ? "primary" : "outline-primary"} onClick={() => setView("materiaPrima")}>
+        <Button
+          variant={view === "materiaPrima" ? "primary" : "outline-primary"}
+          onClick={() => setView("materiaPrima")}
+          className="btn-sm py-1" // Clase para botones pequeños y padding reducido
+        >
           Detalle Materia Prima
         </Button>
       </ButtonGroup>
