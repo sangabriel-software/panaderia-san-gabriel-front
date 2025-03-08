@@ -151,7 +151,7 @@ const MobileVentaDetalle = ({ venta, onDownloadXLS, onDownloadPDF }) => {
           <h6 className="mb-3 text-uppercase text-secondary mt-4">Balance</h6>
           <Card
             className="mb-3 border-0 rounded-3"
-            style={{ backgroundColor: "rgba(230, 230, 250, 0.7)" }} // Fondo morado translúcido
+            style={{ backgroundColor: "#FFF3B0" }} // Fondo amarillo pastel
           >
             <Card.Body className="py-3">
               <div className="d-flex justify-content-between align-items-center mb-2">
