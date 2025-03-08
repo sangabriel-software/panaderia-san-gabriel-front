@@ -71,7 +71,7 @@ const MobileMateriaPrimaDetails = ({ order, detalleConsumo, onDownloadXLS, onDow
           <div className="d-flex justify-content-between align-items-center py-2 border-bottom">
             <span className="text-secondary">
               <BsCalendar size={16} className="me-2" style={{ color: "#FF6B6B" }} /> {/* Ícono de calendario en rojo coral */}
-              Producción para Fecha:
+              Fecha a producir:
             </span>
             <span className="fw-medium text-dark">
               {formatDateToDisplay(encabezado?.fechaAProducir)}
