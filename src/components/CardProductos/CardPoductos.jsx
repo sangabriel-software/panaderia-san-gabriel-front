@@ -155,9 +155,10 @@ const CardProductos = ({
             {`${cantidad} X Q.${parseFloat(precio).toFixed(2)}`}
           </span>
           <span
-            className="d-block mt-1 text-muted"
+            className="d-block mt-1 fw-bold"
             style={{
               fontSize: "0.875rem",
+              color: "#FF6B6B"
             }}
           >
             {categoria}
