@@ -7,6 +7,7 @@ export const crearPayloadProducto = (data) => {
     const productoPayload = {
         nombreProducto: capitalizeFirstLetter( data.nombreProducto ),
         idCategoria: data.idCategoria ,
+        controlarStock: data.controlStock,
         fechaCreacion: currentDate(),
     }
 

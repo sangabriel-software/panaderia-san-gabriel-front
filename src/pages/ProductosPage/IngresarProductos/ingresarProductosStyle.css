@@ -1,0 +1,35 @@
+/* Personalización para los toggles como switches */
+#controlStock{
+    appearance: none;
+    width: 40px;
+    height: 20px;
+    background-color: white; /* Fondo blanco cuando está apagado */
+    border-radius: 10px;
+    outline: none;
+    cursor: pointer;
+    transition: background-color 0.3s, border 0.3s;
+    border: 2px solid #6D28D9;
+    display: flex; /* Flexbox para alinear el círculo */
+    align-items: center; /* Centrar verticalmente */
+    padding: 0; /* Elimina padding */
+}
+
+#controlStock:checked {
+    background-color: #6D28D9; /* Fondo azul cuando está encendido */
+}
+
+#controlStock::before {
+    content: '';
+    width: 16px; /* Tamaño del círculo */
+    height: 16px;
+    background-color: #6D28D9; /* Blanco para mejor visibilidad */
+    border-radius: 50%; /* Hacerlo circular */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); /* Sombra para resaltarlo */
+    transition: transform 0.3s, background-color 0.3s, box-shadow 0.3s;
+}
+
+#controlStock:checked::before {
+    background-color: white; /* El círculo permanece blanco encendido */
+    transform: translateX(20px); /* Mover hacia la derecha */
+    box-shadow: none; /* Elimina sombra cuando está encendido */
+}

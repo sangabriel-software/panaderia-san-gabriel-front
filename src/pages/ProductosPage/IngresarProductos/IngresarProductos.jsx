@@ -1,4 +1,4 @@
-import { React, useState,} from "react";
+import { React, useState } from "react";
 import { useForm } from "react-hook-form";
 import { BsArrowLeft, BsPlus } from "react-icons/bs";
 import Title from "../../../components/Title/Title";
@@ -10,6 +10,7 @@ import SuccessPopup from "../../../components/Popup/SuccessPopup";
 import ErrorPopup from "../../../components/Popup/ErrorPopUp";
 import ModalIngreso from "../../../components/ModalGenerico/Modal";
 import { saveCategory } from "../../Categorias/categoriasUtils";
+import "./IngresarProductosStyle.css"; // Importa el archivo CSS para estilos personalizados
 
 function IngresarProductos() {
   //variables logica productos
@@ -19,21 +20,21 @@ function IngresarProductos() {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const [selectedImage, setSelectedImage] = useState(null);
-  const { register, handleSubmit, reset, formState: { errors } } = useForm({ defaultValues: { idCategoria: "" } });//hook form para el formulario de productos
+  const { register, handleSubmit, reset, formState: { errors } } = useForm({ defaultValues: { idCategoria: "", controlStock: 0 } }); // Añade controlStock con valor por defecto 0
 
   // variables logica categorias
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [isCategorySaving, setIsCategorySaving] = useState(false);
   const [showErrorCategorySave, setShowErrorCategorySave] = useState(false);
-  const { categorias, loadingCategorias} = useGetCategorias();
-  const { register: registerCategory, handleSubmit: handleSubmitCategory, formState: { errors: errorsCategory }, reset: resetCategory,} = useForm({ defaultValues: { nombreCategoria: "", descripcionCategoria: "", }, });//hook form para el formulario de categorias
+  const { categorias, loadingCategorias } = useGetCategorias();
+  const { register: registerCategory, handleSubmit: handleSubmitCategory, formState: { errors: errorsCategory }, reset: resetCategory, } = useForm({ defaultValues: { nombreCategoria: "", descripcionCategoria: "", }, });//hook form para el formulario de categorias
 
   const onSubmit = async (data) => {
     await handleIngresarProductoSubmit(data, setIsPopupOpen, setErrorPopupMessage, setIsPopupErrorOpen, setIsLoading, reset);
   };
 
   const onSubmitCategory = async (data) => {
-    await saveCategory(data, setIsCategorySaving, resetCategory, setShowCategoryModal, setShowErrorCategorySave, categorias );
+    await saveCategory(data, setIsCategorySaving, resetCategory, setShowCategoryModal, setShowErrorCategorySave, categorias);
   }
 
   return (
@@ -155,6 +156,22 @@ function IngresarProductos() {
               </Form.Group>
             </Col>
           </Row>
+
+          {/* Switch para control de stock */}
+          <Form.Group className="mb-3">
+            <Form.Label className="label-title">Control de Stock</Form.Label>
+            <div className="d-flex align-items-center">
+              <span className="me-2">No</span>
+              <Form.Check
+                type="switch"
+                id="controlStock"
+
+                {...register("controlStock")}
+                disabled={isLoading}
+              />
+              <span className="ms-2">Sí</span>
+            </div>
+          </Form.Group>
 
           {/* Botón de enviar */}
           <div className="text-center">
