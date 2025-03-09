@@ -5,10 +5,7 @@ import Title from "../../../components/Title/Title";
 import { useNavigate } from "react-router";
 import { Form, Row, Col, Spinner, Button } from "react-bootstrap";
 import useGetCategorias from "../../../hooks/categorias/UseGetCategorias";
-import {
-  handleIngresarProductoSubmit,
-  resetForm,
-} from "./IngresarProductosUtils";
+import {  handleIngresarProductoSubmit,  resetForm,} from "./IngresarProductosUtils";
 import SuccessPopup from "../../../components/Popup/SuccessPopup";
 import ErrorPopup from "../../../components/Popup/ErrorPopUp";
 import ModalIngreso from "../../../components/ModalGenerico/Modal";
