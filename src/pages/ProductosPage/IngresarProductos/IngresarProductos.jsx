@@ -10,7 +10,7 @@ import SuccessPopup from "../../../components/Popup/SuccessPopup";
 import ErrorPopup from "../../../components/Popup/ErrorPopUp";
 import ModalIngreso from "../../../components/ModalGenerico/Modal";
 import { saveCategory } from "../../Categorias/categoriasUtils";
-import "./IngresarProductosStyle.css"; // Importa el archivo CSS para estilos personalizados
+import "./ingresarProductosStyle.css"; // Importa el archivo CSS para estilos personalizados
 
 function IngresarProductos() {
   //variables logica productos
