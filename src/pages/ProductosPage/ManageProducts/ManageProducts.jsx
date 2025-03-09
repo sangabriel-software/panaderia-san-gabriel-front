@@ -100,6 +100,7 @@ const ManageProducts = () => {
                 cantidad={producto.cantidad}
                 precio={producto.precio}
                 image={producto.imagenB64}
+                categoria={producto.nombreCategoria}
                 onDelete={() => handleDeleleProducto( producto.idProducto, setProductoToDelete, setIsPopupOpen )}
                 onModify={() => handleModifyClick( producto, setSelectedProduct, setInitialProductValues, setShowModifyModal, reset, setHasChanges ) }
               />

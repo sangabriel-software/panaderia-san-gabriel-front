@@ -2,7 +2,18 @@ import React, { useRef, useState, useEffect } from "react";
 import "./CardProductos.css"; // Asegúrate de que este archivo CSS tenga los estilos necesarios
 import { FaEllipsisH, FaTrash, FaEdit } from "react-icons/fa";
 
-const CardProductos = ({ id, nombreProducto, cantidad, precio, image, showOptions, onOptionsClick, onModify, onDelete,}) => {
+const CardProductos = ({
+  id,
+  nombreProducto,
+  cantidad,
+  precio,
+  image,
+  categoria,
+  showOptions,
+  onOptionsClick,
+  onModify,
+  onDelete,
+}) => {
   const modalRef = useRef(null);
   const buttonRef = useRef(null);
   const [position, setPosition] = useState("bottom");
@@ -45,17 +56,16 @@ const CardProductos = ({ id, nombreProducto, cantidad, precio, image, showOption
   }, [isOptionsVisible]);
 
   const getInitial = (name) => {
-    const words = name.split(" "); // Divide el nombre en palabras
-    const initials = words.slice(0, 1).map(word => word.charAt(0).toUpperCase()); // Toma la inicial de la primera palabra
-  
-    // Si hay más de dos palabras, agrega la inicial de la tercera palabra
+    const words = name.split(" ");
+    const initials = words.slice(0, 1).map(word => word.charAt(0).toUpperCase());
+
     if (words.length > 2) {
       initials.push(words[2].charAt(0).toUpperCase());
     } else if (words.length > 1) {
-      initials.push(words[1].charAt(0).toUpperCase()); // Si hay solo dos palabras, toma la inicial de la segunda
+      initials.push(words[1].charAt(0).toUpperCase());
     }
-  
-    return initials.join(""); // Une las iniciales
+
+    return initials.join("");
   };
 
   const getRandomColor = (name) => {
@@ -124,7 +134,6 @@ const CardProductos = ({ id, nombreProducto, cantidad, precio, image, showOption
         break;
     }
 
-    // Cierra el modal después de realizar una acción
     setIsOptionsVisible(false);
   };
 
@@ -144,6 +153,14 @@ const CardProductos = ({ id, nombreProducto, cantidad, precio, image, showOption
             }}
           >
             {`${cantidad} X Q.${parseFloat(precio).toFixed(2)}`}
+          </span>
+          <span
+            className="d-block mt-1 text-muted"
+            style={{
+              fontSize: "0.875rem",
+            }}
+          >
+            {categoria}
           </span>
         </div>
       </div>
