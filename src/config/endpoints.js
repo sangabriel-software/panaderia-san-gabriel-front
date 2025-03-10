@@ -10,6 +10,8 @@ const getEndpoints = {
     CONSULTAR_SUCURSALES: "/getSucursales",
     CONSULTAR_CONSUMO_INGREDIENTES: "/consultar-consumo-ingredientes",
     CONSULTAR_VENTAS_USUARIO: "/consultar-venta-por-usuario",
+    CONSULTAR_ORDEN_POR_CRITERIOS: "consultar-detalle-por-criterios",
+    CONSULTAR_DETALLE_VENTA: "consultar-detalle-venta",
 };
 
 const postEndpoints = {
@@ -21,7 +23,8 @@ const postEndpoints = {
     INGRESAR_PRECIOPRODUCTO: "/ingresarPrecio",
     INGRESAR_IMAGEN_PRODUCTO: "/ingresar-img-producto",
     INGRESAR_CATEGORIA: "/ingresarcategoria",
-    INGRESAR_ORDEN_PRODUCCION: "/ingresar-orden"
+    INGRESAR_ORDEN_PRODUCCION: "/ingresar-orden",
+    INGRESAR_VENTA: "/ingresar-venta",
 };
 
 const putEndpoints = {
@@ -37,7 +40,8 @@ const deleteEndpoints = {
     ELINAR_PERMISOS: "eliminarRolPermisosBatch",
     ELMINAR_USUARIOS: "eliminarUsuario",
     DESACTIVAR_PRODUCTOS: "desactivarProducto",
-    ELIMINAR_ORDEN_PRODUCCION: "/eliminar-ordenes-produccion"
+    ELIMINAR_ORDEN_PRODUCCION: "/eliminar-ordenes-produccion",
+    ELMINAR_VENTA: "/eliminar-venta",
 };
 
 

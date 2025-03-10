@@ -91,14 +91,15 @@ const OrderSummary = ({ show, handleClose, orderData, trayQuantities, productos,
     return sucursal ? sucursal.nombreSucursal : "Desconocida";
   };
 
-  // Filtrar solo los productos con cantidad mayor a 0
-  const filteredProducts = Object.entries(trayQuantities)
-    .filter(([_, cantidad]) => cantidad > 0)
-    .map(([idProducto, cantidad]) => ({
-      idProducto: Number(idProducto),
-      nombreProducto: getProductName(Number(idProducto)),
-      cantidad,
-    }));
+// Filtrar solo los productos con cantidad mayor a 0
+const filteredProducts = Object.entries(trayQuantities)
+  .filter(([_, { cantidad }]) => cantidad > 0) // Filtra por cantidad > 0
+  .map(([idProducto, { cantidad, idCategoria }]) => ({
+    idProducto: Number(idProducto),
+    nombreProducto: getProductName(Number(idProducto)), // Obtén el nombre del producto
+    cantidad, // Cantidad de bandejas/unidades
+    idCategoria, // Incluye la categoría
+  }));
 
   return (
     <StyledModal show={show} onHide={handleClose} centered size="lg">

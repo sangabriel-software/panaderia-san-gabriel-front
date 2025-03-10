@@ -1,25 +1,40 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Nav, Collapse } from 'react-bootstrap';
 import { NavLink } from 'react-router-dom';
 import { 
   FaHome, FaUsers, FaCalendar, FaFolder, FaUserPlus, 
-  FaUsersCog, FaChevronRight, FaCog, FaSun, FaMoon 
+  FaUsersCog, FaChevronRight, FaCog, FaSun, FaMoon, 
+  FaShoppingBag, FaPlus
 } from 'react-icons/fa';
 import { MdOutlineBakeryDining } from 'react-icons/md';
-import * as DarkReader from 'darkreader'; // Importamos Dark Reader
+import * as DarkReader from 'darkreader';
 import "./Sidebar.css";
+import { getUserPermissions } from '../../utils/Auth/decodedata';
 
 function Sidebar({ show, onClose }) {
   const [usersOpen, setUsersOpen] = useState(false);
   const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
+  const [isChangingTheme, setIsChangingTheme] = useState(false);
+  const permisosUsuario = getUserPermissions();
 
-  // Efecto para aplicar el tema y DarkReader al cargar el componente
+  // Convertir los permisos en un objeto para facilitar la búsqueda
+  const permissionsMap = permisosUsuario.reduce((acc, perm) => {
+    acc[perm.rutaAcceso] = true;
+    return acc;
+  }, {});
+
+  // Función para verificar si una ruta está permitida
+  const isRouteAllowed = (route) => {
+    return permissionsMap[route];
+  };
+
+  // Efecto para aplicar el tema al cargar el componente
   useEffect(() => {
     if (theme === 'dark') {
       DarkReader.enable({
         brightness: 100,
-        contrast: 90,
-        sepia: 10
+        contrast: 100,
+        sepia: 0
       });
     } else {
       DarkReader.disable();
@@ -27,80 +42,120 @@ function Sidebar({ show, onClose }) {
   }, [theme]);
 
   // Función para cambiar el tema
-  const toggleTheme = () => {
+  const toggleTheme = useCallback(() => {
+    if (isChangingTheme) return; // Evitar múltiples clics
+    setIsChangingTheme(true);
+
     const newTheme = theme === 'light' ? 'dark' : 'light';
     setTheme(newTheme);
     localStorage.setItem('theme', newTheme);
 
-    if (newTheme === 'dark') {
-      DarkReader.enable({
-        brightness: 100,
-        contrast: 90,
-        sepia: 10
-      });
-    } else {
-      DarkReader.disable();
-    }
-  };
+    // Usar requestIdleCallback para diferir la ejecución de DarkReader
+    const applyDarkReader = () => {
+      if (newTheme === 'dark') {
+        DarkReader.enable({
+          brightness: 99,
+          contrast: 90,
+          sepia: 10
+        });
+      } else {
+        DarkReader.disable();
+      }
+      setIsChangingTheme(false); // Habilitar el interruptor después de aplicar el tema
+    };
 
-  const handleNavLinkClick = () => {
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(applyDarkReader);
+    } else {
+      setTimeout(applyDarkReader, 0); // Fallback para navegadores que no soportan requestIdleCallback
+    }
+  }, [theme, isChangingTheme]);
+
+  const handleNavLinkClick = useCallback(() => {
     if (window.innerWidth <= 768) {
       onClose();
     }
-  };
+  }, [onClose]);
 
   return (
-    <div className={`sidebar bg-dark ${show ? 'show' : 'hide'}`}>
+    <div className={`sidebar bg-dark ${show ? 'show' : 'hide'} ${isChangingTheme ? 'disable-selection' : ''}`}>
       <Nav className="flex-column pt-3">
-        <Nav.Link as={NavLink} to="/dashboard" className="text-light" onClick={handleNavLinkClick}>
-          <FaHome size={25} className="me-2" /> Dashboard
-        </Nav.Link>
-        <Nav.Link as={NavLink} to="/ordenes-produccion" className="text-light" onClick={handleNavLinkClick}>
-          <FaCalendar size={25} className="me-2" /> Ordenes de producción
-        </Nav.Link>
-        <Nav.Link as={NavLink} to="/ventas" className="text-light" onClick={handleNavLinkClick}>
-          <FaFolder size={25} className="me-2" /> Ventas
-        </Nav.Link>
-        <Nav.Link as={NavLink} to="/productos" className="text-light" onClick={handleNavLinkClick}>
-          <MdOutlineBakeryDining size={25} className="me-2" /> Productos
-        </Nav.Link>
+        {isRouteAllowed('/dashboard') && (
+          <Nav.Link as={NavLink} to="/dashboard" className="text-light" onClick={handleNavLinkClick}>
+            <FaHome size={25} className="me-2" /> Dashboard
+          </Nav.Link>
+        )}
+
+        {isRouteAllowed('/ordenes-produccion') && (
+          <Nav.Link as={NavLink} to="/ordenes-produccion" className="text-light" onClick={handleNavLinkClick}>
+            <FaCalendar size={25} className="me-2" /> Ordenes de producción
+          </Nav.Link>
+        )}
+
+        {isRouteAllowed('/pedido-especial') && (
+          <Nav.Link as={NavLink} to="/pedido-especial" className="text-light" onClick={handleNavLinkClick}>
+            <FaShoppingBag size={25} className="me-2" /> Pedido Especial
+          </Nav.Link>
+        )}
+
+        {isRouteAllowed('/ventas') && (
+          <Nav.Link as={NavLink} to="/ventas" className="text-light" onClick={handleNavLinkClick}>
+            <FaFolder size={25} className="me-2" /> Ventas
+          </Nav.Link>
+        )}
+
+        {isRouteAllowed('/productos') && (
+          <Nav.Link as={NavLink} to="/productos" className="text-light" onClick={handleNavLinkClick}>
+            <MdOutlineBakeryDining size={25} className="me-2" /> Productos
+          </Nav.Link>
+        )}
 
         {/* Users Dropdown */}
-        <Nav.Link 
-          className="text-light d-flex justify-content-between align-items-center"
-          onClick={() => setUsersOpen(!usersOpen)}
-          style={{ cursor: 'pointer' }}
-        >
-          <span>
-            <FaUsers size={25} className="me-2"  /> Usuarios
-          </span>
-          <FaChevronRight className={`dropdown-arrow ${usersOpen ? 'open' : ''}`} />
-        </Nav.Link>
-        
-        <Collapse in={usersOpen}>
-          <div>
+        {(isRouteAllowed('/users') || isRouteAllowed('/users/roles')) && (
+          <>
             <Nav.Link 
-              as={NavLink} 
-              to="/users/users" 
-              className="text-light ps-4 submenu-item"
-              onClick={handleNavLinkClick}
+              className="text-light d-flex justify-content-between align-items-center"
+              onClick={() => setUsersOpen(!usersOpen)}
+              style={{ cursor: 'pointer' }}
             >
-              <FaUserPlus className="me-2" /> Gestión de usuarios
+              <span>
+                <FaUsers size={25} className="me-2"  /> Usuarios
+              </span>
+              <FaChevronRight className={`dropdown-arrow ${usersOpen ? 'open' : ''}`} />
             </Nav.Link>
-            <Nav.Link 
-              as={NavLink} 
-              to="/users/roles" 
-              className="text-light ps-4 submenu-item"
-              onClick={handleNavLinkClick}
-            >
-              <FaUsersCog className="me-2" /> Control de Roles
-            </Nav.Link>
-          </div>
-        </Collapse>
+            
+            <Collapse in={usersOpen}>
+              <div>
+                {isRouteAllowed('/users') && (
+                  <Nav.Link 
+                    as={NavLink} 
+                    to="/users" 
+                    className="text-light ps-4 submenu-item"
+                    onClick={handleNavLinkClick}
+                  >
+                    <FaUserPlus className="me-2" /> Gestión de usuarios
+                  </Nav.Link>
+                )}
+                {isRouteAllowed('/users/roles') && (
+                  <Nav.Link 
+                    as={NavLink} 
+                    to="/users/roles" 
+                    className="text-light ps-4 submenu-item"
+                    onClick={handleNavLinkClick}
+                  >
+                    <FaUsersCog className="me-2" /> Control de Roles
+                  </Nav.Link>
+                )}
+              </div>
+            </Collapse>
+          </>
+        )}
 
-        <Nav.Link as={NavLink} to="/config" className="text-light" onClick={handleNavLinkClick}>
-          <FaCog className="me-2" size={25} /> Configuraciones
-        </Nav.Link>
+        {isRouteAllowed('/config') && (
+          <Nav.Link as={NavLink} to="/config" className="text-light" onClick={handleNavLinkClick}>
+            <FaCog className="me-2" size={25} /> Configuraciones
+          </Nav.Link>
+        )}
       </Nav>
 
       {/* Toggle Switch para el tema */}
@@ -110,15 +165,23 @@ function Sidebar({ show, onClose }) {
             type="checkbox" 
             checked={theme === 'dark'} 
             onChange={toggleTheme} 
+            disabled={isChangingTheme} // Deshabilitar durante el cambio
           />
           <span className="slider round">
-            {theme === 'dark' ? <FaMoon size={14} /> : <FaSun size={14} />}
+            {isChangingTheme ? (
+              <div className="spinner-border spinner-border-sm text-light" role="status">
+                <span className="visually-hidden">Loading...</span>
+              </div>
+            ) : theme === 'dark' ? (
+              <FaMoon size={14} />
+            ) : (
+              <FaSun size={14} />
+            )}
           </span>
         </label>
       </div>
-
     </div>
   );
 }
 
-export default Sidebar;
+export default React.memo(Sidebar);

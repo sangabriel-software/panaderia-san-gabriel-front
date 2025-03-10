@@ -37,3 +37,13 @@ export const ingresarOrdenProduccionService = async (dataOrden) => {
     throw error;
   }
 }
+
+
+export const consultarDetalleOrdenPorCriterio = async (ordenTurno, fechaAprducir, idSucursal) => {
+  try {
+    const response = await api.get(`${getEndpoints.CONSULTAR_ORDEN_POR_CRITERIOS}?ordenTurno=${ordenTurno}&fechaAproducir=${fechaAprducir}&idSucursal=${idSucursal}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};

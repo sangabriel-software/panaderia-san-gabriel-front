@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Container, Button, ButtonGroup } from "react-bootstrap";
+import { Container, Button, ButtonGroup, Row, Col } from "react-bootstrap";
 import { useMediaQuery } from "react-responsive";
 import { BsArrowLeft } from "react-icons/bs";
 import { useNavigate, useParams } from "react-router";
@@ -18,10 +18,19 @@ const DetallesOrdenesProduccionPage = () => {
   const isMobile = useMediaQuery({ maxWidth: 768 });
   const { idOrdenProduccion } = useParams();
   const decryptedIdRol = decryptId(decodeURIComponent(idOrdenProduccion));
-  const { detalleOrden, loadingDetalleOrdene, showErrorDetalleOrdene, showInfoDetalleOrden } = useGetDetalleOrden(decryptedIdRol);
-  const { detalleConsumo, loadingDetalleConsumo, showErrorDetalleConsumo, showInfoDetalleConsumo } = useGetConsumoIngredientes(decryptedIdRol);
+  const {
+    detalleOrden,
+    loadingDetalleOrdene,
+    showErrorDetalleOrdene,
+    showInfoDetalleOrden,
+  } = useGetDetalleOrden(decryptedIdRol);
+  const {
+    detalleConsumo,
+    loadingDetalleConsumo,
+    showErrorDetalleConsumo,
+    showInfoDetalleConsumo,
+  } = useGetConsumoIngredientes(decryptedIdRol);
   const [view, setView] = useState("productos");
-
 
   return (
     <Container className="mt-4">
@@ -42,14 +51,32 @@ const DetallesOrdenesProduccionPage = () => {
         </div>
       </div>
 
-      <ButtonGroup className="mb-4">
-        <Button variant={view === "productos" ? "primary" : "outline-primary"} onClick={() => setView("productos")}>
-          Detalle Productos
-        </Button>
-        <Button variant={view === "materiaPrima" ? "primary" : "outline-primary"} onClick={() => setView("materiaPrima")}>
-          Detalle Materia Prima
-        </Button>
-      </ButtonGroup>
+      {/* Botones dentro de columnas para adaptarse a todos los dispositivos */}
+      {/* Botones dentro de columnas para adaptarse a todos los dispositivos */}
+      <Row className="mb-4">
+        <Col className="d-flex justify-content-center col-6 col-md-3 pe-1">
+          {" "}
+          {/* Padding derecho */}
+          <Button
+            variant={view === "productos" ? "primary" : "outline-primary"}
+            onClick={() => setView("productos")}
+            className="btn-sm w-100" // Botón pequeño y ocupa todo el ancho disponible
+          >
+            Detalle Productos
+          </Button>
+        </Col>
+        <Col className="d-flex justify-content-center col-6 col-md-3 ps-1">
+          {" "}
+          {/* Padding izquierdo */}
+          <Button
+            variant={view === "materiaPrima" ? "primary" : "outline-primary"}
+            onClick={() => setView("materiaPrima")}
+            className="btn-sm w-100" // Botón pequeño y ocupa todo el ancho disponible
+          >
+            Detalle Materia Prima
+          </Button>
+        </Col>
+      </Row>
 
       {loadingDetalleOrdene ? (
         <div className="d-flex justify-content-center my-5 mt-5">
@@ -62,14 +89,28 @@ const DetallesOrdenesProduccionPage = () => {
           <MobileOrderDetails
             order={detalleOrden}
             onDownloadXLS={() => console.log("Descargando XLS...")}
-            onDownloadPDF={() => handleDownloadPDF(decryptedIdRol, detalleOrden, detalleConsumo, decryptedIdRol)}
+            onDownloadPDF={() =>
+              handleDownloadPDF(
+                decryptedIdRol,
+                detalleOrden,
+                detalleConsumo,
+                decryptedIdRol
+              )
+            }
           />
         ) : (
           <DesktopOrderDetails
             order={detalleOrden}
             detalleConsumo={detalleConsumo}
             onDownloadXLS={() => console.log("Descargando XLS...")}
-            onDownloadPDF={() => handleDownloadPDF(decryptedIdRol, detalleOrden, detalleConsumo, decryptedIdRol)}
+            onDownloadPDF={() =>
+              handleDownloadPDF(
+                decryptedIdRol,
+                detalleOrden,
+                detalleConsumo,
+                decryptedIdRol
+              )
+            }
           />
         )
       ) : isMobile ? (
@@ -77,14 +118,28 @@ const DetallesOrdenesProduccionPage = () => {
           order={detalleOrden}
           detalleConsumo={detalleConsumo}
           onDownloadXLS={() => console.log("Descargando XLS...")}
-          onDownloadPDF={() => handleDownloadPDF(decryptedIdRol, detalleOrden, detalleConsumo, decryptedIdRol)}
+          onDownloadPDF={() =>
+            handleDownloadPDF(
+              decryptedIdRol,
+              detalleOrden,
+              detalleConsumo,
+              decryptedIdRol
+            )
+          }
         />
       ) : (
         <DesktopMateriaPrimaDetails
           order={detalleOrden}
           detalleConsumo={detalleConsumo}
           onDownloadXLS={() => console.log("Descargando XLS...")}
-          onDownloadPDF={() => handleDownloadPDF(decryptedIdRol, detalleOrden, detalleConsumo, decryptedIdRol)}
+          onDownloadPDF={() =>
+            handleDownloadPDF(
+              decryptedIdRol,
+              detalleOrden,
+              detalleConsumo,
+              decryptedIdRol
+            )
+          }
         />
       )}
     </Container>

@@ -4,8 +4,9 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "./styles/App.css";
 import "./styles/globalStyles.css";
-import { ToastContainer } from "react-toastify"; // Para mostrar notificaciones
+import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import AccessDeniedPage from "./components/AccesoDenegado/AccessDeniedPage";
 
 // Lazy-loaded components
 const MainLayout = lazy(() => import("./layouts/MainLayout"));
@@ -22,7 +23,9 @@ const IngresarProductos = lazy(() => import("./pages/ProductosPage/IngresarProdu
 const GestionPedidosProd = lazy(() => import("./pages/PedidosProdPage/GestionPedidos/GestionPedidosProd"));
 const DetallesOrdenesProduccionPage = lazy(() => import("./pages/PedidosProdPage/DetallesOrdenesProd/DetallesOrdenesProd"));
 const IngresarOrdenProd = lazy(() => import("./pages/PedidosProdPage/IngresarOrdenProd/IngresarOrdenProd"));
-const VentaDetallePage = lazy(() => import("./pages/VentasPage/DetalleVenta/DetalleVentaPage"));
+const GestionVentasPage = lazy(() => import("./pages/VentasPage/GestionVentas/GestionVentasPage"));
+const IngresarVentaPage = lazy(() => import("./pages/VentasPage/IngresarVenta/IngresarVentaPage"));
+const DetalleVentaPage = lazy(() => import("./pages/VentasPage/DetalleVenta/DetalleVentaPage"));
 
 function App() {
   return (
@@ -30,14 +33,16 @@ function App() {
       <ToastContainer /> {/* Contenedor para las notificaciones */}
       <Routes>
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/acceso-denegado" element={<AccessDeniedPage />} /> {/* Ruta de acceso denegado */}
         <Route path="/" element={<Navigate to="/login" />} />
 
         {/* Rutas protegidas */}
         <Route element={<PrivateRoute />}>
           <Route element={<MainLayout />}>
             <Route path="/dashboard" element={<DashboardPage />} />
+
             <Route path="/users">
-              <Route path="users" element={<ManageUsers />} />
+              <Route index element={<ManageUsers />} />
               <Route path="create-user" element={<CreateUsers />} />
               <Route path="roles" element={<ManageRoles />} />
               <Route path="createRol" element={<CreateRolForm />} />
@@ -50,14 +55,15 @@ function App() {
             </Route>
 
             <Route path="/ordenes-produccion">
-              <Route index element={<GestionPedidosProd/>} />
+              <Route index element={<GestionPedidosProd />} />
               <Route path="detalle-orden/:idOrdenProduccion" element={<DetallesOrdenesProduccionPage />} />
               <Route path="ingresar-orden" element={<IngresarOrdenProd />} />
             </Route>
 
             <Route path="/ventas">
-              <Route index element={<VentaDetallePage/>} />
-
+              <Route index element={<GestionVentasPage />} />
+              <Route path="ingresar-venta" element={<IngresarVentaPage />} />
+              <Route path="detalle-venta/:idVenta" element={<DetalleVentaPage />} />
             </Route>
           </Route>
         </Route>

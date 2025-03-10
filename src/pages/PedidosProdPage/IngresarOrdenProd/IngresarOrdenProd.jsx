@@ -1,32 +1,35 @@
 import { useRef, useState } from "react";
 import { Container, Form, Row, Col, Button, Card, InputGroup } from "react-bootstrap";
 import { useForm } from "react-hook-form";
-import useGetProductosYPrecios from "../../../hooks/productosprecios/useGetProductosYprecios";
-import { useGetSucursales } from "../../../hooks/sucursales/useGetSucursales";
 import { BsArrowLeft, BsExclamationTriangleFill } from "react-icons/bs";
 import { useNavigate } from "react-router";
 import Title from "../../../components/Title/Title";
-import { getInitials, getUniqueColor, handleIngresarOrdenProduccionSubmit, scrollToAlert } from "./IngresarOrdenProdUtils";
 import Alert from "../../../components/Alerts/Alert";
 import SuccessPopup from "../../../components/Popup/SuccessPopup";
 import OrderSummary from "../../../components/OrderSummary/OrderSummary";
 import dayjs from "dayjs";
-import "./ordenes.css";
 import ErrorPopup from "../../../components/Popup/ErrorPopUp";
+import useGetProductosYPrecios from "../../../hooks/productosprecios/useGetProductosYprecios";
+import { useGetSucursales } from "../../../hooks/sucursales/useGetSucursales";
+import { filterProductsByName, getFilteredProductsByCategory, getInitials, getUniqueColor, handleIngresarOrdenProduccionSubmit, scrollToAlert } from "./IngresarOrdenProdUtils";
+import { getUserData } from "../../../utils/Auth/decodedata";
+import "./ordenes.css";
 
 const IngresarOrdenProd = () => {
+  const usuario = getUserData(); // Información de usuario conectado.
   const alertRef = useRef(null);
   const navigate = useNavigate();
   const { sucursales, loadingSucursales, showErrorSucursales } = useGetSucursales();
   const { productos, loadigProducts, showErrorProductos } = useGetProductosYPrecios();
   const tomorrow = dayjs().add(1, "day").format("YYYY-MM-DD");
+  const today = dayjs().format("YYYY-MM-DD");
 
   const { register, handleSubmit, formState: { errors }, setValue, watch, reset, getValues } = useForm({
-    defaultValues: { sucursal: "", turno: "AM", fechaAProducir: tomorrow, nombrePanadero: "" },
+    defaultValues: { sucursal: "", turno: "AM", fechaAProducir: usuario.idRol === 1 && usuario.rol === "Admin" ? tomorrow : today, nombrePanadero: "" },
   });
 
   const turnoValue = watch("turno");
-  const [activeCategory, setActiveCategory] = useState("Panadería");
+  const [activeCategory, setActiveCategory] = useState(usuario.idRol === 1 && usuario.rol === "Admin" ? "Panadería" : "Repostería");
   const [trayQuantities, setTrayQuantities] = useState({});
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [isPopupErrorOpen, setIsPopupErrorOpen] = useState(false);
@@ -38,20 +41,8 @@ const IngresarOrdenProd = () => {
   const handleShowOrderSummary = () => setShowOrderSummary(true);
   const handleCloseOrderSummary = () => setShowOrderSummary(false);
 
-  const panaderiaProducts = productos.filter((p) => p.nombreCategoria === "Panadería");
-  const reposteriaProducts = productos.filter((p) => p.nombreCategoria === "Repostería");
-
-  const filterProductsByName = (products, searchTerm) => {
-    if (!searchTerm) return products;
-    return products.filter((producto) =>
-      producto.nombreProducto.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  };
-
-  const filteredProducts = filterProductsByName(productos, searchTerm);
-  const filteredPanaderiaProducts = searchTerm? filteredProducts.filter((p) => p.nombreCategoria === "Panadería") : panaderiaProducts;
-  const filteredReposteriaProducts = searchTerm ? filteredProducts.filter((p) => p.nombreCategoria === "Repostería") : reposteriaProducts;
-  const productsToShow = searchTerm ? filteredProducts : activeCategory === "Panadería" ? filteredPanaderiaProducts : filteredReposteriaProducts;
+  // Usar la función importada para obtener los productos filtrados
+  const productsToShow = getFilteredProductsByCategory(productos, searchTerm, activeCategory, usuario);
 
   const onSubmit = async (data) => {
     setShowOrderSummary(true);
@@ -59,16 +50,8 @@ const IngresarOrdenProd = () => {
 
   const handleConfirmOrder = async () => {
     const data = getValues();
-    await handleIngresarOrdenProduccionSubmit(
-      data,
-      trayQuantities,
-      setTrayQuantities,
-      setIsPopupOpen,
-      setErrorPopupMessage,
-      setIsPopupErrorOpen,
-      setIsLoading,
-      reset
-    );
+    await handleIngresarOrdenProduccionSubmit(data, trayQuantities, setTrayQuantities, setIsPopupOpen, setErrorPopupMessage, setIsPopupErrorOpen,
+      setIsLoading, reset);
     setShowOrderSummary(false);
   };
 
@@ -127,7 +110,7 @@ const IngresarOrdenProd = () => {
                             required: "Seleccione una fecha",
                           })}
                           className="form-control modern-datepicker"
-                          min={tomorrow}
+                          min={usuario.idRol === 1 && usuario.rol === "Admin" ? tomorrow : today }
                         />
                       </InputGroup>
                       {errors.fechaAProducir && (
@@ -146,14 +129,14 @@ const IngresarOrdenProd = () => {
                       <div className="d-flex gap-2 shift-selector">
                         <Button
                           variant={turnoValue === "AM" ? "primary" : "outline-primary"}
-                          className="shift-btn"
+                          className="shift-btn-ventas"
                           onClick={() => setValue("turno", "AM")}
                         >
                           🌅 AM
                         </Button>
                         <Button
                           variant={turnoValue === "PM" ? "primary" : "outline-primary"}
-                          className="shift-btn"
+                          className="shift-btn-ventas"
                           onClick={() => setValue("turno", "PM")}
                         >
                           🌇 PM
@@ -271,19 +254,21 @@ const IngresarOrdenProd = () => {
 
           {/* Selector de categoría */}
           <div className="category-selector mb-4">
-            <Button
-              variant={activeCategory === "Panadería" ? "primary" : "outline-primary"}
-              onClick={() => setActiveCategory("Panadería")}
-              className="category-btn"
-            >
-              Panadería ({searchTerm ? filteredProducts.length : filteredPanaderiaProducts.length})
-            </Button>
+            {usuario.idRol === 1 && usuario.rol === "Admin" && (
+              <Button
+                variant={activeCategory === "Panadería" ? "primary" : "outline-primary"}
+                onClick={() => setActiveCategory("Panadería")}
+                className="category-btn"
+              >
+                Panadería ({searchTerm ? filterProductsByName(productos, searchTerm, usuario).length : productos.filter((p) => p.nombreCategoria === "Panadería").length})
+              </Button>
+            )}
             <Button
               variant={activeCategory === "Repostería" ? "primary" : "outline-primary"}
               onClick={() => setActiveCategory("Repostería")}
               className="category-btn"
             >
-              Repostería ({searchTerm ? filteredProducts.length : filteredReposteriaProducts.length})
+              Repostería ({searchTerm ? filterProductsByName(productos, searchTerm, usuario).length : productos.filter((p) => p.nombreCategoria === "Repostería").length})
             </Button>
           </div>
 
@@ -309,11 +294,14 @@ const IngresarOrdenProd = () => {
                       <Form.Control
                         type="number"
                         min="0"
-                        value={trayQuantities[producto.idProducto] || ""}
+                        value={trayQuantities[producto.idProducto]?.cantidad || ""}
                         onChange={(e) =>
                           setTrayQuantities({
                             ...trayQuantities,
-                            [producto.idProducto]: parseInt(e.target.value) || 0,
+                            [producto.idProducto]: {
+                              cantidad: parseInt(e.target.value) || 0,
+                              idCategoria: producto.idCategoria, // Incluye la categoría
+                            },
                           })
                         }
                         className="product-input"

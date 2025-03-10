@@ -1,10 +1,12 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Table, Button, Badge, Container, Spinner } from "react-bootstrap";
-import { FaTrashAlt, FaFilePdf } from "react-icons/fa";
+import { FaTrashAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { formatDateToDisplay } from "../../../utils/dateUtils";
 import PaginationComponent from "../../PaginationComponent/PaginationComponent";
 import "./VentasTable.css"; // Importa el CSS personalizado
+import { handleViewDetalleVenta } from "../../../pages/VentasPage/DetalleVenta/DetalleVenta.utils";
+import { BsFileEarmarkPdf } from "react-icons/bs";
 
 const ITEMS_PER_PAGE = 5;
 
@@ -28,7 +30,7 @@ const VentasTable = ({ sales, onDelete, onViewPdf, loadingViewPdf }) => {
   const handlePageChange = (newPage) => setCurrentPage(newPage);
 
   const handleRowClick = (idVenta) => {
-    navigate("/detalle-venta/");
+    handleViewDetalleVenta(idVenta, navigate)
   };
 
   useEffect(() => {
@@ -126,7 +128,7 @@ const VentasTable = ({ sales, onDelete, onViewPdf, loadingViewPdf }) => {
                         aria-hidden="true"
                       />
                     ) : (
-                      <FaFilePdf className="ventas-action-icon" />
+                      <BsFileEarmarkPdf className="action-icon text-primary" />
                     )}
                   </Button>
                   <Button

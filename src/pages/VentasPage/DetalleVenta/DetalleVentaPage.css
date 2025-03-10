@@ -1,54 +1,36 @@
-/* Estilos para la tabla moderna */
-.modern-table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-    border-radius: 10px;
-    overflow: hidden;
+/* Estilos para el Card */
+.shadow-md {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   }
   
-  .modern-table thead {
-    background-color: #007bff; /* Color de fondo del encabezado */
-    color: white; /* Color del texto del encabezado */
+  .border-2 {
+    border: 2px solid #e9ecef;
   }
   
-  .modern-table th,
-  .modern-table td {
-    padding: 12px 15px;
-    text-align: center;
+  /* Estilos para los íconos */
+  .text-primary {
+    color: #0d6efd !important;
   }
   
-  .modern-table tbody tr {
-    transition: background-color 0.3s ease;
+  /* Estilos para los textos */
+  .text-muted {
+    color: #6c757d !important;
   }
   
-  .modern-table tbody tr:hover {
-    background-color: #f8f9fa; /* Color de fondo al pasar el mouse */
+  .text-success {
+    color: #28a745 !important;
   }
   
-  .modern-table tbody tr:nth-child(even) {
-    background-color: #f2f2f2; /* Color de fondo para filas pares */
+  /* Espaciado y alineación */
+  .d-flex.align-items-center {
+    padding: 0.5rem 0;
   }
   
-  /* Estilos para los botones de acciones */
-  .modern-table .btn {
-    font-size: 0.875rem;
-    padding: 5px 10px;
-    border-radius: 5px;
-  }
-  
-  .modern-table .btn-primary {
-    background-color: #007bff;
-    border-color: #007bff;
-  }
-  
-  .modern-table .btn-secondary {
-    background-color: #6c757d;
-    border-color: #6c757d;
-  }
-  
-  .modern-table .btn-primary:hover,
-  .modern-table .btn-secondary:hover {
-    opacity: 0.9;
+  /* Estilos para los títulos */
+  h6.fw-bold {
+    font-size: 1.1rem;
+    color: #2c3e50;
+    border-bottom: 2px solid #e9ecef;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
   }

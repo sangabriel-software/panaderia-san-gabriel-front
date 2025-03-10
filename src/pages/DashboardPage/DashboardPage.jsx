@@ -19,7 +19,7 @@ function DashboardPage() {
 
       <div className="row">
         <CardDaschboard
-          message="Ingreso Diario"
+          message="Ingreso Mensual"
           icon="fa-calendar-days"
           borderColor="var(--bs-primary)"
           amount="Q.15205.50"

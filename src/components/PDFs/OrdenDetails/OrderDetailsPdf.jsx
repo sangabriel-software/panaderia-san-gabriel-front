@@ -226,7 +226,7 @@ const OrderDetailsPdf = ({ detalleOrden, encabezadoOrden, detalleConsumo }) => {
                 <View style={styles.tableRow} key={index}>
                   <Text style={styles.tableCellItem}>{index + 1}</Text>
                   <Text style={styles.tableCell}>{item.nombreProducto}</Text>
-                  <Text style={styles.tableCell}>{item.cantidadBandejas || 'N/A'}</Text>
+                  <Text style={styles.tableCell}>{item.cantidadUnidades || 'N/A'}</Text>
                 </View>
               ))}
             </View>

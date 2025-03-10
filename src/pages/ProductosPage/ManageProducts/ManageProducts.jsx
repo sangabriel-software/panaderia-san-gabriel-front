@@ -1,25 +1,49 @@
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useGetProductosYPrecios } from "../../../hooks/productosprecios/useGetProductosYprecios";
-import { checkForChanges, handleConfirmDeletePreoducto, handleDeleleProducto, handleModifyClick, handleUpdateProduct, useCategoriasYFiltrado, useSerchPrductos } from "./ManageProductsUtils";
+import {
+  checkForChanges,
+  handleConfirmDeletePreoducto,
+  handleDeleleProducto,
+  handleModifyClick,
+  handleUpdateProduct,
+  useCategoriasYFiltrado,
+  useSerchPrductos,
+} from "./ManageProductsUtils";
 import SearchInput from "../../../components/SerchInput/SerchInput";
 import Title from "../../../components/Title/Title";
 import CardProductos from "../../../components/CardProductos/CardPoductos";
 import { useNavigate } from "react-router";
 import Alert from "../../../components/Alerts/Alert";
-import { BsExclamationTriangleFill, BsFillInfoCircleFill, BsX } from "react-icons/bs";
+import {
+  BsExclamationTriangleFill,
+  BsFillInfoCircleFill,
+  BsX,
+} from "react-icons/bs";
 import ConfirmPopUp from "../../../components/Popup/ConfirmPopup";
 import ErrorPopup from "../../../components/Popup/ErrorPopUp";
 import ModalIngreso from "../../../components/ModalGenerico/Modal";
-import { Form } from "react-bootstrap";
+import { Form, Row, Col } from "react-bootstrap";
 import useGetCategorias from "../../../hooks/categorias/UseGetCategorias";
 import "./ManageProducts.css";
 import AddButton from "../../../components/AddButton/AddButton";
 
 const ManageProducts = () => {
-  const { productos, loadigProducts, showErrorProductos, showInfoProductos, setProductos } = useGetProductosYPrecios();
-  const { filteredProductos, searchQuery, showNoResults, handleSearch } = useSerchPrductos(productos);
-  const { categorias, filteredByCategory, selectedCategory, setSelectedCategory } = useCategoriasYFiltrado(productos, filteredProductos);
+  const {
+    productos,
+    loadigProducts,
+    showErrorProductos,
+    showInfoProductos,
+    setProductos,
+  } = useGetProductosYPrecios();
+  const { filteredProductos, searchQuery, showNoResults, handleSearch } =
+    useSerchPrductos(productos);
+  const {
+    categorias,
+    filteredByCategory,
+    selectedCategory,
+    setSelectedCategory,
+  } = useCategoriasYFiltrado(productos, filteredProductos);
   const [productoToDelete, setProductoToDelete] = useState(null);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [errorPopupMessage, setErrorPopupMessage] = useState(false);
@@ -29,21 +53,41 @@ const ManageProducts = () => {
   const [initialProductValues, setInitialProductValues] = useState(null);
   const [hasChanges, setHasChanges] = useState(false);
   const navigate = useNavigate();
-  const { categorias: categoriasModify, loadingCategorias, showErrorCategorias, showInfoCategorias } = useGetCategorias();
+  const { categorias: categoriasModify, loadingCategorias, showErrorCategorias, showInfoCategorias, } = useGetCategorias();
   const [loadingModificar, setLoadingModificar] = useState(false);
 
   // React Hook Form
-  const { register, handleSubmit, reset, watch, setValue, formState: { errors } } = useForm();
+  const { register, handleSubmit, reset, watch, setValue, formState: { errors }, } = useForm();
+
+  // Estado para controlar la visibilidad del input de unidades por bandeja
+  const [showUnidadesPorBandeja, setShowUnidadesPorBandeja] = useState(false);
+
+  // Observar el valor del campo idCategoria
+  const selectedCategoryModal = watch("idCategoria");
+
+  // Efecto para mostrar/ocultar el input de unidades por bandeja
+  useEffect(() => {
+    if (selectedCategoryModal && selectedCategoryModal == 1) {
+      setShowUnidadesPorBandeja(true);
+    } else {
+      setShowUnidadesPorBandeja(false);
+    }
+  }, [selectedCategoryModal]);
 
   // Efecto para verificar cambios cada vez que se modifica el formulario
   useEffect(() => {
-    checkForChanges(selectedProduct, initialProductValues, setHasChanges, watch);
+    checkForChanges(
+      selectedProduct,
+      initialProductValues,
+      setHasChanges,
+      watch
+    );
   }, [watch()]);
 
   // Función para guardar los cambios del producto
   const onSubmit = async (data) => {
-    handleUpdateProduct( data, selectedProduct, setProductos, setShowModifyModal, setSelectedProduct, setInitialProductValues,
-                         setHasChanges, setErrorPopupMessage, setIsPopupErrorOpen, setLoadingModificar );
+    handleUpdateProduct( data, selectedProduct, setProductos, setShowModifyModal, setSelectedProduct, setInitialProductValues, setHasChanges,
+                         setErrorPopupMessage, setIsPopupErrorOpen, setLoadingModificar );
   };
 
   if (loadigProducts) {
@@ -52,11 +96,15 @@ const ManageProducts = () => {
 
   return (
     <div className="container">
-      <Title title="Productos" description="Administración de productos existentes" />
+      <Title
+        title="Productos"
+        description="Administración de productos existentes"
+      />
       <div className="row mb-4">
-
-          <AddButton buttonText="Ingresar Producto" onRedirect={() => navigate("/productos/ingresar-producto")} />
-
+        <AddButton
+          buttonText="Ingresar Producto"
+          onRedirect={() => navigate("ingresar-producto")}
+        />
         <div className="col-12 col-md-6">
           <SearchInput
             id="searchInput"
@@ -100,13 +148,30 @@ const ManageProducts = () => {
                 cantidad={producto.cantidad}
                 precio={producto.precio}
                 image={producto.imagenB64}
-                onDelete={() => handleDeleleProducto( producto.idProducto, setProductoToDelete, setIsPopupOpen )}
-                onModify={() => handleModifyClick( producto, setSelectedProduct, setInitialProductValues, setShowModifyModal, reset, setHasChanges ) }
+                categoria={producto.nombreCategoria}
+                onDelete={() =>
+                  handleDeleleProducto(
+                    producto.idProducto,
+                    setProductoToDelete,
+                    setIsPopupOpen
+                  )
+                }
+                onModify={() =>
+                  handleModifyClick(
+                    producto,
+                    setSelectedProduct,
+                    setInitialProductValues,
+                    setShowModifyModal,
+                    reset,
+                    setHasChanges
+                  )
+                }
               />
             </div>
           ))}
         </div>
       </div>
+
       {/* Modal para modificación de productos */}
       <ModalIngreso
         show={showModifyModal}
@@ -180,8 +245,8 @@ const ManageProducts = () => {
             </Form.Group>
 
             {/* Campos: Cantidad y Precio */}
-            <div className="row gx-2">
-              <div className="col-6 mb-3">
+            <Row className="mb-3">
+              <Col xs={6}>
                 <Form.Group controlId="cantidad">
                   <Form.Label>Cantidad</Form.Label>
                   <div className="input-wrapper">
@@ -209,8 +274,8 @@ const ManageProducts = () => {
                     </Form.Control.Feedback>
                   )}
                 </Form.Group>
-              </div>
-              <div className="col-6 mb-3">
+              </Col>
+              <Col xs={6}>
                 <Form.Group controlId="precio">
                   <Form.Label>Precio</Form.Label>
                   <div className="input-wrapper">
@@ -239,8 +304,50 @@ const ManageProducts = () => {
                     </Form.Control.Feedback>
                   )}
                 </Form.Group>
+              </Col>
+            </Row>
+
+            {/* Switch para control de stock */}
+            <Form.Group className="mb-3">
+              <Form.Label className="label-title">Control de Stock</Form.Label>
+              <div className="d-flex align-items-center">
+                <span className="me-2">No</span>
+                <Form.Check
+                  type="switch"
+                  id="controlStock"
+                  {...register("controlarStock")}
+                />
+                <span className="ms-2">Sí</span>
               </div>
-            </div>
+            </Form.Group>
+
+            {/* Input de Unidades por Bandeja (solo visible si la categoría es Panadería) */}
+            {showUnidadesPorBandeja && (
+              <Form.Group className="mb-4">
+                <Form.Label className="label-title my-2">
+                  Unidades por Bandeja
+                  <small className="text-bold" style={{ fontSize: "0.8em" }}>
+                    <strong> (Información para producción)</strong>
+                  </small>
+                </Form.Label>
+                <Form.Control
+                  className="input-data"
+                  type="number"
+                  placeholder="Ingrese las unidades por bandeja"
+                  {...register("unidadesPorBandeja", {
+                    required: "Las unidades por bandeja son obligatorias.",
+                    min: {
+                      value: 1,
+                      message: "Las unidades por bandeja deben ser mayor a 0.",
+                    },
+                  })}
+                  isInvalid={!!errors.unidadesPorBandeja}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {errors.unidadesPorBandeja?.message}
+                </Form.Control.Feedback>
+              </Form.Group>
+            )}
           </Form>
         )}
       </ModalIngreso>

@@ -1,11 +1,12 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Table, Button, Badge, Container, Spinner } from "react-bootstrap";
 import { formatDateToDisplay } from "../../utils/dateUtils";
-import { FaTrashAlt, FaFilePdf } from "react-icons/fa";
+import { FaTrashAlt,} from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import PaginationComponent from "../PaginationComponent/PaginationComponent";
 import { handleViewDetalle } from "../../pages/PedidosProdPage/DetallesOrdenesProd/DetallesOrdenesProdUtils";
 import "./OrderTable.css";
+import { BsFileEarmarkPdf } from "react-icons/bs";
 
 const ITEMS_PER_PAGE = 5;
 
@@ -86,7 +87,7 @@ const OrderTable = ({ orders, onDelete, onViewPdf, loadingViewPdf }) => {
                 className="text-center"
                 title="Doble clic para ver detalles"
               >
-                <Badge pill className={`status-badge ${order.estadoOrden === "P" ? "status-pending" : "status-completed"}`}>
+                <Badge className={`status-badge ${order.estadoOrden === "P" ? "status-pending" : "status-completed"}`}>
                   {order.estadoOrden === "P" ? "Pendiente" : "Completado"}
                 </Badge>
               </td>
@@ -117,7 +118,7 @@ const OrderTable = ({ orders, onDelete, onViewPdf, loadingViewPdf }) => {
                         aria-hidden="true"
                       />
                     ) : (
-                      <FaFilePdf className="action-icon" />
+                      <BsFileEarmarkPdf className="action-icon text-primary" />
                     )}
                   </Button>
                   <Button
