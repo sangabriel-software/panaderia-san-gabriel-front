@@ -95,13 +95,18 @@ export const handleConfirmDeletePreoducto = async (productoToDelete, setProducto
     if (!selectedProduct || !initialProductValues) return;
 
     const currentValues = watch(); // Obtiene los valores actuales del formulario
+
+    const isControlStock = currentValues.controlarStock === true ? 1 : 0;
+
     const hasChangesDetected =
       currentValues.nombreProducto !== initialProductValues.nombreProducto ||
       Number(currentValues.idCategoria) !==
       Number(initialProductValues.idCategoria) ||
       Number(currentValues.cantidad) !==
       Number(initialProductValues.cantidad) ||
-      Number(currentValues.precio) !== Number(initialProductValues.precio);
+      Number(currentValues.precio) !== Number(initialProductValues.precio) ||
+      Number(isControlStock) !== Number(initialProductValues.controlarStock) ||
+      Number(currentValues.unidadesPorBandeja) !== Number(initialProductValues.unidadesPorBandeja);
 
     setHasChanges(hasChangesDetected);
   };
@@ -114,11 +119,6 @@ export const handleConfirmDeletePreoducto = async (productoToDelete, setProducto
     setLoadingModificar(true);
 
     try {
-
-      if(data.cantida != selectedProduct.cantidad || data.precio != selectedProduct.precio){
-        data.precioPorUnidad = data.precio / data.cantidad;
-      }
-
       // Actualiza el producto en el servidor
       const resProdActualizado = await actualizarProductoSevice(data);
 
