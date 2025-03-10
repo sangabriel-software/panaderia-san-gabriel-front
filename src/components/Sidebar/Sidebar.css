@@ -77,3 +77,48 @@ input:checked + .slider:before {
 .spinner-border {
   margin: 0 auto;
 }
+
+/* Estilos para el avatar y el nombre de usuario */
+.user-panel {
+  border-bottom: 1px solid var(--border-color);
+  padding-left: 12px;
+  text-align: center;
+}
+
+.user-panel .image {
+  display: inline-block;
+  margin-right: 10px;
+}
+
+.user-panel .image img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.user-panel .info {
+  display: inline-block;
+}
+
+.user-panel .info a {
+  color: var(--text-primary);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.user-panel .info a:hover {
+  color: var(--text-white);
+}
+
+.avatar-circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 18px;
+  font-weight: bold;
+}

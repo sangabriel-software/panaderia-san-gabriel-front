@@ -131,3 +131,23 @@
     width: 100%;
   }
 }
+
+
+/* Estilos personalizados para el scrollbar del sidebar */
+.sidebar::-webkit-scrollbar {
+  width: 8px; /* Ancho del scrollbar */
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: var(--bg-sidebar); /* Color de fondo del track */
+  border-radius: 4px; /* Bordes redondeados */
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: #6c757d; /* Color del thumb (barra deslizante) */
+  border-radius: 4px; /* Bordes redondeados */
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background: #5a6268; /* Color del thumb al pasar el mouse */
+}
