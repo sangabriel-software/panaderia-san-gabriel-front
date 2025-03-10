@@ -33,6 +33,12 @@
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
   }
   
+  .config-section.disabled {
+    opacity: 0.6; /* Reduce la opacidad para indicar que está deshabilitado */
+    cursor: not-allowed; /* Cambia el cursor a "no permitido" */
+    pointer-events: none; /* Deshabilita los eventos de clic */
+  }
+  
   .section-title {
     display: flex;
     align-items: center;

@@ -15,9 +15,7 @@ const PanelConfig = () => {
 
   return (
     <Container className="panel-config-container">
-      <Title
-        title="Panel de configuraciones"
-      />
+      <Title title="Panel de configuraciones" />
 
       <Row className="my-4">
         {/* Sección: Materia Prima */}
@@ -36,12 +34,9 @@ const PanelConfig = () => {
           </div>
         </Col>
 
-        {/* Sección: Recetas */}
+        {/* Sección: Recetas (Deshabilitada) */}
         <Col xs={12} md={6} className="config-col">
-          <div
-            className="config-section clickable"
-            onClick={() => handleNavigate("/gestionar-recetas")}
-          >
+          <div className="config-section disabled">
             <h2 className="section-title">
               <MdKitchen className="section-icon icon-recetas" /> Gestionar
               Recetas
@@ -52,12 +47,9 @@ const PanelConfig = () => {
           </div>
         </Col>
 
-        {/* Sección: Otras Configuraciones */}
+        {/* Sección: Otras Configuraciones (Deshabilitada) */}
         <Col xs={12} md={6} className="config-col">
-          <div
-            className="config-section clickable"
-            onClick={() => handleNavigate("/otras-configuraciones")}
-          >
+          <div className="config-section disabled">
             <h2 className="section-title">
               <MdSettings className="section-icon icon-otras-config" /> Otras
               Configuraciones
