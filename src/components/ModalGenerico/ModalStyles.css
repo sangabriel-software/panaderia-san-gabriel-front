@@ -1,5 +1,5 @@
 /* Estilos generales del modal */
-.modal-content{
+.modal-content {
   border: none;
   border-radius: 20px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
@@ -8,10 +8,14 @@
 
 /* Encabezado del modal */
 .modal-ingreso-header {
-  background: linear-gradient(135deg, #6a11cb, #c65be7); /* Degradado morado a azul */
+  background: #2A2A2A; /* Fondo oscuro */
   color: white;
   border-bottom: none;
   padding: 1.5rem;
+}
+
+.modal-ingreso-header .btn-close {
+  filter: invert(1); /* Cambia el color del botón de cerrar a blanco */
 }
 
 .modal-ingreso-title {
@@ -34,32 +38,6 @@
   background-color: #ffffff;
 }
 
-/* Botón de cancelar */
-.modal-ingreso-cancelar {
-  background-color: #e0e0e0; /* Gris claro */
-  color: #333;
-  border: none;
-  border-radius: 8px;
-  padding: 0.75rem 1.5rem;
-  font-size: 1rem;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.modal-ingreso-cancelar:hover {
-  background-color: #bdbdbd; /* Gris más oscuro al pasar el mouse */
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-
-/* Spinner dentro del botón de confirmar */
-.modal-ingreso-confirmar .spinner-border {
-  vertical-align: middle;
-}
-
 /* Alertas de error */
 .modal-ingreso-alert {
   background-color: #ffebee; /* Fondo rojo claro */
@@ -76,144 +54,6 @@
 .modal-ingreso-alert .BsExclamationTriangleFill {
   color: #c62828; /* Icono rojo oscuro */
   margin-right: 0.5rem;
-}
-
-/* Estilos responsivos para botones */
-@media (max-width: 991.98px) {
-  .modal-ingreso-btn {
-    width: 100%;
-    margin-bottom: 0.5rem;
-  }
-}
-
-@media (min-width: 992px) {
-  .modal-ingreso-btn {
-    max-width: 150px;
-    width: auto;
-  }
-}
-
-
-/* Estilos generales del modal */
-.modal-content {
-  border: none;
-  border-radius: 20px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-  overflow: hidden;
-}
-
-/* Estilos en modo oscuro */
-[data-theme="dark"] .modal-content {
-  background-color: #1e2022; /* Fondo oscuro */
-  color: #e0e0e0; /* Texto claro */
-}
-
-/* Encabezado del modal */
-.modal-ingreso-header {
-  background: linear-gradient(135deg, #6a11cb, #c65be7); /* Degradado morado a azul */
-  color: white;
-  border-bottom: none;
-  padding: 1.5rem;
-}
-
-/* Encabezado en tema oscuro */
-[data-theme="dark"] .modal-ingreso-header {
-  background: linear-gradient(135deg, #4c1d95, #6a1b9a); /* Degradado más oscuro */
-}
-
-/* Título */
-.modal-ingreso-title {
-  font-size: 1.5rem;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-}
-
-/* Cuerpo del modal */
-.modal-ingreso-body {
-  padding: 1.5rem;
-  background-color: #f8f9fa; /* Fondo claro */
-  color: #333;
-}
-
-/* Cuerpo en tema oscuro */
-[data-theme="dark"] .modal-ingreso-body {
-  background-color: #25282b; /* Fondo oscuro */
-  color: #e0e0e0; /* Texto claro */
-}
-
-/* Pie del modal */
-.modal-ingreso-footer {
-  border-top: none;
-  padding: 1.5rem;
-  background-color: #ffffff;
-}
-
-/* Pie del modal en tema oscuro */
-[data-theme="dark"] .modal-ingreso-footer {
-  background-color: #1e2022; /* Fondo oscuro */
-}
-
-/* Botón de cancelar */
-.modal-ingreso-cancelar {
-  background-color: #e0e0e0; /* Gris claro */
-  color: #333;
-  border: none;
-  border-radius: 8px;
-  padding: 0.75rem 1.5rem;
-  font-size: 1rem;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.modal-ingreso-cancelar:hover {
-  background-color: #bdbdbd; /* Gris más oscuro al pasar el mouse */
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-/* Botón cancelar en tema oscuro */
-[data-theme="dark"] .modal-ingreso-cancelar {
-  background-color: #333; /* Fondo gris oscuro */
-  color: #e0e0e0; /* Texto claro */
-}
-
-[data-theme="dark"] .modal-ingreso-cancelar:hover {
-  background-color: #555; /* Gris más oscuro al pasar el mouse */
-}
-
-/* Botón de confirmar */
-.modal-ingreso-confirmar .spinner-border {
-  vertical-align: middle;
-}
-
-/* Alertas de error */
-.modal-ingreso-alert {
-  background-color: #ffebee; /* Fondo rojo claro */
-  color: #c62828; /* Texto rojo oscuro */
-  border: none;
-  border-radius: 8px;
-  padding: 1rem;
-  margin: 1.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.modal-ingreso-alert .BsExclamationTriangleFill {
-  color: #c62828; /* Icono rojo oscuro */
-  margin-right: 0.5rem;
-}
-
-/* Alertas de error en tema oscuro */
-[data-theme="dark"] .modal-ingreso-alert {
-  background-color: #3e2723; /* Fondo oscuro con rojo tenue */
-  color: #ff6f60; /* Texto más claro para error */
-}
-
-[data-theme="dark"] .modal-ingreso-alert .BsExclamationTriangleFill {
-  color: #ff6f60; /* Icono más claro */
 }
 
 /* Estilos responsivos para botones */

@@ -50,6 +50,8 @@ const ManageProducts = () => {
     return <div className="loading">Cargando productos...</div>;
   }
 
+  console.log(productos)
+
   return (
     <div className="container">
       <Title title="Productos" description="Administración de productos existentes" />

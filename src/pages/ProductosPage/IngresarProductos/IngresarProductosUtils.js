@@ -4,15 +4,24 @@ import { capitalizeFirstLetter } from "../../../utils/utils"
 
 /* Funcion para crear paylod datos de productos */
 export const crearPayloadProducto = (data) => {
-    const productoPayload = {
-        nombreProducto: capitalizeFirstLetter( data.nombreProducto ),
-        idCategoria: data.idCategoria ,
-        controlarStock: data.controlStock,
-        fechaCreacion: currentDate(),
-    }
+  // Convertir idCategoria y unidadesPorBandeja a números
+  const idCategoria = Number(data.idCategoria);
+  const unidadesPorBandeja = Number(data.unidadesPorBandeja);
 
-    return productoPayload
-} 
+  // Determinar bandejasUnidades basado en la categoría
+  const badejasUnidades = (idCategoria === 1) ? unidadesPorBandeja : null;
+
+  // Crear el payload del producto
+  const productoPayload = {
+    nombreProducto: capitalizeFirstLetter(data.nombreProducto),
+    idCategoria: idCategoria, // Usar el valor convertido a número
+    controlarStock: data.controlStock,
+    fechaCreacion: currentDate(),
+    ...(badejasUnidades !== null && { unidadesPorBandeja: badejasUnidades }) // Agregar solo si no es null
+  };
+
+  return productoPayload;
+};
 
 /* Funcion para crar payload de ingreso de precio de productos */
 export const crearPayloadPrecioProducto = (data, idProducto) => {
