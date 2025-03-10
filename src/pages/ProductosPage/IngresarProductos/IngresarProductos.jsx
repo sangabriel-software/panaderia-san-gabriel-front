@@ -250,7 +250,6 @@ function IngresarProductos() {
           {/* Input de Unidades por Bandeja (solo visible si la categoría es Panadería) */}
           {showUnidadesPorBandeja && (
             <Form.Group className="mb-4">
-              jsx Copy
               <Form.Label className="label-title my-2">
                 Unidades por Bandeja
                 <small className="text-bold" style={{ fontSize: "0.8em" }}>
