@@ -6,7 +6,9 @@ import "./styles/App.css";
 import "./styles/globalStyles.css";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import AccessDeniedPage from "./components/AccesoDenegado/AccessDeniedPage";
+import PanelConfig from "./pages/Configuracioens/ConfiguracionesPage/PanelConfig";
+
+const AccessDeniedPage = lazy( ()=> import("./components/AccesoDenegado/AccessDeniedPage"));
 
 // Lazy-loaded components
 const MainLayout = lazy(() => import("./layouts/MainLayout"));
@@ -26,6 +28,7 @@ const IngresarOrdenProd = lazy(() => import("./pages/PedidosProdPage/IngresarOrd
 const GestionVentasPage = lazy(() => import("./pages/VentasPage/GestionVentas/GestionVentasPage"));
 const IngresarVentaPage = lazy(() => import("./pages/VentasPage/IngresarVenta/IngresarVentaPage"));
 const DetalleVentaPage = lazy(() => import("./pages/VentasPage/DetalleVenta/DetalleVentaPage"));
+const GestionDeSucursalesPAge = lazy(() => import("./pages/Sucursales/GestionDeSucursales/GestionDeSucursalesPage"));
 
 function App() {
   return (
@@ -64,6 +67,14 @@ function App() {
               <Route index element={<GestionVentasPage />} />
               <Route path="ingresar-venta" element={<IngresarVentaPage />} />
               <Route path="detalle-venta/:idVenta" element={<DetalleVentaPage />} />
+            </Route>
+
+            <Route path="/sucursales">
+              <Route index element={<GestionDeSucursalesPAge/>} />
+            </Route>
+
+            <Route path="/config">
+              <Route path="control-panel" element={<PanelConfig/>} />
             </Route>
           </Route>
         </Route>

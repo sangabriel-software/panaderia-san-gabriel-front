@@ -230,7 +230,7 @@ function CreateUsers() {
         }
         nombreBotonVolver="Ver Usuarios"
         nombreBotonNuevo="Nuevo Usuario"
-        onView={() => navigate("/users/users")} // Redirige a Ver Usuarios
+        onView={() => navigate("/users")} // Redirige a Ver Usuarios
         onNew={() => {
           setIsPopupOpen(false); // Cierra el popup
           resetForm(reset, setValue, clearErrors, setSelectedOption); // Limpia el formulario
