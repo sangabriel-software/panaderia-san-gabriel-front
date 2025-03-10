@@ -13,6 +13,7 @@
   background-color: var(--bg-sidebar); /* Fondo para que no se superponga con el contenido */
   z-index: 1; /* Asegura que esté por encima del contenido */
   border-top: 1px solid var(--border-color); /* Línea divisoria */
+  margin-bottom: 5rem;
 }
 
 .theme-switch {
@@ -84,9 +85,11 @@ input:checked + .slider:before {
   border-bottom: 1px solid var(--border-color);
   padding-left: 12px;
   text-align: center;
+  margin-bottom: 20px;
 }
 
 .user-panel .image {
+  margin-bottom: 10px;
   display: inline-block;
   margin-right: 10px;
 }
@@ -128,7 +131,7 @@ input:checked + .slider:before {
 .sidebar {
   width: 250px;
   min-height: calc(100vh - 56px);
-  padding-top: 1rem;
+  padding-top: 0.1rem;
   border-right: 1px solid var(--border-color);
   transition: transform 0.3s ease;
   background-color: var(--bg-sidebar) !important;
