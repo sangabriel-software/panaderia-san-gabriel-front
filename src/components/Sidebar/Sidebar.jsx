@@ -275,20 +275,6 @@ function Sidebar({ show, onClose }) {
                 )}
               </div>
             </Collapse>
-            <Collapse in={configOpen}>
-              <div>
-                {isRouteAllowed("/config/control-panel") && (
-                  <Nav.Link
-                    as={NavLink}
-                    to="/config/control-panel"
-                    className="text-light ps-4 submenu-item"
-                    onClick={handleNavLinkClick}
-                  >
-                    <MdDashboard className="me-2" /> Panel de control
-                  </Nav.Link>
-                )}
-              </div>
-            </Collapse>
           </>
         )}
       </Nav>
