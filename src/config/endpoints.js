@@ -25,14 +25,17 @@ const postEndpoints = {
     INGRESAR_CATEGORIA: "/ingresarcategoria",
     INGRESAR_ORDEN_PRODUCCION: "/ingresar-orden",
     INGRESAR_VENTA: "/ingresar-venta",
+    INGRESAR_SUCURSAL: "/ingresarSucursal",
 };
 
 const putEndpoints = {
+
     ACTUALIZAR_ROL: "/actualizarRol",
     DESBLOQUEAR_USAURIO: "/desbloquearUsuario",
     BLOQUEAR_USUARIO: "/bloquearUsuario",
     ACTUALIZAR_PRODUCTO: "/actualizarProducto",
-    ACTUALIZAR_PRECIO: "/actualizarPrecio"
+    ACTUALIZAR_PRECIO: "/actualizarPrecio",
+    ACTUALIZAR_SUCURSALES: "/actualizarSucursal",
 };
 
 const deleteEndpoints = {
@@ -42,6 +45,7 @@ const deleteEndpoints = {
     DESACTIVAR_PRODUCTOS: "desactivarProducto",
     ELIMINAR_ORDEN_PRODUCCION: "/eliminar-ordenes-produccion",
     ELMINAR_VENTA: "/eliminar-venta",
+    ELMINAR_SUCURSAL: "/eliminarSucursal",
 };
 
 
