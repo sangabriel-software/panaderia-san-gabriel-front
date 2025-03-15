@@ -67,30 +67,30 @@ const GestionDeSucursalesPage = () => {
             <Row>
                 {sucursales.map((sucursal) => (
                     <Col key={sucursal.idSucursal} md={isMobile ? 12 : 6} lg={4} className="mb-4">
-                        <Card className="h-100 shadow-sm border-0 custom-card">
-                            <Card.Body className="d-flex flex-column">
-                                <Card.Title className="text-center text-primary">
-                                    {sucursal.nombreSucursal}
-                                </Card.Title>
+                        <Card className="h-100 gestion-card">
+                            <Card.Header className="gestion-card-header">
+                                {sucursal.nombreSucursal}
+                            </Card.Header>
+                            <Card.Body className="gestion-card-body">
                                 <Card.Text className="flex-grow-1">
                                     <div className="d-flex align-items-center mb-2">
-                                        <FaMapMarkerAlt className="me-2 text-secondary" />
+                                        <FaMapMarkerAlt className="gestion-card-icon" />
                                         <strong>Dirección:</strong> {sucursal.direccionSucursal}
                                     </div>
                                     <div className="d-flex align-items-center mb-2">
-                                        <FaCity className="me-2 text-secondary" />
+                                        <FaCity className="gestion-card-icon" />
                                         <strong>Municipio:</strong> {sucursal.municipioSucursal}
                                     </div>
                                     <div className="d-flex align-items-center mb-2">
-                                        <FaGlobeAmericas className="me-2 text-secondary" />
+                                        <FaGlobeAmericas className="gestion-card-icon" />
                                         <strong>Departamento:</strong> {sucursal.departamentoSucursal}
                                     </div>
                                 </Card.Text>
                                 <div className="d-flex justify-content-center gap-3 mt-3">
-                                    <Button variant="outline-primary" onClick={() => console.log('Editar:', sucursal.idSucursal)}>
+                                    <Button variant="outline-primary" className="gestion-card-button gestion-card-button-primary" onClick={() => console.log('Editar:', sucursal.idSucursal)}>
                                         <FaEdit /> Editar
                                     </Button>
-                                    <Button variant="outline-danger" onClick={() => handleDelete(sucursal.idSucursal)}>
+                                    <Button variant="outline-danger" className="gestion-card-button gestion-card-button-danger" onClick={() => handleDelete(sucursal.idSucursal)}>
                                         <FaTrash /> Eliminar
                                     </Button>
                                 </div>
