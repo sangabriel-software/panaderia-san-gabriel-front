@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form'; // Para manejar el formulario
 import useGetSucursales from "../../../hooks/sucursales/useGetSucursales";
 import dayjs from 'dayjs'; // Importar day.js para manejar fechas
 import "./GestionDeSucursalesPage.css";
-import { actualizarSucursalService, elminarSUcursalService, ingresarSucursalService,  } from '../../../services/sucursales/sucursales.service';
+import { actualizarSucursalService, elminarSUcursalService, ingresarSucursalService } from '../../../services/sucursales/sucursales.service';
 import { handleShowModal } from './GestionDeSucursales.utils'; // Importar la función desde el archivo de utilidades
 
 const GestionDeSucursalesPage = () => {
@@ -16,6 +16,7 @@ const GestionDeSucursalesPage = () => {
     const [editingSucursal, setEditingSucursal] = useState(null); // Estado para guardar la sucursal que se está editando
     const [showSuccessMessage, setShowSuccessMessage] = useState(false); // Estado para mostrar mensaje de éxito
     const [showErrorMessage, setShowErrorMessage] = useState(false); // Estado para mostrar mensaje de error
+    const [isSaving, setIsSaving] = useState(false); // Estado para controlar el loading del guardado
 
     // Configuración de react-hook-form
     const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm();
@@ -23,6 +24,7 @@ const GestionDeSucursalesPage = () => {
     // Enviar datos del formulario
     const onSubmit = async (data) => {
         try {
+            setIsSaving(true); // Activar el estado de carga
             // Agregar la fecha actual al payload
             const fechaActual = dayjs().format('YYYY-MM-DD'); // Formato de fecha: Año-Mes-Día
             const payload = { ...data, fechaCreacion: fechaActual, departamentoSucursal: "" };
@@ -42,7 +44,7 @@ const GestionDeSucursalesPage = () => {
             } else {
                 // Lógica para agregar una nueva sucursal
                 const nuevaSucursal = await ingresarSucursalService(payload);
-                setSucursales((prevSucursales) => [...prevSucursales, nuevaSucursal]); // Agregar la nueva sucursal al estado
+                setSucursales((prevSucursales) => [...prevSucursales, payload]); // Agregar la nueva sucursal al estado
                 setShowSuccessMessage("Sucursal agregada correctamente.");
             }
             setShowErrorMessage(false); // Ocultar mensaje de error
@@ -51,6 +53,8 @@ const GestionDeSucursalesPage = () => {
         } catch (error) {
             setShowErrorMessage("Error al procesar la solicitud. Inténtelo de nuevo.");
             console.error(error);
+        } finally {
+            setIsSaving(false); // Desactivar el estado de carga
         }
     };
 
@@ -192,7 +196,7 @@ const GestionDeSucursalesPage = () => {
                         <Form.Group className="mb-3">
                             <Form.Label>Teléfono</Form.Label>
                             <Form.Control
-                                type="text"
+                                type="number"
                                 {...register("telefonoSucursal")}
                             />
                         </Form.Group>
@@ -203,8 +207,21 @@ const GestionDeSucursalesPage = () => {
                                 {...register("correoSucursal")}
                             />
                         </Form.Group>
-                        <Button variant="primary" type="submit">
-                            {editingSucursal ? "Guardar Cambios" : "Guardar"}
+                        <Button variant="primary" type="submit" disabled={isSaving}>
+                            {isSaving ? (
+                                <>
+                                    <Spinner
+                                        as="span"
+                                        animation="border"
+                                        size="sm"
+                                        role="status"
+                                        aria-hidden="true"
+                                    />
+                                    <span className="ms-2">Guardando...</span>
+                                </>
+                            ) : (
+                                editingSucursal ? "Guardar Cambios" : "Guardar"
+                            )}
                         </Button>
                     </Form>
                 </Modal.Body>
