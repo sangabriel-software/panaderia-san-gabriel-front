@@ -10,7 +10,7 @@ import { actualizarSucursalService, ingresarSucursalService } from '../../../ser
 import { handleShowModal } from './GestionDeSucursales.utils'; // Importar la función desde el archivo de utilidades
 
 const GestionDeSucursalesPage = () => {
-    const { sucursales, loadingSucursales, showErrorSucursales } = useGetSucursales();
+    const { sucursales, loadingSucursales, showErrorSucursales, setSucursales } = useGetSucursales();
     const isMobile = useMediaQuery({ query: '(max-width: 767px)' });
     const [showModal, setShowModal] = useState(false);
     const [editingSucursal, setEditingSucursal] = useState(null); // Estado para guardar la sucursal que se está editando
@@ -33,8 +33,8 @@ const GestionDeSucursalesPage = () => {
                 setShowSuccessMessage("Sucursal actualizada correctamente.");
             } else {
                 // Lógica para agregar una nueva sucursal
-                console.log(payload)
                 await ingresarSucursalService(payload);
+                setSucursales((prevSucursales) => [...prevSucursales, payload]); // Agregar la nueva sucursal al estado
                 setShowSuccessMessage("Sucursal agregada correctamente.");
             }
             setShowErrorMessage(false); // Ocultar mensaje de error

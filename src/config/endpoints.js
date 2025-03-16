@@ -35,7 +35,7 @@ const putEndpoints = {
     BLOQUEAR_USUARIO: "/bloquearUsuario",
     ACTUALIZAR_PRODUCTO: "/actualizarProducto",
     ACTUALIZAR_PRECIO: "/actualizarPrecio",
-    ACTUALIZAR_SUCURSALES: "/actualizarSucursal",
+    ACTUALIZAR_SUCURSALES: "/actualizar-sucursal",
 };
 
 const deleteEndpoints = {

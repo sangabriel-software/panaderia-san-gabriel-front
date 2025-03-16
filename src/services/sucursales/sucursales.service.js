@@ -21,7 +21,7 @@ export const ingresarSucursalService = async (dataSucursal) => {
 
 export const actualizarSucursalService = async (dataSucursal) => {
   try {
-      const response = await api.post(`${putEndpoints.ACTUALIZAR_SUCURSALES}`, dataSucursal); 
+      const response = await api.put(`${putEndpoints.ACTUALIZAR_SUCURSALES}`, dataSucursal); 
       return response.data;
   } catch (error) {
     throw error;
