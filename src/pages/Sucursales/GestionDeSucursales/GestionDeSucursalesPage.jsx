@@ -7,6 +7,7 @@ import useGetSucursales from "../../../hooks/sucursales/useGetSucursales";
 import dayjs from 'dayjs'; // Importar day.js para manejar fechas
 import "./GestionDeSucursalesPage.css";
 import { actualizarSucursalService, ingresarSucursalService } from '../../../services/sucursales/sucursales.service';
+import { handleShowModal } from './GestionDeSucursales.utils'; // Importar la función desde el archivo de utilidades
 
 const GestionDeSucursalesPage = () => {
     const { sucursales, loadingSucursales, showErrorSucursales } = useGetSucursales();
@@ -18,24 +19,6 @@ const GestionDeSucursalesPage = () => {
 
     // Configuración de react-hook-form
     const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm();
-
-    // Abrir modal para agregar o editar sucursal
-    const handleShowModal = (sucursal = null) => {
-        if (sucursal) {
-            // Si se está editando, setear los valores en el formulario
-            setEditingSucursal(sucursal);
-            setValue("nombreSucursal", sucursal.nombreSucursal);
-            setValue("direccionSucursal", sucursal.direccionSucursal);
-            setValue("municipioSucursal", sucursal.municipioSucursal);
-            setValue("telefonoSucursal", sucursal.telefonoSucursal);
-            setValue("correoSucursal", sucursal.correoSucursal);
-        } else {
-            // Si se está agregando, resetear el formulario
-            setEditingSucursal(null);
-            reset();
-        }
-        setShowModal(true);
-    };
 
     // Enviar datos del formulario
     const onSubmit = async (data) => {
@@ -91,7 +74,7 @@ const GestionDeSucursalesPage = () => {
     return (
         <Container className="my-5">
             <h1 className="text-center mb-4">Gestión de Sucursales</h1>
-            <Button variant="primary" className="mb-4" onClick={() => handleShowModal()}>
+            <Button variant="primary" className="mb-4" onClick={() => handleShowModal(null, setEditingSucursal, setValue, reset, setShowModal)}>
                 Agregar Sucursal
             </Button>
 
@@ -126,7 +109,7 @@ const GestionDeSucursalesPage = () => {
                                     </div>
                                 </Card.Text>
                                 <div className="d-flex justify-content-center gap-3 mt-3">
-                                    <Button variant="outline-primary" className="gestion-card-button gestion-card-button-primary" onClick={() => handleShowModal(sucursal)}>
+                                    <Button variant="outline-primary" className="gestion-card-button gestion-card-button-primary" onClick={() => handleShowModal(sucursal, setEditingSucursal, setValue, reset, setShowModal)}>
                                         <FaEdit /> Editar
                                     </Button>
                                     <Button variant="outline-danger" className="gestion-card-button gestion-card-button-danger" onClick={() => handleDelete(sucursal.idSucursal)}>
