@@ -28,7 +28,7 @@ export const actualizarSucursalService = async (dataSucursal) => {
   }
 }
 
-export const eliminarOrdenProduccionService = async (idSucursal) => {
+export const elminarSUcursalService = async (idSucursal) => {
   try {
     const response = await api.delete(`${deleteEndpoints.ELMINAR_SUCURSAL}/${idSucursal}`); 
       return response.data;

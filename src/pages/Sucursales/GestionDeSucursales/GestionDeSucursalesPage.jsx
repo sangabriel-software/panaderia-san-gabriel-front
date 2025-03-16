@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form'; // Para manejar el formulario
 import useGetSucursales from "../../../hooks/sucursales/useGetSucursales";
 import dayjs from 'dayjs'; // Importar day.js para manejar fechas
 import "./GestionDeSucursalesPage.css";
-import { actualizarSucursalService, ingresarSucursalService } from '../../../services/sucursales/sucursales.service';
+import { actualizarSucursalService, elminarSUcursalService, ingresarSucursalService,  } from '../../../services/sucursales/sucursales.service';
 import { handleShowModal } from './GestionDeSucursales.utils'; // Importar la función desde el archivo de utilidades
 
 const GestionDeSucursalesPage = () => {
@@ -54,9 +54,22 @@ const GestionDeSucursalesPage = () => {
         }
     };
 
-    const handleDelete = (idSucursal) => {
-        // Aquí iría la lógica para eliminar la sucursal
-        console.log('Eliminar sucursal con ID:', idSucursal);
+    // Función para eliminar una sucursal
+    const handleDelete = async (idSucursal) => {
+        try {
+            await elminarSUcursalService(idSucursal); // Llamar al servicio de eliminación
+            setShowSuccessMessage("Sucursal eliminada correctamente.");
+
+            // Actualizar el estado para eliminar la sucursal del listado
+            setSucursales((prevSucursales) =>
+                prevSucursales.filter((sucursal) => sucursal.idSucursal !== idSucursal)
+            );
+
+            setTimeout(() => setShowSuccessMessage(false), 3000); // Ocultar mensaje de éxito después de 3 segundos
+        } catch (error) {
+            setShowErrorMessage("Error al eliminar la sucursal. Inténtelo de nuevo.");
+            console.error(error);
+        }
     };
 
     if (loadingSucursales) {
