@@ -25,16 +25,24 @@ const GestionDeSucursalesPage = () => {
         try {
             // Agregar la fecha actual al payload
             const fechaActual = dayjs().format('YYYY-MM-DD'); // Formato de fecha: Año-Mes-Día
-            const payload = { ...data, fechaCreacion: fechaActual, departamentoSucursal: "", };
+            const payload = { ...data, fechaCreacion: fechaActual, departamentoSucursal: "" };
 
             if (editingSucursal) {
                 // Lógica para editar la sucursal
-                await actualizarSucursalService({ ...payload, idSucursal: editingSucursal.idSucursal });
+                const actualizacionPayload = { ...payload, idSucursal: editingSucursal.idSucursal };
+                const updatedSucursal = await actualizarSucursalService({ ...payload, idSucursal: editingSucursal.idSucursal });
                 setShowSuccessMessage("Sucursal actualizada correctamente.");
+
+                // Actualizar la lista de sucursales
+                setSucursales((prevSucursales) =>
+                    prevSucursales.map((sucursal) =>
+                        sucursal.idSucursal === actualizacionPayload.idSucursal ? actualizacionPayload : sucursal
+                    )
+                );
             } else {
                 // Lógica para agregar una nueva sucursal
-                await ingresarSucursalService(payload);
-                setSucursales((prevSucursales) => [...prevSucursales, payload]); // Agregar la nueva sucursal al estado
+                const nuevaSucursal = await ingresarSucursalService(payload);
+                setSucursales((prevSucursales) => [...prevSucursales, nuevaSucursal]); // Agregar la nueva sucursal al estado
                 setShowSuccessMessage("Sucursal agregada correctamente.");
             }
             setShowErrorMessage(false); // Ocultar mensaje de error
@@ -98,7 +106,7 @@ const GestionDeSucursalesPage = () => {
                                 {sucursal.nombreSucursal}
                             </Card.Header>
                             <Card.Body className="gestion-card-body">
-                                <Card.Text className="flex-grow-1">
+                                <div className="flex-grow-1">
                                     <div className="d-flex align-items-center mb-2">
                                         <FaMapMarkerAlt className="gestion-card-icon" />
                                         <strong>Dirección:</strong> {sucursal.direccionSucursal}
@@ -107,7 +115,7 @@ const GestionDeSucursalesPage = () => {
                                         <FaCity className="gestion-card-icon" />
                                         <strong>Municipio:</strong> {sucursal.municipioSucursal}
                                     </div>
-                                </Card.Text>
+                                </div>
                                 <div className="d-flex justify-content-center gap-3 mt-3">
                                     <Button variant="outline-primary" className="gestion-card-button gestion-card-button-primary" onClick={() => handleShowModal(sucursal, setEditingSucursal, setValue, reset, setShowModal)}>
                                         <FaEdit /> Editar
