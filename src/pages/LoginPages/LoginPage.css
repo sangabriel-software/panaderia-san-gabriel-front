@@ -94,9 +94,9 @@
   
   /* Estilos para el logo de login */
   .logo-login {
-    width: 200px; /* Ajusta el tamaño del logo */
+    width: 250px; /* Ajusta el tamaño del logo */
     height: auto; /* Mantén las proporciones */
-    margin: 40px; /* Centra el logo */
+    margin: 15px; /* Centra el logo */
     padding: 0;
   }
   

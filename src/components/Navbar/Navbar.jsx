@@ -3,7 +3,7 @@ import { Navbar, Container } from "react-bootstrap";
 import MenuToggle from "../MenuToogle/MenuToogle";
 import NotificationBadge from "../NotificationBadage/NotificationBadge";
 import UserDropdown from "../UserDropdown/UserDropdown";
-import logo from "../../assets/logo.png";
+import logo from "../../assets/logo.png"; // Asegúrate de que el logo sea horizontal
 
 function NavigationBar({ onMenuClick }) {
   return (
@@ -30,6 +30,7 @@ function NavigationBar({ onMenuClick }) {
               src={logo}
               alt="Logo"
               draggable="false"
+              style={{ width: "10px", height: "1px" }} // Ajusta el tamaño del logo
             />
           </Navbar.Brand>
 
