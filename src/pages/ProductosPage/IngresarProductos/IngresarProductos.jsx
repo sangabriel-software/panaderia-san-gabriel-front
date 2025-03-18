@@ -23,27 +23,14 @@ function IngresarProductos() {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const [selectedImage, setSelectedImage] = useState(null);
-  const {
-    register,
-    handleSubmit,
-    reset,
-    watch,
-    formState: { errors },
-  } = useForm({ defaultValues: { idCategoria: "", controlStock: 0 } }); // Añade controlStock con valor por defecto 0
+  const { register, handleSubmit, reset, watch, formState: { errors }, } = useForm({ defaultValues: { idCategoria: "", controlStock: 0 } }); // Añade controlStock con valor por defecto 0
 
   // variables logica categorias
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [isCategorySaving, setIsCategorySaving] = useState(false);
   const [showErrorCategorySave, setShowErrorCategorySave] = useState(false);
   const { categorias, loadingCategorias } = useGetCategorias();
-  const {
-    register: registerCategory,
-    handleSubmit: handleSubmitCategory,
-    formState: { errors: errorsCategory },
-    reset: resetCategory,
-  } = useForm({
-    defaultValues: { nombreCategoria: "", descripcionCategoria: "" },
-  }); //hook form para el formulario de categorias
+  const { register: registerCategory, handleSubmit: handleSubmitCategory, formState: { errors: errorsCategory }, reset: resetCategory, } = useForm({ defaultValues: { nombreCategoria: "", descripcionCategoria: "" }, }); //hook form para el formulario de categorias
 
   // Estado para controlar la visibilidad del input de unidades por bandeja
   const [showUnidadesPorBandeja, setShowUnidadesPorBandeja] = useState(false);
