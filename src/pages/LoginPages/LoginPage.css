@@ -1,6 +1,6 @@
 /* Estilos generales para el contenedor */
 .contenedorLados {
-    background-color: #d9d6c7;
+    background-color: whitesmoke;
     height: 100vh; /* Forzar que ocupe toda la altura de la pantalla */
     display: flex;
     justify-content: center;
@@ -9,7 +9,7 @@
   
   /* Estilos para el contenedor derecho */
   .derecho {
-    background-color: #d9d6c7; /* Color de fondo */
+    background-color: whitesmoke; /* Color de fondo */
     display: flex; /* Asegura el centrado del contenido */
     flex-direction: column;
     justify-content: center;

@@ -51,7 +51,8 @@ const GestionDeSucursalesPage = () => {
             } else {
                 // Lógica para agregar una nueva sucursal
                 const nuevaSucursal = await ingresarSucursalService(payload);
-                setSucursales((prevSucursales) => [...prevSucursales, payload]); // Agregar la nueva sucursal al estado
+                console.log(nuevaSucursal.sucursal);
+                setSucursales((prevSucursales) => [...prevSucursales, nuevaSucursal.sucursal]); // Agregar la nueva sucursal al estado
                 setShowSuccessMessage("Sucursal agregada correctamente.");
             }
             setShowErrorMessage(false); // Ocultar mensaje de error
