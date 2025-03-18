@@ -1,6 +1,6 @@
 /* Estilos generales para el contenedor */
 .contenedorLados {
-    background-color: whitesmoke;
+    background-color: #d9d6c7;
     height: 100vh; /* Forzar que ocupe toda la altura de la pantalla */
     display: flex;
     justify-content: center;
@@ -9,7 +9,7 @@
   
   /* Estilos para el contenedor derecho */
   .derecho {
-    background-color: whitesmoke; /* Color de fondo */
+    background-color: #d9d6c7; /* Color de fondo */
     display: flex; /* Asegura el centrado del contenido */
     flex-direction: column;
     justify-content: center;
@@ -21,7 +21,7 @@
   
   .derecho h3, 
   .derecho span {
-    color: #D8D83D;
+    color: #565327;
   }
   
   /* Estilos del formulario flotante */
