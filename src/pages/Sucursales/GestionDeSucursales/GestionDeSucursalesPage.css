@@ -1,7 +1,7 @@
 /* GestionDeSucursalesPage.css */
 .gestion-card {
     transition: transform 0.2s, box-shadow 0.2s;
-    border-radius: 10px; /* Bordes redondeados */
+    border-radius: 20px; /* Bordes redondeados */
     border: 0.1px solid #3033; /* Borde sutil */
     overflow: hidden; /* Para que el borde redondeado funcione correctamente */
     background-color: #FFFFFF;

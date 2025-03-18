@@ -42,8 +42,6 @@ function Sidebar({ show, onClose }) {
     return permissionsMap[route];
   };
 
-
-
   // Efecto para aplicar el tema al cargar el componente
   useEffect(() => {
     if (theme === "dark") {
@@ -130,7 +128,8 @@ function Sidebar({ show, onClose }) {
         </div>
         <div className="info">
           <a href="#" className="d-block text-light">
-            {`${userData?.nombre} ${userData.apellido}`} {/* Nombre de usuario dinámico */}
+            {`${userData?.nombre} ${userData.apellido}`}{" "}
+            {/* Nombre de usuario dinámico */}
           </a>
         </div>
       </div>
@@ -177,17 +176,6 @@ function Sidebar({ show, onClose }) {
             onClick={handleNavLinkClick}
           >
             <FaFolder size={25} className="me-2" /> Ventas
-          </Nav.Link>
-        )}
-
-        {isRouteAllowed("/sucursales") && (
-          <Nav.Link
-            as={NavLink}
-            to="/sucursales"
-            className="text-light"
-            onClick={handleNavLinkClick}
-          >
-            <FaStore size={25} className="me-2" /> Sucursales
           </Nav.Link>
         )}
 
@@ -243,6 +231,17 @@ function Sidebar({ show, onClose }) {
               </div>
             </Collapse>
           </>
+        )}
+
+        {isRouteAllowed("/sucursales") && (
+          <Nav.Link
+            as={NavLink}
+            to="/sucursales"
+            className="text-light"
+            onClick={handleNavLinkClick}
+          >
+            <FaStore size={25} className="me-2" /> Sucursales
+          </Nav.Link>
         )}
 
         {/* Configuraciones Dropdown */}

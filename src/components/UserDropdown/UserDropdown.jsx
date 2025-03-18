@@ -1,6 +1,7 @@
 import React from 'react';
 import { Dropdown, Image } from 'react-bootstrap';
 import { FaUser, FaSignOutAlt, FaCog } from 'react-icons/fa';
+import { Link } from 'react-router-dom'; // Importa Link
 import useLogout from '../../services/session/logout';
 
 function UserDropdown() {
@@ -23,14 +24,15 @@ function UserDropdown() {
           <FaUser className="me-2" />
           Perfil
         </Dropdown.Item>
-        <Dropdown.Item href="#settings">
+        {/* Reemplaza el Dropdown.Item con Link */}
+        <Link to="/config/control-panel" className="dropdown-item">
           <FaCog className="me-2" />
-          Configuarciones
-        </Dropdown.Item>
+          Configuraciones
+        </Link>
         <Dropdown.Divider />
         <Dropdown.Item onClick={handleLogout}>
           <FaSignOutAlt className="me-2" />
-          Cerrar Sesion
+          Cerrar Sesión
         </Dropdown.Item>
       </Dropdown.Menu>
     </Dropdown>

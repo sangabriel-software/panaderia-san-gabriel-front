@@ -12,6 +12,7 @@ const getEndpoints = {
     CONSULTAR_VENTAS_USUARIO: "/consultar-venta-por-usuario",
     CONSULTAR_ORDEN_POR_CRITERIOS: "consultar-detalle-por-criterios",
     CONSULTAR_DETALLE_VENTA: "consultar-detalle-venta",
+    CONSULTAR_RECETAS: "consultar-recetas",
 };
 
 const postEndpoints = {
@@ -26,6 +27,7 @@ const postEndpoints = {
     INGRESAR_ORDEN_PRODUCCION: "/ingresar-orden",
     INGRESAR_VENTA: "/ingresar-venta",
     INGRESAR_SUCURSAL: "/ingresarSucursal",
+    INGRESAR_RECETA: "/ingresar-receta"
 };
 
 const putEndpoints = {
@@ -36,6 +38,7 @@ const putEndpoints = {
     ACTUALIZAR_PRODUCTO: "/actualizarProducto",
     ACTUALIZAR_PRECIO: "/actualizarPrecio",
     ACTUALIZAR_SUCURSALES: "/actualizar-sucursal",
+    ACTUALIZAR_RECETA: "/actualizar-receta"
 };
 
 const deleteEndpoints = {
@@ -46,6 +49,7 @@ const deleteEndpoints = {
     ELIMINAR_ORDEN_PRODUCCION: "/eliminar-ordenes-produccion",
     ELMINAR_VENTA: "/eliminar-venta",
     ELMINAR_SUCURSAL: "/eliminarSucursal",
+    ELIMINAR_RECETA: "elminar-receta"
 };
 
 

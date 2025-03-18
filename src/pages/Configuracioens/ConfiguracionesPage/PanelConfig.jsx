@@ -22,7 +22,7 @@ const PanelConfig = () => {
         <Col xs={12} md={6} className="config-col">
           <div
             className="config-section clickable"
-            onClick={() => handleNavigate("/gestionar-materia-prima")}
+            onClick={() => handleNavigate("/config/gestionar-materia-prima")}
           >
             <h2 className="section-title">
               <MdStorage className="section-icon icon-materia-prima" />{" "}
@@ -36,13 +36,13 @@ const PanelConfig = () => {
 
         {/* Sección: Recetas (Deshabilitada) */}
         <Col xs={12} md={6} className="config-col">
-          <div className="config-section disabled">
+          <div className="config-section">
             <h2 className="section-title">
-              <MdKitchen className="section-icon icon-recetas" /> Gestionar
-              Recetas
+              <MdKitchen className="section-icon icon-recetas" /> 
+              Configuracion del perfil
             </h2>
             <p className="section-description">
-              Ingresa y administra las recetas de cada producto del catálogo.
+              Gestioa tus credenciales de acceso y nombre de usuario
             </p>
           </div>
         </Col>

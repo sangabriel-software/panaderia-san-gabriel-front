@@ -51,19 +51,11 @@ const GestionDeSucursalesPage = () => {
   const isMobile = useMediaQuery({ query: "(max-width: 767px)" });
   const [showModal, setShowModal] = useState(false);
   const [editingSucursal, setEditingSucursal] = useState(null); // Estado para guardar la sucursal que se está editando
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false); // Estado para mostrar mensaje de éxito
-  const [showErrorMessage, setShowErrorMessage] = useState(false); // Estado para mostrar mensaje de error
   const [isSaving, setIsSaving] = useState(false); // Estado para controlar el loading del guardado
   const [isLoading, setIsLoading] = useState(false); //Para setear carga de alguna opcion
 
   // Configuración de react-hook-form
-  const {
-    register,
-    handleSubmit,
-    reset,
-    setValue,
-    formState: { errors },
-  } = useForm();
+  const { register, handleSubmit, reset, setValue, formState: { errors }, } = useForm();
 
   // Variables de estado para mostrar popup y almacenar la orden a eliminar
   const [isPopupOpen, setIsPopupOpen] = useState(false); //Abrir pop up de confirmacion de elminacion
@@ -74,17 +66,8 @@ const GestionDeSucursalesPage = () => {
 
   // Enviar datos del formulario
   const onSubmit = async (data) => {
-    await handleIngresarSucursalSubmit(
-      data,
-      setIsSaving,
-      editingSucursal,
-      setSucursales,
-      setIsPopupOpenSuccess,
-      setErrorPopupMessage,
-      setIsPopupErrorOpen,
-      setShowModal,
-      reset
-    );
+    await handleIngresarSucursalSubmit( data, setIsSaving, editingSucursal, setSucursales, setIsPopupOpenSuccess,
+                                        setErrorPopupMessage, setIsPopupErrorOpen, setShowModal, reset );
   };
 
   if (loadingSucursales) {
@@ -119,50 +102,15 @@ const GestionDeSucursalesPage = () => {
         title="Sucursales"
         description="Administración de sucursales activas"
       />
-      <Button
-        variant="primary"
-        className="mb-4"
-        onClick={() =>
-          handleShowModal(
-            null,
-            setEditingSucursal,
-            setValue,
-            reset,
-            setShowModal
-          )
-        }
+      <Button variant="primary" className="mb-4" onClick={() => handleShowModal( null, setEditingSucursal, setValue, reset, setShowModal ) }
       >
         Agregar Sucursal
       </Button>
 
-      {/* Mensajes de éxito y error */}
-      {showSuccessMessage && (
-        <Alert
-          variant="success"
-          onClose={() => setShowSuccessMessage(false)}
-          dismissible
-        >
-          {showSuccessMessage}
-        </Alert>
-      )}
-      {showErrorMessage && (
-        <Alert
-          variant="danger"
-          onClose={() => setShowErrorMessage(false)}
-          dismissible
-        >
-          {showErrorMessage}
-        </Alert>
-      )}
-
+      {/* Card para mostrar sucursales */}
       <Row>
         {sucursales.map((sucursal) => (
-          <Col
-            key={sucursal.idSucursal}
-            md={isMobile ? 12 : 6}
-            lg={4}
-            className="mb-4"
-          >
+          <Col key={sucursal.idSucursal} md={isMobile ? 12 : 6} lg={4} className="mb-4" >
             <Card className="h-100 gestion-card">
               <Card.Header className="gestion-card-header">
                 {sucursal.nombreSucursal}
@@ -171,15 +119,24 @@ const GestionDeSucursalesPage = () => {
                 <div className="flex-grow-1">
                   <div className="d-flex align-items-center mb-2">
                     <FaMapMarkerAlt className="gestion-card-icon" />
-                    <strong>Dirección:</strong> {sucursal.direccionSucursal}
+                    <span className="me-2">
+                      <strong>Dirección:</strong>
+                    </span>{" "}
+                    {sucursal.direccionSucursal}
                   </div>
                   <div className="d-flex align-items-center mb-2">
                     <FaCity className="gestion-card-icon" />
-                    <span> <strong>Municipio:</strong> </span> {sucursal.municipioSucursal}
+                    <span className="me-2">
+                      <strong>Municipio:</strong>
+                    </span>{" "}
+                    {sucursal.municipioSucursal}
                   </div>
                   <div className="d-flex align-items-center mb-2">
-                  <FaPhone className="me-2" />
-                    <span> <strong>Telefono:</strong> </span> {sucursal.telefonoSucursal || "N/A"} 
+                    <FaPhone className="me-2" />
+                    <span className="me-2">
+                      <strong>Teléfono:</strong>
+                    </span>{" "}
+                    {sucursal.telefonoSucursal || "N/A"}
                   </div>
                 </div>
                 <div className="d-flex justify-content-center gap-3 mt-3">
@@ -218,6 +175,7 @@ const GestionDeSucursalesPage = () => {
         ))}
       </Row>
 
+      {/* ----------------Modale para ingreso y modificacion de sucrusales---------------------- */}
       <Modal show={showModal} onHide={() => setShowModal(false)} centered>
         <Modal.Header closeButton className="border-0 pb-0">
           <Modal.Title className="w-100 text-center">
