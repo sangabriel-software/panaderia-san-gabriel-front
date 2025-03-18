@@ -10,7 +10,16 @@ import {
   Form,
 } from "react-bootstrap";
 import { useMediaQuery } from "react-responsive";
-import { FaMapMarkerAlt, FaCity, FaTrash, FaEdit } from "react-icons/fa"; // Íconos
+import {
+  FaMapMarkerAlt,
+  FaCity,
+  FaTrash,
+  FaEdit,
+  FaBuilding,
+  FaMapMarkedAlt,
+  FaPhone,
+  FaEnvelope,
+} from "react-icons/fa"; // Íconos
 import { useForm } from "react-hook-form"; // Para manejar el formulario
 import useGetSucursales from "../../../hooks/sucursales/useGetSucursales";
 import dayjs from "dayjs"; // Importar day.js para manejar fechas
@@ -30,7 +39,10 @@ import ConfirmPopUp from "../../../components/Popup/ConfirmPopup";
 import Title from "../../../components/Title/Title";
 import SuccessPopup from "../../../components/Popup/SuccessPopup";
 import ErrorPopup from "../../../components/Popup/ErrorPopUp";
-import { BsExclamationTriangleFill, BsFillInfoCircleFill } from "react-icons/bs";
+import {
+  BsExclamationTriangleFill,
+  BsFillInfoCircleFill,
+} from "react-icons/bs";
 import Alert from "../../../components/Alerts/Alert";
 
 const GestionDeSucursalesPage = () => {
@@ -77,9 +89,7 @@ const GestionDeSucursalesPage = () => {
 
   if (loadingSucursales) {
     return (
-      <Container
-        className="d-flex justify-content-center align-items-center my-5"
-      >
+      <Container className="d-flex justify-content-center align-items-center my-5">
         <Spinner animation="border" role="status">
           <span className="visually-hidden">Cargando...</span>
         </Spinner>
@@ -89,9 +99,7 @@ const GestionDeSucursalesPage = () => {
 
   if (showErrorSucursales) {
     return (
-      <Container
-        className="justify-content-center align-items-center my-5"
-      >
+      <Container className="justify-content-center align-items-center my-5">
         <div className="row justify-content-center">
           <div className="col-md-6 text-center">
             <Alert
@@ -167,7 +175,11 @@ const GestionDeSucursalesPage = () => {
                   </div>
                   <div className="d-flex align-items-center mb-2">
                     <FaCity className="gestion-card-icon" />
-                    <strong>Municipio:</strong> {sucursal.municipioSucursal}
+                    <span> <strong>Municipio:</strong> </span> {sucursal.municipioSucursal}
+                  </div>
+                  <div className="d-flex align-items-center mb-2">
+                  <FaPhone className="me-2" />
+                    <span> <strong>Telefono:</strong> </span> {sucursal.telefonoSucursal || "N/A"} 
                   </div>
                 </div>
                 <div className="d-flex justify-content-center gap-3 mt-3">
@@ -206,23 +218,26 @@ const GestionDeSucursalesPage = () => {
         ))}
       </Row>
 
-      {/* Modal para agregar o editar sucursal */}
-      <Modal show={showModal} onHide={() => setShowModal(false)}>
-        <Modal.Header closeButton>
-          <Modal.Title>
-            {editingSucursal ? "Editar Sucursal" : "Agregar Nueva Sucursal"}
+      <Modal show={showModal} onHide={() => setShowModal(false)} centered>
+        <Modal.Header closeButton className="border-0 pb-0">
+          <Modal.Title className="w-100 text-center">
+            {editingSucursal ? "Editar Sucursal" : "Nueva Sucursal"}
           </Modal.Title>
         </Modal.Header>
-        <Modal.Body>
+        <Modal.Body className="pt-0 my-2">
           <Form onSubmit={handleSubmit(onSubmit)}>
             <Form.Group className="mb-3">
-              <Form.Label>Nombre de la Sucursal</Form.Label>
+              <Form.Label>
+                <FaBuilding className="me-2" />
+                Nombre de la Sucursal
+              </Form.Label>
               <Form.Control
                 type="text"
                 {...register("nombreSucursal", {
                   required: "Este campo es obligatorio",
                 })}
                 isInvalid={!!errors.nombreSucursal}
+                className="custom-input"
               />
               {errors.nombreSucursal && (
                 <Form.Control.Feedback type="invalid">
@@ -231,13 +246,17 @@ const GestionDeSucursalesPage = () => {
               )}
             </Form.Group>
             <Form.Group className="mb-3">
-              <Form.Label>Dirección</Form.Label>
+              <Form.Label>
+                <FaMapMarkedAlt className="me-2" />
+                Dirección
+              </Form.Label>
               <Form.Control
                 type="text"
                 {...register("direccionSucursal", {
                   required: "Este campo es obligatorio",
                 })}
                 isInvalid={!!errors.direccionSucursal}
+                className="custom-input"
               />
               {errors.direccionSucursal && (
                 <Form.Control.Feedback type="invalid">
@@ -246,13 +265,17 @@ const GestionDeSucursalesPage = () => {
               )}
             </Form.Group>
             <Form.Group className="mb-3">
-              <Form.Label>Municipio</Form.Label>
+              <Form.Label>
+                <FaCity className="me-2" />
+                Municipio
+              </Form.Label>
               <Form.Control
                 type="text"
                 {...register("municipioSucursal", {
                   required: "Este campo es obligatorio",
                 })}
                 isInvalid={!!errors.municipioSucursal}
+                className="custom-input"
               />
               {errors.municipioSucursal && (
                 <Form.Control.Feedback type="invalid">
@@ -261,31 +284,52 @@ const GestionDeSucursalesPage = () => {
               )}
             </Form.Group>
             <Form.Group className="mb-3">
-              <Form.Label>Teléfono</Form.Label>
-              <Form.Control type="number" {...register("telefonoSucursal")} />
+              <Form.Label>
+                <FaPhone className="me-2" />
+                Teléfono
+              </Form.Label>
+              <Form.Control
+                type="number"
+                {...register("telefonoSucursal")}
+                className="custom-input"
+              />
             </Form.Group>
             <Form.Group className="mb-3">
-              <Form.Label>Correo Electrónico</Form.Label>
-              <Form.Control type="email" {...register("correoSucursal")} />
+              <Form.Label>
+                <FaEnvelope className="me-2" />
+                Correo Electrónico
+              </Form.Label>
+              <Form.Control
+                type="email"
+                {...register("correoSucursal")}
+                className="custom-input"
+              />
             </Form.Group>
-            <Button variant="primary" type="submit" disabled={isSaving}>
-              {isSaving ? (
-                <>
-                  <Spinner
-                    as="span"
-                    animation="border"
-                    size="sm"
-                    role="status"
-                    aria-hidden="true"
-                  />
-                  <span className="ms-2">Guardando...</span>
-                </>
-              ) : editingSucursal ? (
-                "Guardar Cambios"
-              ) : (
-                "Guardar"
-              )}
-            </Button>
+            <div className="d-flex justify-content-center">
+              <Button
+                variant="primary"
+                type="submit"
+                disabled={isSaving}
+                className="custom-button"
+              >
+                {isSaving ? (
+                  <>
+                    <Spinner
+                      as="span"
+                      animation="border"
+                      size="sm"
+                      role="status"
+                      aria-hidden="true"
+                    />
+                    <span className="ms-2">Guardando...</span>
+                  </>
+                ) : editingSucursal ? (
+                  "Guardar Cambios"
+                ) : (
+                  "Guardar Sucursal"
+                )}
+              </Button>
+            </div>
           </Form>
         </Modal.Body>
       </Modal>

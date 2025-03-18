@@ -7,8 +7,8 @@
 
 /* Definición de colores */
 :root {
-  --bg-topbar: #3c3658; /* Un poco más oscuro que el sidebar */
-  --bg-sidebar: #262335; /* Morado oscuro extraído de la imagen */
+  --bg-topbar: #343A40; /* Un poco más oscuro que el sidebar */
+  --bg-sidebar: #343A40; /* Morado oscuro extraído de la imagen */
   --bg-hover: #332e45; /* Hover en sidebar, un tono más claro */
   --text-primary: #d8b4fe; /* Morado claro para textos */
   --text-white: #ffffff; /* Texto blanco */
