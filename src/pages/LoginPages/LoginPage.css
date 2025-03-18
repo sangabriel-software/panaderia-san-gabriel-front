@@ -1,6 +1,6 @@
 /* Estilos generales para el contenedor */
 .contenedorLados {
-    background-color: #1E3032;
+    background-color: whitesmoke;
     height: 100vh; /* Forzar que ocupe toda la altura de la pantalla */
     display: flex;
     justify-content: center;
@@ -9,7 +9,7 @@
   
   /* Estilos para el contenedor derecho */
   .derecho {
-    background-color: #1E3032;
+    background-color: whitesmoke; /* Color de fondo */
     display: flex; /* Asegura el centrado del contenido */
     flex-direction: column;
     justify-content: center;
@@ -96,7 +96,7 @@
   .logo-login {
     width: 200px; /* Ajusta el tamaño del logo */
     height: auto; /* Mantén las proporciones */
-    margin: 0; /* Centra el logo */
+    margin: 60px; /* Centra el logo */
     padding: 0;
   }
   

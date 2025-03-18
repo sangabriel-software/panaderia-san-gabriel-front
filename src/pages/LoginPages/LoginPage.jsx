@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-
+import logo from "../../assets/logo.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { handleLogin } from "./loginUtils";
@@ -34,7 +34,7 @@ function LoginPage() {
             <div className="divlogo px-5 ms-xl-4">
               <img
                 className="logo-login"
-                src="https://png.pngtree.com/png-vector/20221122/ourmid/pngtree-bread-logo-illustration-png-image_6458295.png"
+                src={logo}
                 alt="Logo"
                 draggable="false"
               />
