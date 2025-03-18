@@ -245,7 +245,7 @@ function Sidebar({ show, onClose }) {
         )}
 
         {/* Configuraciones Dropdown */}
-        {isRouteAllowed("/config/control-panel") && (
+        {isRouteAllowed("/config") && (
           <>
             <Nav.Link
               className="text-light d-flex justify-content-between align-items-center"
@@ -262,10 +262,10 @@ function Sidebar({ show, onClose }) {
 
             <Collapse in={configOpen}>
               <div>
-                {isRouteAllowed("/config/control-panel") && (
+                {isRouteAllowed("/config") && (
                   <Nav.Link
                     as={NavLink}
-                    to="/config/control-panel"
+                    to="/config"
                     className="text-light ps-4 submenu-item"
                     onClick={handleNavLinkClick}
                   >

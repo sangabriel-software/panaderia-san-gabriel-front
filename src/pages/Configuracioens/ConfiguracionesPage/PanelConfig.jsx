@@ -4,9 +4,13 @@ import { MdStorage, MdKitchen, MdSettings } from "react-icons/md"; // Iconos mod
 import "./PanelConfig.css"; // Archivo CSS para estilos
 import { Container, Row, Col } from "react-bootstrap"; // Componentes de Bootstrap
 import Title from "../../../components/Title/Title";
+import { getUserData } from "../../../utils/Auth/decodedata";
 
 const PanelConfig = () => {
   const navigate = useNavigate();
+  const userData = getUserData();
+
+  console.log(userData)
 
   // Función para redirigir a la página correspondiente
   const handleNavigate = (path) => {

@@ -75,7 +75,7 @@ function App() {
             </Route>
 
             <Route path="/config">
-              <Route path="control-panel" element={<PanelConfig/>} />
+              <Route index element={<PanelConfig/>} />
               <Route path="gestionar-materia-prima" element={<GestionDeRecetasPage/>} />
             </Route>
           </Route>

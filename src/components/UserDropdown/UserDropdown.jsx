@@ -25,7 +25,7 @@ function UserDropdown() {
           Perfil
         </Dropdown.Item>
         {/* Reemplaza el Dropdown.Item con Link */}
-        <Link to="/config/control-panel" className="dropdown-item">
+        <Link to="/config" className="dropdown-item">
           <FaCog className="me-2" />
           Configuraciones
         </Link>
