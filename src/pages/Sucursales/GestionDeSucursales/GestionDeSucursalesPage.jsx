@@ -7,7 +7,8 @@ import useGetSucursales from "../../../hooks/sucursales/useGetSucursales";
 import dayjs from 'dayjs'; // Importar day.js para manejar fechas
 import "./GestionDeSucursalesPage.css";
 import { actualizarSucursalService, elminarSUcursalService, ingresarSucursalService } from '../../../services/sucursales/sucursales.service';
-import { handleShowModal } from './GestionDeSucursales.utils'; // Importar la función desde el archivo de utilidades
+import { handleConfirmDeleteSucursal, handleDeleteSucursal, handleShowModal } from './GestionDeSucursales.utils'; // Importar la función desde el archivo de utilidades
+import ConfirmPopUp from '../../../components/Popup/ConfirmPopup';
 
 const GestionDeSucursalesPage = () => {
     const { sucursales, loadingSucursales, showErrorSucursales, setSucursales } = useGetSucursales();
@@ -20,6 +21,12 @@ const GestionDeSucursalesPage = () => {
 
     // Configuración de react-hook-form
     const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm();
+
+      // Variables de estado para mostrar popup y almacenar la orden a eliminar
+      const [isPopupOpen, setIsPopupOpen] = useState(false);
+      const [errorPopupMessage, setErrorPopupMessage] = useState(false);
+      const [isPopupErrorOpen, setIsPopupErrorOpen] = useState(false);
+      const [sucursalToDelete, setSucursalToDelete] = useState(null);
 
     // Enviar datos del formulario
     const onSubmit = async (data) => {
@@ -97,136 +104,205 @@ const GestionDeSucursalesPage = () => {
     }
 
     return (
-        <Container className="my-5">
-            <h1 className="text-center mb-4">Gestión de Sucursales</h1>
-            <Button variant="primary" className="mb-4" onClick={() => handleShowModal(null, setEditingSucursal, setValue, reset, setShowModal)}>
-                Agregar Sucursal
-            </Button>
+      <Container className="my-5">
+        <h1 className="text-center mb-4">Gestión de Sucursales</h1>
+        <Button
+          variant="primary"
+          className="mb-4"
+          onClick={() =>
+            handleShowModal(
+              null,
+              setEditingSucursal,
+              setValue,
+              reset,
+              setShowModal
+            )
+          }
+        >
+          Agregar Sucursal
+        </Button>
 
-            {/* Mensajes de éxito y error */}
-            {showSuccessMessage && (
-                <Alert variant="success" onClose={() => setShowSuccessMessage(false)} dismissible>
-                    {showSuccessMessage}
-                </Alert>
-            )}
-            {showErrorMessage && (
-                <Alert variant="danger" onClose={() => setShowErrorMessage(false)} dismissible>
-                    {showErrorMessage}
-                </Alert>
-            )}
+        {/* Mensajes de éxito y error */}
+        {showSuccessMessage && (
+          <Alert
+            variant="success"
+            onClose={() => setShowSuccessMessage(false)}
+            dismissible
+          >
+            {showSuccessMessage}
+          </Alert>
+        )}
+        {showErrorMessage && (
+          <Alert
+            variant="danger"
+            onClose={() => setShowErrorMessage(false)}
+            dismissible
+          >
+            {showErrorMessage}
+          </Alert>
+        )}
 
-            <Row>
-                {sucursales.map((sucursal) => (
-                    <Col key={sucursal.idSucursal} md={isMobile ? 12 : 6} lg={4} className="mb-4">
-                        <Card className="h-100 gestion-card">
-                            <Card.Header className="gestion-card-header">
-                                {sucursal.nombreSucursal}
-                            </Card.Header>
-                            <Card.Body className="gestion-card-body">
-                                <div className="flex-grow-1">
-                                    <div className="d-flex align-items-center mb-2">
-                                        <FaMapMarkerAlt className="gestion-card-icon" />
-                                        <strong>Dirección:</strong> {sucursal.direccionSucursal}
-                                    </div>
-                                    <div className="d-flex align-items-center mb-2">
-                                        <FaCity className="gestion-card-icon" />
-                                        <strong>Municipio:</strong> {sucursal.municipioSucursal}
-                                    </div>
-                                </div>
-                                <div className="d-flex justify-content-center gap-3 mt-3">
-                                    <Button variant="outline-primary" className="gestion-card-button gestion-card-button-primary" onClick={() => handleShowModal(sucursal, setEditingSucursal, setValue, reset, setShowModal)}>
-                                        <FaEdit /> Editar
-                                    </Button>
-                                    <Button variant="outline-danger" className="gestion-card-button gestion-card-button-danger" onClick={() => handleDelete(sucursal.idSucursal)}>
-                                        <FaTrash /> Eliminar
-                                    </Button>
-                                </div>
-                            </Card.Body>
-                        </Card>
-                    </Col>
-                ))}
-            </Row>
+        <Row>
+          {sucursales.map((sucursal) => (
+            <Col
+              key={sucursal.idSucursal}
+              md={isMobile ? 12 : 6}
+              lg={4}
+              className="mb-4"
+            >
+              <Card className="h-100 gestion-card">
+                <Card.Header className="gestion-card-header">
+                  {sucursal.nombreSucursal}
+                </Card.Header>
+                <Card.Body className="gestion-card-body">
+                  <div className="flex-grow-1">
+                    <div className="d-flex align-items-center mb-2">
+                      <FaMapMarkerAlt className="gestion-card-icon" />
+                      <strong>Dirección:</strong> {sucursal.direccionSucursal}
+                    </div>
+                    <div className="d-flex align-items-center mb-2">
+                      <FaCity className="gestion-card-icon" />
+                      <strong>Municipio:</strong> {sucursal.municipioSucursal}
+                    </div>
+                  </div>
+                  <div className="d-flex justify-content-center gap-3 mt-3">
+                    <Button
+                      variant="outline-primary"
+                      className="gestion-card-button gestion-card-button-primary"
+                      onClick={() =>
+                        handleShowModal(
+                          sucursal,
+                          setEditingSucursal,
+                          setValue,
+                          reset,
+                          setShowModal
+                        )
+                      }
+                    >
+                      <FaEdit /> Editar
+                    </Button>
+                    <Button
+                      variant="outline-danger"
+                      className="gestion-card-button gestion-card-button-danger"
+                      onClick={() =>
+                                        handleConfirmDeleteSucursal(
+                                          sucursal.idSucursal,
+                                          setSucursalToDelete,
+                                          setIsPopupOpen
+                                        )
+                                      }
+                    >
+                      <FaTrash /> Eliminar
+                    </Button>
+                  </div>
+                </Card.Body>
+              </Card>
+            </Col>
+          ))}
+        </Row>
 
-            {/* Modal para agregar o editar sucursal */}
-            <Modal show={showModal} onHide={() => setShowModal(false)}>
-                <Modal.Header closeButton>
-                    <Modal.Title>{editingSucursal ? "Editar Sucursal" : "Agregar Nueva Sucursal"}</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <Form onSubmit={handleSubmit(onSubmit)}>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Nombre de la Sucursal</Form.Label>
-                            <Form.Control
-                                type="text"
-                                {...register("nombreSucursal", { required: "Este campo es obligatorio" })}
-                                isInvalid={!!errors.nombreSucursal}
-                            />
-                            {errors.nombreSucursal && (
-                                <Form.Control.Feedback type="invalid">
-                                    {errors.nombreSucursal.message}
-                                </Form.Control.Feedback>
-                            )}
-                        </Form.Group>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Dirección</Form.Label>
-                            <Form.Control
-                                type="text"
-                                {...register("direccionSucursal", { required: "Este campo es obligatorio" })}
-                                isInvalid={!!errors.direccionSucursal}
-                            />
-                            {errors.direccionSucursal && (
-                                <Form.Control.Feedback type="invalid">
-                                    {errors.direccionSucursal.message}
-                                </Form.Control.Feedback>
-                            )}
-                        </Form.Group>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Municipio</Form.Label>
-                            <Form.Control
-                                type="text"
-                                {...register("municipioSucursal", { required: "Este campo es obligatorio" })}
-                                isInvalid={!!errors.municipioSucursal}
-                            />
-                            {errors.municipioSucursal && (
-                                <Form.Control.Feedback type="invalid">
-                                    {errors.municipioSucursal.message}
-                                </Form.Control.Feedback>
-                            )}
-                        </Form.Group>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Teléfono</Form.Label>
-                            <Form.Control
-                                type="number"
-                                {...register("telefonoSucursal")}
-                            />
-                        </Form.Group>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Correo Electrónico</Form.Label>
-                            <Form.Control
-                                type="email"
-                                {...register("correoSucursal")}
-                            />
-                        </Form.Group>
-                        <Button variant="primary" type="submit" disabled={isSaving}>
-                            {isSaving ? (
-                                <>
-                                    <Spinner
-                                        as="span"
-                                        animation="border"
-                                        size="sm"
-                                        role="status"
-                                        aria-hidden="true"
-                                    />
-                                    <span className="ms-2">Guardando...</span>
-                                </>
-                            ) : (
-                                editingSucursal ? "Guardar Cambios" : "Guardar"
-                            )}
-                        </Button>
-                    </Form>
-                </Modal.Body>
-            </Modal>
-        </Container>
+        {/* Modal para agregar o editar sucursal */}
+        <Modal show={showModal} onHide={() => setShowModal(false)}>
+          <Modal.Header closeButton>
+            <Modal.Title>
+              {editingSucursal ? "Editar Sucursal" : "Agregar Nueva Sucursal"}
+            </Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <Form onSubmit={handleSubmit(onSubmit)}>
+              <Form.Group className="mb-3">
+                <Form.Label>Nombre de la Sucursal</Form.Label>
+                <Form.Control
+                  type="text"
+                  {...register("nombreSucursal", {
+                    required: "Este campo es obligatorio",
+                  })}
+                  isInvalid={!!errors.nombreSucursal}
+                />
+                {errors.nombreSucursal && (
+                  <Form.Control.Feedback type="invalid">
+                    {errors.nombreSucursal.message}
+                  </Form.Control.Feedback>
+                )}
+              </Form.Group>
+              <Form.Group className="mb-3">
+                <Form.Label>Dirección</Form.Label>
+                <Form.Control
+                  type="text"
+                  {...register("direccionSucursal", {
+                    required: "Este campo es obligatorio",
+                  })}
+                  isInvalid={!!errors.direccionSucursal}
+                />
+                {errors.direccionSucursal && (
+                  <Form.Control.Feedback type="invalid">
+                    {errors.direccionSucursal.message}
+                  </Form.Control.Feedback>
+                )}
+              </Form.Group>
+              <Form.Group className="mb-3">
+                <Form.Label>Municipio</Form.Label>
+                <Form.Control
+                  type="text"
+                  {...register("municipioSucursal", {
+                    required: "Este campo es obligatorio",
+                  })}
+                  isInvalid={!!errors.municipioSucursal}
+                />
+                {errors.municipioSucursal && (
+                  <Form.Control.Feedback type="invalid">
+                    {errors.municipioSucursal.message}
+                  </Form.Control.Feedback>
+                )}
+              </Form.Group>
+              <Form.Group className="mb-3">
+                <Form.Label>Teléfono</Form.Label>
+                <Form.Control type="number" {...register("telefonoSucursal")} />
+              </Form.Group>
+              <Form.Group className="mb-3">
+                <Form.Label>Correo Electrónico</Form.Label>
+                <Form.Control type="email" {...register("correoSucursal")} />
+              </Form.Group>
+              <Button variant="primary" type="submit" disabled={isSaving}>
+                {isSaving ? (
+                  <>
+                    <Spinner
+                      as="span"
+                      animation="border"
+                      size="sm"
+                      role="status"
+                      aria-hidden="true"
+                    />
+                    <span className="ms-2">Guardando...</span>
+                  </>
+                ) : editingSucursal ? (
+                  "Guardar Cambios"
+                ) : (
+                  "Guardar"
+                )}
+              </Button>
+            </Form>
+          </Modal.Body>
+        </Modal>
+
+        {/* Popup confirmacion de eliminación */}
+        <ConfirmPopUp
+          isOpen={isPopupOpen}
+          onClose={() => setIsPopupOpen(false)}
+          title="Confirmar Eliminación"
+          message="¿Está seguro de eliminar la orden?"
+          onConfirm={() => {
+            handleDeleteSucursal(
+              sucursalToDelete,
+              setSucursales,
+              setIsPopupOpen,
+              setErrorPopupMessage,
+              setIsPopupErrorOpen
+            );
+          }}
+          onCancel={() => setIsPopupOpen(false)}
+        />
+      </Container>
     );
 };
 
