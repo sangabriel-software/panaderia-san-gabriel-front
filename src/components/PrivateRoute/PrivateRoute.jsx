@@ -14,7 +14,6 @@ const PrivateRoute = () => {
   // Rutas que no requieren verificación de permisos
   const exclusiones = {
     config: "/config",
-    home: "/home", // Otras rutas excluidas
   };
 
   // Función para verificar si el token ha expirado

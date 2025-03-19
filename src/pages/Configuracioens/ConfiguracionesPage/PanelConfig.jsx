@@ -1,21 +1,19 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { MdStorage, MdKitchen, MdSettings } from "react-icons/md"; // Iconos modernos
-import "./PanelConfig.css"; // Archivo CSS para estilos
-import { Container, Row, Col } from "react-bootstrap"; // Componentes de Bootstrap
+import { MdStorage, MdKitchen, MdSettings } from "react-icons/md";
+import "./PanelConfig.css";
+import { Container, Row, Col } from "react-bootstrap";
 import Title from "../../../components/Title/Title";
-import { getUserData } from "../../../utils/Auth/decodedata";
+import useValidarPermisos from "../../../hooks/configuraciones/useValidarPermisos";
+import { rutas } from "./config.routes";
+import { handleNavigate } from "./PanelConfig.utils";
+
 
 const PanelConfig = () => {
   const navigate = useNavigate();
-  const userData = getUserData();
 
-  console.log(userData)
-
-  // Función para redirigir a la página correspondiente
-  const handleNavigate = (path) => {
-    navigate(path);
-  };
+  // Usar el custom hook para obtener los permisos
+  const permisos = useValidarPermisos(rutas);
 
   return (
     <Container className="panel-config-container">
@@ -25,8 +23,13 @@ const PanelConfig = () => {
         {/* Sección: Materia Prima */}
         <Col xs={12} md={6} className="config-col">
           <div
-            className="config-section clickable"
-            onClick={() => handleNavigate("/config/gestionar-materia-prima")}
+            className={`config-section ${
+              permisos.gestionarMateriaPrima ? "clickable" : "disabled"
+            }`}
+            onClick={() =>
+              permisos.gestionarMateriaPrima &&
+              handleNavigate("/config/gestionar-materia-prima", navigate)
+            }
           >
             <h2 className="section-title">
               <MdStorage className="section-icon icon-materia-prima" />{" "}
@@ -38,22 +41,38 @@ const PanelConfig = () => {
           </div>
         </Col>
 
-        {/* Sección: Recetas (Deshabilitada) */}
+        {/* Sección: Configuración del Perfil */}
         <Col xs={12} md={6} className="config-col">
-          <div className="config-section">
+          <div
+            className={`config-section ${
+              permisos.configuracionPerfil ? "clickable" : "disabled"
+            }`}
+            onClick={() =>
+              permisos.configuracionPerfil &&
+              handleNavigate("/config/configuracion-perfil", navigate)
+            }
+          >
             <h2 className="section-title">
               <MdKitchen className="section-icon icon-recetas" /> 
-              Configuracion del perfil
+              Configuración del Perfil
             </h2>
             <p className="section-description">
-              Gestioa tus credenciales de acceso y nombre de usuario
+              Gestiona tus credenciales de acceso y nombre de usuario.
             </p>
           </div>
         </Col>
 
-        {/* Sección: Otras Configuraciones (Deshabilitada) */}
+        {/* Sección: Otras Configuraciones */}
         <Col xs={12} md={6} className="config-col">
-          <div className="config-section disabled">
+          <div
+            className={`config-section ${
+              permisos.otrasConfiguraciones ? "clickable" : "disabled"
+            }`}
+            onClick={() =>
+              permisos.otrasConfiguraciones &&
+              handleNavigate("/config/otras-configuraciones", navigate)
+            }
+          >
             <h2 className="section-title">
               <MdSettings className="section-icon icon-otras-config" /> Otras
               Configuraciones
