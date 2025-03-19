@@ -1,6 +1,6 @@
 /* Estilos generales para el contenedor */
 .contenedorLados {
-  background-color: #F5F5F5; /* Fondo gris claro */
+  background-color: #ffff; /* Fondo gris claro */
   height: 100vh; /* Forzar que ocupe toda la altura de la pantalla */
   display: flex;
   justify-content: center;
@@ -127,7 +127,7 @@
     margin-left: 100px;
     justify-content: center; /* Centra el contenido verticalmente */
     align-items: center; /* Centra el contenido horizontalmente */
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); /* Sombra suave */
+
     padding-top: 10px;
     border-radius: 15px; /* Bordes redondeados */
   }

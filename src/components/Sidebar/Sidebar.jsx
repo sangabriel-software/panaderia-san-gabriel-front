@@ -245,7 +245,6 @@ function Sidebar({ show, onClose }) {
         )}
 
         {/* Configuraciones Dropdown */}
-        {isRouteAllowed("/config") && (
           <>
             <Nav.Link
               className="text-light d-flex justify-content-between align-items-center"
@@ -262,7 +261,6 @@ function Sidebar({ show, onClose }) {
 
             <Collapse in={configOpen}>
               <div>
-                {isRouteAllowed("/config") && (
                   <Nav.Link
                     as={NavLink}
                     to="/config"
@@ -271,11 +269,9 @@ function Sidebar({ show, onClose }) {
                   >
                     <MdDashboard className="me-2" /> Panel de control
                   </Nav.Link>
-                )}
               </div>
             </Collapse>
           </>
-        )}
       </Nav>
 
       {/* Toggle Switch para el tema */}
