@@ -1,23 +1,26 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { MdStorage, MdKitchen, MdSettings } from "react-icons/md";
-import "./PanelConfig.css";
+import { MdStorage, MdKitchen, MdSettings, MdOutlineSettings, } from "react-icons/md"; // Importar el ícono
 import { Container, Row, Col } from "react-bootstrap";
 import Title from "../../../components/Title/Title";
 import useValidarPermisos from "../../../hooks/configuraciones/useValidarPermisos";
 import { rutas } from "./config.routes";
 import { handleNavigate } from "./PanelConfig.utils";
-
+import "./PanelConfig.css";
 
 const PanelConfig = () => {
   const navigate = useNavigate();
-
-  // Usar el custom hook para obtener los permisos
-  const permisos = useValidarPermisos(rutas);
+  const permisos = useValidarPermisos(rutas); // Usar el custom hook para obtener los permisos
 
   return (
     <Container className="panel-config-container">
-      <Title title="Panel de configuraciones" />
+      {/* Contenedor centrado para el ícono y el título */}
+      <div className="config-title-container d-flex justify-content-center align-items-center mb-4">
+        <div className="d-flex align-items-center">
+          <MdOutlineSettings className="config-title-icon" size={30} />
+          <Title title="Configuraciones" />
+        </div>
+      </div>
 
       <Row className="my-4">
         {/* Sección: Materia Prima */}
@@ -53,7 +56,7 @@ const PanelConfig = () => {
             }
           >
             <h2 className="section-title">
-              <MdKitchen className="section-icon icon-recetas" /> 
+              <MdKitchen className="section-icon icon-recetas" />
               Configuración del Perfil
             </h2>
             <p className="section-description">

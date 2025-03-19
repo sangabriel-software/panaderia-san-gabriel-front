@@ -69,3 +69,14 @@
   .icon-otras-config {
     color: #3F51B5; /* Azul */
   }
+
+/* Estilo para el ícono del título */
+.config-title-icon {
+  color: #007bff; /* Color azul */
+  margin-right: 10px; /* Espaciado a la derecha */
+}
+
+/* Estilo para el contenedor del título */
+.config-title-container {
+  margin-bottom: 20px; /* Espaciado inferior */
+}
