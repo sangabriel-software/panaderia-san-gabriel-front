@@ -3,7 +3,7 @@ import { Container, Row, Col, Accordion, Button, Modal, Form } from "react-boots
 import useGetRecetas from "../../hooks/recetas/useGetRecetas";
 import DotsMove from "../../components/Spinners/DotsMove";
 import Alert from "../../components/Alerts/Alert";
-import { BsExclamationTriangleFill, BsPencil, BsTrash, BsPlus } from "react-icons/bs";
+import { BsExclamationTriangleFill, BsPencil, BsTrash, BsPlus, BsBox, BsClipboardData, BsCalculator } from "react-icons/bs";
 
 const GestionDeRecetasPage = () => {
   const { recetas, loadingRecetas, showErrorRecetas, showInfoRecetas, setRecetas } = useGetRecetas();
@@ -78,8 +78,8 @@ const GestionDeRecetasPage = () => {
     <Container className="my-5">
       <Row className="mb-4">
         <Col>
-          <Button variant="primary" onClick={handleAddReceta}>
-            <BsPlus /> Agregar Nueva Receta
+          <Button variant="primary" onClick={handleAddReceta} className="d-flex align-items-center">
+            <BsPlus className="me-2" /> Agregar Nueva Receta
           </Button>
         </Col>
       </Row>
@@ -89,22 +89,28 @@ const GestionDeRecetasPage = () => {
             {recetas.map((receta, index) => (
               <Accordion.Item key={receta.idReceta} eventKey={index.toString()} className="mb-3 shadow-sm">
                 <Accordion.Header>
-                  <div className="d-flex justify-content-between w-100">
-                    <span className="fw-bold">{receta.nombreProducto}</span>
+                  <div className="d-flex justify-content-between w-100 align-items-center">
+                    <span className="fw-bold d-flex align-items-center">
+                      <BsBox className="me-2" /> {receta.nombreProducto}
+                    </span>
                   </div>
                 </Accordion.Header>
                 <Accordion.Body>
                   <Row>
                     <Col>
-                      <p><strong>Ingrediente:</strong> {receta.nombreIngrediente}</p>
-                      <p><strong>Cantidad:</strong> {receta.cantidadNecesaria} {receta.unidadMedida}</p>
+                      <p className="d-flex align-items-center">
+                        <BsClipboardData className="me-2" /> <strong>Ingrediente:</strong> {receta.nombreIngrediente}
+                      </p>
+                      <p className="d-flex align-items-center">
+                        <BsCalculator className="me-2" /> <strong>Cantidad:</strong> {receta.cantidadNecesaria} {receta.unidadMedida}
+                      </p>
                     </Col>
                     <Col className="d-flex justify-content-end align-items-center">
-                      <Button variant="outline-primary" onClick={() => handleEditReceta(receta)} className="me-2">
-                        <BsPencil /> Editar
+                      <Button variant="outline-primary" onClick={() => handleEditReceta(receta)} className="me-2 d-flex align-items-center">
+                        <BsPencil className="me-2" /> Editar
                       </Button>
-                      <Button variant="outline-danger" onClick={() => handleDeleteReceta(receta)}>
-                        <BsTrash /> Eliminar
+                      <Button variant="outline-danger" onClick={() => handleDeleteReceta(receta)} className="d-flex align-items-center">
+                        <BsTrash className="me-2" /> Eliminar
                       </Button>
                     </Col>
                   </Row>
