@@ -1,44 +1,225 @@
-import { Container } from "react-bootstrap";
+import React, { useState } from "react";
+import { Container, Row, Col, Accordion, Button, Modal, Form } from "react-bootstrap";
 import useGetRecetas from "../../hooks/recetas/useGetRecetas";
 import DotsMove from "../../components/Spinners/DotsMove";
 import Alert from "../../components/Alerts/Alert";
-import { BsExclamationTriangleFill } from "react-icons/bs";
+import { BsExclamationTriangleFill, BsPencil, BsTrash, BsPlus } from "react-icons/bs";
 
 const GestionDeRecetasPage = () => {
   const { recetas, loadingRecetas, showErrorRecetas, showInfoRecetas, setRecetas } = useGetRecetas();
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedReceta, setSelectedReceta] = useState(null);
+
+  const handleAddReceta = () => {
+    setShowAddModal(true);
+  };
+
+  const handleEditReceta = (receta) => {
+    setSelectedReceta(receta);
+    setShowEditModal(true);
+  };
+
+  const handleDeleteReceta = (receta) => {
+    setSelectedReceta(receta);
+    setShowDeleteModal(true);
+  };
+
+  const handleSaveReceta = (newReceta) => {
+    // Lógica para guardar la nueva receta
+    setRecetas([...recetas, newReceta]);
+    setShowAddModal(false);
+  };
+
+  const handleUpdateReceta = (updatedReceta) => {
+    // Lógica para actualizar la receta
+    const updatedRecetas = recetas.map(receta =>
+      receta.idReceta === updatedReceta.idReceta ? updatedReceta : receta
+    );
+    setRecetas(updatedRecetas);
+    setShowEditModal(false);
+  };
+
+  const handleConfirmDelete = () => {
+    // Lógica para eliminar la receta
+    const filteredRecetas = recetas.filter(receta => receta.idReceta !== selectedReceta.idReceta);
+    setRecetas(filteredRecetas);
+    setShowDeleteModal(false);
+  };
 
   console.log(recetas);
 
   if (loadingRecetas) {
     return (
-      <Container
-        className="d-flex justify-content-center align-items-center"
-        style={{ minHeight: "70vh" }} // Asegura que el contenedor ocupe toda la altura de la pantalla
-      >
-        <div>
-          <DotsMove />
-        </div>
+      <Container className="d-flex justify-content-center align-items-center" style={{ minHeight: "70vh" }}>
+        <DotsMove />
       </Container>
     );
   }
 
-    if (showErrorRecetas) {
-      return (
-        <Container className="justify-content-center align-items-center my-5">
-          <div className="row justify-content-center">
-            <div className="col-md-8 text-center">
-              <Alert
-                type="danger"
-                message="Hubo un error al consultar los productos y sus ingrdientes."
-                icon={<BsExclamationTriangleFill />}
-              />
-            </div>
-          </div>
-        </Container>
-      );
-    }
+  if (showErrorRecetas) {
+    return (
+      <Container className="justify-content-center align-items-center my-5">
+        <Row className="justify-content-center">
+          <Col md={8} className="text-center">
+            <Alert
+              type="danger"
+              message="Hubo un error al consultar los productos y sus ingredientes."
+              icon={<BsExclamationTriangleFill />}
+            />
+          </Col>
+        </Row>
+      </Container>
+    );
+  }
 
-  return <p>recetas</p>;
+  return (
+    <Container className="my-5">
+      <Row className="mb-4">
+        <Col>
+          <Button variant="primary" onClick={handleAddReceta}>
+            <BsPlus /> Agregar Nueva Receta
+          </Button>
+        </Col>
+      </Row>
+      <Row>
+        <Col>
+          <Accordion>
+            {recetas.map((receta, index) => (
+              <Accordion.Item key={receta.idReceta} eventKey={index.toString()} className="mb-3 shadow-sm">
+                <Accordion.Header>
+                  <div className="d-flex justify-content-between w-100">
+                    <span className="fw-bold">{receta.nombreProducto}</span>
+                  </div>
+                </Accordion.Header>
+                <Accordion.Body>
+                  <Row>
+                    <Col>
+                      <p><strong>Ingrediente:</strong> {receta.nombreIngrediente}</p>
+                      <p><strong>Cantidad:</strong> {receta.cantidadNecesaria} {receta.unidadMedida}</p>
+                    </Col>
+                    <Col className="d-flex justify-content-end align-items-center">
+                      <Button variant="outline-primary" onClick={() => handleEditReceta(receta)} className="me-2">
+                        <BsPencil /> Editar
+                      </Button>
+                      <Button variant="outline-danger" onClick={() => handleDeleteReceta(receta)}>
+                        <BsTrash /> Eliminar
+                      </Button>
+                    </Col>
+                  </Row>
+                </Accordion.Body>
+              </Accordion.Item>
+            ))}
+          </Accordion>
+        </Col>
+      </Row>
+
+      {/* Modal para agregar nueva receta */}
+      <Modal show={showAddModal} onHide={() => setShowAddModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Agregar Nueva Receta</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form>
+            <Form.Group className="mb-3">
+              <Form.Label>Producto</Form.Label>
+              <Form.Control as="select">
+                {/* Aquí puedes mapear los productos disponibles */}
+                <option>Producto 1</option>
+                <option>Producto 2</option>
+              </Form.Control>
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Ingrediente</Form.Label>
+              <Form.Control as="select">
+                {/* Aquí puedes mapear los ingredientes disponibles */}
+                <option>Ingrediente 1</option>
+                <option>Ingrediente 2</option>
+              </Form.Control>
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Cantidad</Form.Label>
+              <Form.Control type="number" placeholder="Cantidad" />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Unidad de Medida</Form.Label>
+              <Form.Control type="text" placeholder="Unidad de Medida" />
+            </Form.Group>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowAddModal(false)}>
+            Cancelar
+          </Button>
+          <Button variant="primary" onClick={handleSaveReceta}>
+            Guardar
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Modal para editar receta */}
+      <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Editar Receta</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form>
+            <Form.Group className="mb-3">
+              <Form.Label>Producto</Form.Label>
+              <Form.Control as="select" defaultValue={selectedReceta?.idProducto}>
+                {/* Aquí puedes mapear los productos disponibles */}
+                <option>Producto 1</option>
+                <option>Producto 2</option>
+              </Form.Control>
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Ingrediente</Form.Label>
+              <Form.Control as="select" defaultValue={selectedReceta?.idIngrediente}>
+                {/* Aquí puedes mapear los ingredientes disponibles */}
+                <option>Ingrediente 1</option>
+                <option>Ingrediente 2</option>
+              </Form.Control>
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Cantidad</Form.Label>
+              <Form.Control type="number" defaultValue={selectedReceta?.cantidadNecesaria} />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Unidad de Medida</Form.Label>
+              <Form.Control type="text" defaultValue={selectedReceta?.unidadMedida} />
+            </Form.Group>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowEditModal(false)}>
+            Cancelar
+          </Button>
+          <Button variant="primary" onClick={() => handleUpdateReceta(selectedReceta)}>
+            Guardar Cambios
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Modal para confirmar eliminación */}
+      <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirmar Eliminación</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          ¿Estás seguro de que deseas eliminar la receta de {selectedReceta?.nombreProducto}?
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
+            Cancelar
+          </Button>
+          <Button variant="danger" onClick={handleConfirmDelete}>
+            Eliminar
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </Container>
+  );
 };
 
 export default GestionDeRecetasPage;
