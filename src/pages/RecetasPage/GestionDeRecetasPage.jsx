@@ -116,22 +116,26 @@ const GestionDeRecetasPage = () => {
   return (
     <Container>
       {/* Toast para el mensaje flotante */}
-      <ToastContainer position="top-end" className="p-3" style={{ marginTop: "80px" }}>
-        <Toast
-          show={showToast}
-          onClose={() => setShowToast(false)}
-          delay={10000} // Duración antes de desaparecer
-          autohide // Desaparece automáticamente
-        >
-          <Toast.Header>
-            <strong className="me-auto">Configuración de ingredientes</strong>
-            <small>Ahora</small>
-          </Toast.Header>
-          <Toast.Body>
-            Configura los ingredientes de cada producto para que se muestren en las órdenes de producción.
-          </Toast.Body>
-        </Toast>
-      </ToastContainer>
+{/* Toast para el mensaje flotante */}
+<ToastContainer position="top-end" className="p-3" style={{ marginTop: "80px" }}>
+  <Toast
+    show={showToast}
+    onClose={() => setShowToast(false)}
+    delay={5000} // Duración antes de desaparecer
+    autohide // Desaparece automáticamente
+    className="custom-toast" // Clase personalizada para el Toast
+  >
+    <Toast.Header className="custom-toast-header">
+      <strong className="me-auto">Configuración de ingredientes</strong>
+      <small>Ahora</small>
+    </Toast.Header>
+    <Toast.Body className="custom-toast-body">
+      Configura los ingredientes de cada producto para que se muestren en las órdenes de producción.
+    </Toast.Body>
+    {/* Barra de progreso */}
+    <div className="toast-progress-bar" style={{ width: "100%" }}></div>
+  </Toast>
+</ToastContainer>
 
       {/* Encabezado */}
       <div className="text-center mb-3">

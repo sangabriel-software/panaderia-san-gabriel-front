@@ -13,7 +13,7 @@
 .custom-accordion-header {
   background-color: #E9F4FF;
   padding: 1rem;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid #1463B4;
   transition: background-color 0.3s ease;
 }
 
@@ -23,7 +23,8 @@
 
 .custom-accordion-body {
   padding: 1rem;
-  background-color: #FBBA2A;
+  background-color: #FFFFFF;
+  border: 1px solid #1463B4;
 }
 
 .custom-button {
@@ -156,3 +157,42 @@
 .custom-button-cancel:hover {
   background-color: #a71d2a;
 }
+
+/* Estilos para el Toast */
+.custom-toast {
+    background-color: #e3f2fd; /* Fondo azul claro */
+    border: 1px solid #90caf9; /* Borde azul */
+    border-radius: 8px; /* Bordes redondeados */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave */
+  }
+  
+  .custom-toast-header {
+    background-color: #bbdefb; /* Fondo azul más oscuro para el encabezado */
+    border-bottom: 1px solid #90caf9; /* Borde inferior */
+    color: #0d47a1; /* Color del texto */
+    font-weight: bold; /* Texto en negrita */
+    border-radius: 8px 8px 0 0; /* Bordes redondeados solo arriba */
+  }
+  
+  .custom-toast-body {
+    color: #1565c0; /* Color del texto del cuerpo */
+    font-size: 14px; /* Tamaño del texto */
+  }
+  
+  /* Barra de progreso */
+  .toast-progress-bar {
+    height: 4px; /* Altura de la barra */
+    background-color: #64b5f6; /* Color de la barra */
+    animation: progress-bar 10s linear forwards; /* Animación de 10 segundos */
+    border-radius: 0 0 8px 8px; /* Bordes redondeados solo abajo */
+  }
+  
+  /* Animación para la barra de progreso */
+  @keyframes progress-bar {
+    from {
+      width: 100%; /* Comienza con el 100% de ancho */
+    }
+    to {
+      width: 0%; /* Termina con el 0% de ancho */
+    }
+  }
