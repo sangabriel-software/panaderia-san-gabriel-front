@@ -81,49 +81,54 @@ const GestionDeRecetasPage = () => {
       </Row>
 
       <Row>
-        <Col>
-          <Accordion>
-            {recetas.map((receta, index) => (
-              <Accordion.Item key={receta.idReceta} eventKey={index.toString()} className="mb-3 shadow-sm custom-accordion-item">
-                <Accordion.Header className="custom-accordion-header">
-                  <div className="d-flex justify-content-between w-100 align-items-center">
-                    <span className="fw-bold d-flex align-items-center">
-                      {receta.nombreProducto}
-                    </span>
-                  </div>
-                </Accordion.Header>
-                <Accordion.Body className="custom-accordion-body">
-                  <Row>
-                    <Col>
-                      <p className="d-flex align-items-center">
-                        <BsClipboardData className="me-2" style={{ color: "#198754" }} />
-                        <strong>Ingrediente:</strong> {receta.nombreIngrediente}
-                      </p>
-                      <p className="d-flex align-items-center">
-                        <BsCalculator className="me-2" style={{ color: "#ffc107" }} />
-                        <strong>Cantidad:</strong> {receta.cantidadNecesaria} {receta.unidadMedida}
-                      </p>
-                    </Col>
-                    <Col className="d-flex justify-content-end align-items-center">
-                      <Button variant="outline-primary" onClick={() => handleEditReceta(receta)} className="me-2 d-flex align-items-center custom-button">
-                        <BsPencil className="me-2" /> Editar
-                      </Button>
-                      <Button variant="outline-danger" onClick={() => handleDeleteReceta(receta)} className="d-flex align-items-center">
-                        <BsTrash className="me-2" /> Eliminar
-                      </Button>
-                    </Col>
-                  </Row>
-                </Accordion.Body>
-              </Accordion.Item>
-            ))}
-          </Accordion>
-        </Col>
+  <Col>
+    <Accordion>
+      {/* Mapear las recetas en dos columnas */}
+      <Row>
+        {recetas.map((receta, index) => (
+          <Col key={receta.idReceta} xs={12} md={6} className="mb-3">
+            <Accordion.Item eventKey={index.toString()} className="shadow-sm custom-accordion-item">
+              <Accordion.Header className="custom-accordion-header">
+                <div className="d-flex justify-content-between w-100 align-items-center">
+                  <span className="fw-bold d-flex align-items-center">
+                    {receta.nombreProducto}
+                  </span>
+                </div>
+              </Accordion.Header>
+              <Accordion.Body className="custom-accordion-body">
+                <Row>
+                  <Col>
+                    <p className="d-flex align-items-center">
+                      <BsClipboardData className="me-2" style={{ color: "#198754" }} />
+                      <strong>Ingrediente:</strong> {receta.nombreIngrediente}
+                    </p>
+                    <p className="d-flex align-items-center">
+                      <BsCalculator className="me-2" style={{ color: "#ffc107" }} />
+                      <strong>Cantidad:</strong> {receta.cantidadNecesaria} {receta.unidadMedida}
+                    </p>
+                  </Col>
+                  <Col className="d-flex justify-content-end align-items-center">
+                    <Button variant="outline-primary" onClick={() => handleEditReceta(receta)} className="me-2 d-flex align-items-center custom-button">
+                      <BsPencil className="me-2" /> Editar
+                    </Button>
+                    <Button variant="danger" onClick={() => handleDeleteReceta(receta)} className="d-flex align-items-center custom-button-cancel">
+                      <BsTrash className="me-2" /> Eliminar
+                    </Button>
+                  </Col>
+                </Row>
+              </Accordion.Body>
+            </Accordion.Item>
+          </Col>
+        ))}
       </Row>
+    </Accordion>
+  </Col>
+</Row>
 
       {/* Modal para agregar nueva receta */}
       <Modal show={showAddModal} onHide={() => setShowAddModal(false)}>
         <Modal.Header closeButton>
-          <Modal.Title>Agregar Nueva Receta</Modal.Title>
+          <Modal.Title className="modal-title-center">Nueva Receta</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form>
@@ -164,7 +169,7 @@ const GestionDeRecetasPage = () => {
       {/* Modal para editar receta */}
       <Modal show={showEditModal} onHide={() => setShowEditModal(false)} className="my-2">
         <Modal.Header closeButton>
-          <Modal.Title>Editar Receta</Modal.Title>
+          <Modal.Title className="modal-title-center">Editar Receta</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form>
@@ -223,7 +228,7 @@ const GestionDeRecetasPage = () => {
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowEditModal(false)} className="custom-button">
+          <Button variant="danger" onClick={() => setShowEditModal(false)} className="custom-button">
             Cancelar
           </Button>
           <Button variant="primary" onClick={() => handleUpdateReceta(selectedReceta)} className="custom-button">
@@ -244,7 +249,7 @@ const GestionDeRecetasPage = () => {
           <Button variant="secondary" onClick={() => setShowDeleteModal(false)} className="custom-button">
             Cancelar
           </Button>
-          <Button variant="danger" onClick={handleConfirmDelete} className="custom-button">
+          <Button variant="danger" onClick={handleConfirmDelete} className="custom-button-cancel">
             Eliminar
           </Button>
         </Modal.Footer>

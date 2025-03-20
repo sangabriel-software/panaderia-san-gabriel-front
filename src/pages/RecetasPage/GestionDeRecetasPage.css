@@ -50,13 +50,20 @@
     background-color: #FFFFFF;
     border-bottom: 1px solid #0F4D8B;
     color: #0F4D8B;
+    text-align: center;
   }
   
   .modal-title {
     font-size: 1.9rem;
     font-weight: bold;
     color: #0F4D8B;
+    text-align: center;
+  }
 
+  /* Clase para centrar el título del modal */
+  .modal-title-center {
+    text-align: center;
+    width: 100%; /* Asegura que ocupe todo el ancho */
   }
   
 /* Cambiar el color del botón de cierre */
@@ -110,4 +117,19 @@
     cursor: not-allowed;
   }
 
+  /* Estilos para el botón */
+  .custom-button-cancel {
+    background-color: #dc3545;
+    border: 1.5px solid #dc3545;
+    color: #FFFFFF;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+  }
+  
+  .custom-button-cancel:hover {
+    background-color: #a71d2a;
+  }
   
