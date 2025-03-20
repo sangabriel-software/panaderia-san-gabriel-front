@@ -108,7 +108,7 @@ const GestionDeRecetasPage = () => {
                       <Button variant="outline-primary" onClick={() => handleEditReceta(receta)} className="me-2 d-flex align-items-center custom-button">
                         <BsPencil className="me-2" /> Editar
                       </Button>
-                      <Button variant="outline-danger" onClick={() => handleDeleteReceta(receta)} className="d-flex align-items-center custom-button">
+                      <Button variant="outline-danger" onClick={() => handleDeleteReceta(receta)} className="d-flex align-items-center">
                         <BsTrash className="me-2" /> Eliminar
                       </Button>
                     </Col>
@@ -162,7 +162,7 @@ const GestionDeRecetasPage = () => {
       </Modal>
 
       {/* Modal para editar receta */}
-      <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
+      <Modal show={showEditModal} onHide={() => setShowEditModal(false)} className="my-2">
         <Modal.Header closeButton>
           <Modal.Title>Editar Receta</Modal.Title>
         </Modal.Header>
