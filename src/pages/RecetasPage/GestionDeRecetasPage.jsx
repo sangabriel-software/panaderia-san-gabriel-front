@@ -3,7 +3,8 @@ import { Container, Row, Col, Accordion, Button, Modal, Form } from "react-boots
 import useGetRecetas from "../../hooks/recetas/useGetRecetas";
 import DotsMove from "../../components/Spinners/DotsMove";
 import Alert from "../../components/Alerts/Alert";
-import { BsExclamationTriangleFill, BsPencil, BsTrash, BsPlus, BsBox, BsClipboardData, BsCalculator } from "react-icons/bs";
+import { BsExclamationTriangleFill, BsPencil, BsTrash, BsPlus, BsBook, BsClipboardData, BsCalculator, BsFlower1 } from "react-icons/bs";
+import "./GestionDeRecetasPage.css"; // Importa el archivo CSS
 
 const GestionDeRecetasPage = () => {
   const { recetas, loadingRecetas, showErrorRecetas, showInfoRecetas, setRecetas } = useGetRecetas();
@@ -27,13 +28,11 @@ const GestionDeRecetasPage = () => {
   };
 
   const handleSaveReceta = (newReceta) => {
-    // Lógica para guardar la nueva receta
     setRecetas([...recetas, newReceta]);
     setShowAddModal(false);
   };
 
   const handleUpdateReceta = (updatedReceta) => {
-    // Lógica para actualizar la receta
     const updatedRecetas = recetas.map(receta =>
       receta.idReceta === updatedReceta.idReceta ? updatedReceta : receta
     );
@@ -42,13 +41,10 @@ const GestionDeRecetasPage = () => {
   };
 
   const handleConfirmDelete = () => {
-    // Lógica para eliminar la receta
     const filteredRecetas = recetas.filter(receta => receta.idReceta !== selectedReceta.idReceta);
     setRecetas(filteredRecetas);
     setShowDeleteModal(false);
   };
-
-  console.log(recetas);
 
   if (loadingRecetas) {
     return (
@@ -83,33 +79,36 @@ const GestionDeRecetasPage = () => {
           </Button>
         </Col>
       </Row>
+
       <Row>
         <Col>
           <Accordion>
             {recetas.map((receta, index) => (
-              <Accordion.Item key={receta.idReceta} eventKey={index.toString()} className="mb-3 shadow-sm">
-                <Accordion.Header>
+              <Accordion.Item key={receta.idReceta} eventKey={index.toString()} className="mb-3 shadow-sm custom-accordion-item">
+                <Accordion.Header className="custom-accordion-header">
                   <div className="d-flex justify-content-between w-100 align-items-center">
                     <span className="fw-bold d-flex align-items-center">
-                      <BsBox className="me-2" /> {receta.nombreProducto}
+                      {receta.nombreProducto}
                     </span>
                   </div>
                 </Accordion.Header>
-                <Accordion.Body>
+                <Accordion.Body className="custom-accordion-body">
                   <Row>
                     <Col>
                       <p className="d-flex align-items-center">
-                        <BsClipboardData className="me-2" /> <strong>Ingrediente:</strong> {receta.nombreIngrediente}
+                        <BsClipboardData className="me-2" style={{ color: "#198754" }} />
+                        <strong>Ingrediente:</strong> {receta.nombreIngrediente}
                       </p>
                       <p className="d-flex align-items-center">
-                        <BsCalculator className="me-2" /> <strong>Cantidad:</strong> {receta.cantidadNecesaria} {receta.unidadMedida}
+                        <BsCalculator className="me-2" style={{ color: "#ffc107" }} />
+                        <strong>Cantidad:</strong> {receta.cantidadNecesaria} {receta.unidadMedida}
                       </p>
                     </Col>
                     <Col className="d-flex justify-content-end align-items-center">
-                      <Button variant="outline-primary" onClick={() => handleEditReceta(receta)} className="me-2 d-flex align-items-center">
+                      <Button variant="outline-primary" onClick={() => handleEditReceta(receta)} className="me-2 d-flex align-items-center custom-button">
                         <BsPencil className="me-2" /> Editar
                       </Button>
-                      <Button variant="outline-danger" onClick={() => handleDeleteReceta(receta)} className="d-flex align-items-center">
+                      <Button variant="outline-danger" onClick={() => handleDeleteReceta(receta)} className="d-flex align-items-center custom-button">
                         <BsTrash className="me-2" /> Eliminar
                       </Button>
                     </Col>
@@ -131,7 +130,6 @@ const GestionDeRecetasPage = () => {
             <Form.Group className="mb-3">
               <Form.Label>Producto</Form.Label>
               <Form.Control as="select">
-                {/* Aquí puedes mapear los productos disponibles */}
                 <option>Producto 1</option>
                 <option>Producto 2</option>
               </Form.Control>
@@ -139,7 +137,6 @@ const GestionDeRecetasPage = () => {
             <Form.Group className="mb-3">
               <Form.Label>Ingrediente</Form.Label>
               <Form.Control as="select">
-                {/* Aquí puedes mapear los ingredientes disponibles */}
                 <option>Ingrediente 1</option>
                 <option>Ingrediente 2</option>
               </Form.Control>
@@ -171,29 +168,53 @@ const GestionDeRecetasPage = () => {
         </Modal.Header>
         <Modal.Body>
           <Form>
+            {/* Campo de Producto (deshabilitado) */}
             <Form.Group className="mb-3">
               <Form.Label>Producto</Form.Label>
-              <Form.Control as="select" defaultValue={selectedReceta?.idProducto}>
-                {/* Aquí puedes mapear los productos disponibles */}
-                <option>Producto 1</option>
-                <option>Producto 2</option>
+              <Form.Control
+                as="select"
+                value={selectedReceta?.nombreProducto || ""}
+                disabled
+              >
+                <option>{selectedReceta?.nombreProducto}</option>
               </Form.Control>
             </Form.Group>
+
+            {/* Campo de Ingrediente (deshabilitado) */}
             <Form.Group className="mb-3">
               <Form.Label>Ingrediente</Form.Label>
-              <Form.Control as="select" defaultValue={selectedReceta?.idIngrediente}>
-                {/* Aquí puedes mapear los ingredientes disponibles */}
-                <option>Ingrediente 1</option>
-                <option>Ingrediente 2</option>
+              <Form.Control
+                as="select"
+                value={selectedReceta?.nombreIngrediente || ""}
+                disabled
+              >
+                <option>{selectedReceta?.nombreIngrediente}</option>
               </Form.Control>
             </Form.Group>
+
+            {/* Campo de Cantidad (editable) */}
             <Form.Group className="mb-3">
               <Form.Label>Cantidad</Form.Label>
-              <Form.Control type="number" defaultValue={selectedReceta?.cantidadNecesaria} />
+              <Form.Control
+                type="number"
+                defaultValue={selectedReceta?.cantidadNecesaria || ""}
+                onChange={(e) =>
+                  setSelectedReceta({
+                    ...selectedReceta,
+                    cantidadNecesaria: e.target.value,
+                  })
+                }
+              />
             </Form.Group>
+
+            {/* Campo de Unidad de Medida (deshabilitado) */}
             <Form.Group className="mb-3">
               <Form.Label>Unidad de Medida</Form.Label>
-              <Form.Control type="text" defaultValue={selectedReceta?.unidadMedida} />
+              <Form.Control
+                type="text"
+                value={selectedReceta?.unidadMedida || ""}
+                disabled
+              />
             </Form.Group>
           </Form>
         </Modal.Body>
