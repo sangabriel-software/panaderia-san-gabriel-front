@@ -158,41 +158,45 @@
   background-color: #a71d2a;
 }
 
+/*---------Notificacion--------------------*/
 /* Estilos para el Toast */
 .custom-toast {
-    background-color: #e3f2fd; /* Fondo azul claro */
-    border: 1px solid #90caf9; /* Borde azul */
-    border-radius: 8px; /* Bordes redondeados */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave */
-  }
-  
-  .custom-toast-header {
-    background-color: #bbdefb; /* Fondo azul más oscuro para el encabezado */
-    border-bottom: 1px solid #90caf9; /* Borde inferior */
-    color: #0d47a1; /* Color del texto */
-    font-weight: bold; /* Texto en negrita */
-    border-radius: 8px 8px 0 0; /* Bordes redondeados solo arriba */
-  }
-  
-  .custom-toast-body {
-    color: #1565c0; /* Color del texto del cuerpo */
-    font-size: 14px; /* Tamaño del texto */
-  }
-  
-  /* Barra de progreso */
-  .toast-progress-bar {
-    height: 4px; /* Altura de la barra */
-    background-color: #64b5f6; /* Color de la barra */
-    animation: progress-bar 10s linear forwards; /* Animación de 10 segundos */
-    border-radius: 0 0 8px 8px; /* Bordes redondeados solo abajo */
-  }
-  
-  /* Animación para la barra de progreso */
-  @keyframes progress-bar {
-    from {
+  background-color: #ffffff; /* Fondo blanco */
+  border: 1px solid #e0e0e0; /* Borde gris claro */
+  border-radius: 12px; /* Bordes más redondeados */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Sombra más pronunciada */
+  overflow: hidden; /* Para que la barra de progreso no se salga del borde */
+}
+
+.custom-toast-header {
+  background-color: #f5f5f5; /* Fondo gris claro para el encabezado */
+  border-bottom: 1px solid #e0e0e0; /* Borde inferior */
+  color: #333333; /* Color del texto oscuro */
+  font-weight: 600; /* Texto semi-negrita */
+  border-radius: 12px 12px 0 0; /* Bordes redondeados solo arriba */
+  padding: 12px 16px; /* Más espacio interno */
+}
+
+.custom-toast-body {
+  color: #555555; /* Color del texto del cuerpo */
+  font-size: 14px; /* Tamaño del texto */
+  padding: 16px; /* Más espacio interno */
+}
+
+/* Barra de progreso */
+.toast-progress-bar {
+  height: 4px; /* Altura de la barra */
+  background-color: #007bff; /* Color de la barra (azul moderno) */
+  animation: progress-bar 3s linear forwards; /* Animación de 3 segundos (igual que el delay) */
+  border-radius: 0 0 12px 12px; /* Bordes redondeados solo abajo */
+}
+
+/* Animación para la barra de progreso */
+@keyframes progress-bar {
+  from {
       width: 100%; /* Comienza con el 100% de ancho */
-    }
-    to {
-      width: 0%; /* Termina con el 0% de ancho */
-    }
   }
+  to {
+      width: 0%; /* Termina con el 0% de ancho */
+  }
+}

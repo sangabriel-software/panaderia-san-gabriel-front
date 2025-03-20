@@ -1,55 +1,32 @@
-import React, { useState, useEffect } from "react";
-import {
-  Container,
-  Row,
-  Col,
-  Accordion,
-  Button,
-  Modal,
-  Form,
-  Toast,
-  ToastContainer,
-} from "react-bootstrap";
+import React, { useState } from "react";
+import { Container, Row, Col, Accordion, Button, Modal, Form } from "react-bootstrap";
 import useGetRecetas from "../../hooks/recetas/useGetRecetas";
+import useGetProductosYPrecios from "../../hooks/productosprecios/useGetProductosYprecios";
 import DotsMove from "../../components/Spinners/DotsMove";
 import Alert from "../../components/Alerts/Alert";
-import {
-  BsExclamationTriangleFill,
-  BsPencil,
-  BsTrash,
-  BsPlus,
-  BsClipboardData,
-  BsCalculator,
-  BsArrowLeft,
-} from "react-icons/bs";
-import "./GestionDeRecetasPage.css"; // Importa el archivo CSS
+import { BsExclamationTriangleFill, BsPencil, BsTrash, BsPlus, BsClipboardData, BsCalculator, BsArrowLeft } from "react-icons/bs";
 import Title from "../../components/Title/Title";
 import { useNavigate } from "react-router";
+import "./GestionDeRecetasPage.css";
+import ToastNotification from "../../components/ToastNotifications/Notification/ToastNotification";
+import SearchableSelect from "../../components/SearchableSelect/SearchableSelect";
 
 const GestionDeRecetasPage = () => {
-  const {
-    recetas,
-    loadingRecetas,
-    showErrorRecetas,
-    showInfoRecetas,
-    setRecetas,
-  } = useGetRecetas();
+  const { recetas, loadingRecetas, showErrorRecetas, setRecetas } = useGetRecetas();
+  const { productos, loadigProducts, showErrorProductos } = useGetProductosYPrecios();
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedReceta, setSelectedReceta] = useState(null);
-  const [showToast, setShowToast] = useState(true); // Estado para controlar el toast
+  const [showToast, setShowToast] = useState(true);
+  const [selectedProduct, setSelectedProduct] = useState(null); // Estado para el producto seleccionado
   const navigate = useNavigate();
 
-  // Efecto para ocultar el toast después de 10 segundos
-  useEffect(() => {
-    if (showToast) {
-      const timer = setTimeout(() => {
-        setShowToast(false);
-      }, 10000); // 10 segundos
-      return () => clearTimeout(timer); // Limpiar el timer si el componente se desmonta
-    }
-  }, [showToast]);
+  // Convertir productos al formato esperado por SearchableSelect
+  const productOptions = productos.map((producto) => ({
+    value: producto.idProducto,
+    label: producto.nombreProducto,
+  }));
 
   const handleAddReceta = () => {
     setShowAddModal(true);
@@ -65,9 +42,19 @@ const GestionDeRecetasPage = () => {
     setShowDeleteModal(true);
   };
 
-  const handleSaveReceta = (newReceta) => {
-    setRecetas([...recetas, newReceta]);
-    setShowAddModal(false);
+  const handleSaveReceta = () => {
+    if (selectedProduct) {
+      const newReceta = {
+        idReceta: recetas.length + 1, // Generar un ID único (esto es solo un ejemplo)
+        nombreProducto: selectedProduct.label,
+        nombreIngrediente: "Harina", // Esto debería venir de otro input o select
+        cantidadNecesaria: 100, // Esto debería venir de otro input
+        unidadMedida: "kg", // Esto debería venir de otro input
+      };
+      setRecetas([...recetas, newReceta]);
+      setShowAddModal(false);
+      setSelectedProduct(null); // Limpiar selección
+    }
   };
 
   const handleUpdateReceta = (updatedReceta) => {
@@ -86,7 +73,8 @@ const GestionDeRecetasPage = () => {
     setShowDeleteModal(false);
   };
 
-  if (loadingRecetas) {
+  // Loading mientras se cargan los recursos
+  if (loadingRecetas || loadigProducts) {
     return (
       <Container
         className="d-flex justify-content-center align-items-center"
@@ -97,7 +85,8 @@ const GestionDeRecetasPage = () => {
     );
   }
 
-  if (showErrorRecetas) {
+  // Notificación de error al consultar los recursos
+  if (showErrorRecetas || showErrorProductos) {
     return (
       <Container className="justify-content-center align-items-center my-5">
         <Row className="justify-content-center">
@@ -115,33 +104,10 @@ const GestionDeRecetasPage = () => {
 
   return (
     <Container>
-      {/* Toast para el mensaje flotante */}
-{/* Toast para el mensaje flotante */}
-<ToastContainer position="top-end" className="p-3" style={{ marginTop: "80px" }}>
-  <Toast
-    show={showToast}
-    onClose={() => setShowToast(false)}
-    delay={5000} // Duración antes de desaparecer
-    autohide // Desaparece automáticamente
-    className="custom-toast" // Clase personalizada para el Toast
-  >
-    <Toast.Header className="custom-toast-header">
-      <strong className="me-auto">Configuración de ingredientes</strong>
-      <small>Ahora</small>
-    </Toast.Header>
-    <Toast.Body className="custom-toast-body">
-      Configura los ingredientes de cada producto para que se muestren en las órdenes de producción.
-    </Toast.Body>
-    {/* Barra de progreso */}
-    <div className="toast-progress-bar" style={{ width: "100%" }}></div>
-  </Toast>
-</ToastContainer>
-
-      {/* Encabezado */}
+      {/* ---------------- Titulo ----------------- */}
       <div className="text-center mb-3">
         <div className="row">
           <div className="col-2">
-            {/* Botón de volver */}
             <button
               className="btn bt-return rounded-circle d-flex align-items-center justify-content-center shadow"
               style={{ width: "40px", height: "40px" }}
@@ -159,6 +125,7 @@ const GestionDeRecetasPage = () => {
         </div>
       </div>
 
+      {/* Botón para agregar Recetas */}
       <Row className="mb-4">
         <Col>
           <Button
@@ -171,10 +138,10 @@ const GestionDeRecetasPage = () => {
         </Col>
       </Row>
 
+      {/* Mapear las recetas en dos columnas */}
       <Row>
         <Col>
           <Accordion>
-            {/* Mapear las recetas en dos columnas */}
             <Row>
               {recetas.map((receta, index) => (
                 <Col key={receta.idReceta} xs={12} md={6} className="mb-3">
@@ -235,7 +202,7 @@ const GestionDeRecetasPage = () => {
         </Col>
       </Row>
 
-      {/* Modal para agregar nueva receta */}
+      {/*----------------- Modal para agregar nueva receta ----------------------------*/}
       <Modal show={showAddModal} onHide={() => setShowAddModal(false)}>
         <Modal.Header closeButton>
           <Modal.Title className="modal-title-center">Nueva Receta</Modal.Title>
@@ -244,11 +211,15 @@ const GestionDeRecetasPage = () => {
           <Form>
             <Form.Group className="mb-3">
               <Form.Label>Producto</Form.Label>
-              <Form.Control as="select" className="custom-input">
-                <option>Producto 1</option>
-                <option>Producto 2</option>
-              </Form.Control>
+              {/* Usar el componente SearchableSelect */}
+              <SearchableSelect
+                options={productOptions}
+                placeholder="Selecciona un producto..."
+                onSelect={(selected) => setSelectedProduct(selected)}
+                className="custom-input"
+              />
             </Form.Group>
+
             <Form.Group className="mb-3">
               <Form.Label>Ingrediente</Form.Label>
               <Form.Control as="select" className="custom-input">
@@ -256,6 +227,7 @@ const GestionDeRecetasPage = () => {
                 {/* Agrega más opciones según sea necesario */}
               </Form.Control>
             </Form.Group>
+
             <Form.Group className="mb-3">
               <Form.Label>Cantidad</Form.Label>
               <Form.Control
@@ -277,7 +249,7 @@ const GestionDeRecetasPage = () => {
         </Modal.Footer>
       </Modal>
 
-      {/* Modal para editar receta */}
+      {/*---------------------------- Modal para editar receta -----------------*/}
       <Modal
         show={showEditModal}
         onHide={() => setShowEditModal(false)}
@@ -331,17 +303,6 @@ const GestionDeRecetasPage = () => {
                 className="custom-input"
               />
             </Form.Group>
-
-            {/* Campo de Unidad de Medida (deshabilitado) */}
-            <Form.Group className="mb-3">
-              <Form.Label>Unidad de Medida</Form.Label>
-              <Form.Control
-                type="text"
-                value={selectedReceta?.unidadMedida || ""}
-                disabled
-                className="custom-input"
-              />
-            </Form.Group>
           </Form>
         </Modal.Body>
         <Modal.Footer className="modal-footer-centered">
@@ -381,6 +342,16 @@ const GestionDeRecetasPage = () => {
           </Button>
         </Modal.Footer>
       </Modal>
+
+      {/* Notificaciones*/}
+      <ToastNotification
+        show={showToast}
+        onClose={() => setShowToast(false)}
+        delay={3000}
+        title="Configuración de ingredientes"
+        message="Configura los ingredientes de cada producto para que se muestren en las órdenes de producción."
+        position="top-end"
+      />
     </Container>
   );
 };

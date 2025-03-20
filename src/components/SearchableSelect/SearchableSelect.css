@@ -1,0 +1,97 @@
+/* Contenedor del SearchableSelect */
+.searchable-select-container {
+    position: relative;
+    width: 100%;
+  }
+  
+  /* Contenedor del input y el botón de limpieza */
+  .input-with-clear {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  
+  /* Input */
+  .searchable-select-container input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    padding-right: 30px; /* Espacio para el botón de limpieza */
+    border-radius: 8px;
+    border: 0.5px solid #303335;
+    padding: 10px;
+    font-size: 14px;
+    transition: border-color 0.3s ease;
+  }
+  
+  /* Botón de limpieza (x) */
+  .clear-button {
+    position: absolute;
+    right: 8px;
+    background: none;
+    border: none;
+    font-size: 30px;
+    cursor: pointer;
+    color: #DA1A32;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Efecto hover en el botón de limpieza */
+  .clear-button:hover {
+    color: #333;
+  }
+  
+  /* Dropdown de opciones */
+  .searchable-select-dropdown {
+    position: absolute;
+    top: 100%; /* Posiciona el dropdown debajo del input */
+    left: 0;
+    width: 100%;
+    max-height: 200px;
+    overflow-y: auto;
+    background-color: #343A40;
+    color: #FFFF;
+    border: 1px solid #0F4D8B;
+    border-radius: 4px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 1000; /* Asegura que el dropdown esté por encima de otros elementos */
+  }
+  
+  /* Opciones del dropdown */
+  .searchable-select-option {
+    padding: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s;
+  }
+  
+  /* Efecto hover en las opciones */
+  .searchable-select-option:hover {
+    background-color: #2A2A2A;
+    color: #ccc;
+  }
+  
+  /* Mensaje cuando no hay resultados */
+  .searchable-select-option.no-results {
+    color: #888;
+    cursor: default;
+  }
+
+  /* Estilos para los inputs */
+.custom-input {
+  border-radius: 8px;
+  border: 0.5px solid #303335;
+  padding: 10px;
+  font-size: 14px;
+  transition: border-color 0.3s ease;
+}
+
+.custom-input:focus {
+  border-color: #007bff;
+  box-shadow: none;
+}
