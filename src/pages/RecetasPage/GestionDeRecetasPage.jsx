@@ -228,7 +228,14 @@ const GestionDeRecetasPage = () => {
       </Row>
 
       {/*----------------- Modal para agregar nueva receta ----------------------------*/}
-      <Modal show={showAddModal} onHide={() => setShowAddModal(false)}>
+      <Modal show={showAddModal} 
+        onHide={() => {
+          setShowAddModal(false); // Cerrar el modal
+          resetAdd(); // Limpiar el formulario
+          setSelectedProduct(null); // Limpiar el producto seleccionado
+          setSearchableSelectError(""); // Limpiar el mensaje de error
+        }}
+      >
         <Modal.Header closeButton>
           <Modal.Title className="modal-title-center">Nueva Receta</Modal.Title>
         </Modal.Header>
@@ -314,7 +321,10 @@ const GestionDeRecetasPage = () => {
       {/*---------------------------- Modal para editar receta -----------------*/}
       <Modal
         show={showEditModal}
-        onHide={() => setShowEditModal(false)}
+        onHide={() => {
+          setShowEditModal(false); // Cerrar el modal
+          resetEdit(); // Limpiar el formulario
+        }}
         className="my-2"
       >
         <Modal.Header closeButton>
