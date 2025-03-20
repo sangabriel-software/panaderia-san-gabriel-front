@@ -129,33 +129,33 @@ const GestionDeRecetasPage = () => {
           <Form>
             <Form.Group className="mb-3">
               <Form.Label>Producto</Form.Label>
-              <Form.Control as="select">
+              <Form.Control as="select" className="custom-input">
                 <option>Producto 1</option>
                 <option>Producto 2</option>
               </Form.Control>
             </Form.Group>
             <Form.Group className="mb-3">
               <Form.Label>Ingrediente</Form.Label>
-              <Form.Control as="select">
+              <Form.Control as="select" className="custom-input">
                 <option>Ingrediente 1</option>
                 <option>Ingrediente 2</option>
               </Form.Control>
             </Form.Group>
             <Form.Group className="mb-3">
               <Form.Label>Cantidad</Form.Label>
-              <Form.Control type="number" placeholder="Cantidad" />
+              <Form.Control type="number" placeholder="Cantidad" className="custom-input" />
             </Form.Group>
             <Form.Group className="mb-3">
               <Form.Label>Unidad de Medida</Form.Label>
-              <Form.Control type="text" placeholder="Unidad de Medida" />
+              <Form.Control type="text" placeholder="Unidad de Medida" className="custom-input" />
             </Form.Group>
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowAddModal(false)}>
+          <Button variant="secondary" onClick={() => setShowAddModal(false)} className="custom-button">
             Cancelar
           </Button>
-          <Button variant="primary" onClick={handleSaveReceta}>
+          <Button variant="primary" onClick={handleSaveReceta} className="custom-button">
             Guardar
           </Button>
         </Modal.Footer>
@@ -175,6 +175,7 @@ const GestionDeRecetasPage = () => {
                 as="select"
                 value={selectedReceta?.nombreProducto || ""}
                 disabled
+                className="custom-input"
               >
                 <option>{selectedReceta?.nombreProducto}</option>
               </Form.Control>
@@ -187,6 +188,7 @@ const GestionDeRecetasPage = () => {
                 as="select"
                 value={selectedReceta?.nombreIngrediente || ""}
                 disabled
+                className="custom-input"
               >
                 <option>{selectedReceta?.nombreIngrediente}</option>
               </Form.Control>
@@ -204,6 +206,7 @@ const GestionDeRecetasPage = () => {
                     cantidadNecesaria: e.target.value,
                   })
                 }
+                className="custom-input"
               />
             </Form.Group>
 
@@ -214,15 +217,16 @@ const GestionDeRecetasPage = () => {
                 type="text"
                 value={selectedReceta?.unidadMedida || ""}
                 disabled
+                className="custom-input"
               />
             </Form.Group>
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowEditModal(false)}>
+          <Button variant="secondary" onClick={() => setShowEditModal(false)} className="custom-button">
             Cancelar
           </Button>
-          <Button variant="primary" onClick={() => handleUpdateReceta(selectedReceta)}>
+          <Button variant="primary" onClick={() => handleUpdateReceta(selectedReceta)} className="custom-button">
             Guardar Cambios
           </Button>
         </Modal.Footer>
@@ -237,10 +241,10 @@ const GestionDeRecetasPage = () => {
           ¿Estás seguro de que deseas eliminar la receta de {selectedReceta?.nombreProducto}?
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
+          <Button variant="secondary" onClick={() => setShowDeleteModal(false)} className="custom-button">
             Cancelar
           </Button>
-          <Button variant="danger" onClick={handleConfirmDelete}>
+          <Button variant="danger" onClick={handleConfirmDelete} className="custom-button">
             Eliminar
           </Button>
         </Modal.Footer>
