@@ -1,135 +1,158 @@
 /* GestionDeRecetasPage.css */
 .custom-accordion-item {
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    overflow: hidden;
-    transition: all 0.3s ease;
-  }
-  
-  .custom-accordion-item:hover {
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  }
-  
-  .custom-accordion-header {
-    background-color: #f8f9fa;
-    padding: 1rem;
-    border-bottom: 1px solid #e0e0e0;
-    transition: background-color 0.3s ease;
-  }
-  
-  .custom-accordion-header:hover {
-    background-color: #e9ecef;
-  }
-  
-  .custom-accordion-body {
-    padding: 1rem;
-    background-color: #ffffff;
-  }
-  
-  .custom-button {
-    border-radius: 20px;
-    padding: 0.5rem 1rem;
-    transition: all 0.3s ease;
-  }
-  
-  .custom-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  }
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
 
-  /*------------- Modal -----------------------------*/
+.custom-accordion-item:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.custom-accordion-header {
+  background-color: #E9F4FF;
+  padding: 1rem;
+  border-bottom: 1px solid #e0e0e0;
+  transition: background-color 0.3s ease;
+}
+
+.custom-accordion-header:hover {
+  background-color: #e9ecef;
+}
+
+.custom-accordion-body {
+  padding: 1rem;
+  background-color: #FBBA2A;
+}
+
+.custom-button {
+  border-radius: 20px;
+  padding: 0.5rem 1rem;
+  transition: all 0.3s ease;
+}
+
+.custom-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/*------------- Modal -----------------------------*/
 /* Estilos para el modal */
 .modal-content {
-    border-radius: 10px;
-    border: none;
-    box-shadow: 0 4px 100px rgba(0, 0, 0, 0.1);
-    margin-bottom: 40px;
-  }
-  
-  .modal-header {
-    background-color: #FFFFFF;
-    border-bottom: 1px solid #0F4D8B;
-    color: #0F4D8B;
-    text-align: center;
-  }
-  
-  .modal-title {
-    font-size: 1.9rem;
-    font-weight: bold;
-    color: #0F4D8B;
-    text-align: center;
-  }
+  border-radius: 10px;
+  border: none;
+  box-shadow: 0 4px 100px rgba(0, 0, 0, 0.1);
+  margin-bottom: 40px;
+}
 
-  /* Clase para centrar el título del modal */
-  .modal-title-center {
-    text-align: center;
-    width: 100%; /* Asegura que ocupe todo el ancho */
-  }
-  
+.modal-header {
+  background-color: #ffffff;
+  border-bottom: 1px solid #0f4d8b;
+  color: #0f4d8b;
+  text-align: center;
+}
+
+.modal-title {
+  font-size: 1.9rem;
+  font-weight: bold;
+  color: #0f4d8b;
+  text-align: center;
+}
+
+/* Clase para centrar el título del modal */
+.modal-title-center {
+  text-align: center;
+  width: 100%; /* Asegura que ocupe todo el ancho */
+}
+
+/* Centrar los botones en el footer del modal */
+.modal-footer-centered {
+  display: flex;
+  justify-content: center;
+  gap: 10px; /* Espacio entre los botones */
+}
+
 /* Cambiar el color del botón de cierre */
 .modal-header .btn-close {
-    background-color: #0F4D8B; /* Color personalizado */
-    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
-    mask-repeat: no-repeat;
-    mask-position: center;
-    opacity: 1; /* Asegura que el ícono sea completamente visible */
-    border: none; /* Elimina el borde predeterminado */
-  }
-  
-  /* Cambiar el hover del botón de cierre */
-  .modal-header .btn-close:hover {
-    background-color: #0F4D8B; /* Color personalizado al hacer hover */
-    opacity: 0.8; /* Reduce ligeramente la opacidad al hacer hover */
-  }
-  
-  /* Estilos para los inputs */
-  .custom-input {
-    border-radius: 8px;
-    border: 0.5px solid #303335;
-    padding: 10px;
-    font-size: 14px;
-    transition: border-color 0.3s ease;
-  }
-  
-  .custom-input:focus {
-    border-color: #007bff;
-    box-shadow: none;
-  }
-  
-  /* Estilos para el botón */
-  .custom-button {
-    background-color: #FFFFFF;
-    border: 1.5px solid #0F4D8B;
-    color: #0F4D8B;
-    border-radius: 8px;
-    padding: 10px 20px;
-    font-size: 14px;
-    font-weight: 500;
-    transition: background-color 0.3s ease;
-  }
-  
-  .custom-button:hover {
-    background-color: #0056b3;
-  }
-  
-  .custom-button:disabled {
-    background-color: #6c757d;
-    cursor: not-allowed;
-  }
+  background-color: #0f4d8b; /* Color personalizado */
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+  mask-repeat: no-repeat;
+  mask-position: center;
+  opacity: 1; /* Asegura que el ícono sea completamente visible */
+  border: none; /* Elimina el borde predeterminado */
+}
 
-  /* Estilos para el botón */
-  .custom-button-cancel {
-    background-color: #dc3545;
-    border: 1.5px solid #dc3545;
-    color: #FFFFFF;
-    border-radius: 8px;
-    padding: 10px 20px;
-    font-size: 14px;
-    font-weight: 500;
-    transition: background-color 0.3s ease;
-  }
-  
-  .custom-button-cancel:hover {
-    background-color: #a71d2a;
-  }
-  
+/* Cambiar el hover del botón de cierre */
+.modal-header .btn-close:hover {
+  background-color: #0f4d8b; /* Color personalizado al hacer hover */
+  opacity: 0.8; /* Reduce ligeramente la opacidad al hacer hover */
+}
+
+/* Estilos para los inputs */
+.custom-input {
+  border-radius: 8px;
+  border: 0.5px solid #303335;
+  padding: 10px;
+  font-size: 14px;
+  transition: border-color 0.3s ease;
+}
+
+.custom-input:focus {
+  border-color: #007bff;
+  box-shadow: none;
+}
+
+/* Estilos para el botón */
+.custom-button {
+  background-color: #ffffff;
+  border: 1.5px solid #0f4d8b;
+  color: #0f4d8b;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+}
+
+.custom-button:hover {
+  background-color: #0056b3;
+}
+
+.custom-button:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+}
+
+/* Estilos para el botón */
+.custom-button-guardar {
+  background-color: #0f4d8b;
+  border: 1.5px solid #0f4d8b;
+  color: #ffffff;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+}
+
+.custom-button-guardar:hover {
+  background-color: #ffffff;
+  color: #0f4d8b;
+}
+
+/* Estilos para el botón */
+.custom-button-cancel {
+  background-color: #dc3545;
+  border: 1.5px solid #dc3545;
+  color: #ffffff;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+}
+
+.custom-button-cancel:hover {
+  background-color: #a71d2a;
+}
