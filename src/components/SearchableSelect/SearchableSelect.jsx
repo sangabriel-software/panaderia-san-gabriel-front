@@ -1,7 +1,8 @@
-import React, { useState } from "react";
-import "./SearchableSelect.css"
+import React, { useState, forwardRef } from "react";
+import "./SearchableSelect.css";
 
-const SearchableSelect = ({ options, placeholder, onSelect }) => {
+const SearchableSelect = forwardRef((props, ref) => {
+  const { options, placeholder, onSelect } = props;
   const [searchTerm, setSearchTerm] = useState("");
   const [isOpen, setIsOpen] = useState(false); // Estado para controlar si el dropdown está abierto
 
@@ -38,6 +39,7 @@ const SearchableSelect = ({ options, placeholder, onSelect }) => {
           onFocus={() => setIsOpen(true)} // Abrir el dropdown al hacer clic
           onBlur={() => setTimeout(() => setIsOpen(false), 200)} // Cerrar el dropdown al perder el foco
           className="form-control custom-input"
+          ref={ref} // Asignar la ref al input
         />
         {/* Botón de limpieza (x) */}
         {searchTerm && (
@@ -69,6 +71,6 @@ const SearchableSelect = ({ options, placeholder, onSelect }) => {
       )}
     </div>
   );
-};
+});
 
 export default SearchableSelect;

@@ -19,7 +19,7 @@ export const ingresarRecetaService = async (dataReceta) => {
   }
 }
 
-export const actualizarSucursalService = async (dataReceta) => {
+export const actualizarRecetaService = async (dataReceta) => {
   try {
       const response = await api.put(`${putEndpoints.ACTUALIZAR_RECETA}`, dataReceta); 
       return response.data;
