@@ -273,6 +273,7 @@ const GestionDeSucursalesPage = () => {
         </div>
       )}
 
+      {/* Popup modificacion e ingreso exitoso */}
       <SuccessPopup
         isOpen={isPopupOpenSuccess}
         onClose={() => setIsPopupOpenSuccess(false)}
@@ -293,7 +294,7 @@ const GestionDeSucursalesPage = () => {
         isOpen={isPopupOpen}
         onClose={() => setIsPopupOpen(false)}
         title="Confirmar Eliminación"
-        message="¿Está seguro de eliminar la orden?"
+        message="¿Está seguro de eliminar la sucursal?"
         onConfirm={() => {
           handleDeleteSucursal(
             sucursalToDelete,

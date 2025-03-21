@@ -28,7 +28,7 @@ export const actualizarRecetaService = async (dataReceta) => {
   }
 }
 
-export const elminarSUcursalService = async (idProducto) => {
+export const eliminarRectaService = async (idProducto) => {
   try {
     const response = await api.delete(`${deleteEndpoints.ELIMINAR_RECETA}/${idProducto}`); 
       return response.data;

@@ -5,21 +5,21 @@ import useGetRecetas from "../../hooks/recetas/useGetRecetas";
 import useGetProductosYPrecios from "../../hooks/productosprecios/useGetProductosYprecios";
 import DotsMove from "../../components/Spinners/DotsMove";
 import Alert from "../../components/Alerts/Alert";
-import { BsExclamationTriangleFill, BsPencil, BsTrash, BsPlus, BsClipboardData, BsCalculator, BsArrowLeft, } from "react-icons/bs";
+import { BsExclamationTriangleFill, BsPencil, BsTrash, BsPlus, BsClipboardData, BsCalculator, BsArrowLeft, BsFillInfoCircleFill, } from "react-icons/bs";
 import Title from "../../components/Title/Title";
 import { useNavigate } from "react-router";
-import "./GestionDeRecetasPage.css";
 import ToastNotification from "../../components/ToastNotifications/Notification/ToastNotification";
 import SearchableSelect from "../../components/SearchableSelect/SearchableSelect";
-import { actualizarRecetaService, ingresarRecetaService, } from "../../services/recetasServices/recetas.service";
-import dayjs from "dayjs";
+import SuccessPopup from "../../components/Popup/SuccessPopup";
+import ConfirmPopUp from "../../components/Popup/ConfirmPopup";
+import "./GestionDeRecetasPage.css";
+import { getProductOptions, handleAddReceta, handleConfirmDeleteReceta, handleDeleteReceta, handleEditReceta, handleIngresarReceta, handleModificarReceta } from "./GestionDeRecetas.utils";
 
 const GestionDeRecetasPage = () => {
   const { recetas, loadingRecetas, showErrorRecetas, setRecetas } = useGetRecetas();
   const { productos, loadigProducts, showErrorProductos } = useGetProductosYPrecios();
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedReceta, setSelectedReceta] = useState(null);
   const [showToast, setShowToast] = useState(false); // Inicialmente en false
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -28,138 +28,35 @@ const GestionDeRecetasPage = () => {
   const searchableSelectRef = useRef(null);
   const navigate = useNavigate();
 
+  // Variables de estado para mostrar popup y almacenar la orden a eliminar
+  const [isPopupOpen, setIsPopupOpen] = useState(false); //Abrir pop up de confirmacion de elminacion
+  const [isPopupOpenSuccess, setIsPopupOpenSuccess] = useState(false);
+  const [errorPopupMessage, setErrorPopupMessage] = useState(false);
+  const [isPopupErrorOpen, setIsPopupErrorOpen] = useState(false);
+  const [recetaToDelete, setRecetaToDelete] = useState(null);
+  const [editingReceta, setEditingReceta] = useState(false); // Estado para guardar la sucursal que se está editando
+  const [isLoading, setIsLoading] = useState(false); //Para setear carga de alguna opcion
+
   // React Hook Form para el modal de agregar
   const { register: registerAdd, handleSubmit: handleSubmitAdd, reset: resetAdd, formState: { errors: errorsAdd }, } = useForm();
-  
   // React Hook Form para el modal de editar
   const { register: registerEdit, handleSubmit: handleSubmitEdit, reset: resetEdit, formState: { errors: errorsEdit }, setValue: setEditValue, } = useForm();
 
-  // Convertir productos al formato esperado por SearchableSelect
-  const productOptions = productos.map((producto) => ({
-    value: producto.idProducto,
-    label: producto.nombreProducto,
-  }));
+  const onSubmitAdd = (data) => {
+    handleIngresarReceta( data, selectedProduct, setEditingReceta, setShowAddModal, resetAdd, setRecetas, setSelectedProduct,
+                   setSearchableSelectError, setErrorMessage, setIsPopupOpenSuccess, setIsPopupErrorOpen, setErrorPopupMessage );
+  };
+
+  const onSubmitEdit = (data) => {
+    handleModificarReceta( data, selectedReceta, setRecetas, setEditingReceta, setShowEditModal, resetEdit, setErrorMessage,
+                      setIsPopupOpenSuccess, setIsPopupErrorOpen, setErrorPopupMessage );
+};
 
   // Usa useEffect para mostrar el Toast solo al cargar la página por primera vez
   useEffect(() => {
     setShowToast(true); // Muestra el Toast cuando el componente se monta
   }, []); // El array vacío asegura que esto solo ocurra una vez
 
-  const handleAddReceta = () => {
-    setShowAddModal(true);
-  };
-
-  const handleEditReceta = (receta) => {
-    setSelectedReceta(receta);
-    setShowEditModal(true);
-    // Prellenar los valores del formulario de edición
-    setEditValue("nombreProducto", receta.nombreProducto);
-    setEditValue("nombreIngrediente", receta.nombreIngrediente);
-    setEditValue("cantidadNecesaria", receta.cantidadNecesaria);
-  };
-
-  const handleDeleteReceta = (receta) => {
-    setSelectedReceta(receta);
-    setShowDeleteModal(true);
-  };
-
-  // Guardar nueva receta
-  const onSubmitAdd = async (data) => {
-    if (!selectedProduct) {
-      setSearchableSelectError("Por favor, selecciona un producto.");
-      return;
-    }
-
-    const newReceta = {
-      idProducto: selectedProduct.value,
-      detallesReceta: [
-        {
-          idIngrediente: 1,
-          cantidadNecesaria: data.cantidadNecesaria,
-          unidadMedida: data.unidadMedida,
-          fechaCreacion: dayjs().format("YYYY-MM-DD"),
-        },
-      ],
-    };
-
-    try {
-      const response = await ingresarRecetaService(newReceta);
-      if (response.status === 201) {
-        const recetaRetun = {
-          idReceta: response.receta,
-          idProducto: newReceta.idProducto,
-          nombreProducto: selectedProduct.label,
-          idIngrediente: newReceta.detallesReceta[0].idIngrediente,
-          nombreIngrediente: data.nombreIngrediente,
-          cantidadNecesaria: newReceta.detallesReceta[0].cantidadNecesaria,
-          unidadMedida: "Lb",
-        };
-
-        setRecetas((prevRecetas) => [recetaRetun, ...prevRecetas]);
-        setShowAddModal(false);
-        resetAdd();
-        setSelectedProduct(null);
-        setSearchableSelectError("");
-        setErrorMessage("");
-      }
-    } catch (error) {
-      console.error("Error al agregar la receta:", error);
-      setErrorMessage(
-        "Hubo un error al agregar la receta. Por favor, inténtalo de nuevo."
-      );
-    }
-  };
-
-  // Actualizar receta existente
-  const onSubmitEdit = async (data) => {
-    const updatedReceta = {
-      idProducto: selectedReceta.idProducto,
-      detallesReceta: [
-        {
-          idIngrediente: selectedReceta.idIngrediente,
-          cantidadNecesaria: data.cantidadNecesaria,
-          unidadMedida: selectedReceta.unidadMedida,
-          fechaCreacion: selectedReceta.fechaCreacion,
-        },
-      ],
-    };
-
-    try {
-      const response = await actualizarRecetaService(updatedReceta);
-      if (response) {
-        const recetaRetun = {
-          idReceta: selectedReceta.idReceta,
-          idProducto: selectedReceta.idProducto,
-          nombreProducto: selectedReceta.nombreProducto,
-          idIngrediente: selectedReceta.idIngrediente,
-          nombreIngrediente: selectedReceta.nombreIngrediente,
-          cantidadNecesaria: data.cantidadNecesaria,
-          unidadMedida: selectedReceta.unidadMedida,
-        };
-
-        const updatedRecetas = recetas.map((receta) =>
-          receta.idReceta === selectedReceta.idReceta ? recetaRetun : receta
-        );
-        setRecetas(updatedRecetas);
-        setShowEditModal(false);
-        resetEdit();
-        setErrorMessage("");
-      }
-    } catch (error) {
-      console.error("Error al actualizar la receta:", error);
-      setErrorMessage(
-        "Hubo un error al actualizar la receta. Por favor, inténtalo de nuevo."
-      );
-    }
-  };
-
-  const handleConfirmDelete = () => {
-    const filteredRecetas = recetas.filter(
-      (receta) => receta.idReceta !== selectedReceta.idReceta
-    );
-    setRecetas(filteredRecetas);
-    setShowDeleteModal(false);
-  };
 
   // Loading mientras se cargan los recursos
   if (loadingRecetas || loadigProducts) {
@@ -218,7 +115,7 @@ const GestionDeRecetasPage = () => {
         <Col>
           <Button
             variant="primary"
-            onClick={handleAddReceta}
+            onClick={() => handleAddReceta(setShowAddModal)}
             className="d-flex align-items-center"
           >
             <BsPlus className="me-2" /> Agregar Nueva Receta
@@ -281,14 +178,14 @@ const GestionDeRecetasPage = () => {
                         <Col className="d-flex justify-content-end align-items-center">
                           <Button
                             variant="outline-primary"
-                            onClick={() => handleEditReceta(receta)}
+                            onClick={() => handleEditReceta(receta, setSelectedReceta, setShowEditModal, setEditValue)}
                             className="me-2 d-flex align-items-center custom-button"
                           >
                             <BsPencil className="me-2" /> Editar
                           </Button>
                           <Button
                             variant="danger"
-                            onClick={() => handleDeleteReceta(receta)}
+                            onClick={() => handleConfirmDeleteReceta(receta.idProducto, setRecetaToDelete, setIsPopupOpen)}
                             className="d-flex align-items-center custom-button-cancel"
                           >
                             <BsTrash className="me-2" /> Eliminar
@@ -322,7 +219,7 @@ const GestionDeRecetasPage = () => {
             <Form.Group className="mb-3">
               <Form.Label>Producto</Form.Label>
               <SearchableSelect
-                options={productOptions}
+                options={getProductOptions(productos)}
                 placeholder="Selecciona un producto..."
                 onSelect={(selected) => {
                   setSelectedProduct(selected);
@@ -450,32 +347,57 @@ const GestionDeRecetasPage = () => {
         </Modal.Footer>
       </Modal>
 
-      {/* Modal para confirmar eliminación */}
-      <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
-        <Modal.Header closeButton>
-          <Modal.Title>Confirmar Eliminación</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          ¿Estás seguro de que deseas eliminar la receta de{" "}
-          {selectedReceta?.nombreProducto}?
-        </Modal.Body>
-        <Modal.Footer>
-          <Button
-            variant="secondary"
-            onClick={() => setShowDeleteModal(false)}
-            className="custom-button"
-          >
-            Cancelar
-          </Button>
-          <Button
-            variant="danger"
-            onClick={handleConfirmDelete}
-            className="custom-button-cancel"
-          >
-            Eliminar
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      {/* ---------------- PopUp y Alertas de errores e informacion -------------------- */}
+      {recetas.length === 0 && (
+        <div className="row justify-content-center my-3">
+          <div className="col-md-6 text-center">
+            <Alert
+              type="primary"
+              message="No se han ingresado Recetas."
+              icon={<BsFillInfoCircleFill />}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Popup modificacion e ingreso exitoso */}
+      <SuccessPopup
+        isOpen={isPopupOpenSuccess}
+        onClose={() => setIsPopupOpenSuccess(false)}
+        title="¡Éxito!"
+        message={
+          editingReceta
+            ? `La informacion se ha modificado con exito.`
+            : "La Receta se ha ingresado con éxito."
+        }
+        nombreBotonVolver="Ver Recetas"
+        nombreBotonNuevo="Ingresar Receta"
+        onView={() => setIsPopupOpenSuccess(false)}
+        onNew={() => {
+          setIsPopupOpenSuccess(false);
+          setShowAddModal(true);
+        }}
+      />
+
+      {/* Popup confirmacion de eliminación */}
+      <ConfirmPopUp
+        isOpen={isPopupOpen}
+        onClose={() => setIsPopupOpen(false)}
+        title="Confirmar Eliminación"
+        message="¿Está seguro de eliminar la sucursal?"
+        onConfirm={() => {
+          handleDeleteReceta(
+            recetaToDelete,
+            setRecetas,
+            setIsPopupOpen,
+            setErrorPopupMessage,
+            setIsPopupErrorOpen,
+            setIsLoading
+          );
+        }}
+        onCancel={() => setIsPopupOpen(false)}
+        isLoading={isLoading}
+      />
 
       {/* Notificaciones*/}
       <ToastNotification
