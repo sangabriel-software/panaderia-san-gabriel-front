@@ -30,7 +30,7 @@ const ToastNotification = ({
           {message}
         </Toast.Body>
         {/* Barra de progreso */}
-        <div className="toast-progress-bar" style={{ width: "100%" }}></div>
+        {/* <div className="toast-progress-bar" style={{ width: "100%" }}></div> */}
       </Toast>
     </ToastContainer>
   );

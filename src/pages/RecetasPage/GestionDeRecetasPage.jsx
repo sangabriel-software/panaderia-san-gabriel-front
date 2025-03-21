@@ -1,75 +1,49 @@
-import React, { useState, useRef } from "react";
-import {
-  Container,
-  Row,
-  Col,
-  Accordion,
-  Button,
-  Modal,
-  Form,
-} from "react-bootstrap";
-import { useForm } from "react-hook-form"; // Importar React Hook Form
+import React, { useState, useRef, useEffect } from "react"; // Asegúrate de importar useEffect
+import { Container, Row, Col, Accordion, Button, Modal, Form, } from "react-bootstrap";
+import { useForm } from "react-hook-form";
 import useGetRecetas from "../../hooks/recetas/useGetRecetas";
 import useGetProductosYPrecios from "../../hooks/productosprecios/useGetProductosYprecios";
 import DotsMove from "../../components/Spinners/DotsMove";
 import Alert from "../../components/Alerts/Alert";
-import {
-  BsExclamationTriangleFill,
-  BsPencil,
-  BsTrash,
-  BsPlus,
-  BsClipboardData,
-  BsCalculator,
-  BsArrowLeft,
-} from "react-icons/bs";
+import { BsExclamationTriangleFill, BsPencil, BsTrash, BsPlus, BsClipboardData, BsCalculator, BsArrowLeft, } from "react-icons/bs";
 import Title from "../../components/Title/Title";
 import { useNavigate } from "react-router";
 import "./GestionDeRecetasPage.css";
 import ToastNotification from "../../components/ToastNotifications/Notification/ToastNotification";
 import SearchableSelect from "../../components/SearchableSelect/SearchableSelect";
-import {
-  actualizarRecetaService,
-  ingresarRecetaService,
-} from "../../services/recetasServices/recetas.service";
+import { actualizarRecetaService, ingresarRecetaService, } from "../../services/recetasServices/recetas.service";
 import dayjs from "dayjs";
 
 const GestionDeRecetasPage = () => {
-  const { recetas, loadingRecetas, showErrorRecetas, setRecetas } =
-    useGetRecetas();
-  const { productos, loadigProducts, showErrorProductos } =
-    useGetProductosYPrecios();
+  const { recetas, loadingRecetas, showErrorRecetas, setRecetas } = useGetRecetas();
+  const { productos, loadigProducts, showErrorProductos } = useGetProductosYPrecios();
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedReceta, setSelectedReceta] = useState(null);
-  const [showToast, setShowToast] = useState(true);
-  const [selectedProduct, setSelectedProduct] = useState(null); // Estado para el producto seleccionado
-  const [searchableSelectError, setSearchableSelectError] = useState(""); // Estado para manejar el error del SearchableSelect
-  const [errorMessage, setErrorMessage] = useState(""); // Estado para manejar errores generales
-  const searchableSelectRef = useRef(null); // Referencia para el SearchableSelect
+  const [showToast, setShowToast] = useState(false); // Inicialmente en false
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [searchableSelectError, setSearchableSelectError] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const searchableSelectRef = useRef(null);
   const navigate = useNavigate();
 
   // React Hook Form para el modal de agregar
-  const {
-    register: registerAdd,
-    handleSubmit: handleSubmitAdd,
-    reset: resetAdd,
-    formState: { errors: errorsAdd },
-  } = useForm();
+  const { register: registerAdd, handleSubmit: handleSubmitAdd, reset: resetAdd, formState: { errors: errorsAdd }, } = useForm();
+  
   // React Hook Form para el modal de editar
-  const {
-    register: registerEdit,
-    handleSubmit: handleSubmitEdit,
-    reset: resetEdit,
-    formState: { errors: errorsEdit },
-    setValue: setEditValue,
-  } = useForm();
+  const { register: registerEdit, handleSubmit: handleSubmitEdit, reset: resetEdit, formState: { errors: errorsEdit }, setValue: setEditValue, } = useForm();
 
   // Convertir productos al formato esperado por SearchableSelect
   const productOptions = productos.map((producto) => ({
     value: producto.idProducto,
     label: producto.nombreProducto,
   }));
+
+  // Usa useEffect para mostrar el Toast solo al cargar la página por primera vez
+  useEffect(() => {
+    setShowToast(true); // Muestra el Toast cuando el componente se monta
+  }, []); // El array vacío asegura que esto solo ocurra una vez
 
   const handleAddReceta = () => {
     setShowAddModal(true);
@@ -95,43 +69,38 @@ const GestionDeRecetasPage = () => {
       setSearchableSelectError("Por favor, selecciona un producto.");
       return;
     }
-  
+
     const newReceta = {
-      idProducto: selectedProduct.value, // ID del producto seleccionado
+      idProducto: selectedProduct.value,
       detallesReceta: [
         {
-          idIngrediente: 1, // ID del ingrediente seleccionado (debes obtenerlo dinámicamente si es necesario)
-          cantidadNecesaria: data.cantidadNecesaria, // Cantidad necesaria
-          unidadMedida: data.unidadMedida, // Unidad de medida
-          fechaCreacion: dayjs().format("YYYY-MM-DD"), // Fecha de creación en formato YYYY-MM-DD usando day.js
+          idIngrediente: 1,
+          cantidadNecesaria: data.cantidadNecesaria,
+          unidadMedida: data.unidadMedida,
+          fechaCreacion: dayjs().format("YYYY-MM-DD"),
         },
       ],
     };
-  
+
     try {
       const response = await ingresarRecetaService(newReceta);
       if (response.status === 201) {
-        // Construir el payload para la nueva receta
         const recetaRetun = {
-          idReceta: response.receta, // ID de la receta devuelta por el backend
-          idProducto: newReceta.idProducto, // ID del producto
-          nombreProducto: selectedProduct.label, // Nombre del producto seleccionado
-          idIngrediente: newReceta.detallesReceta[0].idIngrediente, // ID del ingrediente
-          nombreIngrediente: data.nombreIngrediente, // Nombre del ingrediente (debes obtenerlo dinámicamente si es necesario)
-          cantidadNecesaria: newReceta.detallesReceta[0].cantidadNecesaria, // Cantidad necesaria
-          unidadMedida: "Lb", // Unidad de medida
+          idReceta: response.receta,
+          idProducto: newReceta.idProducto,
+          nombreProducto: selectedProduct.label,
+          idIngrediente: newReceta.detallesReceta[0].idIngrediente,
+          nombreIngrediente: data.nombreIngrediente,
+          cantidadNecesaria: newReceta.detallesReceta[0].cantidadNecesaria,
+          unidadMedida: "Lb",
         };
-  
-        // Actualizar el estado de las recetas
+
         setRecetas((prevRecetas) => [recetaRetun, ...prevRecetas]);
-  
-        // Cerrar el modal y limpiar el formulario
         setShowAddModal(false);
         resetAdd();
         setSelectedProduct(null);
         setSearchableSelectError("");
-        setShowToast(true);
-        setErrorMessage(""); // Limpiar mensajes de error
+        setErrorMessage("");
       }
     } catch (error) {
       console.error("Error al agregar la receta:", error);
@@ -144,42 +113,37 @@ const GestionDeRecetasPage = () => {
   // Actualizar receta existente
   const onSubmitEdit = async (data) => {
     const updatedReceta = {
-      idProducto: selectedReceta.idProducto, // ID del producto (no cambia)
+      idProducto: selectedReceta.idProducto,
       detallesReceta: [
         {
-          idIngrediente: selectedReceta.idIngrediente, // ID del ingrediente (no cambia)
-          cantidadNecesaria: data.cantidadNecesaria, // Cantidad modificada
-          unidadMedida: selectedReceta.unidadMedida, // Unidad de medida (no cambia)
-          fechaCreacion: selectedReceta.fechaCreacion, // Fecha de creación (no cambia)
+          idIngrediente: selectedReceta.idIngrediente,
+          cantidadNecesaria: data.cantidadNecesaria,
+          unidadMedida: selectedReceta.unidadMedida,
+          fechaCreacion: selectedReceta.fechaCreacion,
         },
       ],
     };
-  
+
     try {
       const response = await actualizarRecetaService(updatedReceta);
       if (response) {
-        // Construir el payload para la receta actualizada
         const recetaRetun = {
-          idReceta: selectedReceta.idReceta, // ID de la receta (no cambia)
-          idProducto: selectedReceta.idProducto, // ID del producto (no cambia)
-          nombreProducto: selectedReceta.nombreProducto, // Nombre del producto (no cambia)
-          idIngrediente: selectedReceta.idIngrediente, // ID del ingrediente (no cambia)
-          nombreIngrediente: selectedReceta.nombreIngrediente, // Nombre del ingrediente (no cambia)
-          cantidadNecesaria: data.cantidadNecesaria, // Cantidad modificada
-          unidadMedida: selectedReceta.unidadMedida, // Unidad de medida (no cambia)
+          idReceta: selectedReceta.idReceta,
+          idProducto: selectedReceta.idProducto,
+          nombreProducto: selectedReceta.nombreProducto,
+          idIngrediente: selectedReceta.idIngrediente,
+          nombreIngrediente: selectedReceta.nombreIngrediente,
+          cantidadNecesaria: data.cantidadNecesaria,
+          unidadMedida: selectedReceta.unidadMedida,
         };
-  
-        // Actualizar el estado de las recetas
+
         const updatedRecetas = recetas.map((receta) =>
           receta.idReceta === selectedReceta.idReceta ? recetaRetun : receta
         );
         setRecetas(updatedRecetas);
-  
-        // Cerrar el modal y limpiar el formulario
         setShowEditModal(false);
         resetEdit();
-        setShowToast(true);
-        setErrorMessage(""); // Limpiar mensajes de error
+        setErrorMessage("");
       }
     } catch (error) {
       console.error("Error al actualizar la receta:", error);
@@ -517,7 +481,7 @@ const GestionDeRecetasPage = () => {
       <ToastNotification
         show={showToast}
         onClose={() => setShowToast(false)}
-        delay={3000}
+        delay={2000}
         title="Configuración de ingredientes"
         message="Configura los ingredientes de cada producto para que se muestren en las órdenes de producción."
         position="top-end"
