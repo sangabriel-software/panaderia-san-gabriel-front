@@ -1,26 +1,30 @@
 import React, { useState } from "react";
-import { Container, Form, Button, Row, Col } from "react-bootstrap";
+import { Container, Form, Button, Row, Col, Spinner } from "react-bootstrap";
 import { BsArrowLeft, BsPencil, BsCheck, BsPerson, BsEnvelope, BsPersonBadge } from "react-icons/bs";
 import Title from "../../../components/Title/Title";
 import { getUserData } from "../../../utils/Auth/decodedata";
 import { actualizarDatosUsuario } from "../../../services/userServices/usersservices/users.service";
+import { getLocalStorage } from "../../../utils/Auth/localstorage";
+import successGif from "../../../assets/success.gif"; // Importa un GIF de éxito
+import "./PerfilPage.css"; // Archivo CSS para estilos personalizados
 
 const PerfilPage = () => {
-  const userData = getUserData(); // Obtener datos del usuario
-  const [editField, setEditField] = useState(null); // Campo en edición
+  const userData = JSON.parse(getLocalStorage("userData")) || getUserData();
+  const [editField, setEditField] = useState(null);
   const [formData, setFormData] = useState({
-    nombreUsuario: userData.nombre,
-    apellidoUsuario: userData.apellido,
+    nombreUsuario: userData.nombreUsuario || userData.nombre,
+    apellidoUsuario: userData.apellidoUsuario || userData.apellido,
     usuario: userData.usuario,
-    correoUsuario: userData.correo,
+    correoUsuario: userData.correoUsuario || userData.correo,
     idRol: userData.idRol,
-    fechaCreacion: "2025-01-25", // Este valor debe venir del backend o localStorage
+    fechaCreacion: "2025-01-25",
     idUsuario: userData.idUsuario,
   });
-  const [isChanged, setIsChanged] = useState(false); // Estado para habilitar el botón de guardar
-  const [isEditing, setIsEditing] = useState(false); // Estado para controlar si se está editando
+  const [isChanged, setIsChanged] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false); // Estado para el spinner
+  const [showSuccess, setShowSuccess] = useState(false); // Estado para mostrar el GIF de éxito
 
-  // Función para actualizar el localStorage
   const updateLocalStorage = (key, data) => {
     try {
       localStorage.setItem(key, JSON.stringify(data));
@@ -29,48 +33,51 @@ const PerfilPage = () => {
     }
   };
 
-  // Función para habilitar la edición de un campo
   const handleEdit = (field) => {
     setEditField(field);
-    setIsEditing(true); // Habilitar la edición
+    setIsEditing(true);
   };
 
-  // Función para guardar los cambios de un campo
   const handleSave = async (field) => {
     setEditField(null);
-    setIsChanged(true); // Habilitar el botón de guardar cambios
+    setIsChanged(true);
   };
 
-  // Función para manejar cambios en los inputs
   const handleChange = (e, field) => {
     const { value } = e.target;
     setFormData({
       ...formData,
       [field]: value,
     });
-    setIsChanged(true); // Habilitar el botón de guardar cambios
+    setIsChanged(true);
   };
 
-  // Función para guardar todos los cambios
   const handleSubmit = async () => {
+    setIsSaving(true); // Activar el spinner
     try {
-      const response = await actualizarDatosUsuario(formData); // Enviar datos al backend
+      const response = await actualizarDatosUsuario(formData);
       console.log("Datos actualizados:", response);
 
-      // Actualizar el localStorage con los nuevos datos
       updateLocalStorage("userData", formData);
 
-      // Deshabilitar los inputs y el botón de guardar cambios
       setIsEditing(false);
       setIsChanged(false);
-      setEditField(false)
+      setEditField(false);
+      setShowSuccess(true); // Mostrar el GIF de éxito
+
+      // Ocultar el GIF después de 3 segundos
+      setTimeout(() => {
+        setShowSuccess(false);
+      }, 1100);
     } catch (error) {
       console.error("Error al actualizar los datos:", error);
+    } finally {
+      setIsSaving(false); // Desactivar el spinner
     }
   };
 
   return (
-    <Container>
+    <Container className="perfil-container">
       {/* ---------------- Titulo ----------------- */}
       <div className="text-center mb-3">
         <div className="row">
@@ -94,8 +101,8 @@ const PerfilPage = () => {
 
       {/* ---------------- Formulario de datos ----------------- */}
       <Row className="justify-content-center">
-        <Col lg={6} sm={12}> {/* Formulario ocupa 6 columnas en pantallas grandes y 12 en móviles */}
-          <Form>
+        <Col lg={6} sm={12}>
+          <Form className="perfil-form">
             {/* Nombre */}
             <Form.Group className="mb-3">
               <Form.Label>
@@ -107,6 +114,7 @@ const PerfilPage = () => {
                   value={formData.nombreUsuario}
                   disabled={!isEditing || editField !== "nombreUsuario"}
                   onChange={(e) => handleChange(e, "nombreUsuario")}
+                  className="form-control-custom"
                 />
                 <button
                   type="button"
@@ -137,6 +145,7 @@ const PerfilPage = () => {
                   value={formData.apellidoUsuario}
                   disabled={!isEditing || editField !== "apellidoUsuario"}
                   onChange={(e) => handleChange(e, "apellidoUsuario")}
+                  className="form-control-custom"
                 />
                 <button
                   type="button"
@@ -167,6 +176,7 @@ const PerfilPage = () => {
                   value={formData.usuario}
                   disabled={!isEditing || editField !== "usuario"}
                   onChange={(e) => handleChange(e, "usuario")}
+                  className="form-control-custom"
                 />
                 <button
                   type="button"
@@ -195,6 +205,7 @@ const PerfilPage = () => {
                   value={formData.correoUsuario}
                   disabled={!isEditing || editField !== "correoUsuario"}
                   onChange={(e) => handleChange(e, "correoUsuario")}
+                  className="form-control-custom"
                 />
                 <button
                   type="button"
@@ -218,13 +229,33 @@ const PerfilPage = () => {
             <Button
               variant="primary"
               onClick={handleSubmit}
-              disabled={!isChanged}
+              disabled={!isChanged || isSaving}
+              className="save-button"
             >
-              Guardar cambios
+              {isSaving ? (
+                <Spinner
+                  as="span"
+                  animation="border"
+                  size="sm"
+                  role="status"
+                  aria-hidden="true"
+                  className="me-2"
+                />
+              ) : null}
+              {isSaving ? "Guardando..." : "Guardar cambios"}
             </Button>
           </Form>
         </Col>
       </Row>
+
+      {/* Feedback de éxito (superpuesto) */}
+      {showSuccess && (
+        <div className="success-overlay">
+          <div>
+            <img src={successGif} alt="Éxito" className="success-gif" />
+          </div>
+        </div>
+      )}
     </Container>
   );
 };

@@ -6,6 +6,7 @@ const useLogout = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
+    removeLocalStorage("userData");
     removeLocalStorage("token");
 
     // Mostrar notificación de cierre de sesión
