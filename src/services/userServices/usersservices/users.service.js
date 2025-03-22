@@ -11,7 +11,6 @@ export const crearUsuario = async (dataUSuario) => {
   }
 }
 
-
 export const consultarUsuarios = async () => {
     try {
         const response = await api.get(`${getEndpoints.ALL_USERS}`); 
@@ -48,4 +47,11 @@ export const desbloquearUsuario = async (idUsuario) => {
   }
 }
 
-
+export const actualizarDatosUsuario = async (dataUSuario) => {
+  try {
+      const response = await api.put(`${putEndpoints.ACTUALIZAR_DATOS_USUARIO}`, dataUSuario); 
+      return response.data;
+  } catch (error) {
+    throw error;
+  }
+}

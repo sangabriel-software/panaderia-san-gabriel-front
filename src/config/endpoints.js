@@ -35,6 +35,7 @@ const putEndpoints = {
     ACTUALIZAR_ROL: "/actualizarRol",
     DESBLOQUEAR_USAURIO: "/desbloquearUsuario",
     BLOQUEAR_USUARIO: "/bloquearUsuario",
+    ACTUALIZAR_DATOS_USUARIO: "/actualizarUsuario",
     ACTUALIZAR_PRODUCTO: "/actualizarProducto",
     ACTUALIZAR_PRECIO: "/actualizarPrecio",
     ACTUALIZAR_SUCURSALES: "/actualizar-sucursal",

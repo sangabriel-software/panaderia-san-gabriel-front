@@ -1,15 +1,18 @@
-import React from 'react';
-import { Dropdown, Image } from 'react-bootstrap';
-import { FaUser, FaSignOutAlt, FaCog } from 'react-icons/fa';
-import { Link } from 'react-router-dom'; // Importa Link
-import useLogout from '../../services/session/logout';
+import React from "react";
+import { Dropdown, Image } from "react-bootstrap";
+import { FaUser, FaSignOutAlt, FaCog } from "react-icons/fa";
+import { Link } from "react-router-dom"; // Importa Link
+import useLogout from "../../services/session/logout";
 
 function UserDropdown() {
   const { handleLogout } = useLogout();
 
   return (
     <Dropdown align="end">
-      <Dropdown.Toggle variant="link" className="nav-link p-0 text-light custom-dropdown-toggle">
+      <Dropdown.Toggle
+        variant="link"
+        className="nav-link p-0 text-light custom-dropdown-toggle"
+      >
         <Image
           src="https://i.pinimg.com/originals/d3/a2/9d/d3a29d4e0fa8e004b274880ec979b1e2.jpg"
           roundedCircle
@@ -20,10 +23,10 @@ function UserDropdown() {
       </Dropdown.Toggle>
 
       <Dropdown.Menu className="shadow">
-        <Dropdown.Item href="#profile">
+        <Link to="/config/configuracion-perfil" className="dropdown-item">
           <FaUser className="me-2" />
           Perfil
-        </Dropdown.Item>
+        </Link>
         {/* Reemplaza el Dropdown.Item con Link */}
         <Link to="/config" className="dropdown-item">
           <FaCog className="me-2" />

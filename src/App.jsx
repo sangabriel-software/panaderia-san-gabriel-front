@@ -6,10 +6,8 @@ import "./styles/App.css";
 import "./styles/globalStyles.css";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import GestionDeRecetasPage from "./pages/RecetasPage/GestionDeRecetasPage";
 
 const AccessDeniedPage = lazy( ()=> import("./components/AccesoDenegado/AccessDeniedPage"));
-
 // Lazy-loaded components
 const MainLayout = lazy(() => import("./layouts/MainLayout"));
 const LoginPage = lazy(() => import("./pages/LoginPages/LoginPage"));
@@ -30,6 +28,8 @@ const IngresarVentaPage = lazy(() => import("./pages/VentasPage/IngresarVenta/In
 const DetalleVentaPage = lazy(() => import("./pages/VentasPage/DetalleVenta/DetalleVentaPage"));
 const GestionDeSucursalesPAge = lazy(() => import("./pages/Sucursales/GestionDeSucursales/GestionDeSucursalesPage"));
 const PanelConfig = lazy(() => import("./pages/Configuracioens/ConfiguracionesPage/PanelConfig"));
+const GestionDeRecetasPage = lazy(() => import("./pages/RecetasPage/GestionDeRecetasPage"));
+const PerfilPage = lazy(() => import("./pages/Configuracioens/PerfilPage/PerfilPage"));
 
 function App() {
   return (
@@ -77,6 +77,8 @@ function App() {
             <Route path="/config">
               <Route index element={<PanelConfig/>} />
               <Route path="gestionar-materia-prima" element={<GestionDeRecetasPage/>} />
+              <Route path="configuracion-perfil" element={<PerfilPage/>} />
+
             </Route>
           </Route>
         </Route>
