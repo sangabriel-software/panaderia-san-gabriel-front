@@ -68,13 +68,14 @@ const PerfilPage = () => {
       setEditField(false);
       setShowSuccess(true); // Mostrar el GIF de éxito
 
-      // Ocultar el GIF después de 1.1 segundos
-      setTimeout(() => {
-        setShowSuccess(false);
-      }, 1100);
+
     } catch (error) {
       console.error("Error al actualizar los datos:", error);
     } finally {
+            // Ocultar el GIF después de 1.1 segundos
+            setTimeout(() => {
+              setShowSuccess(false);
+            }, 1500);
       setIsSaving(false); // Desactivar el spinner
     }
   };
