@@ -30,14 +30,14 @@
 }
 
 .success-gif {
-  width: 100px;
-  height: 100px;
-  background-color: transparent; /* Fondo transparente */
-  border-radius: 50%; /* Hace que el ícono sea circular (opcional) */
-  border: none; /* Elimina cualquier borde */
-  box-shadow: none; /* Elimina sombras (opcional) */
+  width: 150px;
+  height: 150px;
+  background-color: transparent;
+  border-radius: 50%;
+  border: none;
+  box-shadow: none;
+  mix-blend-mode: multiply; /* Elimina el fondo blanco */
 }
-
 .success-message {
   color: #28a745;
   font-size: 18px;
