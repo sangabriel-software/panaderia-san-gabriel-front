@@ -25,7 +25,7 @@ const PerfilPage = () => {
   const [isChanged, setIsChanged] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false); // Estado para el spinner
-  const [showSuccess, setShowSuccess] = useState(true); // Estado para mostrar el GIF de éxito
+  const [showSuccess, setShowSuccess] = useState(false); // Estado para mostrar el GIF de éxito
   const [showCredenciales, setShowCredenciales] = useState(false); // Estado para mostrar/ocultar credenciales
 
   const updateLocalStorage = (key, data) => {
