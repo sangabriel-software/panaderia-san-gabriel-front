@@ -107,7 +107,7 @@ const PerfilPage = () => {
         <Col lg={6} sm={12}>
           <div className="d-flex justify-content-between">
             <Button
-              variant="light"
+              variant="primary"
               className="w-50 me-2"
               onClick={() => setShowCredenciales(false)}
               active={!showCredenciales}
@@ -115,7 +115,7 @@ const PerfilPage = () => {
               Datos Personales
             </Button>
             <Button
-              variant="light"
+              variant="primary"
               className="w-50"
               onClick={() => setShowCredenciales(true)}
               active={showCredenciales}
