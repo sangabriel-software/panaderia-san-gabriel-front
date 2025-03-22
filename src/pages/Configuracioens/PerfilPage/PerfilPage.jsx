@@ -75,7 +75,7 @@ const PerfilPage = () => {
             // Ocultar el GIF después de 1.1 segundos
             setTimeout(() => {
               setShowSuccess(false);
-            }, 1500);
+            }, 1650);
       setIsSaving(false); // Desactivar el spinner
     }
   };
