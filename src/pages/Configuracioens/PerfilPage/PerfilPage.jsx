@@ -54,20 +54,21 @@ const PerfilPage = () => {
       [field]: value,
     });
     setIsChanged(true);
-
-    // Validar contraseñas en tiempo real
-    if (field === "contrasena" || field === "confirmarContrasena") {
-      validatePasswords();
-    }
   };
 
   const validatePasswords = () => {
-    if (formData.contrasena !== formData.confirmarContrasena) {
-      setPasswordError("Las contraseñas no coinciden");
-      return false; // Retorna false si no coinciden
+    // Solo validar si el campo de confirmación de contraseña no está vacío
+    if (formData.confirmarContrasena.trim() !== "") {
+      if (formData.contrasena !== formData.confirmarContrasena) {
+        setPasswordError("Las contraseñas no coinciden");
+        return false; // Retorna false si no coinciden
+      } else {
+        setPasswordError(""); // Limpia el mensaje de error
+        return true; // Retorna true si coinciden
+      }
     } else {
-      setPasswordError(""); // Limpia el mensaje de error
-      return true; // Retorna true si coinciden
+      setPasswordError(""); // Limpia el mensaje de error si el campo está vacío
+      return false; // Retorna false si el campo está vacío
     }
   };
 
@@ -308,6 +309,7 @@ const PerfilPage = () => {
                       type="password"
                       value={formData.confirmarContrasena}
                       onChange={(e) => handleChange(e, "confirmarContrasena")}
+                      onKeyUp={validatePasswords} // Validar mientras el usuario escribe
                       className="form-control-custom"
                     />
                     {/* Espacio para mantener el mismo tamaño */}
