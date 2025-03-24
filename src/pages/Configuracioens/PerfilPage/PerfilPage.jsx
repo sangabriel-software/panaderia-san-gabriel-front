@@ -27,6 +27,7 @@ const PerfilPage = () => {
   const [isSaving, setIsSaving] = useState(false); // Estado para el spinner
   const [showSuccess, setShowSuccess] = useState(false); // Estado para mostrar el GIF de éxito
   const [showCredenciales, setShowCredenciales] = useState(false); // Estado para mostrar/ocultar credenciales
+  const [passwordError, setPasswordError] = useState(""); // Estado para el mensaje de error de contraseña
 
   const updateLocalStorage = (key, data) => {
     try {
@@ -53,9 +54,28 @@ const PerfilPage = () => {
       [field]: value,
     });
     setIsChanged(true);
+
+    // Validar contraseñas en tiempo real
+    if (field === "contrasena" || field === "confirmarContrasena") {
+      validatePasswords();
+    }
+  };
+
+  const validatePasswords = () => {
+    if (formData.contrasena !== formData.confirmarContrasena) {
+      setPasswordError("Las contraseñas no coinciden");
+      return false; // Retorna false si no coinciden
+    } else {
+      setPasswordError(""); // Limpia el mensaje de error
+      return true; // Retorna true si coinciden
+    }
   };
 
   const handleSubmit = async () => {
+    if (showCredenciales && !validatePasswords()) {
+      return; // Detiene la ejecución si las contraseñas no coinciden
+    }
+
     setIsSaving(true); // Activar el spinner
     try {
       const response = await actualizarDatosUsuario(formData);
@@ -67,15 +87,13 @@ const PerfilPage = () => {
       setIsChanged(false);
       setEditField(false);
       setShowSuccess(true); // Mostrar el GIF de éxito
-
-
     } catch (error) {
       console.error("Error al actualizar los datos:", error);
     } finally {
-            // Ocultar el GIF después de 1.1 segundos
-            setTimeout(() => {
-              setShowSuccess(false);
-            }, 1650);
+      // Ocultar el GIF después de 1.1 segundos
+      setTimeout(() => {
+        setShowSuccess(false);
+      }, 1650);
       setIsSaving(false); // Desactivar el spinner
     }
   };
@@ -268,12 +286,16 @@ const PerfilPage = () => {
                   <Form.Label>
                     <BsLock className="me-2" style={{ color: "#27ae60" }} /> Contraseña
                   </Form.Label>
-                  <Form.Control
-                    type="password"
-                    value={formData.contrasena}
-                    onChange={(e) => handleChange(e, "contrasena")}
-                    className="form-control-custom"
-                  />
+                  <div className="d-flex align-items-center">
+                    <Form.Control
+                      type="password"
+                      value={formData.contrasena}
+                      onChange={(e) => handleChange(e, "contrasena")}
+                      className="form-control-custom"
+                    />
+                    {/* Espacio para mantener el mismo tamaño */}
+                    <div style={{ width: "50px" }}></div>
+                  </div>
                 </Form.Group>
 
                 {/* Confirmar Contraseña */}
@@ -281,12 +303,19 @@ const PerfilPage = () => {
                   <Form.Label>
                     <BsLock className="me-2" style={{ color: "#27ae60" }} /> Confirmar Contraseña
                   </Form.Label>
-                  <Form.Control
-                    type="password"
-                    value={formData.confirmarContrasena}
-                    onChange={(e) => handleChange(e, "confirmarContrasena")}
-                    className="form-control-custom"
-                  />
+                  <div className="d-flex align-items-center">
+                    <Form.Control
+                      type="password"
+                      value={formData.confirmarContrasena}
+                      onChange={(e) => handleChange(e, "confirmarContrasena")}
+                      className="form-control-custom"
+                    />
+                    {/* Espacio para mantener el mismo tamaño */}
+                    <div style={{ width: "50px" }}></div>
+                  </div>
+                  {passwordError && (
+                    <div className="text-danger mt-2">{passwordError}</div>
+                  )}
                 </Form.Group>
               </div>
             )}
@@ -295,7 +324,7 @@ const PerfilPage = () => {
             <Button
               variant="primary"
               onClick={handleSubmit}
-              disabled={!isChanged || isSaving}
+              disabled={!isChanged || isSaving || (showCredenciales && passwordError)}
               className="save-button"
             >
               {isSaving ? (
