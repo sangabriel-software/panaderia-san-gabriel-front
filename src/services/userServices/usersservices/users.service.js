@@ -55,3 +55,12 @@ export const actualizarDatosUsuario = async (dataUSuario) => {
     throw error;
   }
 }
+
+export const cambiarPassSErvice = async (dataNewPass) => {
+  try {
+      const response = await api.put(`${putEndpoints.CAMBIAR_PASS}`, dataNewPass); 
+      return response.data;
+  } catch (error) {
+    throw error;
+  }
+}

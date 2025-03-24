@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import { Container, Form, Button, Row, Col, Spinner } from "react-bootstrap";
+import { Container, Form, Button, Row, Col, Spinner, Alert } from "react-bootstrap";
 import { BsArrowLeft, BsPencil, BsCheck, BsPerson, BsEnvelope, BsPersonBadge, BsLock } from "react-icons/bs";
 import Title from "../../../components/Title/Title";
 import { getUserData } from "../../../utils/Auth/decodedata";
-import { actualizarDatosUsuario } from "../../../services/userServices/usersservices/users.service";
 import { getLocalStorage } from "../../../utils/Auth/localstorage";
 import successGif from "../../../assets/success.gif"; // Importa un GIF de éxito
 import "./PerfilPage.css"; // Archivo CSS para estilos personalizados
+import { cambiarPassSErvice } from "../../../services/userServices/usersservices/users.service";
 
 const PerfilPage = () => {
   const userData = JSON.parse(getLocalStorage("userData")) || getUserData();
@@ -28,6 +28,8 @@ const PerfilPage = () => {
   const [showSuccess, setShowSuccess] = useState(false); // Estado para mostrar el GIF de éxito
   const [showCredenciales, setShowCredenciales] = useState(false); // Estado para mostrar/ocultar credenciales
   const [passwordError, setPasswordError] = useState(""); // Estado para el mensaje de error de contraseña
+  const [changePasswordError, setChangePasswordError] = useState(""); // Estado para el mensaje de error al cambiar la contraseña
+  const [changePasswordSuccess, setChangePasswordSuccess] = useState(""); // Estado para el mensaje de éxito al cambiar la contraseña
 
   const updateLocalStorage = (key, data) => {
     try {
@@ -72,30 +74,41 @@ const PerfilPage = () => {
     }
   };
 
-  const handleSubmit = async () => {
-    if (showCredenciales && !validatePasswords()) {
+  const handleChangePassword = async () => {
+    if (!validatePasswords()) {
       return; // Detiene la ejecución si las contraseñas no coinciden
     }
 
     setIsSaving(true); // Activar el spinner
+    setChangePasswordError(""); // Limpiar mensajes de error anteriores
+    setChangePasswordSuccess(""); // Limpiar mensajes de éxito anteriores
+
     try {
-      const response = await actualizarDatosUsuario(formData);
-      console.log("Datos actualizados:", response);
+      const payload = {
+        contrasena: formData.contrasena, // Nueva contraseña
+        usuario: userData.usuario, // Usuario autenticado
+      };
 
-      updateLocalStorage("userData", formData);
+      const response = await cambiarPassSErvice(payload); // Consumir el servicio
+      console.log("Contraseña cambiada:", response);
 
-      setIsEditing(false);
-      setIsChanged(false);
-      setEditField(false);
+      setChangePasswordSuccess("Contraseña cambiada exitosamente"); // Mostrar mensaje de éxito
       setShowSuccess(true); // Mostrar el GIF de éxito
+
+      // Limpiar el formulario después de un cambio exitoso
+      setFormData({
+        ...formData,
+        contrasena: "",
+        confirmarContrasena: "",
+      });
     } catch (error) {
-      console.error("Error al actualizar los datos:", error);
+      console.error("Error al cambiar la contraseña:", error);
+      setChangePasswordError("Error al cambiar la contraseña. Inténtalo de nuevo."); // Mostrar mensaje de error
     } finally {
-      // Ocultar el GIF después de 1.1 segundos
-      setTimeout(() => {
-        setShowSuccess(false);
-      }, 1650);
       setIsSaving(false); // Desactivar el spinner
+      setTimeout(() => {
+        setShowSuccess(false); // Ocultar el GIF de éxito después de 1.1 segundos
+      }, 1650);
     }
   };
 
@@ -253,39 +266,10 @@ const PerfilPage = () => {
             {showCredenciales && (
               <div className="mb-4">
                 <h5 className="mb-3" style={{ color: "#2c3e50" }}>Credenciales</h5>
-                {/* Usuario */}
-                <Form.Group className="mb-3">
-                  <Form.Label>
-                    <BsPersonBadge className="me-2" style={{ color: "#8e44ad" }} /> Usuario
-                  </Form.Label>
-                  <div className="d-flex align-items-center">
-                    <Form.Control
-                      type="text"
-                      value={formData.usuario}
-                      disabled={!isEditing || editField !== "usuario"}
-                      onChange={(e) => handleChange(e, "usuario")}
-                      className="form-control-custom"
-                    />
-                    <button
-                      type="button"
-                      className="btn btn-link"
-                      onClick={() =>
-                        editField === "usuario" ? handleSave("usuario") : handleEdit("usuario")
-                      }
-                    >
-                      {editField === "usuario" ? (
-                        <BsCheck size={20} className="text-success" />
-                      ) : (
-                        <BsPencil size={20} className={isEditing ? "text-primary" : "text-secondary"} />
-                      )}
-                    </button>
-                  </div>
-                </Form.Group>
-
                 {/* Contraseña */}
                 <Form.Group className="mb-3">
                   <Form.Label>
-                    <BsLock className="me-2" style={{ color: "#27ae60" }} /> Contraseña
+                    <BsLock className="me-2" style={{ color: "#27ae60" }} /> Nueva Contraseña
                   </Form.Label>
                   <div className="d-flex align-items-center">
                     <Form.Control
@@ -319,28 +303,40 @@ const PerfilPage = () => {
                     <div className="text-danger mt-2">{passwordError}</div>
                   )}
                 </Form.Group>
+
+                {/* Mensajes de éxito o error al cambiar la contraseña */}
+                {changePasswordSuccess && (
+                  <Alert variant="success" className="mt-3">
+                    {changePasswordSuccess}
+                  </Alert>
+                )}
+                {changePasswordError && (
+                  <Alert variant="danger" className="mt-3">
+                    {changePasswordError}
+                  </Alert>
+                )}
+
+                {/* Botón para cambiar la contraseña */}
+                <Button
+                  variant="primary"
+                  onClick={handleChangePassword}
+                  disabled={!isChanged || isSaving || passwordError}
+                  className="save-button"
+                >
+                  {isSaving ? (
+                    <Spinner
+                      as="span"
+                      animation="border"
+                      size="sm"
+                      role="status"
+                      aria-hidden="true"
+                      className="me-2"
+                    />
+                  ) : null}
+                  {isSaving ? "Guardando..." : "Cambiar contraseña"}
+                </Button>
               </div>
             )}
-
-            {/* Botón de guardar cambios */}
-            <Button
-              variant="primary"
-              onClick={handleSubmit}
-              disabled={!isChanged || isSaving || (showCredenciales && passwordError)}
-              className="save-button"
-            >
-              {isSaving ? (
-                <Spinner
-                  as="span"
-                  animation="border"
-                  size="sm"
-                  role="status"
-                  aria-hidden="true"
-                  className="me-2"
-                />
-              ) : null}
-              {isSaving ? "Guardando..." : "Guardar cambios"}
-            </Button>
           </Form>
         </Col>
       </Row>
