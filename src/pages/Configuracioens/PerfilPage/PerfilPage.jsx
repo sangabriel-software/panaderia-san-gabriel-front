@@ -6,7 +6,7 @@ import { getUserData } from "../../../utils/Auth/decodedata";
 import { getLocalStorage } from "../../../utils/Auth/localstorage";
 import successGif from "../../../assets/success.gif"; // Importa un GIF de éxito
 import "./PerfilPage.css"; // Archivo CSS para estilos personalizados
-import { cambiarPassSErvice } from "../../../services/userServices/usersservices/users.service";
+import { cambiarPassSErvice, actualizarDatosUsuario } from "../../../services/userServices/usersservices/users.service";
 
 const PerfilPage = () => {
   const userData = JSON.parse(getLocalStorage("userData")) || getUserData();
@@ -104,6 +104,33 @@ const PerfilPage = () => {
     } catch (error) {
       console.error("Error al cambiar la contraseña:", error);
       setChangePasswordError("Error al cambiar la contraseña. Inténtalo de nuevo."); // Mostrar mensaje de error
+    } finally {
+      setIsSaving(false); // Desactivar el spinner
+      setTimeout(() => {
+        setShowSuccess(false); // Ocultar el GIF de éxito después de 1.1 segundos
+      }, 1650);
+    }
+  };
+
+  const handleSavePersonalData = async () => {
+    setIsSaving(true); // Activar el spinner
+    try {
+      const payload = {
+        nombreUsuario: formData.nombreUsuario,
+        apellidoUsuario: formData.apellidoUsuario,
+        correoUsuario: formData.correoUsuario,
+        usuario: userData.usuario,
+        idUsuario: formData.idUsuario,
+      };
+
+      const response = await actualizarDatosUsuario(payload); // Consumir el servicio
+      console.log("Datos actualizados:", response);
+
+      setShowSuccess(true); // Mostrar el GIF de éxito
+      setIsChanged(false); // Desactivar el estado de cambios
+      updateLocalStorage("userData", { ...userData, ...payload }); // Actualizar localStorage
+    } catch (error) {
+      console.error("Error al actualizar los datos:", error);
     } finally {
       setIsSaving(false); // Desactivar el spinner
       setTimeout(() => {
@@ -259,6 +286,26 @@ const PerfilPage = () => {
                     </button>
                   </div>
                 </Form.Group>
+
+                {/* Botón para guardar cambios en datos personales */}
+                <Button
+                  variant="primary"
+                  onClick={handleSavePersonalData}
+                  disabled={!isChanged || isSaving}
+                  className="save-button"
+                >
+                  {isSaving ? (
+                    <Spinner
+                      as="span"
+                      animation="border"
+                      size="sm"
+                      role="status"
+                      aria-hidden="true"
+                      className="me-2"
+                    />
+                  ) : null}
+                  {isSaving ? "Guardando..." : "Guardar cambios"}
+                </Button>
               </div>
             )}
 
@@ -266,6 +313,21 @@ const PerfilPage = () => {
             {showCredenciales && (
               <div className="mb-4">
                 <h5 className="mb-3" style={{ color: "#2c3e50" }}>Credenciales</h5>
+                {/* Usuario */}
+                <Form.Group className="mb-3">
+                  <Form.Label>
+                    <BsPerson className="me-2" style={{ color: "#3498db" }} /> Usuario
+                  </Form.Label>
+                  <div className="d-flex align-items-center">
+                    <Form.Control
+                      type="text"
+                      value={formData.usuario}
+                      disabled
+                      className="form-control-custom"
+                    />
+                  </div>
+                </Form.Group>
+
                 {/* Contraseña */}
                 <Form.Group className="mb-3">
                   <Form.Label>
