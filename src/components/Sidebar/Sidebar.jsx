@@ -1,22 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Nav, Collapse } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
-import {
-  FaHome,
-  FaUsers,
-  FaCalendar,
-  FaFolder,
-  FaUserPlus,
-  FaUsersCog,
-  FaChevronRight,
-  FaCog,
-  FaSun,
-  FaMoon,
-  FaShoppingBag,
-  FaPlus,
-  FaStore,
-  FaUtensils,
-} from "react-icons/fa";
+import { FaHome, FaUsers, FaCalendar, FaFolder, FaUserPlus, FaUsersCog, FaChevronRight, FaCog, FaSun, FaMoon, FaShoppingBag, FaStore, } from "react-icons/fa";
 import { MdDashboard, MdOutlineBakeryDining } from "react-icons/md";
 import * as DarkReader from "darkreader";
 import "./Sidebar.css";

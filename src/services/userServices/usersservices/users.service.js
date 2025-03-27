@@ -56,7 +56,7 @@ export const actualizarDatosUsuario = async (dataUSuario) => {
   }
 }
 
-export const cambiarPassSErvice = async (dataNewPass) => {
+export const cambiarPassService = async (dataNewPass) => {
   try {
       const response = await api.put(`${putEndpoints.CAMBIAR_PASS}`, dataNewPass); 
       return response.data;

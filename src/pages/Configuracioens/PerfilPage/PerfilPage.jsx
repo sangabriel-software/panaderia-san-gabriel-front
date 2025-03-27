@@ -1,15 +1,18 @@
 import React, { useState } from "react";
 import { Container, Form, Button, Row, Col, Spinner, Alert } from "react-bootstrap";
-import { BsArrowLeft, BsPencil, BsCheck, BsPerson, BsEnvelope, BsPersonBadge, BsLock } from "react-icons/bs";
+import { BsArrowLeft, BsPencil, BsCheck, BsPerson, BsEnvelope, BsPersonBadge, BsLock, BsEye, BsEyeSlash } from "react-icons/bs";
 import Title from "../../../components/Title/Title";
 import { getUserData } from "../../../utils/Auth/decodedata";
 import { getLocalStorage } from "../../../utils/Auth/localstorage";
-import successGif from "../../../assets/success.gif"; // Importa un GIF de éxito
-import "./PerfilPage.css"; // Archivo CSS para estilos personalizados
-import { cambiarPassSErvice, actualizarDatosUsuario } from "../../../services/userServices/usersservices/users.service";
+import successGif from "../../../assets/success.gif";
+import "./PerfilPage.css";
+import { guardarCambiosCredenciales, handleChange, handleChangePassword, handleEdit, handleSave, handleSavePersonalData, validatePasswords } from "./Permfil.utils";
+import { useNavigate } from "react-router";
 
 const PerfilPage = () => {
+  const navigate = useNavigate();
   const userData = JSON.parse(getLocalStorage("userData")) || getUserData();
+
   const [editField, setEditField] = useState(null);
   const [formData, setFormData] = useState({
     nombreUsuario: userData.nombreUsuario || userData.nombre,
@@ -18,126 +21,18 @@ const PerfilPage = () => {
     usuario: userData.usuario,
     contrasena: "",
     confirmarContrasena: "",
-    idRol: userData.idRol,
-    fechaCreacion: "2025-01-25",
     idUsuario: userData.idUsuario,
   });
   const [isChanged, setIsChanged] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [isSaving, setIsSaving] = useState(false); // Estado para el spinner
-  const [showSuccess, setShowSuccess] = useState(false); // Estado para mostrar el GIF de éxito
-  const [showCredenciales, setShowCredenciales] = useState(false); // Estado para mostrar/ocultar credenciales
-  const [passwordError, setPasswordError] = useState(""); // Estado para el mensaje de error de contraseña
-  const [changePasswordError, setChangePasswordError] = useState(""); // Estado para el mensaje de error al cambiar la contraseña
-  const [changePasswordSuccess, setChangePasswordSuccess] = useState(""); // Estado para el mensaje de éxito al cambiar la contraseña
-
-  const updateLocalStorage = (key, data) => {
-    try {
-      localStorage.setItem(key, JSON.stringify(data));
-    } catch (error) {
-      console.error("Error al actualizar el localStorage:", error);
-    }
-  };
-
-  const handleEdit = (field) => {
-    setEditField(field);
-    setIsEditing(true);
-  };
-
-  const handleSave = async (field) => {
-    setEditField(null);
-    setIsChanged(true);
-  };
-
-  const handleChange = (e, field) => {
-    const { value } = e.target;
-    setFormData({
-      ...formData,
-      [field]: value,
-    });
-    setIsChanged(true);
-  };
-
-  const validatePasswords = () => {
-    // Solo validar si el campo de confirmación de contraseña no está vacío
-    if (formData.confirmarContrasena.trim() !== "") {
-      if (formData.contrasena !== formData.confirmarContrasena) {
-        setPasswordError("Las contraseñas no coinciden");
-        return false; // Retorna false si no coinciden
-      } else {
-        setPasswordError(""); // Limpia el mensaje de error
-        return true; // Retorna true si coinciden
-      }
-    } else {
-      setPasswordError(""); // Limpia el mensaje de error si el campo está vacío
-      return false; // Retorna false si el campo está vacío
-    }
-  };
-
-  const handleChangePassword = async () => {
-    if (!validatePasswords()) {
-      return; // Detiene la ejecución si las contraseñas no coinciden
-    }
-
-    setIsSaving(true); // Activar el spinner
-    setChangePasswordError(""); // Limpiar mensajes de error anteriores
-    setChangePasswordSuccess(""); // Limpiar mensajes de éxito anteriores
-
-    try {
-      const payload = {
-        contrasena: formData.contrasena, // Nueva contraseña
-        usuario: userData.usuario, // Usuario autenticado
-      };
-
-      const response = await cambiarPassSErvice(payload); // Consumir el servicio
-      console.log("Contraseña cambiada:", response);
-
-      setChangePasswordSuccess("Contraseña cambiada exitosamente"); // Mostrar mensaje de éxito
-      setShowSuccess(true); // Mostrar el GIF de éxito
-
-      // Limpiar el formulario después de un cambio exitoso
-      setFormData({
-        ...formData,
-        contrasena: "",
-        confirmarContrasena: "",
-      });
-    } catch (error) {
-      console.error("Error al cambiar la contraseña:", error);
-      setChangePasswordError("Error al cambiar la contraseña. Inténtalo de nuevo."); // Mostrar mensaje de error
-    } finally {
-      setIsSaving(false); // Desactivar el spinner
-      setTimeout(() => {
-        setShowSuccess(false); // Ocultar el GIF de éxito después de 1.1 segundos
-      }, 1650);
-    }
-  };
-
-  const handleSavePersonalData = async () => {
-    setIsSaving(true); // Activar el spinner
-    try {
-      const payload = {
-        nombreUsuario: formData.nombreUsuario,
-        apellidoUsuario: formData.apellidoUsuario,
-        correoUsuario: formData.correoUsuario,
-        usuario: userData.usuario,
-        idUsuario: formData.idUsuario,
-      };
-
-      const response = await actualizarDatosUsuario(payload); // Consumir el servicio
-      console.log("Datos actualizados:", response);
-
-      setShowSuccess(true); // Mostrar el GIF de éxito
-      setIsChanged(false); // Desactivar el estado de cambios
-      updateLocalStorage("userData", { ...userData, ...payload }); // Actualizar localStorage
-    } catch (error) {
-      console.error("Error al actualizar los datos:", error);
-    } finally {
-      setIsSaving(false); // Desactivar el spinner
-      setTimeout(() => {
-        setShowSuccess(false); // Ocultar el GIF de éxito después de 1.1 segundos
-      }, 1650);
-    }
-  };
+  const [isSaving, setIsSaving] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [showCredenciales, setShowCredenciales] = useState(false);
+  const [passwordError, setPasswordError] = useState("");
+  const [changePasswordError, setChangePasswordError] = useState("");
+  const [changePasswordSuccess, setChangePasswordSuccess] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   return (
     <Container className="perfil-container">
@@ -204,7 +99,7 @@ const PerfilPage = () => {
                       type="text"
                       value={formData.nombreUsuario}
                       disabled={!isEditing || editField !== "nombreUsuario"}
-                      onChange={(e) => handleChange(e, "nombreUsuario")}
+                      onChange={(e) => handleChange(e, "nombreUsuario", formData, setFormData, setIsChanged)}
                       className="form-control-custom"
                     />
                     <button
@@ -212,8 +107,8 @@ const PerfilPage = () => {
                       className="btn btn-link"
                       onClick={() =>
                         editField === "nombreUsuario"
-                          ? handleSave("nombreUsuario")
-                          : handleEdit("nombreUsuario")
+                          ? handleSave("nombreUsuario", setEditField, setIsEditing)
+                          : handleEdit("nombreUsuario", setEditField, setIsEditing)
                       }
                     >
                       {editField === "nombreUsuario" ? (
@@ -235,7 +130,7 @@ const PerfilPage = () => {
                       type="text"
                       value={formData.apellidoUsuario}
                       disabled={!isEditing || editField !== "apellidoUsuario"}
-                      onChange={(e) => handleChange(e, "apellidoUsuario")}
+                      onChange={(e) => handleChange(e, "apellidoUsuario", formData, setFormData, setIsChanged)}
                       className="form-control-custom"
                     />
                     <button
@@ -243,8 +138,8 @@ const PerfilPage = () => {
                       className="btn btn-link"
                       onClick={() =>
                         editField === "apellidoUsuario"
-                          ? handleSave("apellidoUsuario")
-                          : handleEdit("apellidoUsuario")
+                          ? handleSave("apellidoUsuario", setEditField, setIsEditing)
+                          : handleEdit("apellidoUsuario", setEditField, setIsEditing)
                       }
                     >
                       {editField === "apellidoUsuario" ? (
@@ -266,7 +161,7 @@ const PerfilPage = () => {
                       type="email"
                       value={formData.correoUsuario}
                       disabled={!isEditing || editField !== "correoUsuario"}
-                      onChange={(e) => handleChange(e, "correoUsuario")}
+                      onChange={(e) => handleChange(e, "correoUsuario", formData, setFormData, setIsChanged)}
                       className="form-control-custom"
                     />
                     <button
@@ -274,8 +169,8 @@ const PerfilPage = () => {
                       className="btn btn-link"
                       onClick={() =>
                         editField === "correoUsuario"
-                          ? handleSave("correoUsuario")
-                          : handleEdit("correoUsuario")
+                          ? handleSave("correoUsuario", setEditField, setIsEditing)
+                          : handleEdit("correoUsuario", setEditField, setIsEditing)
                       }
                     >
                       {editField === "correoUsuario" ? (
@@ -290,7 +185,16 @@ const PerfilPage = () => {
                 {/* Botón para guardar cambios en datos personales */}
                 <Button
                   variant="primary"
-                  onClick={handleSavePersonalData}
+                  onClick={() =>
+                    handleSavePersonalData(
+                      formData,
+                      userData,
+                      setIsSaving,
+                      setShowSuccess,
+                      setIsChanged,
+                      guardarCambiosCredenciales
+                    )
+                  }
                   disabled={!isChanged || isSaving}
                   className="save-button"
                 >
@@ -333,15 +237,21 @@ const PerfilPage = () => {
                   <Form.Label>
                     <BsLock className="me-2" style={{ color: "#27ae60" }} /> Nueva Contraseña
                   </Form.Label>
-                  <div className="d-flex align-items-center">
+                  <div className="d-flex align-items-center position-relative">
                     <Form.Control
-                      type="password"
+                      type={showPassword ? "text" : "password"}
                       value={formData.contrasena}
-                      onChange={(e) => handleChange(e, "contrasena")}
+                      onChange={(e) => handleChange(e, "contrasena", formData, setFormData, setIsChanged)}
                       className="form-control-custom"
                     />
-                    {/* Espacio para mantener el mismo tamaño */}
-                    <div style={{ width: "50px" }}></div>
+                    <button 
+                      type="button" 
+                      className="btn btn-link position-absolute end-0 top-50 translate-middle-y"
+                      onClick={() => setShowPassword(!showPassword)}
+                      style={{ zIndex: 10, padding: '0.375rem' }}
+                    >
+                      {showPassword ? <BsEyeSlash size={20} /> : <BsEye size={20} />}
+                    </button>
                   </div>
                 </Form.Group>
 
@@ -350,16 +260,22 @@ const PerfilPage = () => {
                   <Form.Label>
                     <BsLock className="me-2" style={{ color: "#27ae60" }} /> Confirmar Contraseña
                   </Form.Label>
-                  <div className="d-flex align-items-center">
+                  <div className="d-flex align-items-center position-relative">
                     <Form.Control
-                      type="password"
+                      type={showConfirmPassword ? "text" : "password"}
                       value={formData.confirmarContrasena}
-                      onChange={(e) => handleChange(e, "confirmarContrasena")}
-                      onKeyUp={validatePasswords} // Validar mientras el usuario escribe
+                      onChange={(e) => handleChange(e, "confirmarContrasena", formData, setFormData, setIsChanged)}
+                      onKeyUp={() => validatePasswords(formData, setPasswordError)}
                       className="form-control-custom"
                     />
-                    {/* Espacio para mantener el mismo tamaño */}
-                    <div style={{ width: "50px" }}></div>
+                    <button 
+                      type="button" 
+                      className="btn btn-link position-absolute end-0 top-50 translate-middle-y"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      style={{ zIndex: 10, padding: '0.375rem' }}
+                    >
+                      {showConfirmPassword ? <BsEyeSlash size={20} /> : <BsEye size={20} />}
+                    </button>
                   </div>
                   {passwordError && (
                     <div className="text-danger mt-2">{passwordError}</div>
@@ -381,7 +297,18 @@ const PerfilPage = () => {
                 {/* Botón para cambiar la contraseña */}
                 <Button
                   variant="primary"
-                  onClick={handleChangePassword}
+                  onClick={() =>
+                    handleChangePassword(
+                      formData,
+                      userData,
+                      setIsSaving,
+                      setChangePasswordError,
+                      setChangePasswordSuccess,
+                      setShowSuccess,
+                      setFormData,
+                      setPasswordError
+                    )
+                  }
                   disabled={!isChanged || isSaving || passwordError}
                   className="save-button"
                 >
