@@ -401,10 +401,7 @@ function IngresarProductos() {
         onNew={() => {
           setIsPopupOpen(false);
           resetForm(
-            reset,
-            setSelectedImage,
-            setImagePreview,
-            setIsResetImageInput
+            reset
           );
         }}
       />

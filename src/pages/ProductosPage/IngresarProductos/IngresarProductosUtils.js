@@ -8,12 +8,26 @@ export const crearPayloadProducto = (data) => {
   const idCategoria = Number(data.idCategoria);
   const unidadesPorBandeja = Number(data.unidadesPorBandeja);
   const badejasUnidades = (idCategoria === 1) ? unidadesPorBandeja : null;   // Determinar bandejasUnidades basado en la categoría
-  const tipoProduccion = data.tipoProduccion === "bandejas" ? 0 : 1;
+  //determinar tipo produccion
+  let tipoProduccion
+  if(idCategoria === 1){
+    tipoProduccion = data.tipoProduccion;
+  }else{
+    tipoProduccion = "Otros";
+  }
+
+  //determinar control stock 
+  let controlStock;
+  if(idCategoria === 1){
+    controlStock = data.controlStock;
+  }else{
+    controlStock = 1;
+  }
 
   const productoPayload = {  // Crear el payload del producto
     nombreProducto: capitalizeFirstLetter(data.nombreProducto),
     idCategoria: idCategoria, 
-    controlarStock: data.controlStock,
+    controlarStock: controlStock,
     controlarStockDiario: data.stockDiario,
     tipoProduccion: tipoProduccion, 
     fechaCreacion: currentDate(),

@@ -1,25 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useGetProductosYPrecios } from "../../../hooks/productosprecios/useGetProductosYprecios";
-import {
-  checkForChanges,
-  handleConfirmDeletePreoducto,
-  handleDeleleProducto,
-  handleModifyClick,
-  handleUpdateProduct,
-  useCategoriasYFiltrado,
-  useSerchPrductos,
+import { checkForChanges, handleConfirmDeletePreoducto, handleDeleleProducto, handleModifyClick, handleUpdateProduct, useCategoriasYFiltrado, useSerchPrductos,
 } from "./ManageProductsUtils";
 import SearchInput from "../../../components/SerchInput/SerchInput";
 import Title from "../../../components/Title/Title";
 import CardProductos from "../../../components/CardProductos/CardPoductos";
 import { useNavigate } from "react-router";
 import Alert from "../../../components/Alerts/Alert";
-import {
-  BsExclamationTriangleFill,
-  BsFillInfoCircleFill,
-  BsX,
-} from "react-icons/bs";
+import { BsExclamationTriangleFill, BsFillInfoCircleFill, BsX, } from "react-icons/bs";
 import ConfirmPopUp from "../../../components/Popup/ConfirmPopup";
 import ErrorPopup from "../../../components/Popup/ErrorPopUp";
 import ModalIngreso from "../../../components/ModalGenerico/Modal";
