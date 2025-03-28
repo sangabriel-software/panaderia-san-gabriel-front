@@ -136,6 +136,29 @@ const styles = StyleSheet.create({
     fontSize: 9,
     color: '#9E9E9E',
   },
+  flourSummaryContainer: {
+    marginTop: 15,
+    backgroundColor: '#FFF3E0',
+    padding: 12,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: '#FFA000',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  flourSummaryText: {
+    fontSize: 14,
+    fontWeight: 'extrabold',
+    color: '#5D4037',
+    textAlign: 'center',
+  },
+  flourTotal: {
+    fontSize: 16,
+    fontWeight: 'extrabold',
+    color: '#BF360C',
+    marginLeft: 5,
+  },
 });
 
 const OrderDetailsPdf = ({ detalleOrden, encabezadoOrden, detalleConsumo }) => {
@@ -143,12 +166,36 @@ const OrderDetailsPdf = ({ detalleOrden, encabezadoOrden, detalleConsumo }) => {
   const reposteria = detalleOrden?.filter(item => item.idCategoria === 2);
   const fechaGeneracion = new Date().toLocaleString();
 
+  // Calcular total de harina
+  const calcularTotalHarina = () => {
+    if (!detalleConsumo || detalleConsumo.length === 0) return null;
+    
+    const harinas = detalleConsumo.filter(item => 
+      item.Ingrediente.toLowerCase().includes('harina')
+    );
+
+    if (harinas.length === 0) return null;
+
+    const totalHarina = harinas.reduce((sum, item) => {
+      return sum + parseFloat(item.CantidadUsada);
+    }, 0);
+
+    const unidad = harinas[0]?.UnidadMedida || '';
+
+    return {
+      total: totalHarina,
+      unidad: unidad
+    };
+  };
+
+  const totalHarina = calcularTotalHarina();
+
   return (
     <Document>
       <Page style={styles.page}>
         <View style={styles.logoContainer}>
           <Image 
-            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSFVkyNISVjpl9Sqk0A4bbegVdZz0P-FwndQSr_fhYHPwwQ-MKYRpl7Nzii0L3nWWUFzJo&usqp=CAU" 
+            src="https://sangabrielpiloto.vercel.app/assets/logo-Qf7fe2hw.png" 
             style={styles.logo} 
           />
         </View>
@@ -233,29 +280,12 @@ const OrderDetailsPdf = ({ detalleOrden, encabezadoOrden, detalleConsumo }) => {
           </View>
         )}
 
-        {detalleConsumo && detalleConsumo.length > 0 && (
-          <View style={styles.tableContainer}>
-            <View style={styles.tableTitleContainer}>
-              <Text style={styles.tableTitle}>Detalles de Ingredientes Utilizados</Text>
-            </View>
-                              <View style={styles.tableRow}>
-                    <Text style={styles.tableCellItem}>#</Text>
-                    <Text style={styles.tableHeader}>Producto</Text>
-                    <Text style={styles.tableHeader}>Ingrediente</Text>
-                    <Text style={styles.tableHeader}>Cantidad Usada</Text>
-                  </View>
-            <View style={styles.table}>
-              {detalleConsumo.map((item, index) => (
-                <React.Fragment key={index}>
-                  <View style={styles.tableRow}>
-                    <Text style={styles.tableCellItem}>{index + 1}</Text>
-                    <Text style={styles.tableCell}>{item.Producto}</Text>
-                    <Text style={styles.tableCell}>{item.Ingrediente}</Text>
-                    <Text style={styles.tableCell}>{`${item.CantidadUsada} ${item.UnidadMedida}`}</Text>
-                  </View>
-                </React.Fragment>
-              ))}
-            </View>
+        {totalHarina && (
+          <View style={styles.flourSummaryContainer}>
+            <Text style={styles.flourSummaryText}>TOTAL HARINA NECESARIA:</Text>
+            <Text style={styles.flourTotal}>
+              {totalHarina.total.toFixed(2)} {totalHarina.unidad.toUpperCase()}
+            </Text>
           </View>
         )}
 
