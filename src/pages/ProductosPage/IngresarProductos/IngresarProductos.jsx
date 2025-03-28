@@ -13,7 +13,7 @@ import SuccessPopup from "../../../components/Popup/SuccessPopup";
 import ErrorPopup from "../../../components/Popup/ErrorPopUp";
 import ModalIngreso from "../../../components/ModalGenerico/Modal";
 import { saveCategory } from "../../Categorias/categoriasUtils";
-import "./ingresarProductosStyle.css"; // Importa el archivo CSS para estilos personalizados
+import "./ingresarProductosStyle.css";
 
 function IngresarProductos() {
   //variables logica productos
@@ -23,55 +23,62 @@ function IngresarProductos() {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const [selectedImage, setSelectedImage] = useState(null);
-  const { register, handleSubmit, reset, watch, formState: { errors }, } = useForm({ defaultValues: { idCategoria: "", controlStock: 0 } }); // Añade controlStock con valor por defecto 0
+  const { register, handleSubmit, reset, watch, formState: { errors }, setValue } = useForm({ defaultValues: { dCategoria: "", controlStock: 0, stockDiario: 0, tipoProduccion: "bandejas", unidadesPorBandeja: "" } });
 
   // variables logica categorias
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [isCategorySaving, setIsCategorySaving] = useState(false);
   const [showErrorCategorySave, setShowErrorCategorySave] = useState(false);
   const { categorias, loadingCategorias } = useGetCategorias();
-  const { register: registerCategory, handleSubmit: handleSubmitCategory, formState: { errors: errorsCategory }, reset: resetCategory, } = useForm({ defaultValues: { nombreCategoria: "", descripcionCategoria: "" }, }); //hook form para el formulario de categorias
-
-  // Estado para controlar la visibilidad del input de unidades por bandeja
-  const [showUnidadesPorBandeja, setShowUnidadesPorBandeja] = useState(false);
+  const { register: registerCategory, handleSubmit: handleSubmitCategory, formState: { errors: errorsCategory }, reset: resetCategory, } = useForm({ defaultValues: { nombreCategoria: "", descripcionCategoria: "" }, });
 
   // Observar el valor del campo idCategoria
   const selectedCategory = watch("idCategoria");
+  const tipoProduccion = watch("tipoProduccion");
+  const controlStock = watch("controlStock") === 1;
+  const stockDiario = watch("stockDiario") === 1;
+  
+  // Determinar si la categoría seleccionada es Panadería
+  const [isPanaderia, setIsPanaderia] = useState(false);
 
-  // Efecto para mostrar/ocultar el input de unidades por bandeja
   useEffect(() => {
-    if (selectedCategory && selectedCategory == 1) {
+    if (selectedCategory) {
       const categoriaSeleccionada = categorias?.find(
         (cat) => cat.idCategoria == selectedCategory
       );
-      setShowUnidadesPorBandeja(
-        categoriaSeleccionada?.nombreCategoria === "Panadería"
-      );
-    } else {
-      setShowUnidadesPorBandeja(false);
+      const esPanaderia = categoriaSeleccionada?.nombreCategoria === "Panaderia";
+      setIsPanaderia(esPanaderia);
+      
+      // Resetear valores específicos de panadería cuando se cambia de categoría
+      if (!esPanaderia) {
+        setValue('controlStock', 0);
+        setValue('stockDiario', 0);
+        setValue('tipoProduccion', 'bandejas');
+        setValue('unidadesPorBandeja', '');
+      }
     }
-  }, [selectedCategory, categorias]);
+  }, [selectedCategory, categorias, setValue]);
 
-  const onSubmit = async (data) => {
-    await handleIngresarProductoSubmit(
-      data,
-      setIsPopupOpen,
-      setErrorPopupMessage,
-      setIsPopupErrorOpen,
-      setIsLoading,
-      reset
-    );
+  // Efecto para manejar la exclusividad de los switches
+  useEffect(() => {
+    if (controlStock && stockDiario) {
+      setValue('stockDiario', 0);
+    }
+  }, [controlStock, setValue]);
+
+  useEffect(() => {
+    if (stockDiario && controlStock) {
+      setValue('controlStock', 0);
+    }
+  }, [stockDiario, setValue]);
+
+  const onSubmit = async (data) => { 
+    await handleIngresarProductoSubmit( data, setIsPopupOpen, setErrorPopupMessage, setIsPopupErrorOpen, setIsLoading, reset 
+    ); 
   };
 
-  const onSubmitCategory = async (data) => {
-    await saveCategory(
-      data,
-      setIsCategorySaving,
-      resetCategory,
-      setShowCategoryModal,
-      setShowErrorCategorySave,
-      categorias
-    );
+  const onSubmitCategory = async (data) => {  
+    await saveCategory( data, setIsCategorySaving, resetCategory, setShowCategoryModal, setShowErrorCategorySave, categorias );
   };
 
   return (
@@ -219,48 +226,100 @@ function IngresarProductos() {
             </Col>
           </Row>
 
-          {/* Switch para control de stock */}
-          <Form.Group className="mb-3">
-            <Form.Label className="label-title">Control de Stock</Form.Label>
-            <div className="d-flex align-items-center">
-              <span className="me-2">No</span>
-              <Form.Check
-                type="switch"
-                id="controlStock"
-                {...register("controlStock")}
-                disabled={isLoading}
-              />
-              <span className="ms-2">Sí</span>
-            </div>
-          </Form.Group>
+          {/* Sección específica para Panadería */}
+          {isPanaderia && (
+            <>
+              <div className="mb-3">
+                <h6 className="label-title">Configuración para Producción y Stock</h6>
+              </div>
 
-          {/* Input de Unidades por Bandeja (solo visible si la categoría es Panadería) */}
-          {showUnidadesPorBandeja && (
-            <Form.Group className="mb-4">
-              <Form.Label className="label-title my-2">
-                Unidades por Bandeja
-                <small className="text-bold" style={{ fontSize: "0.8em" }}>
-                  <strong> (Información para producción)</strong>
-                </small>
-              </Form.Label>
-              <Form.Control
-                className="input-data"
-                type="number"
-                placeholder="Ingrese las unidades por bandeja"
-                {...register("unidadesPorBandeja", {
-                  required: "Las unidades por bandeja son obligatorias.",
-                  min: {
-                    value: 1,
-                    message: "Las unidades por bandeja deben ser mayor a 0.",
-                  },
-                })}
-                isInvalid={!!errors.unidadesPorBandeja}
-                disabled={isLoading}
-              />
-              <Form.Control.Feedback type="invalid">
-                {errors.unidadesPorBandeja?.message}
-              </Form.Control.Feedback>
-            </Form.Group>
+              {/* Controles de stock en una fila */}
+              <Row className="mb-3">
+                <Col xs={6}>
+                  <Form.Group>
+                    <Form.Label className="label-title">Control de Stock</Form.Label>
+                    <div className="d-flex align-items-center">
+                      <span className="me-2">No</span>
+                      <Form.Check
+                        type="switch"
+                        id="controlStock"
+                        checked={controlStock}
+                        onChange={(e) => setValue("controlStock", e.target.checked ? 1 : 0)}
+                        disabled={isLoading || stockDiario}
+                      />
+                      <span className="ms-2">Sí</span>
+                    </div>
+                  </Form.Group>
+                </Col>
+                <Col xs={6}>
+                  <Form.Group>
+                    <Form.Label className="label-title">Control de Stock Diario</Form.Label>
+                    <div className="d-flex align-items-center">
+                      <span className="me-2">No</span>
+                      <Form.Check
+                        type="switch"
+                        id="stockDiario"
+                        checked={stockDiario}
+                        onChange={(e) => setValue("stockDiario", e.target.checked ? 1 : 0)}
+                        disabled={isLoading || controlStock}
+                      />
+                      <span className="ms-2">Sí</span>
+                    </div>
+                  </Form.Group>
+                </Col>
+              </Row>
+
+              {/* Selector de tipo de producción */}
+              <Form.Group className="mb-3">
+                <Form.Label className="label-title">Tipo de Producción</Form.Label>
+                <div className="d-flex align-items-center">
+                  <Form.Check
+                    type="radio"
+                    id="bandejas"
+                    label="Bandejas"
+                    value="bandejas"
+                    checked={tipoProduccion === "bandejas"}
+                    onChange={() => setValue("tipoProduccion", "bandejas")}
+                    disabled={isLoading}
+                    className="me-3 tipoProd"
+                  />
+                  <Form.Check
+                    className="tipoProd"
+                    type="radio"
+                    id="harina"
+                    label="Harina"
+                    value="harina"
+                    checked={tipoProduccion === "harina"}
+                    onChange={() => setValue("tipoProduccion", "harina")}
+                    disabled={isLoading}
+                  />
+                </div>
+              </Form.Group>
+
+              {/* Input solo para producción por bandejas */}
+              {tipoProduccion === "bandejas" && (
+                <Form.Group className="mb-3">
+                  <Form.Label className="label-title">Unidades por Bandeja</Form.Label>
+                  <Form.Control
+                    className="input-data"
+                    type="number"
+                    placeholder="Ingrese las unidades por bandeja"
+                    {...register("unidadesPorBandeja", {
+                      required: "Las unidades por bandeja son obligatorias para producción por bandejas.",
+                      min: {
+                        value: 1,
+                        message: "Las unidades por bandeja deben ser mayor a 0.",
+                      },
+                    })}
+                    isInvalid={!!errors.unidadesPorBandeja}
+                    disabled={isLoading}
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    {errors.unidadesPorBandeja?.message}
+                  </Form.Control.Feedback>
+                </Form.Group>
+              )}
+            </>
           )}
 
           {/* Botón de enviar */}
@@ -283,7 +342,7 @@ function IngresarProductos() {
         </div>
       </Form>
 
-      {/* Modal para ingreso de categorías utilizando react-hook-form para validaciones */}
+      {/* Modal para ingreso de categorías */}
       <ModalIngreso
         show={showCategoryModal}
         onHide={() => {
@@ -330,8 +389,7 @@ function IngresarProductos() {
         </Form>
       </ModalIngreso>
 
-      {/* ---------------- PopUp -------------------- */}
-
+      {/* Popups */}
       <SuccessPopup
         isOpen={isPopupOpen}
         onClose={() => setIsPopupOpen(false)}
