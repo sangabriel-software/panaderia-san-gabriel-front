@@ -29,7 +29,7 @@ const IngresarOrdenProd = () => {
   });
 
   const turnoValue = watch("turno");
-  const [activeCategory, setActiveCategory] = useState(usuario.idRol === 1 && usuario.rol === "Admin" ? "Panaderia" : "Reposteria");
+  const [activeCategory, setActiveCategory] = useState("Panaderia"); // Solo panadería por defecto
   const [trayQuantities, setTrayQuantities] = useState({});
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [isPopupErrorOpen, setIsPopupErrorOpen] = useState(false);
@@ -41,8 +41,13 @@ const IngresarOrdenProd = () => {
   const handleShowOrderSummary = () => setShowOrderSummary(true);
   const handleCloseOrderSummary = () => setShowOrderSummary(false);
 
+  // Filtrar solo productos de panadería (idCategoria = 1)
+  const filteredProducts = productos.filter(producto => producto.idCategoria === 1);
+  
   // Usar la función importada para obtener los productos filtrados
-  const productsToShow = getFilteredProductsByCategory(productos, searchTerm, activeCategory, usuario);
+  const productsToShow = searchTerm 
+    ? filterProductsByName(filteredProducts, searchTerm) 
+    : filteredProducts;
 
   const onSubmit = async (data) => {
     setShowOrderSummary(true);
@@ -252,26 +257,6 @@ const IngresarOrdenProd = () => {
             />
           </div>
 
-          {/* Selector de categoría */}
-          <div className="category-selector mb-4">
-            {usuario.idRol === 1 && usuario.rol === "Admin" && (
-              <Button
-                variant={activeCategory === "Panaderia" ? "primary" : "outline-primary"}
-                onClick={() => setActiveCategory("Panaderia")}
-                className="category-btn"
-              >
-                Panaderia ({searchTerm ? filterProductsByName(productos, searchTerm, usuario).length : productos.filter((p) => p.nombreCategoria === "Panaderia").length})
-              </Button>
-            )}
-            <Button
-              variant={activeCategory === "Reposteria" ? "primary" : "outline-primary"}
-              onClick={() => setActiveCategory("Reposteria")}
-              className="category-btn"
-            >
-              Reposteria ({searchTerm ? filterProductsByName(productos, searchTerm, usuario).length : productos.filter((p) => p.nombreCategoria === "Reposteria").length})
-            </Button>
-          </div>
-
           {/* Lista de productos filtrados */}
           <Row className="g-4 product-grid">
             {productsToShow.map((producto) => (
@@ -287,9 +272,7 @@ const IngresarOrdenProd = () => {
                       {getInitials(producto.nombreProducto)}
                     </div>
                     <h3 className="product-title">{producto.nombreProducto}</h3>
-                    <p className="product-category">
-                      {producto.nombreCategoria === "Panaderia" ? "Bandejas" : "Unidades"}
-                    </p>
+                    <p className="product-category">{`${producto.tipoProduccion === 'bandejas' ? 'Bandejas' : 'Libras' }`}</p>
                     <InputGroup className="product-input-group">
                       <Form.Control
                         type="number"
@@ -300,7 +283,7 @@ const IngresarOrdenProd = () => {
                             ...trayQuantities,
                             [producto.idProducto]: {
                               cantidad: parseInt(e.target.value) || 0,
-                              idCategoria: producto.idCategoria, // Incluye la categoría
+                              idCategoria: 1, // Siempre será panadería (idCategoria = 1)
                             },
                           })
                         }
@@ -330,7 +313,7 @@ const IngresarOrdenProd = () => {
         handleClose={handleCloseOrderSummary}
         orderData={getValues()}
         trayQuantities={trayQuantities}
-        productos={productos}
+        productos={filteredProducts} // Usar solo productos filtrados
         sucursales={sucursales}
         onConfirm={handleConfirmOrder}
         isLoading={isLoading}
