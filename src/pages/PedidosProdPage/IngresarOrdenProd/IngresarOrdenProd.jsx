@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
-import { Container, Form, Row, Col, Button, Card, InputGroup } from "react-bootstrap";
+import { Container, Form, Row, Col, Button, Card, InputGroup, } from "react-bootstrap";
 import { useForm } from "react-hook-form";
-import { BsArrowLeft, BsExclamationTriangleFill } from "react-icons/bs";
+import { BsArrowLeft, BsExclamationTriangleFill, BsFillInfoCircleFill, } from "react-icons/bs";
 import { useNavigate } from "react-router";
 import Title from "../../../components/Title/Title";
 import Alert from "../../../components/Alerts/Alert";
@@ -11,7 +11,7 @@ import dayjs from "dayjs";
 import ErrorPopup from "../../../components/Popup/ErrorPopUp";
 import useGetProductosYPrecios from "../../../hooks/productosprecios/useGetProductosYprecios";
 import { useGetSucursales } from "../../../hooks/sucursales/useGetSucursales";
-import { filterProductsByName, getFilteredProductsByCategory, getInitials, getUniqueColor, handleIngresarOrdenProduccionSubmit, scrollToAlert } from "./IngresarOrdenProdUtils";
+import { filterProductsByName, getFilteredProductsByCategory, getInitials, getUniqueColor, handleIngresarOrdenProduccionSubmit, scrollToAlert, } from "./IngresarOrdenProdUtils";
 import { getUserData } from "../../../utils/Auth/decodedata";
 import "./ordenes.css";
 
@@ -23,10 +23,7 @@ const IngresarOrdenProd = () => {
   const { productos, loadigProducts, showErrorProductos } = useGetProductosYPrecios();
   const tomorrow = dayjs().add(1, "day").format("YYYY-MM-DD");
   const today = dayjs().format("YYYY-MM-DD");
-
-  const { register, handleSubmit, formState: { errors }, setValue, watch, reset, getValues } = useForm({
-    defaultValues: { sucursal: "", turno: "AM", fechaAProducir: usuario.idRol === 1 && usuario.rol === "Admin" ? tomorrow : today, nombrePanadero: "" },
-  });
+  const { register, handleSubmit, formState: { errors }, setValue, watch, reset, getValues, } = useForm({defaultValues: {sucursal: "", turno: "AM", fechaAProducir: usuario.idRol === 1 && usuario.rol === "Admin" ? tomorrow : today, nombrePanadero: "", },});
 
   const turnoValue = watch("turno");
   const [activeCategory, setActiveCategory] = useState("Panaderia"); // Solo panadería por defecto
@@ -42,12 +39,10 @@ const IngresarOrdenProd = () => {
   const handleCloseOrderSummary = () => setShowOrderSummary(false);
 
   // Filtrar solo productos de panadería (idCategoria = 1)
-  const filteredProducts = productos.filter(producto => producto.idCategoria === 1);
-  
+  const filteredProducts = productos.filter((producto) => producto.idCategoria === 1);
+
   // Usar la función importada para obtener los productos filtrados
-  const productsToShow = searchTerm 
-    ? filterProductsByName(filteredProducts, searchTerm) 
-    : filteredProducts;
+  const productsToShow = getFilteredProductsByCategory( productos, searchTerm, activeCategory, usuario );
 
   const onSubmit = async (data) => {
     setShowOrderSummary(true);
@@ -55,8 +50,7 @@ const IngresarOrdenProd = () => {
 
   const handleConfirmOrder = async () => {
     const data = getValues();
-    await handleIngresarOrdenProduccionSubmit(data, trayQuantities, setTrayQuantities, setIsPopupOpen, setErrorPopupMessage, setIsPopupErrorOpen,
-      setIsLoading, reset);
+    await handleIngresarOrdenProduccionSubmit( data, trayQuantities, setTrayQuantities, setIsPopupOpen, setErrorPopupMessage, setIsPopupErrorOpen, setIsLoading, reset );
     setShowOrderSummary(false);
   };
 
@@ -115,7 +109,11 @@ const IngresarOrdenProd = () => {
                             required: "Seleccione una fecha",
                           })}
                           className="form-control modern-datepicker"
-                          min={usuario.idRol === 1 && usuario.rol === "Admin" ? tomorrow : today }
+                          min={
+                            usuario.idRol === 1 && usuario.rol === "Admin"
+                              ? tomorrow
+                              : today
+                          }
                         />
                       </InputGroup>
                       {errors.fechaAProducir && (
@@ -133,14 +131,18 @@ const IngresarOrdenProd = () => {
                       </label>
                       <div className="d-flex gap-2 shift-selector">
                         <Button
-                          variant={turnoValue === "AM" ? "primary" : "outline-primary"}
+                          variant={
+                            turnoValue === "AM" ? "primary" : "outline-primary"
+                          }
                           className="shift-btn-ventas"
                           onClick={() => setValue("turno", "AM")}
                         >
                           🌅 AM
                         </Button>
                         <Button
-                          variant={turnoValue === "PM" ? "primary" : "outline-primary"}
+                          variant={
+                            turnoValue === "PM" ? "primary" : "outline-primary"
+                          }
                           className="shift-btn-ventas"
                           onClick={() => setValue("turno", "PM")}
                         >
@@ -162,7 +164,10 @@ const IngresarOrdenProd = () => {
                       </label>
                       {loadingSucursales ? (
                         <div className="loading-spinner">
-                          <div className="spinner-border text-primary" role="status" />
+                          <div
+                            className="spinner-border text-primary"
+                            role="status"
+                          />
                         </div>
                       ) : (
                         <Form.Select
@@ -226,7 +231,10 @@ const IngresarOrdenProd = () => {
                 }
               >
                 {isLoading ? (
-                  <span className="spinner-border spinner-border-sm" role="status" />
+                  <span
+                    className="spinner-border spinner-border-sm"
+                    role="status"
+                  />
                 ) : (
                   <>
                     <span className="btn-icon">🚀</span>
@@ -266,18 +274,26 @@ const IngresarOrdenProd = () => {
                     <div
                       className="product-badge"
                       style={{
-                        backgroundColor: getUniqueColor(producto.nombreProducto),
+                        backgroundColor: getUniqueColor(
+                          producto.nombreProducto
+                        ),
                       }}
                     >
                       {getInitials(producto.nombreProducto)}
                     </div>
                     <h3 className="product-title">{producto.nombreProducto}</h3>
-                    <p className="product-category">{`${producto.tipoProduccion === 'bandejas' ? 'Bandejas' : 'Libras' }`}</p>
+                    <p className="product-category">{`${
+                      producto.tipoProduccion === "bandejas"
+                        ? "Bandejas"
+                        : "Libras"
+                    }`}</p>
                     <InputGroup className="product-input-group">
                       <Form.Control
                         type="number"
                         min="0"
-                        value={trayQuantities[producto.idProducto]?.cantidad || ""}
+                        value={
+                          trayQuantities[producto.idProducto]?.cantidad || ""
+                        }
                         onChange={(e) =>
                           setTrayQuantities({
                             ...trayQuantities,
@@ -318,6 +334,31 @@ const IngresarOrdenProd = () => {
         onConfirm={handleConfirmOrder}
         isLoading={isLoading}
       />
+
+      {/* -------------------- Poups y alertas ---------------------- */}
+      {productsToShow.length === 0 && (
+          <div className="row justify-content-center my-3">
+            <div className="col-md-6 col-xsm-12 text-center">
+              <Alert
+                type="primary"
+                message="No se encontraron Productos."
+                icon={<BsFillInfoCircleFill />}
+              />
+            </div>
+          </div>
+        )}
+
+      {productos.length === 0 && (
+        <div className="row justify-content-center my-3">
+          <div className="col-md-6 text-center">
+            <Alert
+              type="primary"
+              message="No se han ingresado Productos."
+              icon={<BsFillInfoCircleFill />}
+            />
+          </div>
+        </div>
+      )}
 
       {/* Popup de Éxito */}
       <SuccessPopup

@@ -45,23 +45,20 @@ export const filterProductsByName = (products, searchTerm, usuario) => {
   );
 };
 
-export const getFilteredProductsByCategory = (productos, searchTerm, activeCategory, usuario) => {
-  const panaderiaProducts = productos.filter((p) => p.nombreCategoria === "Panaderia");
-  const reposteriaProducts = productos.filter((p) => p.nombreCategoria === "Reposteria");
+export const getFilteredProductsByCategory = (productos, searchTerm) => {
+  // Filtrar solo productos de panadería (idCategoria = 1)
+  const panaderiaProducts = productos.filter((p) => p.idCategoria === 1);
 
-  const filteredProducts = filterProductsByName(productos, searchTerm, usuario);
-  const filteredPanaderiaProducts = searchTerm
-    ? filteredProducts.filter((p) => p.nombreCategoria === "Panaderia")
-    : panaderiaProducts;
-  const filteredReposteriaProducts = searchTerm
-    ? filteredProducts.filter((p) => p.nombreCategoria === "Reposteria")
-    : reposteriaProducts;
+  // Si hay término de búsqueda, filtrar por nombre dentro de los productos de panadería
+  if (searchTerm) {
+    const searchTermLower = searchTerm.toLowerCase();
+    return panaderiaProducts.filter((p) => 
+      p.nombreProducto.toLowerCase().includes(searchTermLower)
+    );
+  }
 
-  return searchTerm
-    ? filteredProducts
-    : activeCategory === "Panaderia"
-    ? filteredPanaderiaProducts
-    : filteredReposteriaProducts;
+  // Si no hay término de búsqueda, devolver todos los productos de panadería
+  return panaderiaProducts;
 };
 
 const crearPyaloadOrdenProduccion = (data, trayQuantities) => {
