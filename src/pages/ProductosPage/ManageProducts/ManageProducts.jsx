@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useGetProductosYPrecios } from "../../../hooks/productosprecios/useGetProductosYprecios";
-import { checkForChanges, handleConfirmDeletePreoducto, handleDeleleProducto, handleModifyClick, handleUpdateProduct, useCategoriasYFiltrado, useSerchPrductos,
+import { checkForChanges, handleConfirmDeletePreoducto, handleDeleleProducto, handleUpdateProduct, useCategoriasYFiltrado, useSerchPrductos,
 } from "./ManageProductsUtils";
 import SearchInput from "../../../components/SerchInput/SerchInput";
 import Title from "../../../components/Title/Title";
@@ -331,17 +331,20 @@ const ManageProducts = () => {
               <Form.Label>Categoría</Form.Label>
               <div className="input-wrapper">
                 <Form.Select
-                  defaultValue={selectedProduct.idCategoria}
-                  {...register("idCategoria", {
-                    required: "La categoría es obligatoria.",
-                  })}
-                  isInvalid={!!errors.idCategoria}
-                  className="input-field input-data"
-                  onChange={(e) => {
-                    setIsPanaderia(e.target.value == 1);
-                    setHasChanges(true);
-                  }}
-                >
+                      defaultValue={selectedProduct.idCategoria}
+                      {...register("idCategoria", {
+                        required: "La categoría es obligatoria.",
+                      })}
+                      isInvalid={!!errors.idCategoria}
+                      className="input-field input-data"
+                      onChange={(e) => {
+                        const newValue = e.target.value;
+                        setValue("idCategoria", newValue);
+                        setIsPanaderia(newValue == 1);
+                        // Forzar la verificación de cambios
+                        setHasChanges(checkForChanges(watch(), initialProductValues));
+                      }}
+                    >
                   <option value="">Selecciona una categoría...</option>
                   {loadingCategorias ? (
                     <option>Cargando categorías...</option>
@@ -518,20 +521,23 @@ const ManageProducts = () => {
                   <Form.Group className="mb-3">
                     <Form.Label className="label-title">Unidades por Bandeja</Form.Label>
                     <Form.Control
-                      className="input-data"
-                      type="number"
-                      placeholder="Ingrese las unidades por bandeja"
-                      defaultValue={selectedProduct.unidadesPorBandeja || ''}
-                      {...register("unidadesPorBandeja", {
-                        required: tipoProduccion === "bandejas" ? "Las unidades por bandeja son obligatorias." : false,
-                        min: {
-                          value: 1,
-                          message: "Las unidades por bandeja deben ser mayor a 0.",
-                        },
-                      })}
-                      isInvalid={!!errors.unidadesPorBandeja}
-                      onChange={() => setHasChanges(true)}
-                    />
+                    className="input-data"
+                    type="number"
+                    placeholder="Ingrese las unidades por bandeja"
+                    defaultValue={selectedProduct.unidadesPorBandeja || ''}
+                    {...register("unidadesPorBandeja", {
+                      required: tipoProduccion === "bandejas" ? "Las unidades por bandeja son obligatorias." : false,
+                      min: {
+                        value: 1,
+                        message: "Las unidades por bandeja deben ser mayor a 0.",
+                      },
+                    })}
+                    isInvalid={!!errors.unidadesPorBandeja}
+                    onChange={(e) => {
+                      setValue("unidadesPorBandeja", e.target.value);
+                      setHasChanges(checkForChanges(watch(), initialProductValues));
+                    }}
+                  />
                     <Form.Control.Feedback type="invalid">
                       {errors.unidadesPorBandeja?.message}
                     </Form.Control.Feedback>

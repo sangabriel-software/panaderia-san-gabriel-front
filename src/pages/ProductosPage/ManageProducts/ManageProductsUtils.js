@@ -84,34 +84,35 @@ export const handleConfirmDeletePreoducto = async (productoToDelete, setProducto
   };
 
   // Función para manejar el clic en el botón "Modificar"
- export const handleModifyClick = (producto, setSelectedProduct, setInitialProductValues, setShowModifyModal, reset, setHasChanges ) => {
-    setSelectedProduct(producto); // Guarda el producto seleccionado
-    setInitialProductValues({ ...producto }); // Guarda los valores iniciales
-    setShowModifyModal(true); // Abre el modal de modificación
-    reset(producto); // Resetea el formulario con los valores del producto seleccionado
-    setHasChanges(false); // Reinicia el estado de cambios
-  };
+//  export const handleModifyClick = (producto, setSelectedProduct, setInitialProductValues, setShowModifyModal, reset, setHasChanges, watch ) => {
+//     setSelectedProduct(producto); // Guarda el producto seleccionado
+//     setInitialProductValues({ ...producto }); // Guarda los valores iniciales
+//     setShowModifyModal(true); // Abre el modal de modificación
+//     reset(producto); // Resetea el formulario con los valores del producto seleccionado
+//     setHasChanges(false); // Reinicia el estado de cambios
+//   };
 
     // Función para verificar cambios en los campos
-  export const checkForChanges = ( selectedProduct, initialProductValues, setHasChanges, watch ) => {
-    if (!selectedProduct || !initialProductValues) return;
+export const checkForChanges = (currentValues, initialProductValues) => {
+  if (!initialProductValues) return false;
 
-    const currentValues = watch(); // Obtiene los valores actuales del formulario
+  // Comparación más robusta que maneja valores undefined/null
+  const compare = (a, b) => {
+    if (a === undefined || b === undefined) return false;
+    if (a === null || b === null) return false;
+    return Number(a) !== Number(b);
+    };
 
-    const isControlStock = currentValues.controlarStock === true ? 1 : 0;
-
-    const hasChangesDetected =
+    return (
       currentValues.nombreProducto !== initialProductValues.nombreProducto ||
-      Number(currentValues.idCategoria) !==
-      Number(initialProductValues.idCategoria) ||
-      Number(currentValues.cantidad) !==
-      Number(initialProductValues.cantidad) ||
-      Number(currentValues.precio) !== Number(initialProductValues.precio) ||
-      Number(isControlStock) !== Number(initialProductValues.controlarStock) ||
-      Number(currentValues.unidadesPorBandeja) !== Number(initialProductValues.unidadesPorBandeja);
-
-    setHasChanges(hasChangesDetected);
-  };
+      compare(currentValues.idCategoria, initialProductValues.idCategoria) ||
+      compare(currentValues.cantidad, initialProductValues.cantidad) ||
+      compare(currentValues.precio, initialProductValues.precio) ||
+      compare(currentValues.controlStock, initialProductValues.controlarStock) ||
+      compare(currentValues.unidadesPorBandeja, initialProductValues.unidadesPorBandeja) ||
+      compare(currentValues.tipoProduccion, initialProductValues.tipoProduccion)
+    );
+};
 
 
   /* Funcion para crear paylod datos de productos */
