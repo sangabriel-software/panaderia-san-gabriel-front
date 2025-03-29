@@ -223,8 +223,18 @@ const ManageProducts = () => {
                       onChange={(e) => {
                         const newValue = e.target.value;
                         setValue("idCategoria", newValue);
-                        setIsPanaderia(newValue == 1);
-                        // Forzar la verificación de cambios
+                        const isNowPanaderia = newValue == 1;
+                        setIsPanaderia(isNowPanaderia);
+                        
+                        // Cambio clave aquí: establecer "bandejas" como valor por defecto si es Panadería
+                        if (isNowPanaderia) {
+                          setTipoProduccion("bandejas");
+                          setValue("tipoProduccion", "bandejas");
+                        } else {
+                          setTipoProduccion(null);
+                          setValue("tipoProduccion", null);
+                        }
+                        
                         setHasChanges(checkForChanges(watch(), initialProductValues));
                       }}
                     >

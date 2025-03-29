@@ -358,7 +358,7 @@ export const crearPayloadProducto = (data, selectedProduct) => {
     //determinar tipo produccion
     let tipoProduccion;
     if (idCategoria === 1) {
-      tipoProduccion = data.tipoProduccion !== null ? data.tipoProduccion : "bandejas";
+      tipoProduccion = data.tipoProduccion;
     } else {
       tipoProduccion = "Otros";
     }
