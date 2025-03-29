@@ -1,5 +1,7 @@
 import { useEffect, useState, useMemo} from "react";
 import { actualizarPrecioProductoSevice, actualizarProductoSevice, desactivarProductosService } from "../../../services/productos/productos.service";
+import { capitalizeFirstLetter } from "../../../utils/utils";
+import { currentDate } from "../../../utils/dateUtils";
 
 /* Consulta interna par la pagina de roles Busqueda de usuarios*/
 export const useSerchPrductos = (productos) => {
@@ -112,19 +114,78 @@ export const handleConfirmDeletePreoducto = async (productoToDelete, setProducto
   };
 
 
+  /* Funcion para crear paylod datos de productos */
+  export const crearPayloadProducto = (data, selectedProduct) => {
+
+    try{
+      const idCategoria = Number(data.idCategoria);
+      const unidadesPorBandeja = Number(data.unidadesPorBandeja);
+      const badejasUnidades = (idCategoria === 1) ? unidadesPorBandeja : null;   // Determinar bandejasUnidades basado en la categoría
+      //determinar tipo produccion
+      let tipoProduccion
+      if(idCategoria === 1){
+        tipoProduccion = data.tipoProduccion;
+      }else{
+        tipoProduccion = "Otros";
+      }
+    
+      //determinar control stock 
+      let controlStock;
+      if(idCategoria === 1){
+        controlStock = data.controlStock;
+      }else{
+        controlStock = 1;
+      }
+    
+      const productoPayload = {  // Crear el payload del producto
+        idProducto: selectedProduct.idProducto,
+        nombreProducto: capitalizeFirstLetter(data.nombreProducto),
+        idCategoria: idCategoria, 
+        controlarStock: controlStock,
+        controlarStockDiario: data.stockDiario,
+        tipoProduccion: tipoProduccion, 
+        fechaCreacion: currentDate(),
+        ...(badejasUnidades !== null && { unidadesPorBandeja: badejasUnidades }) // Agregar solo si no es null
+      };
+
+      return productoPayload;
+
+    }catch(error){
+      throw error;
+    }
+  };
+
+/* Funcion para crar payload de ingreso de precio de productos */
+export const crearPayloadPrecioProducto = (data, idProducto) => {
+    const precioProductoPayload = {
+        idProducto,
+        cantidad: data.cantidad,
+        precio: data.precio,
+        precioPorUnidad: data.precio / data.cantidad,
+        fechaInicio: currentDate(),
+        fechaFin: data.fechaFin || null
+    }
+
+    return precioProductoPayload;
+}
+
+
   // Función para manejar la actualización del producto
   export const handleUpdateProduct = async ( data, selectedProduct, setProductos, setShowModifyModal, setSelectedProduct, setInitialProductValues, setHasChanges, setErrorPopupMessage, setIsPopupErrorOpen, setLoadingModificar ) => {
-    if (!data || !selectedProduct) return;
-
+    // if (!data || !selectedProduct) return;
     setLoadingModificar(true);
 
     try {
+      const payloaUpdate = crearPayloadProducto(data, selectedProduct);
+      
       // Actualiza el producto en el servidor
-      const resProdActualizado = await actualizarProductoSevice(data);
+      const resProdActualizado = await actualizarProductoSevice(payloaUpdate);
 
       if (resProdActualizado.status === 200) {
         // Actualiza el precio del producto en el servidor
-        const resPrecioActualizado = await actualizarPrecioProductoSevice(data);
+
+         const preciosUpdatePayload = crearPayloadPrecioProducto(data, selectedProduct.idProducto);
+        const resPrecioActualizado = await actualizarPrecioProductoSevice(preciosUpdatePayload);
 
         // Actualiza el estado local con el producto modificado
         setProductos((prevProductos) =>

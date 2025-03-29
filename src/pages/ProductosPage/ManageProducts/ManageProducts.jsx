@@ -212,33 +212,9 @@ const ManageProducts = () => {
 
   // Función para guardar los cambios del producto
   const onSubmit = async (data) => {
-    const productoActualizado = {
-      ...data,
-      controlarStock: data.controlStock,
-      controlarStockDiario: data.stockDiario
-    };
-
-    if (data.idCategoria != 1) {
-      productoActualizado.controlarStock = 1;
-      productoActualizado.controlarStockDiario = 0;
-      productoActualizado.tipoProduccion = null;
-      productoActualizado.unidadesPorBandeja = null;
-    }
-    
-    handleUpdateProduct(
-      productoActualizado, 
-      selectedProduct, 
-      setProductos, 
-      setShowModifyModal, 
-      setSelectedProduct, 
-      setInitialProductValues, 
-      setHasChanges,
-      setErrorPopupMessage, 
-      setIsPopupErrorOpen, 
-      setLoadingModificar
-    );
+    handleUpdateProduct( data, selectedProduct, setProductos, setShowModifyModal, setSelectedProduct, setInitialProductValues, setHasChanges,
+                         setErrorPopupMessage, setIsPopupErrorOpen, setLoadingModificar );
   };
-
   if (loadigProducts) {
     return <div className="loading">Cargando productos...</div>;
   }
