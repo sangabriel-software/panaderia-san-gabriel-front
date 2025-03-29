@@ -51,11 +51,11 @@ const fetchProductos = async () => {
   return resProductos.status === 200 ? resProductos.preciosProductos : [];
 };
 
-// Función para filtrar productos de Panadería que estén en la orden
+// Función para filtrar productos de Panaderia que estén en la orden
 const filtrarProductosPanaderia = (productos, detalleOrden) => {
-  // Obtener los productos de Panadería que están en la orden
+  // Obtener los productos de Panaderia que están en la orden
   const productosPanaderiaEnOrden = detalleOrden
-    .filter((item) => item.idCategoria === 1) // Filtrar por categoría 1 (Panadería)
+    .filter((item) => item.idCategoria === 1) // Filtrar por categoría 1 (Panaderia)
     .map((item) => ({
       idProducto: item.idProducto,
       cantidadUnidades: item.cantidadUnidades, // Incluir el campo cantidadUnidades
@@ -63,7 +63,7 @@ const filtrarProductosPanaderia = (productos, detalleOrden) => {
 
   return productos.map((producto) => {
     if (producto.idCategoria === 1) {
-      // Si es de la categoría "Panadería", buscar si está en la orden
+      // Si es de la categoría "Panaderia", buscar si está en la orden
       const productoEnOrden = productosPanaderiaEnOrden.find(
         (item) => item.idProducto === producto.idProducto
       );
@@ -82,7 +82,7 @@ const filtrarProductosPanaderia = (productos, detalleOrden) => {
       // Incluir todos los productos de otras categorías sin cambios
       return producto;
     }
-  }).filter((producto) => producto !== null); // Filtrar los productos nulos (Panadería no incluidos en la orden)
+  }).filter((producto) => producto !== null); // Filtrar los productos nulos (Panaderia no incluidos en la orden)
 };
 
 // Función principal para manejar la búsqueda de ventas
@@ -111,7 +111,7 @@ export const handleBuscarVentas = async ( setIsLoading, turnoValue, sucursalValu
 
       // Verificar si existe una orden y si tiene detalles
       if (orden && orden.detalleOrden && orden.detalleOrden.length > 0) {
-        // Filtrar productos de la categoría "Panadería" que estén en la orden
+        // Filtrar productos de la categoría "Panaderia" que estén en la orden
         nuevosProductos = filtrarProductosPanaderia(productos, orden.detalleOrden);
       } else {
         // Si no hay orden, devolver todos los productos
@@ -166,7 +166,7 @@ const crearDetalleVenta = (productos, trayQuantities, orden, fechaActual) => {
     .map((producto) => {
       const cantidadIngresada = producto.cantidadIngresada; // Usar la cantidad obtenida
 
-      // Solo para la categoría 1 (Panadería) y si hay idOrdenProduccion
+      // Solo para la categoría 1 (Panaderia) y si hay idOrdenProduccion
       if (producto.idCategoria === 1 && idOrdenProduccion) {
         // Verificar si el producto está en la orden
         const productoEnOrden = orden.detalleOrden.some(

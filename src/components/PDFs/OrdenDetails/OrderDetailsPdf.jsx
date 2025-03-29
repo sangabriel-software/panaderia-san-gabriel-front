@@ -237,7 +237,7 @@ const OrderDetailsPdf = ({ detalleOrden, encabezadoOrden, detalleConsumo }) => {
         {panaderia.length > 0 && (
           <View style={styles.tableContainer}>
             <View style={styles.tableTitleContainer}>
-              <Text style={styles.tableTitle}>Productos de Panadería</Text>
+              <Text style={styles.tableTitle}>Productos de Panaderia</Text>
             </View>
             <View style={styles.table}>
               <View style={styles.tableRow}>
@@ -261,7 +261,7 @@ const OrderDetailsPdf = ({ detalleOrden, encabezadoOrden, detalleConsumo }) => {
         {reposteria.length > 0 && (
           <View style={styles.tableContainer}>
             <View style={styles.tableTitleContainer}>
-              <Text style={styles.tableTitle}>Productos de Repostería</Text>
+              <Text style={styles.tableTitle}>Productos de Reposteria</Text>
             </View>
             <View style={styles.table}>
               <View style={styles.tableRow}>

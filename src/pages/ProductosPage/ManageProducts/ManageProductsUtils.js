@@ -129,7 +129,7 @@ export const resetFormToInitialValues = (selectedProduct, reset, setValue, setIs
   }
 };
 
-// Efecto para determinar si es Panadería y configurar valores iniciales
+// Efecto para determinar si es Panaderia y configurar valores iniciales
 export const useProductFormSetup = (selectedProduct, setValue, reset, setIsPanaderia, setTipoProduccion, setInitialProductValues) => {
   useEffect(() => {
     if (selectedProduct) {
@@ -150,7 +150,7 @@ export const useProductFormSetup = (selectedProduct, setValue, reset, setIsPanad
           : null,
       });
 
-      // Configurar tipo de producción si es Panadería
+      // Configurar tipo de producción si es Panaderia
       if (esPanaderia) {
         setTipoProduccion(selectedProduct.tipoProduccion || "bandejas");
       }
@@ -175,7 +175,7 @@ export const useCheckFormChanges = (selectedProduct, initialProductValues, formV
     if (selectedProduct && initialProductValues) {
       const currentValues = {
         ...formValues,
-        // Para Panadería, comparamos los valores específicos
+        // Para Panaderia, comparamos los valores específicos
         ...(isPanaderia && {
           controlarStock: formValues.controlStock,
           controlarStockDiario: formValues.stockDiario,

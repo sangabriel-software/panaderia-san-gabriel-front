@@ -33,7 +33,7 @@ const ManageProducts = () => {
   const [loadingModificar, setLoadingModificar] = useState(false);
   const { register, handleSubmit, reset, watch, setValue, formState: { errors } } = useForm();  // React Hook Form
 
-  // Estado para controlar la visibilidad de los controles de Panadería
+  // Estado para controlar la visibilidad de los controles de Panaderia
   const [isPanaderia, setIsPanaderia] = useState(false);
   const [tipoProduccion, setTipoProduccion] = useState("bandejas");
 
@@ -181,7 +181,7 @@ const ManageProducts = () => {
                         const isNowPanaderia = newValue == 1;
                         setIsPanaderia(isNowPanaderia);
                         
-                        // Cambio clave aquí: establecer "bandejas" como valor por defecto si es Panadería
+                        // Cambio clave aquí: establecer "bandejas" como valor por defecto si es Panaderia
                         if (isNowPanaderia) {
                           setTipoProduccion("bandejas");
                           setValue("tipoProduccion", "bandejas");
@@ -282,7 +282,7 @@ const ManageProducts = () => {
               </Col>
             </Row>
 
-            {/* Sección específica para Panadería */}
+            {/* Sección específica para Panaderia */}
             {isPanaderia && (
               <>
                 <div className="mb-3">

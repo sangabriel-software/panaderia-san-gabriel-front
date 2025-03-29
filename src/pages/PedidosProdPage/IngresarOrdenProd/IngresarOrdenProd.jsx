@@ -29,7 +29,7 @@ const IngresarOrdenProd = () => {
   });
 
   const turnoValue = watch("turno");
-  const [activeCategory, setActiveCategory] = useState(usuario.idRol === 1 && usuario.rol === "Admin" ? "Panadería" : "Repostería");
+  const [activeCategory, setActiveCategory] = useState(usuario.idRol === 1 && usuario.rol === "Admin" ? "Panaderia" : "Reposteria");
   const [trayQuantities, setTrayQuantities] = useState({});
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [isPopupErrorOpen, setIsPopupErrorOpen] = useState(false);
@@ -256,19 +256,19 @@ const IngresarOrdenProd = () => {
           <div className="category-selector mb-4">
             {usuario.idRol === 1 && usuario.rol === "Admin" && (
               <Button
-                variant={activeCategory === "Panadería" ? "primary" : "outline-primary"}
-                onClick={() => setActiveCategory("Panadería")}
+                variant={activeCategory === "Panaderia" ? "primary" : "outline-primary"}
+                onClick={() => setActiveCategory("Panaderia")}
                 className="category-btn"
               >
-                Panadería ({searchTerm ? filterProductsByName(productos, searchTerm, usuario).length : productos.filter((p) => p.nombreCategoria === "Panadería").length})
+                Panaderia ({searchTerm ? filterProductsByName(productos, searchTerm, usuario).length : productos.filter((p) => p.nombreCategoria === "Panaderia").length})
               </Button>
             )}
             <Button
-              variant={activeCategory === "Repostería" ? "primary" : "outline-primary"}
-              onClick={() => setActiveCategory("Repostería")}
+              variant={activeCategory === "Reposteria" ? "primary" : "outline-primary"}
+              onClick={() => setActiveCategory("Reposteria")}
               className="category-btn"
             >
-              Repostería ({searchTerm ? filterProductsByName(productos, searchTerm, usuario).length : productos.filter((p) => p.nombreCategoria === "Repostería").length})
+              Reposteria ({searchTerm ? filterProductsByName(productos, searchTerm, usuario).length : productos.filter((p) => p.nombreCategoria === "Reposteria").length})
             </Button>
           </div>
 
@@ -288,7 +288,7 @@ const IngresarOrdenProd = () => {
                     </div>
                     <h3 className="product-title">{producto.nombreProducto}</h3>
                     <p className="product-category">
-                      {producto.nombreCategoria === "Panadería" ? "Bandejas" : "Unidades"}
+                      {producto.nombreCategoria === "Panaderia" ? "Bandejas" : "Unidades"}
                     </p>
                     <InputGroup className="product-input-group">
                       <Form.Control

@@ -35,10 +35,10 @@ const assignedColors = {}; // Almacena los colores asignados de manera persisten
 export const filterProductsByName = (products, searchTerm, usuario) => {
   if (!searchTerm) return products;
 
-  // Si el usuario no es admin, excluir los productos de "Panadería"
+  // Si el usuario no es admin, excluir los productos de "Panaderia"
   const filteredProducts = usuario.idRol === 1 && usuario.rol === "Admin"
     ? products
-    : products.filter((p) => p.nombreCategoria !== "Panadería");
+    : products.filter((p) => p.nombreCategoria !== "Panaderia");
 
   return filteredProducts.filter((producto) =>
     producto.nombreProducto.toLowerCase().includes(searchTerm.toLowerCase())
@@ -46,20 +46,20 @@ export const filterProductsByName = (products, searchTerm, usuario) => {
 };
 
 export const getFilteredProductsByCategory = (productos, searchTerm, activeCategory, usuario) => {
-  const panaderiaProducts = productos.filter((p) => p.nombreCategoria === "Panadería");
-  const reposteriaProducts = productos.filter((p) => p.nombreCategoria === "Repostería");
+  const panaderiaProducts = productos.filter((p) => p.nombreCategoria === "Panaderia");
+  const reposteriaProducts = productos.filter((p) => p.nombreCategoria === "Reposteria");
 
   const filteredProducts = filterProductsByName(productos, searchTerm, usuario);
   const filteredPanaderiaProducts = searchTerm
-    ? filteredProducts.filter((p) => p.nombreCategoria === "Panadería")
+    ? filteredProducts.filter((p) => p.nombreCategoria === "Panaderia")
     : panaderiaProducts;
   const filteredReposteriaProducts = searchTerm
-    ? filteredProducts.filter((p) => p.nombreCategoria === "Repostería")
+    ? filteredProducts.filter((p) => p.nombreCategoria === "Reposteria")
     : reposteriaProducts;
 
   return searchTerm
     ? filteredProducts
-    : activeCategory === "Panadería"
+    : activeCategory === "Panaderia"
     ? filteredPanaderiaProducts
     : filteredReposteriaProducts;
 };

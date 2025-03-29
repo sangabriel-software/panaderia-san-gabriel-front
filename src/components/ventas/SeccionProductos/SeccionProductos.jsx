@@ -17,23 +17,23 @@ const SeccionProductos = ({
   // Estado para manejar el foco de los inputs
   const [focusedInput, setFocusedInput] = useState(null);
 
-  // Inicializar trayQuantities con 0 solo para productos de Panadería
+  // Inicializar trayQuantities con 0 solo para productos de Panaderia
   useEffect(() => {
     const productosPanaderia = ordenYProductos.filter(
-      (producto) => producto.nombreCategoria === "Panadería"
+      (producto) => producto.nombreCategoria === "Panaderia"
     );
 
     const initialQuantities = {};
     productosPanaderia.forEach((producto) => {
       if (trayQuantities[producto.idProducto] === undefined) {
         initialQuantities[producto.idProducto] = {
-          cantidad: 0, // Valor predeterminado para Panadería
+          cantidad: 0, // Valor predeterminado para Panaderia
           precioPorUnidad: producto.precioPorUnidad,
         };
       }
     });
 
-    // Solo actualizar si hay productos de Panadería para inicializar
+    // Solo actualizar si hay productos de Panaderia para inicializar
     if (Object.keys(initialQuantities).length > 0) {
       setTrayQuantities((prev) => ({ ...prev, ...initialQuantities }));
     }
@@ -62,7 +62,7 @@ const SeccionProductos = ({
   const getInputValue = (producto) => {
     const cantidad = trayQuantities[producto.idProducto]?.cantidad ?? 0;
 
-    if (producto.nombreCategoria === "Panadería") {
+    if (producto.nombreCategoria === "Panaderia") {
       if (focusedInput === producto.idProducto) {
         // Si el input está enfocado, mostrar el valor sin el 0
         return cantidad === 0 ? "" : cantidad.toString();
@@ -125,7 +125,7 @@ const SeccionProductos = ({
                 </div>
                 <h3 className="product-title">{producto.nombreProducto}</h3>
                 <p className="product-category">
-                  {producto.nombreCategoria === "Panadería"
+                  {producto.nombreCategoria === "Panaderia"
                     ? "Unidades no vendidas"
                     : "Unidades"}
                 </p>

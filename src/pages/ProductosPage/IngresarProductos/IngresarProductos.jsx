@@ -38,7 +38,7 @@ function IngresarProductos() {
   const controlStock = watch("controlStock") === 1;
   const stockDiario = watch("stockDiario") === 1;
   
-  // Determinar si la categoría seleccionada es Panadería
+  // Determinar si la categoría seleccionada es Panaderia
   const [isPanaderia, setIsPanaderia] = useState(false);
 
   useEffect(() => {
@@ -49,7 +49,7 @@ function IngresarProductos() {
       const esPanaderia = categoriaSeleccionada?.nombreCategoria === "Panaderia";
       setIsPanaderia(esPanaderia);
       
-      // Resetear valores específicos de panadería cuando se cambia de categoría
+      // Resetear valores específicos de Panaderia cuando se cambia de categoría
       if (!esPanaderia) {
         setValue('controlStock', 0);
         setValue('stockDiario', 0);
@@ -226,7 +226,7 @@ function IngresarProductos() {
             </Col>
           </Row>
 
-          {/* Sección específica para Panadería */}
+          {/* Sección específica para Panaderia */}
           {isPanaderia && (
             <>
               <div className="mb-3">
