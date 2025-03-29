@@ -1,9 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import {
-  actualizarPrecioProductoSevice,
-  actualizarProductoSevice,
-  desactivarProductosService,
-} from "../../../services/productos/productos.service";
+import { actualizarPrecioProductoSevice, actualizarProductoSevice, desactivarProductosService, } from "../../../services/productos/productos.service";
 import { capitalizeFirstLetter } from "../../../utils/utils";
 import { currentDate } from "../../../utils/dateUtils";
 
@@ -39,9 +35,7 @@ export const useSerchPrductos = (productos) => {
 };
 
 export const useCategoriasYFiltrado = (productos, filteredProductos) => {
-  const [selectedCategory, setSelectedCategory] = useState(
-    "Todas las Categorias"
-  );
+  const [selectedCategory, setSelectedCategory] = useState("Todas las Categorias");
 
   // Generar lista de categorías (incluyendo "Todas las Categorias")
   const categorias = useMemo(() => {
@@ -65,23 +59,13 @@ export const useCategoriasYFiltrado = (productos, filteredProductos) => {
 };
 
 /* Elminacion de productos*/
-export const handleDeleleProducto = (
-  idProducto,
-  setProductoToDelete,
-  setIsPopupOpen
-) => {
+export const handleDeleleProducto = (idProducto, setProductoToDelete, setIsPopupOpen ) => {
   setProductoToDelete(idProducto);
   setIsPopupOpen(true);
 };
 
 /* funcion para ejcutar la logica de eliminacion de producto */
-export const handleConfirmDeletePreoducto = async (
-  productoToDelete,
-  setProducto,
-  setIsPopupOpen,
-  setErrorPopupMessage,
-  setIsPopupErrorOpen
-) => {
+export const handleConfirmDeletePreoducto = async (productoToDelete, setProducto, setIsPopupOpen, setErrorPopupMessage, setIsPopupErrorOpen) => {
   try {
     if (productoToDelete) {
       const resDelete = await desactivarProductosService(productoToDelete);
@@ -108,14 +92,7 @@ export const handleConfirmDeletePreoducto = async (
 };
 
 // Función para resetear todos los valores al estado original
-export const resetFormToInitialValues = (
-  selectedProduct,
-  reset,
-  setValue,
-  setIsPanaderia,
-  setTipoProduccion,
-  setHasChanges
-) => {
+export const resetFormToInitialValues = (selectedProduct, reset, setValue, setIsPanaderia, setTipoProduccion, setHasChanges ) => {
   if (selectedProduct) {
     const esPanaderia = selectedProduct.idCategoria == 1;
 
@@ -153,14 +130,7 @@ export const resetFormToInitialValues = (
 };
 
 // Efecto para determinar si es Panadería y configurar valores iniciales
-export const useProductFormSetup = (
-  selectedProduct,
-  setValue,
-  reset,
-  setIsPanaderia,
-  setTipoProduccion,
-  setInitialProductValues
-) => {
+export const useProductFormSetup = (selectedProduct, setValue, reset, setIsPanaderia, setTipoProduccion, setInitialProductValues) => {
   useEffect(() => {
     if (selectedProduct) {
       const esPanaderia = selectedProduct.idCategoria == 1;
@@ -200,13 +170,7 @@ export const useProductFormSetup = (
 };
 
 // Efecto para verificar cambios en el formulario
-export const useCheckFormChanges = (
-  selectedProduct,
-  initialProductValues,
-  formValues,
-  isPanaderia,
-  setHasChanges
-) => {
+export const useCheckFormChanges = (selectedProduct, initialProductValues, formValues, isPanaderia, setHasChanges) => {
   useEffect(() => {
     if (selectedProduct && initialProductValues) {
       const currentValues = {
@@ -250,12 +214,7 @@ export const useCheckFormChanges = (
 };
 
 // Efecto para manejar la exclusividad de los switches
-export const useSwitchExclusivity = (
-  controlStock,
-  stockDiario,
-  setValue,
-  setHasChanges
-) => {
+export const useSwitchExclusivity = (controlStock, stockDiario, setValue, setHasChanges) => {
   useEffect(() => {
     if (controlStock && stockDiario) {
       setValue("stockDiario", 0);
@@ -272,16 +231,7 @@ export const useSwitchExclusivity = (
 };
 
 // Función para configurar los valores iniciales al modificar
-export const handleModify = (
-  producto,
-  setSelectedProduct,
-  setShowModifyModal,
-  reset,
-  setIsPanaderia,
-  setTipoProduccion,
-  setInitialProductValues,
-  setHasChanges
-) => {
+export const handleModify = (producto, setSelectedProduct, setShowModifyModal, reset, setIsPanaderia, setTipoProduccion, setInitialProductValues, setHasChanges) => {
   setSelectedProduct(producto);
   setShowModifyModal(true);
 
@@ -403,18 +353,7 @@ export const crearPayloadPrecioProducto = (data, idProducto) => {
 };
 
 // Función para manejar la actualización del producto
-export const handleUpdateProduct = async (
-  data,
-  selectedProduct,
-  setProductos,
-  setShowModifyModal,
-  setSelectedProduct,
-  setInitialProductValues,
-  setHasChanges,
-  setErrorPopupMessage,
-  setIsPopupErrorOpen,
-  setLoadingModificar
-) => {
+export const handleUpdateProduct = async (data, selectedProduct, setProductos, setShowModifyModal, setSelectedProduct, setInitialProductValues, setHasChanges, setErrorPopupMessage, setIsPopupErrorOpen, setLoadingModificar ) => {
   // if (!data || !selectedProduct) return;
   setLoadingModificar(true);
 

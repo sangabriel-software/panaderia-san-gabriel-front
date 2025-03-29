@@ -1,20 +1,7 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useGetProductosYPrecios } from "../../../hooks/productosprecios/useGetProductosYprecios";
-import { 
-  checkForChanges, 
-  handleConfirmDeletePreoducto, 
-  handleDeleleProducto, 
-  handleUpdateProduct, 
-  useCategoriasYFiltrado, 
-  useSerchPrductos,
-  resetFormToInitialValues,
-  useProductFormSetup,
-  useCheckFormChanges,
-  useSwitchExclusivity,
-  handleModify,
-  handleCloseModal
-} from "./ManageProductsUtils";
+import { checkForChanges, handleConfirmDeletePreoducto, handleDeleleProducto, handleUpdateProduct, useCategoriasYFiltrado, useSerchPrductos, resetFormToInitialValues, useProductFormSetup, useCheckFormChanges, useSwitchExclusivity, handleModify, handleCloseModal } from "./ManageProductsUtils";
 import SearchInput from "../../../components/SerchInput/SerchInput";
 import Title from "../../../components/Title/Title";
 import CardProductos from "../../../components/CardProductos/CardPoductos";
@@ -30,21 +17,9 @@ import "./ManageProducts.css";
 import AddButton from "../../../components/AddButton/AddButton";
 
 const ManageProducts = () => {
-  const {
-    productos,
-    loadigProducts,
-    showErrorProductos,
-    showInfoProductos,
-    setProductos,
-  } = useGetProductosYPrecios();
-  const { filteredProductos, searchQuery, showNoResults, handleSearch } =
-    useSerchPrductos(productos);
-  const {
-    categorias,
-    filteredByCategory,
-    selectedCategory,
-    setSelectedCategory,
-  } = useCategoriasYFiltrado(productos, filteredProductos);
+  const { productos, loadigProducts, showErrorProductos, showInfoProductos, setProductos, } = useGetProductosYPrecios();
+  const { filteredProductos, searchQuery, showNoResults, handleSearch } = useSerchPrductos(productos);
+  const { categorias, filteredByCategory, selectedCategory, setSelectedCategory, } = useCategoriasYFiltrado(productos, filteredProductos);
   const [productoToDelete, setProductoToDelete] = useState(null);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [errorPopupMessage, setErrorPopupMessage] = useState(false);
@@ -56,9 +31,7 @@ const ManageProducts = () => {
   const navigate = useNavigate();
   const { categorias: categoriasModify, loadingCategorias, showErrorCategorias, showInfoCategorias } = useGetCategorias();
   const [loadingModificar, setLoadingModificar] = useState(false);
-
-  // React Hook Form
-  const { register, handleSubmit, reset, watch, setValue, formState: { errors } } = useForm();
+  const { register, handleSubmit, reset, watch, setValue, formState: { errors } } = useForm();  // React Hook Form
 
   // Estado para controlar la visibilidad de los controles de Panadería
   const [isPanaderia, setIsPanaderia] = useState(false);
@@ -66,7 +39,7 @@ const ManageProducts = () => {
 
   // Observar todos los valores relevantes
   const formValues = watch();
-  const controlStock = watch("controlStock") === 1;
+  const controlStock = watch("controlStock") === 1; 
   const stockDiario = watch("stockDiario") === 1;
 
   // Custom hooks para manejar la lógica del formulario
@@ -74,28 +47,10 @@ const ManageProducts = () => {
   useCheckFormChanges(selectedProduct, initialProductValues, formValues, isPanaderia, setHasChanges);
   useSwitchExclusivity(controlStock, stockDiario, setValue, setHasChanges);
 
-  // Función para cerrar el modal
-  const onCloseModal = () => {
-    handleCloseModal(
-      () => resetFormToInitialValues(selectedProduct, reset, setValue, setIsPanaderia, setTipoProduccion, setHasChanges),
-      setShowModifyModal
-    );
-  };
 
   // Función para guardar los cambios del producto
   const onSubmit = async (data) => {
-    handleUpdateProduct(
-      data, 
-      selectedProduct, 
-      setProductos, 
-      setShowModifyModal, 
-      setSelectedProduct, 
-      setInitialProductValues, 
-      setHasChanges,
-      setErrorPopupMessage, 
-      setIsPopupErrorOpen, 
-      setLoadingModificar 
-    );
+    handleUpdateProduct( data, selectedProduct, setProductos, setShowModifyModal, setSelectedProduct, setInitialProductValues, setHasChanges, setErrorPopupMessage, setIsPopupErrorOpen, setLoadingModificar);
   };
 
   if (loadigProducts) {
