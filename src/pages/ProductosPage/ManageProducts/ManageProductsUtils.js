@@ -326,6 +326,7 @@ export const crearPayloadProducto = (data, selectedProduct) => {
       idProducto: selectedProduct.idProducto,
       nombreProducto: capitalizeFirstLetter(data.nombreProducto),
       idCategoria: idCategoria,
+      oldCategoria: Number(selectedProduct.idCategoria),
       controlarStock: controlStock,
       controlarStockDiario: data.stockDiario,
       tipoProduccion: tipoProduccion,
