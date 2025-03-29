@@ -1,14 +1,26 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useGetProductosYPrecios } from "../../../hooks/productosprecios/useGetProductosYprecios";
-import { checkForChanges, handleConfirmDeletePreoducto, handleDeleleProducto, handleUpdateProduct, useCategoriasYFiltrado, useSerchPrductos,
+import { 
+  checkForChanges, 
+  handleConfirmDeletePreoducto, 
+  handleDeleleProducto, 
+  handleUpdateProduct, 
+  useCategoriasYFiltrado, 
+  useSerchPrductos,
+  resetFormToInitialValues,
+  useProductFormSetup,
+  useCheckFormChanges,
+  useSwitchExclusivity,
+  handleModify,
+  handleCloseModal
 } from "./ManageProductsUtils";
 import SearchInput from "../../../components/SerchInput/SerchInput";
 import Title from "../../../components/Title/Title";
 import CardProductos from "../../../components/CardProductos/CardPoductos";
 import { useNavigate } from "react-router";
 import Alert from "../../../components/Alerts/Alert";
-import { BsExclamationTriangleFill, BsFillInfoCircleFill, BsX, } from "react-icons/bs";
+import { BsExclamationTriangleFill, BsFillInfoCircleFill, BsX } from "react-icons/bs";
 import ConfirmPopUp from "../../../components/Popup/ConfirmPopup";
 import ErrorPopup from "../../../components/Popup/ErrorPopUp";
 import ModalIngreso from "../../../components/ModalGenerico/Modal";
@@ -42,11 +54,11 @@ const ManageProducts = () => {
   const [initialProductValues, setInitialProductValues] = useState(null);
   const [hasChanges, setHasChanges] = useState(false);
   const navigate = useNavigate();
-  const { categorias: categoriasModify, loadingCategorias, showErrorCategorias, showInfoCategorias, } = useGetCategorias();
+  const { categorias: categoriasModify, loadingCategorias, showErrorCategorias, showInfoCategorias } = useGetCategorias();
   const [loadingModificar, setLoadingModificar] = useState(false);
 
   // React Hook Form
-  const { register, handleSubmit, reset, watch, setValue, formState: { errors }, } = useForm();
+  const { register, handleSubmit, reset, watch, setValue, formState: { errors } } = useForm();
 
   // Estado para controlar la visibilidad de los controles de Panadería
   const [isPanaderia, setIsPanaderia] = useState(false);
@@ -54,167 +66,38 @@ const ManageProducts = () => {
 
   // Observar todos los valores relevantes
   const formValues = watch();
-  const selectedCategoryModal = watch("idCategoria");
   const controlStock = watch("controlStock") === 1;
   const stockDiario = watch("stockDiario") === 1;
 
-  // Función para resetear todos los valores al estado original
-  const resetFormToInitialValues = () => {
-    if (selectedProduct) {
-      const esPanaderia = selectedProduct.idCategoria == 1;
-      
-      // Resetear valores del formulario
-      reset({
-        nombreProducto: selectedProduct.nombreProducto,
-        idCategoria: selectedProduct.idCategoria,
-        cantidad: selectedProduct.cantidad,
-        precio: selectedProduct.precio,
-        controlStock: esPanaderia ? selectedProduct.controlarStock : 1,
-        stockDiario: esPanaderia ? selectedProduct.controlarStockDiario : 0,
-        tipoProduccion: esPanaderia ? selectedProduct.tipoProduccion : null,
-        unidadesPorBandeja: esPanaderia ? selectedProduct.unidadesPorBandeja : null
-      });
+  // Custom hooks para manejar la lógica del formulario
+  useProductFormSetup(selectedProduct, setValue, reset, setIsPanaderia, setTipoProduccion, setInitialProductValues);
+  useCheckFormChanges(selectedProduct, initialProductValues, formValues, isPanaderia, setHasChanges);
+  useSwitchExclusivity(controlStock, stockDiario, setValue, setHasChanges);
 
-      // Resetear estados internos
-      setIsPanaderia(esPanaderia);
-      setTipoProduccion(esPanaderia ? selectedProduct.tipoProduccion || "bandejas" : "bandejas");
-      setHasChanges(false);
-      
-      // Forzar actualización de los switches
-      setValue('controlStock', esPanaderia ? selectedProduct.controlarStock : 1, { shouldDirty: true });
-      setValue('stockDiario', esPanaderia ? selectedProduct.controlarStockDiario : 0, { shouldDirty: true });
-    }
-  };
-
-  // Efecto para determinar si es Panadería y configurar valores iniciales
-  useEffect(() => {
-    if (selectedProduct) {
-      const esPanaderia = selectedProduct.idCategoria == 1;
-      setIsPanaderia(esPanaderia);
-      
-      // Configurar valores iniciales del formulario
-      reset({
-        nombreProducto: selectedProduct.nombreProducto,
-        idCategoria: selectedProduct.idCategoria,
-        cantidad: selectedProduct.cantidad,
-        precio: selectedProduct.precio,
-        controlStock: esPanaderia ? selectedProduct.controlarStock : 1,
-        stockDiario: esPanaderia ? selectedProduct.controlarStockDiario : 0,
-        tipoProduccion: esPanaderia ? selectedProduct.tipoProduccion : null,
-        unidadesPorBandeja: esPanaderia ? selectedProduct.unidadesPorBandeja : null
-      });
-
-      // Configurar tipo de producción si es Panadería
-      if (esPanaderia) {
-        setTipoProduccion(selectedProduct.tipoProduccion || "bandejas");
-      }
-
-      // Guardar los valores iniciales para comparación
-      setInitialProductValues({
-        ...selectedProduct,
-        controlStock: esPanaderia ? selectedProduct.controlarStock : 1,
-        stockDiario: esPanaderia ? selectedProduct.controlarStockDiario : 0,
-        tipoProduccion: esPanaderia ? selectedProduct.tipoProduccion : null,
-        unidadesPorBandeja: esPanaderia ? selectedProduct.unidadesPorBandeja : null
-      });
-    }
-  }, [selectedProduct, setValue, reset]);
-
-  // Efecto para verificar cambios en el formulario
-  useEffect(() => {
-    if (selectedProduct && initialProductValues) {
-      const currentValues = {
-        ...formValues,
-        // Para Panadería, comparamos los valores específicos
-        ...(isPanaderia && {
-          controlarStock: formValues.controlStock,
-          controlarStockDiario: formValues.stockDiario,
-          tipoProduccion: formValues.tipoProduccion,
-          unidadesPorBandeja: formValues.unidadesPorBandeja
-        })
-      };
-
-      const initialValuesForComparison = {
-        ...initialProductValues,
-        // Mapeamos los nombres para la comparación
-        controlStock: initialProductValues.controlarStock,
-        stockDiario: initialProductValues.controlarStockDiario,
-        tipoProduccion: initialProductValues.tipoProduccion,
-        unidadesPorBandeja: initialProductValues.unidadesPorBandeja
-      };
-
-      // Verificamos si hay cambios
-      const changesDetected = Object.keys(currentValues).some(key => {
-        // Comparación especial para valores numéricos que pueden venir como strings
-        if (typeof currentValues[key] === 'number' || typeof initialValuesForComparison[key] === 'number') {
-          return Number(currentValues[key]) !== Number(initialValuesForComparison[key]);
-        }
-        return currentValues[key] !== initialValuesForComparison[key];
-      });
-
-      setHasChanges(changesDetected);
-    }
-  }, [formValues, initialProductValues, isPanaderia, selectedProduct]);
-
-  // Efecto para manejar la exclusividad de los switches
-  useEffect(() => {
-    if (controlStock && stockDiario) {
-      setValue('stockDiario', 0);
-      setHasChanges(true);
-    }
-  }, [controlStock, setValue]);
-
-  useEffect(() => {
-    if (stockDiario && controlStock) {
-      setValue('controlStock', 0);
-      setHasChanges(true);
-    }
-  }, [stockDiario, setValue]);
-
-  // Función para configurar los valores iniciales al modificar
-  const handleModify = (producto) => {
-    setSelectedProduct(producto);
-    setShowModifyModal(true);
-    
-    // Usamos timeout para asegurar que el modal esté montado antes de setear valores
-    setTimeout(() => {
-      const esPanaderia = producto.idCategoria == 1;
-      
-      reset({
-        nombreProducto: producto.nombreProducto,
-        idCategoria: producto.idCategoria,
-        cantidad: producto.cantidad,
-        precio: producto.precio,
-        controlStock: esPanaderia ? producto.controlarStock : 1,
-        stockDiario: esPanaderia ? producto.controlarStockDiario : 0,
-        tipoProduccion: esPanaderia ? producto.tipoProduccion : null,
-        unidadesPorBandeja: esPanaderia ? producto.unidadesPorBandeja : null
-      });
-
-      setIsPanaderia(esPanaderia);
-      setTipoProduccion(esPanaderia ? producto.tipoProduccion || "bandejas" : "bandejas");
-      
-      setInitialProductValues({
-        ...producto,
-        controlStock: esPanaderia ? producto.controlarStock : 1,
-        stockDiario: esPanaderia ? producto.controlarStockDiario : 0
-      });
-      
-      setHasChanges(false);
-    }, 100);
-  };
-
-  // Función para cerrar el modal y resetear los valores
-  const handleCloseModal = () => {
-    resetFormToInitialValues();
-    setShowModifyModal(false);
+  // Función para cerrar el modal
+  const onCloseModal = () => {
+    handleCloseModal(
+      () => resetFormToInitialValues(selectedProduct, reset, setValue, setIsPanaderia, setTipoProduccion, setHasChanges),
+      setShowModifyModal
+    );
   };
 
   // Función para guardar los cambios del producto
   const onSubmit = async (data) => {
-    handleUpdateProduct( data, selectedProduct, setProductos, setShowModifyModal, setSelectedProduct, setInitialProductValues, setHasChanges,
-                         setErrorPopupMessage, setIsPopupErrorOpen, setLoadingModificar );
+    handleUpdateProduct(
+      data, 
+      selectedProduct, 
+      setProductos, 
+      setShowModifyModal, 
+      setSelectedProduct, 
+      setInitialProductValues, 
+      setHasChanges,
+      setErrorPopupMessage, 
+      setIsPopupErrorOpen, 
+      setLoadingModificar 
+    );
   };
+
   if (loadigProducts) {
     return <div className="loading">Cargando productos...</div>;
   }
@@ -281,7 +164,7 @@ const ManageProducts = () => {
                     setIsPopupOpen
                   )
                 }
-                onModify={() => handleModify(producto)}
+                onModify={() => handleModify(producto, setSelectedProduct, setShowModifyModal, reset, setIsPanaderia, setTipoProduccion, setInitialProductValues, setHasChanges)}
               />
             </div>
           ))}
@@ -291,7 +174,7 @@ const ManageProducts = () => {
       {/* Modal para modificación de productos */}
       <ModalIngreso
         show={showModifyModal}
-        onHide={handleCloseModal}
+        onHide={() => {handleCloseModal(resetFormToInitialValues, setShowModifyModal)}}
         title="Modificar Producto"
         onConfirm={handleSubmit(onSubmit)}
         confirmText="Modificar"
