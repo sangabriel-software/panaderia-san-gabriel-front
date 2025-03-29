@@ -48,35 +48,195 @@ const ManageProducts = () => {
   // React Hook Form
   const { register, handleSubmit, reset, watch, setValue, formState: { errors }, } = useForm();
 
-  // Estado para controlar la visibilidad del input de unidades por bandeja
-  const [showUnidadesPorBandeja, setShowUnidadesPorBandeja] = useState(false);
+  // Estado para controlar la visibilidad de los controles de Panadería
+  const [isPanaderia, setIsPanaderia] = useState(false);
+  const [tipoProduccion, setTipoProduccion] = useState("bandejas");
 
-  // Observar el valor del campo idCategoria
+  // Observar todos los valores relevantes
+  const formValues = watch();
   const selectedCategoryModal = watch("idCategoria");
+  const controlStock = watch("controlStock") === 1;
+  const stockDiario = watch("stockDiario") === 1;
 
-  // Efecto para mostrar/ocultar el input de unidades por bandeja
-  useEffect(() => {
-    if (selectedCategoryModal && selectedCategoryModal == 1) {
-      setShowUnidadesPorBandeja(true);
-    } else {
-      setShowUnidadesPorBandeja(false);
+  // Función para resetear todos los valores al estado original
+  const resetFormToInitialValues = () => {
+    if (selectedProduct) {
+      const esPanaderia = selectedProduct.idCategoria == 1;
+      
+      // Resetear valores del formulario
+      reset({
+        nombreProducto: selectedProduct.nombreProducto,
+        idCategoria: selectedProduct.idCategoria,
+        cantidad: selectedProduct.cantidad,
+        precio: selectedProduct.precio,
+        controlStock: esPanaderia ? selectedProduct.controlarStock : 1,
+        stockDiario: esPanaderia ? selectedProduct.controlarStockDiario : 0,
+        tipoProduccion: esPanaderia ? selectedProduct.tipoProduccion : null,
+        unidadesPorBandeja: esPanaderia ? selectedProduct.unidadesPorBandeja : null
+      });
+
+      // Resetear estados internos
+      setIsPanaderia(esPanaderia);
+      setTipoProduccion(esPanaderia ? selectedProduct.tipoProduccion || "bandejas" : "bandejas");
+      setHasChanges(false);
+      
+      // Forzar actualización de los switches
+      setValue('controlStock', esPanaderia ? selectedProduct.controlarStock : 1, { shouldDirty: true });
+      setValue('stockDiario', esPanaderia ? selectedProduct.controlarStockDiario : 0, { shouldDirty: true });
     }
-  }, [selectedCategoryModal]);
+  };
 
-  // Efecto para verificar cambios cada vez que se modifica el formulario
+  // Efecto para determinar si es Panadería y configurar valores iniciales
   useEffect(() => {
-    checkForChanges(
-      selectedProduct,
-      initialProductValues,
-      setHasChanges,
-      watch
-    );
-  }, [watch()]);
+    if (selectedProduct) {
+      const esPanaderia = selectedProduct.idCategoria == 1;
+      setIsPanaderia(esPanaderia);
+      
+      // Configurar valores iniciales del formulario
+      reset({
+        nombreProducto: selectedProduct.nombreProducto,
+        idCategoria: selectedProduct.idCategoria,
+        cantidad: selectedProduct.cantidad,
+        precio: selectedProduct.precio,
+        controlStock: esPanaderia ? selectedProduct.controlarStock : 1,
+        stockDiario: esPanaderia ? selectedProduct.controlarStockDiario : 0,
+        tipoProduccion: esPanaderia ? selectedProduct.tipoProduccion : null,
+        unidadesPorBandeja: esPanaderia ? selectedProduct.unidadesPorBandeja : null
+      });
+
+      // Configurar tipo de producción si es Panadería
+      if (esPanaderia) {
+        setTipoProduccion(selectedProduct.tipoProduccion || "bandejas");
+      }
+
+      // Guardar los valores iniciales para comparación
+      setInitialProductValues({
+        ...selectedProduct,
+        controlStock: esPanaderia ? selectedProduct.controlarStock : 1,
+        stockDiario: esPanaderia ? selectedProduct.controlarStockDiario : 0,
+        tipoProduccion: esPanaderia ? selectedProduct.tipoProduccion : null,
+        unidadesPorBandeja: esPanaderia ? selectedProduct.unidadesPorBandeja : null
+      });
+    }
+  }, [selectedProduct, setValue, reset]);
+
+  // Efecto para verificar cambios en el formulario
+  useEffect(() => {
+    if (selectedProduct && initialProductValues) {
+      const currentValues = {
+        ...formValues,
+        // Para Panadería, comparamos los valores específicos
+        ...(isPanaderia && {
+          controlarStock: formValues.controlStock,
+          controlarStockDiario: formValues.stockDiario,
+          tipoProduccion: formValues.tipoProduccion,
+          unidadesPorBandeja: formValues.unidadesPorBandeja
+        })
+      };
+
+      const initialValuesForComparison = {
+        ...initialProductValues,
+        // Mapeamos los nombres para la comparación
+        controlStock: initialProductValues.controlarStock,
+        stockDiario: initialProductValues.controlarStockDiario,
+        tipoProduccion: initialProductValues.tipoProduccion,
+        unidadesPorBandeja: initialProductValues.unidadesPorBandeja
+      };
+
+      // Verificamos si hay cambios
+      const changesDetected = Object.keys(currentValues).some(key => {
+        // Comparación especial para valores numéricos que pueden venir como strings
+        if (typeof currentValues[key] === 'number' || typeof initialValuesForComparison[key] === 'number') {
+          return Number(currentValues[key]) !== Number(initialValuesForComparison[key]);
+        }
+        return currentValues[key] !== initialValuesForComparison[key];
+      });
+
+      setHasChanges(changesDetected);
+    }
+  }, [formValues, initialProductValues, isPanaderia, selectedProduct]);
+
+  // Efecto para manejar la exclusividad de los switches
+  useEffect(() => {
+    if (controlStock && stockDiario) {
+      setValue('stockDiario', 0);
+      setHasChanges(true);
+    }
+  }, [controlStock, setValue]);
+
+  useEffect(() => {
+    if (stockDiario && controlStock) {
+      setValue('controlStock', 0);
+      setHasChanges(true);
+    }
+  }, [stockDiario, setValue]);
+
+  // Función para configurar los valores iniciales al modificar
+  const handleModify = (producto) => {
+    setSelectedProduct(producto);
+    setShowModifyModal(true);
+    
+    // Usamos timeout para asegurar que el modal esté montado antes de setear valores
+    setTimeout(() => {
+      const esPanaderia = producto.idCategoria == 1;
+      
+      reset({
+        nombreProducto: producto.nombreProducto,
+        idCategoria: producto.idCategoria,
+        cantidad: producto.cantidad,
+        precio: producto.precio,
+        controlStock: esPanaderia ? producto.controlarStock : 1,
+        stockDiario: esPanaderia ? producto.controlarStockDiario : 0,
+        tipoProduccion: esPanaderia ? producto.tipoProduccion : null,
+        unidadesPorBandeja: esPanaderia ? producto.unidadesPorBandeja : null
+      });
+
+      setIsPanaderia(esPanaderia);
+      setTipoProduccion(esPanaderia ? producto.tipoProduccion || "bandejas" : "bandejas");
+      
+      setInitialProductValues({
+        ...producto,
+        controlStock: esPanaderia ? producto.controlarStock : 1,
+        stockDiario: esPanaderia ? producto.controlarStockDiario : 0
+      });
+      
+      setHasChanges(false);
+    }, 100);
+  };
+
+  // Función para cerrar el modal y resetear los valores
+  const handleCloseModal = () => {
+    resetFormToInitialValues();
+    setShowModifyModal(false);
+  };
 
   // Función para guardar los cambios del producto
   const onSubmit = async (data) => {
-    handleUpdateProduct( data, selectedProduct, setProductos, setShowModifyModal, setSelectedProduct, setInitialProductValues, setHasChanges,
-                         setErrorPopupMessage, setIsPopupErrorOpen, setLoadingModificar );
+    const productoActualizado = {
+      ...data,
+      controlarStock: data.controlStock,
+      controlarStockDiario: data.stockDiario
+    };
+
+    if (data.idCategoria != 1) {
+      productoActualizado.controlarStock = 1;
+      productoActualizado.controlarStockDiario = 0;
+      productoActualizado.tipoProduccion = null;
+      productoActualizado.unidadesPorBandeja = null;
+    }
+    
+    handleUpdateProduct(
+      productoActualizado, 
+      selectedProduct, 
+      setProductos, 
+      setShowModifyModal, 
+      setSelectedProduct, 
+      setInitialProductValues, 
+      setHasChanges,
+      setErrorPopupMessage, 
+      setIsPopupErrorOpen, 
+      setLoadingModificar
+    );
   };
 
   if (loadigProducts) {
@@ -145,16 +305,7 @@ const ManageProducts = () => {
                     setIsPopupOpen
                   )
                 }
-                onModify={() =>
-                  handleModifyClick(
-                    producto,
-                    setSelectedProduct,
-                    setInitialProductValues,
-                    setShowModifyModal,
-                    reset,
-                    setHasChanges
-                  )
-                }
+                onModify={() => handleModify(producto)}
               />
             </div>
           ))}
@@ -164,7 +315,7 @@ const ManageProducts = () => {
       {/* Modal para modificación de productos */}
       <ModalIngreso
         show={showModifyModal}
-        onHide={() => setShowModifyModal(false)}
+        onHide={handleCloseModal}
         title="Modificar Producto"
         onConfirm={handleSubmit(onSubmit)}
         confirmText="Modificar"
@@ -180,6 +331,7 @@ const ManageProducts = () => {
                 <Form.Control
                   type="text"
                   placeholder="Ingrese el nombre"
+                  defaultValue={selectedProduct.nombreProducto}
                   {...register("nombreProducto", {
                     required: "El nombre del producto es obligatorio.",
                   })}
@@ -203,11 +355,16 @@ const ManageProducts = () => {
               <Form.Label>Categoría</Form.Label>
               <div className="input-wrapper">
                 <Form.Select
+                  defaultValue={selectedProduct.idCategoria}
                   {...register("idCategoria", {
                     required: "La categoría es obligatoria.",
                   })}
                   isInvalid={!!errors.idCategoria}
                   className="input-field input-data"
+                  onChange={(e) => {
+                    setIsPanaderia(e.target.value == 1);
+                    setHasChanges(true);
+                  }}
                 >
                   <option value="">Selecciona una categoría...</option>
                   {loadingCategorias ? (
@@ -242,6 +399,7 @@ const ManageProducts = () => {
                     <Form.Control
                       type="number"
                       placeholder="Ingrese la cantidad"
+                      defaultValue={selectedProduct.cantidad}
                       {...register("cantidad", {
                         required: "La cantidad es obligatoria.",
                         min: {
@@ -272,6 +430,7 @@ const ManageProducts = () => {
                       type="number"
                       step="0.01"
                       placeholder="Ingrese el precio"
+                      defaultValue={selectedProduct.precio}
                       {...register("precio", {
                         required: "El precio es obligatorio.",
                         min: {
@@ -296,46 +455,113 @@ const ManageProducts = () => {
               </Col>
             </Row>
 
-            {/* Switch para control de stock */}
-            <Form.Group className="mb-3">
-              <Form.Label className="label-title">Control de Stock</Form.Label>
-              <div className="d-flex align-items-center">
-                <span className="me-2">No</span>
-                <Form.Check
-                  type="switch"
-                  id="controlStock"
-                  {...register("controlarStock")}
-                />
-                <span className="ms-2">Sí</span>
-              </div>
-            </Form.Group>
+            {/* Sección específica para Panadería */}
+            {isPanaderia && (
+              <>
+                <div className="mb-3">
+                  <h6 className="label-title">Configuración para Producción y Stock</h6>
+                </div>
 
-            {/* Input de Unidades por Bandeja (solo visible si la categoría es Panadería) */}
-            {showUnidadesPorBandeja && (
-              <Form.Group className="mb-4">
-                <Form.Label className="label-title my-2">
-                  Unidades por Bandeja
-                  <small className="text-bold" style={{ fontSize: "0.8em" }}>
-                    <strong> (Información para producción)</strong>
-                  </small>
-                </Form.Label>
-                <Form.Control
-                  className="input-data"
-                  type="number"
-                  placeholder="Ingrese las unidades por bandeja"
-                  {...register("unidadesPorBandeja", {
-                    required: "Las unidades por bandeja son obligatorias.",
-                    min: {
-                      value: 1,
-                      message: "Las unidades por bandeja deben ser mayor a 0.",
-                    },
-                  })}
-                  isInvalid={!!errors.unidadesPorBandeja}
-                />
-                <Form.Control.Feedback type="invalid">
-                  {errors.unidadesPorBandeja?.message}
-                </Form.Control.Feedback>
-              </Form.Group>
+                {/* Controles de stock en una fila */}
+                <Row className="mb-3">
+                  <Col xs={6}>
+                    <Form.Group>
+                      <Form.Label className="label-title">Control de Stock</Form.Label>
+                      <div className="d-flex align-items-center">
+                        <span className="me-2">No</span>
+                        <Form.Check
+                          type="switch"
+                          id="controlStock"
+                          checked={controlStock}
+                          onChange={(e) => {
+                            setValue("controlStock", e.target.checked ? 1 : 0);
+                            setHasChanges(true);
+                          }}
+                          disabled={stockDiario}
+                        />
+                        <span className="ms-2">Sí</span>
+                      </div>
+                    </Form.Group>
+                  </Col>
+                  <Col xs={6}>
+                    <Form.Group>
+                      <Form.Label className="label-title">Stock Diario</Form.Label>
+                      <div className="d-flex align-items-center">
+                        <span className="me-2">No</span>
+                        <Form.Check
+                          type="switch"
+                          id="stockDiario"
+                          checked={stockDiario}
+                          onChange={(e) => {
+                            setValue("stockDiario", e.target.checked ? 1 : 0);
+                            setHasChanges(true);
+                          }}
+                          disabled={controlStock}
+                        />
+                        <span className="ms-2">Sí</span>
+                      </div>
+                    </Form.Group>
+                  </Col>
+                </Row>
+
+                {/* Selector de tipo de producción */}
+                <Form.Group className="mb-3">
+                  <Form.Label className="label-title">Tipo de Producción</Form.Label>
+                  <div className="d-flex align-items-center">
+                    <Form.Check
+                      type="radio"
+                      id="bandejas"
+                      label="Bandejas"
+                      value="bandejas"
+                      checked={tipoProduccion === "bandejas"}
+                      onChange={() => {
+                        setTipoProduccion("bandejas");
+                        setValue("tipoProduccion", "bandejas");
+                        setHasChanges(true);
+                      }}
+                      className="me-3 tipoProd"
+                    />
+                    <Form.Check
+                      className="tipoProd"
+                      type="radio"
+                      id="harina"
+                      label="Harina"
+                      value="harina"
+                      checked={tipoProduccion === "harina"}
+                      onChange={() => {
+                        setTipoProduccion("harina");
+                        setValue("tipoProduccion", "harina");
+                        setHasChanges(true);
+                      }}
+                    />
+                  </div>
+                </Form.Group>
+
+                {/* Input para unidades por bandeja */}
+                {tipoProduccion === "bandejas" && (
+                  <Form.Group className="mb-3">
+                    <Form.Label className="label-title">Unidades por Bandeja</Form.Label>
+                    <Form.Control
+                      className="input-data"
+                      type="number"
+                      placeholder="Ingrese las unidades por bandeja"
+                      defaultValue={selectedProduct.unidadesPorBandeja || ''}
+                      {...register("unidadesPorBandeja", {
+                        required: tipoProduccion === "bandejas" ? "Las unidades por bandeja son obligatorias." : false,
+                        min: {
+                          value: 1,
+                          message: "Las unidades por bandeja deben ser mayor a 0.",
+                        },
+                      })}
+                      isInvalid={!!errors.unidadesPorBandeja}
+                      onChange={() => setHasChanges(true)}
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      {errors.unidadesPorBandeja?.message}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+                )}
+              </>
             )}
           </Form>
         )}
