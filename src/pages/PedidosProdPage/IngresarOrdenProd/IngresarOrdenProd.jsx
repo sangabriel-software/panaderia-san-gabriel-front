@@ -299,7 +299,10 @@ const IngresarOrdenProd = () => {
                             ...trayQuantities,
                             [producto.idProducto]: {
                               cantidad: parseInt(e.target.value) || 0,
-                              idCategoria: 1, // Siempre será panadería (idCategoria = 1)
+                              idCategoria: producto.idCategoria, // Siempre será panadería (idCategoria = 1)
+                              tipoProduccion: producto.tipoProduccion,
+                              controlarStock: producto.controlarStock,
+                              controlarStockDiario: producto.controlarStockDiario,
                             },
                           })
                         }

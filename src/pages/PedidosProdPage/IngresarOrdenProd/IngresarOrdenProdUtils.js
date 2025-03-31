@@ -65,11 +65,14 @@ const crearPyaloadOrdenProduccion = (data, trayQuantities) => {
   const {idUsuario} = getUserData();
   const detalleOrden = Object.entries(trayQuantities)
     .filter(([_, { cantidad }]) => cantidad > 0) // Filtra por cantidad > 0
-    .map(([idProducto, { cantidad, idCategoria }]) => ({
+    .map(([idProducto, { cantidad, idCategoria, tipoProduccion, controlarStock, controlarStockDiario }]) => ({
       idProducto: Number(idProducto),
       idCategoria: idCategoria,
-      cantidadBandejas: idCategoria === 1 ? cantidad : 0,
-      cantidadUnidades: idCategoria !== 1 ? cantidad : 0,
+      cantidadBandejas: tipoProduccion === "bandejas" ? cantidad : 0,
+      cantidadHarina: tipoProduccion !== "bandejas" ? cantidad : 0,
+      tipoProduccion: tipoProduccion,
+      controlarStock: controlarStock,
+      controlarStockDiario: controlarStockDiario,
       fechaCreacion: dayjs().format("YYYY-MM-DD"),
     }));
 
@@ -127,7 +130,7 @@ export const handleIngresarOrdenProduccionSubmit = async ( data, trayQuantities,
       reset();
       setTrayQuantities([])
       setIsPopupOpen(true);
-      descargarPdfDuranteIngresoOrden(resIngresoOrden.idOrdenProduccion.idOrdenGenerada);
+      //descargarPdfDuranteIngresoOrden(resIngresoOrden.idOrdenProduccion.idOrdenGenerada);
     }
   } catch (error) {
     if(error.status === 409){
