@@ -130,7 +130,7 @@ export const handleIngresarOrdenProduccionSubmit = async ( data, trayQuantities,
       reset();
       setTrayQuantities([])
       setIsPopupOpen(true);
-      //descargarPdfDuranteIngresoOrden(resIngresoOrden.idOrdenProduccion.idOrdenGenerada);
+      descargarPdfDuranteIngresoOrden(resIngresoOrden.idOrdenProduccion.idOrdenGenerada);
     }
   } catch (error) {
     if(error.status === 409){

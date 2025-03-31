@@ -162,12 +162,27 @@ const styles = StyleSheet.create({
 });
 
 const OrderDetailsPdf = ({ detalleOrden, encabezadoOrden, detalleConsumo }) => {
-  const panaderia = detalleOrden?.filter(item => item.idCategoria === 1);
-  const reposteria = detalleOrden?.filter(item => item.idCategoria === 2);
+
+  const prodBandejas = detalleOrden?.filter(item => item.tipoProduccion === "bandejas");
+  const prodHarina   = detalleOrden?.filter(item => item.tipoProduccion === "harina");
   const fechaGeneracion = new Date().toLocaleString();
 
+  const calcularTotalHarinaProdPorHarina= () => {
+    // Verificamos que prodHarina sea un array válido
+    if (!Array.isArray(prodHarina)) return 0;
+    
+    // Sumamos todas las cantidades de harina
+    const totalHarina = prodHarina.reduce((total, producto) => {
+      // Convertimos a número y sumamos (si no es número, suma 0)
+      return total + (Number(producto.cantidadHarina) || 0);
+    }, 0);
+  
+    return totalHarina;
+  };
+
+
   // Calcular total de harina
-  const calcularTotalHarina = () => {
+  const calcularTotalHarinaProdPorBandejas = () => {
     if (!detalleConsumo || detalleConsumo.length === 0) return null;
     
     const harinas = detalleConsumo.filter(item => 
@@ -183,12 +198,14 @@ const OrderDetailsPdf = ({ detalleOrden, encabezadoOrden, detalleConsumo }) => {
     const unidad = harinas[0]?.UnidadMedida || '';
 
     return {
-      total: totalHarina,
+      total: Math.round(totalHarina),
       unidad: unidad
     };
   };
 
-  const totalHarina = calcularTotalHarina();
+  const totalHarinaBandejas = calcularTotalHarinaProdPorBandejas();
+
+  const totalHarinaNecesaria = totalHarinaBandejas.total + calcularTotalHarinaProdPorHarina();
 
   return (
     <Document>
@@ -234,10 +251,10 @@ const OrderDetailsPdf = ({ detalleOrden, encabezadoOrden, detalleConsumo }) => {
           </View>
         </View>
 
-        {panaderia.length > 0 && (
+        {prodBandejas.length > 0 && (
           <View style={styles.tableContainer}>
             <View style={styles.tableTitleContainer}>
-              <Text style={styles.tableTitle}>Productos de Panaderia</Text>
+              <Text style={styles.tableTitle}>Bandejas</Text>
             </View>
             <View style={styles.table}>
               <View style={styles.tableRow}>
@@ -246,7 +263,7 @@ const OrderDetailsPdf = ({ detalleOrden, encabezadoOrden, detalleConsumo }) => {
                 <Text style={styles.tableHeader}>Bandejas</Text>
                 <Text style={styles.tableHeader}>Unidades</Text>
               </View>
-              {panaderia.map((item, index) => (
+              {prodBandejas.map((item, index) => (
                 <View style={styles.tableRow} key={index}>
                   <Text style={styles.tableCellItem}>{index + 1}</Text>
                   <Text style={styles.tableCell}>{item.nombreProducto}</Text>
@@ -258,36 +275,46 @@ const OrderDetailsPdf = ({ detalleOrden, encabezadoOrden, detalleConsumo }) => {
           </View>
         )}
 
-        {reposteria.length > 0 && (
+        {prodHarina.length > 0 && (
           <View style={styles.tableContainer}>
             <View style={styles.tableTitleContainer}>
-              <Text style={styles.tableTitle}>Productos de Reposteria</Text>
+              <Text style={styles.tableTitle}>Harina</Text>
             </View>
             <View style={styles.table}>
               <View style={styles.tableRow}>
                 <Text style={styles.tableCellItem}>#</Text>
                 <Text style={styles.tableHeader}>Producto</Text>
-                <Text style={styles.tableHeader}>Unidades</Text>
+                <Text style={styles.tableHeader}>Harina</Text>
               </View>
-              {reposteria.map((item, index) => (
+              {/* Fila fija */}
+              <View style={[styles.tableRow, styles.fixedRow]}>
+                <Text style={styles.tableCellItem}>1</Text>
+                <Text style={styles.tableCell}>Frances</Text>
+                <Text style={styles.tableCell}>
+                  {totalHarinaBandejas ? `${totalHarinaBandejas.total.toFixed(2)} ${totalHarinaBandejas.unidad}` : 'N/A'}
+                </Text>
+              </View>
+              {/* Resto de productos */}
+              {prodHarina.map((item, index) => (
                 <View style={styles.tableRow} key={index}>
-                  <Text style={styles.tableCellItem}>{index + 1}</Text>
-                  <Text style={styles.tableCell}>{item.nombreProducto}</Text>
-                  <Text style={styles.tableCell}>{item.cantidadUnidades || 'N/A'}</Text>
+                  <Text style={styles.tableCellItem}>{index + 2}</Text>
+                  <Text style={styles.tableCell}>{item.nombreProducto || 'N/A'}</Text>
+                  <Text style={styles.tableCell}>{item.cantidadHarina ? `${item.cantidadHarina} ${totalHarinaBandejas.unidad}` : 'N/A'}</Text>
                 </View>
               ))}
             </View>
           </View>
         )}
 
-        {totalHarina && (
+
+
           <View style={styles.flourSummaryContainer}>
-            <Text style={styles.flourSummaryText}>TOTAL HARINA NECESARIA:</Text>
+            <Text style={styles.flourSummaryText}>TOTAL HARINA:</Text>
             <Text style={styles.flourTotal}>
-              {totalHarina.total.toFixed(2)} {totalHarina.unidad.toUpperCase()}
+              {totalHarinaNecesaria.toFixed(2)} {totalHarinaBandejas?.unidad.toUpperCase()}
             </Text>
           </View>
-        )}
+
 
         <Text style={styles.footer}>Generado el {fechaGeneracion}</Text>
       </Page>

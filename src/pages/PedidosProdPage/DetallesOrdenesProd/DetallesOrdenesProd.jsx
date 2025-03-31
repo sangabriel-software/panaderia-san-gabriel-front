@@ -18,18 +18,8 @@ const DetallesOrdenesProduccionPage = () => {
   const isMobile = useMediaQuery({ maxWidth: 768 });
   const { idOrdenProduccion } = useParams();
   const decryptedIdRol = decryptId(decodeURIComponent(idOrdenProduccion));
-  const {
-    detalleOrden,
-    loadingDetalleOrdene,
-    showErrorDetalleOrdene,
-    showInfoDetalleOrden,
-  } = useGetDetalleOrden(decryptedIdRol);
-  const {
-    detalleConsumo,
-    loadingDetalleConsumo,
-    showErrorDetalleConsumo,
-    showInfoDetalleConsumo,
-  } = useGetConsumoIngredientes(decryptedIdRol);
+  const { detalleOrden, loadingDetalleOrdene, showErrorDetalleOrdene, showInfoDetalleOrden, } = useGetDetalleOrden(decryptedIdRol);
+  const { detalleConsumo, loadingDetalleConsumo, showErrorDetalleConsumo, showInfoDetalleConsumo, } = useGetConsumoIngredientes(decryptedIdRol);
   const [view, setView] = useState("productos");
 
   return (
