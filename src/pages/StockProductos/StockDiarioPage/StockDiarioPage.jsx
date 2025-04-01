@@ -99,7 +99,7 @@ const StockDiarioPage = () => {
           </div>
           <div className="col-8">
             <Title
-              title={`Stock Diario - ${sucursalData.nombreSucursal || " "}`}
+              title={`Stock Diario ${sucursalData.nombreSucursal || " "}`}
               description={`Productos disponibles para hoy - ${formatDateToDisplay(
                 fechaValidez
               )}`}

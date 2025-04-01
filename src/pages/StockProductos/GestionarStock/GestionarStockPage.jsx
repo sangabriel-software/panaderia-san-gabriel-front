@@ -52,7 +52,7 @@ const GestionarStockPage = () => {
                             
                             <div className="gestionar-stock-options-container">
                                 <Card 
-                                    className="gestionar-stock-option-card stock-total"
+                                    className="gestionar-stock-option-card stock-total disabled-card"
                                     onClick={() => handleNavigate(navigate, sucursal.idSucursal, 'ventas-generales')}
                                 >
                                     <Card.Body>

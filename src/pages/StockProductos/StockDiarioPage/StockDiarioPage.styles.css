@@ -306,3 +306,8 @@
       display: none !important;
     }
   }
+
+  .disabled-card {
+    opacity: 0.6; /* Hace que se vea más claro */
+    pointer-events: none; /* Evita cualquier interacción */
+}
