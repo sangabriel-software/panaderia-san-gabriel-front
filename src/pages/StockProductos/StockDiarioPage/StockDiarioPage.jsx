@@ -25,7 +25,7 @@ const StockDiarioPage = () => {
   // Efecto para mostrar/ocultar el botón de scroll
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 300) {
+      if (window.scrollY > 100) {
         setShowScrollButton(true);
       } else {
         setShowScrollButton(false);
