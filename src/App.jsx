@@ -6,6 +6,7 @@ import "./styles/App.css";
 import "./styles/globalStyles.css";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import GestionarStockPage from "./pages/StockProductos/GestionarStock/GestionarStockPage";
 
 const AccessDeniedPage = lazy( ()=> import("./components/AccesoDenegado/AccessDeniedPage"));
 // Lazy-loaded components
@@ -78,8 +79,12 @@ function App() {
               <Route index element={<PanelConfig/>} />
               <Route path="gestionar-materia-prima" element={<GestionDeRecetasPage/>} />
               <Route path="configuracion-perfil" element={<PerfilPage/>} />
-
             </Route>
+
+            <Route path="/stock-productos">
+              <Route index element={<GestionarStockPage/>} />
+            </Route>
+
           </Route>
         </Route>
       </Routes>

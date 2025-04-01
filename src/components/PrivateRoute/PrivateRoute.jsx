@@ -5,6 +5,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { removeLocalStorage } from "../../utils/Auth/localstorage";
 import { getTokenExpiration, getUserPermissions } from "../../utils/Auth/decodedata";
 import { hasPermission, isTokenExpired } from "../../utils/Auth/validacionpermisos";
+import { exclusiones } from "../../utils/Auth/exclusiones.routes";
 
 const PrivateRoute = () => {
   const navigate = useNavigate();
