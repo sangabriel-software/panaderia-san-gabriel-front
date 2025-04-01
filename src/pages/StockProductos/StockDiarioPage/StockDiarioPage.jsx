@@ -1,17 +1,47 @@
 import { useNavigate, useParams } from "react-router";
 import useGetStockDelDia from "../../../hooks/stock/useGetStockDelDia";
-import { BsArrowLeft } from "react-icons/bs";
+import { BsArrowLeft, BsX } from "react-icons/bs";
 import Title from "../../../components/Title/Title";
-import { Container, Spinner, Alert } from "react-bootstrap";
+import { Container, Spinner, Alert, Form } from "react-bootstrap";
 import "./StockDiarioPage.styles.css";
-import { FaStore, FaCalendarAlt, FaBoxOpen } from "react-icons/fa";
+import { FaStore, FaCalendarAlt, FaBoxOpen, FaSearch } from "react-icons/fa";
 import DotsMove from "../../../components/Spinners/DotsMove";
 import { formatDateToDisplay } from "../../../utils/dateUtils";
+import { useState, useMemo } from "react";
 
 const StockDiarioPage = () => {
   const { idSucursal } = useParams();
   const { stockDelDia, loadingStockDiario } = useGetStockDelDia(idSucursal);
   const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const isArray = Array.isArray(stockDelDia);
+  const isEmptyStock = useMemo(() => {
+    return (
+      !isArray ||
+      stockDelDia.length === 0 ||
+      (stockDelDia.length === 1 && stockDelDia[0].idStockDiario === 0)
+    );
+  }, [isArray, stockDelDia]);
+
+  const sucursalData = useMemo(() => {
+    return isArray && stockDelDia.length > 0 ? stockDelDia[0] : {};
+  }, [isArray, stockDelDia]);
+
+  const fechaValidez = useMemo(() => {
+    return sucursalData?.fechaValidez || "";
+  }, [sucursalData]);
+
+  const filteredProducts = useMemo(() => {
+    if (!isArray) return [];
+    return stockDelDia.filter((producto) =>
+      producto.nombreProducto.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [stockDelDia, searchTerm, isArray]);
+
+  const handleClearSearch = () => {
+    setSearchTerm("");
+  };
 
   if (loadingStockDiario) {
     return (
@@ -23,17 +53,6 @@ const StockDiarioPage = () => {
       </Container>
     );
   }
-
-  // Verificar si stockDelDia es un array válido
-  const isArray = Array.isArray(stockDelDia);
-  const isEmptyStock =
-    !isArray ||
-    stockDelDia.length === 0 ||
-    (stockDelDia.length === 1 && stockDelDia[0].idStockDiario === 0);
-
-  // Obtener datos de sucursal (con protección)
-  const sucursalData = isArray && stockDelDia.length > 0 ? stockDelDia[0] : {};
-  const fechaValidez = sucursalData?.fechaValidez || "";
 
   return (
     <Container className="stock-diario-container">
@@ -51,9 +70,7 @@ const StockDiarioPage = () => {
           </div>
           <div className="col-8">
             <Title
-              title={`Stock Diario - ${
-                sucursalData.nombreSucursal || " "
-              }`}
+              title={`Stock Diario - ${sucursalData.nombreSucursal || " "}`}
               description={`Productos disponibles para hoy - ${formatDateToDisplay(
                 fechaValidez
               )}`}
@@ -61,6 +78,31 @@ const StockDiarioPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Barra de búsqueda */}
+      {!isEmptyStock && (
+        <div className="mb-4">
+          <div
+            className="position-relative"
+            style={{ maxWidth: "500px", margin: "0 auto" }}
+          >
+            <Form.Control
+              type="text"
+              placeholder="Buscar producto..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="stock-diario-search-input"
+            />
+            <FaSearch className="stock-diario-search-icon" />
+            {searchTerm && (
+              <BsX
+                className="stock-diario-clear-icon"
+                onClick={handleClearSearch}
+              />
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Contenido condicional */}
       {isEmptyStock ? (
@@ -74,8 +116,8 @@ const StockDiarioPage = () => {
         </div>
       ) : (
         <div className="stock-diario-grid">
-          {isArray &&
-            stockDelDia.map((producto) => (
+          {filteredProducts.length > 0 ? (
+            filteredProducts.map((producto) => (
               <div key={producto.idStockDiario} className="stock-diario-card">
                 <h3 className="stock-diario-product-name">
                   {producto.nombreProducto}
@@ -89,7 +131,14 @@ const StockDiarioPage = () => {
                   </span>
                 </div>
               </div>
-            ))}
+            ))
+          ) : (
+            <div className="w-100 d-flex justify-content-center">
+              <div className="no-products-message">
+                No se encontraron productos con ese nombre.
+              </div>
+            </div>
+          )}
         </div>
       )}
     </Container>
