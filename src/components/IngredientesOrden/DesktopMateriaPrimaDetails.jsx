@@ -265,7 +265,7 @@ const TableRow = ({ detalle, subIndex }) => {
       </td>
       <td className="text-center">
         <span className="fw-bold">
-          {detalle.CantidadUsada} {detalle.UnidadMedida}
+          {detalle.CantidadUsada.toFixed(2)} {detalle.UnidadMedida}
         </span>
       </td>
     </tr>
