@@ -1,14 +1,13 @@
-import { Container, Row, Col, Card } from "react-bootstrap";
+import { Container, Row, Col, Card, Button } from "react-bootstrap";
 import DotsMove from "../../../components/Spinners/DotsMove";
 import useGetSucursales from "../../../hooks/sucursales/useGetSucursales";
 import { useNavigate } from "react-router-dom";
-import "./GestionarStockPage.styles.css"; // Archivo CSS específico para este componente
+import "./GestionarStockPage.styles.css";
 
 const GestionarStockPage = () => {
     const { sucursales, loadingSucursales } = useGetSucursales();
     const navigate = useNavigate();
 
-    // Loading mientras se cargan los recursos
     if (loadingSucursales) {
         return (
             <Container
@@ -24,10 +23,20 @@ const GestionarStockPage = () => {
         navigate(`/stock/${sucursalId}/${tipoStock}`);
     };
 
+    const handleAddProduct = () => {
+        navigate("/stock/agregar-producto");
+    };
+
+    const handleAddProductToSucursal = (sucursalId) => {
+        navigate(`/stock/agregar-producto/${sucursalId}`);
+    };
+
     return (
         <Container className="gestionar-stock-container">
-            <h1 className="gestionar-stock-title">Gestión de Stock</h1>
-            <p className="gestionar-stock-subtitle">Seleccione una sucursal y tipo de stock</p>
+            <div className="gestionar-stock-header">
+                <h1 className="gestionar-stock-title">Gestión de Stock</h1>
+                <p className="gestionar-stock-subtitle">Seleccione una sucursal y tipo de stock</p>
+            </div>
             
             <Row className="gestionar-stock-row">
                 {sucursales.map((sucursal) => (
@@ -74,6 +83,13 @@ const GestionarStockPage = () => {
                                         </div>
                                     </Card.Body>
                                 </Card>
+
+                                <Button
+                                    className="gestionar-stock-sucursal-add-button"
+                                    onClick={() => handleAddProductToSucursal(sucursal.idSucursal)}
+                                >
+                                    <i className="bi bi-plus-lg"></i> Agregar a esta sucursal
+                                </Button>
                             </div>
                         </div>
                     </Col>
