@@ -1,10 +1,14 @@
-import React, { useState, useEffect } from "react"; // Importamos useState y useEffect
+import React, { useState, useEffect } from "react";
 import { Badge, Card, Button, Dropdown } from "react-bootstrap";
 import { formatDateToDisplay } from "../../utils/dateUtils";
-import { BsBox, BsClipboard, BsCalendar, BsDownload, BsFileEarmarkPdf, BsFileEarmarkExcel, BsPerson, BsClock, BsPersonBadge, BsClipboardCheck, BsBuilding, BsArrowUp } from "react-icons/bs"; // Añadimos BsArrowUp
+import { BsBox, BsClipboard, BsCalendar, BsDownload, BsFileEarmarkPdf, BsFileEarmarkExcel, BsPerson, BsClock, BsPersonBadge, BsClipboardCheck, BsBuilding, BsArrowUp } from "react-icons/bs";
 
 const MobileMateriaPrimaDetails = ({ order, detalleConsumo, onDownloadXLS, onDownloadPDF }) => {
   const encabezado = order?.encabezadoOrden;
+  const detalleOrden = order.detalleOrden;
+  
+  // Filtrar productos por tipo de producción
+  const prodHarina = detalleOrden?.filter(item => item.tipoProduccion === "harina") || [];
 
   // Agrupar los detalles de consumo por producto
   const groupedConsumo = detalleConsumo?.reduce((acc, item) => {
@@ -15,19 +19,44 @@ const MobileMateriaPrimaDetails = ({ order, detalleConsumo, onDownloadXLS, onDow
     return acc;
   }, {});
 
-  // Calcular el total de la cantidad usada por ingrediente
+  // Agregar los productos de harina al consumo
+  prodHarina?.forEach(producto => {
+    if (!groupedConsumo[producto.nombreProducto]) {
+      groupedConsumo[producto.nombreProducto] = [];
+    }
+    groupedConsumo[producto.nombreProducto].push({
+      Producto: producto.nombreProducto,
+      Ingrediente: "Harina",
+      CantidadUsada: producto.cantidadHarina,
+      UnidadMedida: "Lb"
+    });
+  });
+
+  // Calcular total de harina de ingredientes (con decimales)
+  const totalHarinaIngredientes = detalleConsumo?.reduce((total, item) => {
+    return item.Ingrediente.toLowerCase().includes('harina') ? 
+           total + (parseFloat(item.CantidadUsada) || 0) : total;
+  }, 0) || 0;
+
+  // Calcular total de harina de productos (con decimales)
+  const totalHarinaProductos = prodHarina.reduce((total, producto) => {
+    return total + (parseFloat(producto.cantidadHarina) || 0);
+  }, 0) || 0;
+
+  // Total general de harina (redondeado)
+  const totalGeneralHarina = Math.round(totalHarinaIngredientes + totalHarinaProductos);
+
+  // Calcular el total de la cantidad usada por ingrediente (con decimales)
   const totalPorIngrediente = detalleConsumo?.reduce((acc, item) => {
     if (!acc[item.Ingrediente]) {
       acc[item.Ingrediente] = { cantidad: 0, unidad: item.UnidadMedida };
     }
-    acc[item.Ingrediente].cantidad += item.CantidadUsada;
+    acc[item.Ingrediente].cantidad += (parseFloat(item.CantidadUsada) || 0);
     return acc;
   }, {});
 
-  // Estado para controlar la visibilidad del botón flotante
   const [showScrollButton, setShowScrollButton] = useState(false);
 
-  // Efecto para mostrar u ocultar el botón flotante según el scroll
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 100) {
@@ -38,19 +67,11 @@ const MobileMateriaPrimaDetails = ({ order, detalleConsumo, onDownloadXLS, onDow
     };
 
     window.addEventListener("scroll", handleScroll);
-
-    // Limpiar el event listener cuando el componente se desmonte
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Función para regresar al inicio de la página
   const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth", // Desplazamiento suave
-    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
@@ -69,7 +90,6 @@ const MobileMateriaPrimaDetails = ({ order, detalleConsumo, onDownloadXLS, onDow
                 Detalles de materia prima
               </small>
             </div>
-            {/* Menú desplegable para descargas */}
             <Dropdown>
               <Dropdown.Toggle
                 style={{ backgroundColor: "#4ECDC4", borderColor: "#4ECDC4", color: "#FFFFFF" }}
@@ -78,7 +98,6 @@ const MobileMateriaPrimaDetails = ({ order, detalleConsumo, onDownloadXLS, onDow
               >
                 <BsDownload size={20} />
               </Dropdown.Toggle>
-
               <Dropdown.Menu>
                 <Dropdown.Item onClick={onDownloadPDF}>
                   <div className="d-flex align-items-center gap-2">
@@ -165,17 +184,36 @@ const MobileMateriaPrimaDetails = ({ order, detalleConsumo, onDownloadXLS, onDow
             </React.Fragment>
           ))}
 
-          {/* Resumen de Ingredientes Usados */}
+          {/* Resumen de Harina */}
           <div className="mt-4">
-            <h6 className="mb-3 text-uppercase text-secondary" style={{ color: "#556270" }}>Resumen de Ingredientes Usados</h6>
-            {Object.entries(totalPorIngrediente || {}).map(([ingrediente, { cantidad, unidad }]) => (
-              <div key={ingrediente} className="d-flex justify-content-between align-items-center mb-2">
-                <span className="fw-medium" style={{ color: "#556270" }}>{ingrediente}</span>
-                <span className="fw-bold" style={{ color: "#4ECDC4" }}>
-                  {cantidad.toFixed(2)} {unidad}
-                </span>
-              </div>
-            ))}
+            <h6 className="mb-3 text-uppercase text-secondary" style={{ color: "#556270" }}>Resumen de Harina</h6>
+            
+            <Card className="mb-3 border-0 rounded-3 shadow-sm" style={{ backgroundColor: "#E8F5E9" }}>
+              <Card.Body>
+                <div className="d-flex justify-content-between align-items-center mb-2">
+                  <span><strong>Harina bandejas solicitadas:</strong></span>
+                  <span className="fw-bold">{Math.round(totalHarinaIngredientes.toFixed(2))} Lb</span>
+                </div>
+              </Card.Body>
+            </Card>
+
+            <Card className="mb-3 border-0 rounded-3 shadow-sm" style={{ backgroundColor: "#E8F5E9" }}>
+              <Card.Body>
+                <div className="d-flex justify-content-between align-items-center mb-2">
+                  <span><strong> Harina libras solicitadas:</strong></span>
+                  <span className="fw-bold">{Math.round(totalHarinaProductos.toFixed(2))} Lb</span>
+                </div>
+              </Card.Body>
+            </Card>
+
+            <Card className="border-0 rounded-3 shadow-sm" style={{ backgroundColor: "#FFEBEE" }}>
+              <Card.Body>
+                <div className="d-flex justify-content-between align-items-center">
+                  <span className="fw-bold">Total harina:</span>
+                  <span className="fw-bold text-danger">{totalGeneralHarina} Lb</span>
+                </div>
+              </Card.Body>
+            </Card>
           </div>
         </Card.Body>
       </Card>
@@ -196,7 +234,7 @@ const MobileMateriaPrimaDetails = ({ order, detalleConsumo, onDownloadXLS, onDow
             justifyContent: "center",
           }}
         >
-          <BsArrowUp size={20} /> {/* Ícono de flecha hacia arriba */}
+          <BsArrowUp size={20} />
         </button>
       )}
     </>
@@ -215,7 +253,7 @@ const MateriaPrimaCardMobile = ({ detalle, index }) => {
         <div className="d-flex justify-content-between small">
           <div className="text-center">
             <div className="text-secondary">Cantidad Usada</div>
-            <div className="fw-bold text-dark">{detalle.CantidadUsada}</div>
+            <div className="fw-bold text-dark">{parseFloat(detalle.CantidadUsada).toFixed(2)}</div>
           </div>
           <div className="text-center">
             <div className="text-secondary">Unidad</div>

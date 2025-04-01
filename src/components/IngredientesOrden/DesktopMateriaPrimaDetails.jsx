@@ -5,6 +5,11 @@ import { formatDateToDisplay } from "../../utils/dateUtils";
 
 const DesktopMateriaPrimaDetails = ({ order, detalleConsumo, onDownloadXLS, onDownloadPDF }) => {
   const encabezado = order?.encabezadoOrden;
+  const detalleOrden = order.detalleOrden;
+  
+  // Filtrar productos por tipo de producción
+  const prodBandejas = detalleOrden?.filter(item => item.tipoProduccion === "bandejas") || [];
+  const prodHarina = detalleOrden?.filter(item => item.tipoProduccion === "harina") || [];
 
   // Agrupar los detalles de consumo por producto
   const groupedConsumo = detalleConsumo?.reduce((acc, item) => {
@@ -15,14 +20,41 @@ const DesktopMateriaPrimaDetails = ({ order, detalleConsumo, onDownloadXLS, onDo
     return acc;
   }, {});
 
+  // Agregar los productos de harina al consumo
+  prodHarina?.forEach(producto => {
+    if (!groupedConsumo[producto.nombreProducto]) {
+      groupedConsumo[producto.nombreProducto] = [];
+    }
+    groupedConsumo[producto.nombreProducto].push({
+      Producto: producto.nombreProducto,
+      Ingrediente: "Harina",
+      CantidadUsada: producto.cantidadHarina,
+      UnidadMedida: "Lb"
+    });
+  });
+
   // Calcular el total de la cantidad usada por ingrediente
   const totalPorIngrediente = detalleConsumo?.reduce((acc, item) => {
     if (!acc[item.Ingrediente]) {
       acc[item.Ingrediente] = { cantidad: 0, unidad: item.UnidadMedida };
     }
-    acc[item.Ingrediente].cantidad += item.CantidadUsada;
+    acc[item.Ingrediente].cantidad += parseFloat(item.CantidadUsada) || 0;
     return acc;
   }, {});
+
+  // Calcular total de harina de ingredientes (de detalleConsumo)
+  const totalHarinaIngredientes = detalleConsumo?.reduce((total, item) => {
+    return item.Ingrediente.toLowerCase().includes('harina') ? 
+           total + (parseFloat(item.CantidadUsada) || 0) : total;
+  }, 0) || 0;
+
+  // Calcular total de harina de productos por harina
+  const totalHarinaProductos = prodHarina.reduce((total, producto) => {
+    return total + (parseFloat(producto.cantidadHarina) || 0);
+  }, 0) || 0;
+
+  // Total general de harina
+  const totalGeneralHarina = totalHarinaIngredientes + totalHarinaProductos;
 
   return (
     <Container fluid>
@@ -31,6 +63,8 @@ const DesktopMateriaPrimaDetails = ({ order, detalleConsumo, onDownloadXLS, onDo
         onDownloadXLS={onDownloadXLS}
         onDownloadPDF={onDownloadPDF}
       />
+      
+      {/* Tabla de consumo de materia prima */}
       <Card className="shadow-lg border-0 overflow-hidden mb-5" style={{ borderRadius: "15px" }}>
         <div className="table-responsive">
           <Table hover className="mb-0">
@@ -66,29 +100,81 @@ const DesktopMateriaPrimaDetails = ({ order, detalleConsumo, onDownloadXLS, onDo
         </div>
       </Card>
 
-      {/* Card para mostrar el total por ingrediente */}
+      {/* Resumen de productos por bandejas */}
+      {/* {prodBandejas.length > 0 && (
+        <Card className="shadow-lg border-0 mb-4" style={{ borderRadius: "15px" }}>
+          <Card.Body className="p-4">
+            <h5 className="mb-3 fw-bold text-primary">Productos Solicitados por Bandejas</h5>
+            <Table hover>
+              <thead>
+                <tr>
+                  <th>Producto</th>
+                  <th className="text-center">Bandejas</th>
+                  <th className="text-center">Unidades</th>
+                </tr>
+              </thead>
+              <tbody>
+                {prodBandejas.map((producto, index) => (
+                  <tr key={index}>
+                    <td>{producto.nombreProducto}</td>
+                    <td className="text-center fw-bold">{producto.cantidadBandejas}</td>
+                    <td className="text-center">{producto.cantidadUnidades.toLocaleString()}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          </Card.Body>
+        </Card> */}
+      {/* )} */}
+
+      {/* Resumen de harina */}
       <Card className="shadow-lg border-0 mb-5" style={{ borderRadius: "15px" }}>
         <Card.Body className="p-4">
-          <h5 className="mb-4 fw-bold text-primary">Resumen de Ingredientes Usados</h5>
-          <Row>
-            {Object.entries(totalPorIngrediente || {}).map(([ingrediente, { cantidad, unidad }]) => (
-              <Col key={ingrediente} md={4} className="mb-3">
-                <div className="d-flex justify-content-between align-items-center">
-                  <span className="fw-medium">{ingrediente}</span>
-                  <span className="fw-bold">
-                    {cantidad.toFixed(2)} {unidad}
+          <h5 className="mb-4 fw-bold text-primary">Resumen de Harina</h5>
+          
+          <Row className="mb-4">
+            <Col md={6}>
+              <Card className="h-100">
+                <Card.Body>
+                  <h6 className="fw-bold text-center mb-3">Productos Solicitados por bandejas</h6>
+                  <div className="text-center">
+                  <span className="fw-bold h4">{Math.round(totalHarinaIngredientes.toFixed(2))} Lb</span>
+                  </div>
+                </Card.Body>
+              </Card>
+            </Col>
+            <Col md={6}>
+              <Card className="h-100">
+                <Card.Body>
+                  <h6 className="fw-bold text-center mb-3">Productos Solicitados por harina</h6>
+                  <div className="text-center">
+                  <span className="fw-bold h4">{Math.round(totalHarinaProductos.toFixed(2))} Lb</span>
+                  </div>
+                </Card.Body>
+              </Card>
+            </Col>
+          </Row>
+
+          {/* Total general */}
+          <div className="mt-3 pt-3 border-top">
+            <Row>
+              <Col md={12}>
+                <div className="d-flex justify-content-between align-items-center p-3 bg-light rounded">
+                  <span className="fw-bold h5">TOTAL GENERAL DE HARINA:</span>
+                  <span className="fw-bold h4 text-danger">
+                    {Math.round(totalGeneralHarina.toFixed(2))} Lb
                   </span>
                 </div>
               </Col>
-            ))}
-          </Row>
+            </Row>
+          </div>
         </Card.Body>
       </Card>
     </Container>
   );
 };
 
-// Componente DesktopHeader (copiado desde DesktopOrderDetails)
+// Componente DesktopHeader
 const DesktopHeader = ({ encabezado, onDownloadXLS, onDownloadPDF }) => (
   <Card
     className="shadow-lg border-0 mb-4 bg-gradient-primary"

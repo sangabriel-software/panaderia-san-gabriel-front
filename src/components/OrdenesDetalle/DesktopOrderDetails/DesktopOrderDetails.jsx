@@ -2,10 +2,9 @@ import React from "react";
 import { Badge, Card, Col, Container, Row, Table } from "react-bootstrap";
 import DownloadDropdown from "../../../components/DownloadDropdown/DownloadDropdown";
 import { formatDateToDisplay } from "../../../utils/dateUtils";
-import "./DesktopOrderDetails.css"
+import "./DesktopOrderDetails.css";
 
 const DesktopOrderDetails = ({ order, onDownloadXLS, onDownloadPDF }) => {
-  // Acceder a los datos anidados
   const encabezado = order?.encabezadoOrden;
   const detalles = order?.detalleOrden;
 
@@ -90,7 +89,7 @@ const DesktopHeader = ({ encabezado, onDownloadXLS, onDownloadPDF }) => (
                 onDownloadXLS={onDownloadXLS}
                 onDownloadPDF={onDownloadPDF}
                 variant="light"
-                className="w-100 w-md-auto" // Nueva clase añadida
+                className="w-100 w-md-auto"
               />
             </div>
           </div>
@@ -100,35 +99,77 @@ const DesktopHeader = ({ encabezado, onDownloadXLS, onDownloadPDF }) => (
   </Card>
 );
 
-const OrderTable = ({ productos }) => (
-  <Card
-    className="shadow-lg border-0 overflow-hidden mb-5"
-    style={{ borderRadius: "15px" }}
-  >
-    <div className="table-responsive">
-      <Table hover className="mb-0">
-        <thead className="bg-dark text-white">
-          <tr>
-            <th className="ps-4 py-3 text-center fw-semibold">Item</th>
-            <th className="py-3 fw-semibold">Producto</th>
-            <th className="py-3 text-center fw-semibold">Bandejas</th>
-            <th className="py-3 text-center fw-semibold">Unidades</th>
-            <th className="py-3 text-center fw-semibold">Categoria</th>
-          </tr>
-        </thead>
-        <tbody>
-          {productos?.map((prod, index) => (
-            <TableRow
-              key={prod.idDetalleOrdenProduccion}
-              product={prod}
-              index={index}
-            />
-          ))}
-        </tbody>
-      </Table>
-    </div>
-  </Card>
-);
+const OrderTable = ({ productos }) => {
+  // Filtrar productos por tipo de producción
+  const productosBandejas = productos?.filter(prod => prod.tipoProduccion === "bandejas") || [];
+  const productosHarina = productos?.filter(prod => prod.tipoProduccion === "harina") || [];
+
+  // Calcular total de harina
+  const totalHarina = productosHarina.reduce((total, prod) => {
+    return total + (Number(prod.cantidadHarina) || 0);
+  }, 0);
+
+  return (
+    <Card className="shadow-lg border-0 overflow-hidden mb-5" style={{ borderRadius: "15px" }}>
+      <div className="table-responsive">
+        {/* Tabla para productos por bandejas */}
+        {productosBandejas.length > 0 && (
+          <>
+            <div className="bg-secondary bg-opacity-10 p-3">
+              <h5 className="mb-0 fw-bold text-dark">PRODUCTOS POR BANDEJAS</h5>
+            </div>
+            <Table hover className="mb-0">
+              <thead className="bg-dark text-white">
+                <tr>
+                  <th className="ps-4 py-3 text-center fw-semibold">#</th>
+                  <th className="py-3 fw-semibold">Producto</th>
+                  <th className="py-3 text-center fw-semibold">Bandejas</th>
+                  <th className="py-3 text-center fw-semibold">Unidades</th>
+                  <th className="py-3 text-center fw-semibold">Categoría</th>
+                </tr>
+              </thead>
+              <tbody>
+                {productosBandejas.map((prod, index) => (
+                  <TableRow key={prod.idDetalleOrdenProduccion} product={prod} index={index} />
+                ))}
+              </tbody>
+            </Table>
+          </>
+        )}
+
+        {/* Tabla para productos por harina */}
+        {productosHarina.length > 0 && (
+          <>
+            <div className="bg-secondary bg-opacity-10 p-3 mt-4">
+              <h5 className="mb-0 fw-bold text-dark">PRODUCTOS POR HARINA</h5>
+            </div>
+            <Table hover className="mb-0">
+              <thead className="bg-dark text-white">
+                <tr>
+                  <th className="ps-4 py-3 text-center fw-semibold">#</th>
+                  <th className="py-3 fw-semibold">Producto</th>
+                  <th className="py-3 text-center fw-semibold">Harina (Lb)</th>
+                  <th className="py-3 text-center fw-semibold">Categoría</th>
+                </tr>
+              </thead>
+              <tbody>
+                {productosHarina.map((prod, index) => (
+                  <TableRowHarina key={prod.idDetalleOrdenProduccion} product={prod} index={index} />
+                ))}
+                {/* Fila de total */}
+                <tr className="bg-light">
+                  {/* <td colSpan="2" className="text-end fw-bold">Total Harina:</td> */}
+                  {/* <td className="text-center fw-bold text-primary">{totalHarina} kg</td> */}
+                  <td></td>
+                </tr>
+              </tbody>
+            </Table>
+          </>
+        )}
+      </div>
+    </Card>
+  );
+};
 
 const TableRow = ({ product, index }) => {
   return (
@@ -156,6 +197,37 @@ const TableRow = ({ product, index }) => {
         <span className="badge bg-secondary bg-opacity-10 text-dark rounded-pill px-3 py-2">
           {product.cantidadUnidades.toLocaleString()}
         </span>
+      </td>
+      <td className="text-center">
+        <span className="badge bg-primary bg-opacity-10 text-dark rounded-pill px-3 py-2">
+          {product.nombreCategoria}
+        </span>
+      </td>
+    </tr>
+  );
+};
+
+const TableRowHarina = ({ product, index }) => {
+  return (
+    <tr
+      className="align-middle"
+      style={{
+        backgroundColor: index % 2 === 0 ? "#f8f9fa" : "white",
+        borderBottom: "2px solid #f1f1f1",
+      }}
+    >
+      <td className="ps-4 text-center">
+        <span className="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-2">
+          {index + 1}
+        </span>
+      </td>
+      <td>
+        <div className="d-flex align-items-center gap-3">
+          <span className="fw-medium">{product.nombreProducto}</span>
+        </div>
+      </td>
+      <td className="text-center fw-bold text-primary">
+        {product.cantidadHarina}
       </td>
       <td className="text-center">
         <span className="badge bg-primary bg-opacity-10 text-dark rounded-pill px-3 py-2">
