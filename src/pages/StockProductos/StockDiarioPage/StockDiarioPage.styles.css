@@ -1,313 +1,272 @@
 /* Contenedor principal */
 .stock-diario-container {
-    padding: 1.5rem;
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-  
-  /* Encabezado */
-  .stock-diario-header {
-    margin-bottom: 2rem;
-    text-align: center;
-  }
-  
-  .stock-diario-title {
-    font-size: 1.8rem;
-    font-weight: 600;
-    color: #2d3748;
-    margin-bottom: 0.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-  
-  .stock-diario-subtitle {
-    color: #718096;
-    font-size: 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-  
-  .stock-diario-date-icon {
-    color: #718096;
-    font-size: 0.9em;
-  }
-  
-  /* Grid de productos */
-  .stock-diario-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 1.5rem;
-  }
-  
-  /* Tarjeta de producto */
-  .stock-diario-card {
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
-    padding: 1.5rem;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    border: 1px solid #f0f2f5;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .stock-diario-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-  }
-  
-  .stock-diario-product-name {
-    font-size: 1.2rem;
-    color: #2d3748;
-    margin-bottom: 1rem;
-    font-weight: 500;
-  }
-  
-  /* Cantidad destacada */
-  .stock-diario-quantity-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-top: 0.5rem;
-  }
-  
-  .stock-diario-quantity {
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: #3182ce;
-    line-height: 1;
-  }
-  
-  .stock-diario-quantity-label {
-    font-size: 0.9rem;
-    color: #718096;
-    margin-top: 0.5rem;
-  }
-  
-  /* Loading */
-  .stock-diario-loading {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 70vh;
-  }
-  
-  /* Estilos para el mensaje de stock vacío */
-  .stock-diario-empty-alert {
-    text-align: center;
-    margin-top: 2rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 1.5rem;
-    font-size: 1.1rem;
-    border-radius: 10px;
-  }
-  
-  .stock-diario-empty-alert svg {
-    font-size: 1.5rem;
-    margin-right: 0.75rem;
-    color: #0dcaf0;
-  }
-  
-  /* Estilos para la barra de búsqueda */
-  .stock-diario-search-input {
-    padding-left: 2.5rem;
-    padding-right: 2rem;
-    border-radius: 20px;
-    border: 1px solid #dee2e6;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  }
-  
-  .stock-diario-search-input:focus {
-    border-color: #86b7fe;
-    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
-  }
-  
-  .stock-diario-search-icon {
-    position: absolute;
-    left: 1rem;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #6c757d;
-  }
-  
-  .stock-diario-clear-icon {
-    position: absolute;
-    right: 1rem;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #6c757d;
-    cursor: pointer;
-    transition: color 0.2s;
-  }
-  
-  .stock-diario-clear-icon:hover {
-    color: #212529;
-  }
-  
-  /* Mensaje de productos no encontrados */
-  .no-products-message {
-    background-color: #f8f9fa;
-    padding: 1.5rem;
-    border-radius: 8px;
-    border-left: 4px solid #6c757d;
-    font-size: 1.1rem;
-    color: #495057;
-    text-align: center;
-    max-width: 500px;
-    width: 100%;
-    margin-top: 2rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  }
-  
-  /* Responsive */
-  @media (max-width: 768px) {
-    .stock-diario-title {
-      font-size: 1.5rem;
-    }
-    
-    .stock-diario-grid {
-      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    }
-    
-    .stock-diario-quantity {
-      font-size: 2rem;
-    }
-    
-    .no-products-message {
-      padding: 1rem;
-      margin-top: 1rem;
-    }
-  }
-  
-  @media (max-width: 576px) {
-    .stock-diario-container {
-      padding: 1rem;
-    }
-    
-    .stock-diario-title {
-      font-size: 1.4rem;
-      flex-direction: column;
-    }
-    
-    .stock-diario-subtitle {
-      flex-direction: column;
-    }
-    
-    .stock-diario-grid {
-      grid-template-columns: 1fr;
-    }
-    
-    .stock-diario-quantity {
-      font-size: 1.8rem;
-    }
-    
-    .no-products-message {
-      font-size: 1rem;
-      padding: 0.75rem;
-    }
-  }
+  padding: 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
 
-  /* Botón de scroll para móviles */
+/* Encabezado */
+.stock-diario-header {
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.stock-diario-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #2d3748;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.stock-diario-subtitle {
+  color: #718096;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* Estilos para la tabla tipo Excel */
+.excel-like-table-container {
+  margin: 1.5rem 0;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.excel-like-table {
+  width: 100%;
+  margin-bottom: 0;
+  color: #212529;
+  font-size: 0.9rem;
+  min-width: 600px; /* Minimum width for better mobile scrolling */
+}
+
+.excel-like-table .dark-header {
+  background-color: #343a40;
+  color: white;
+  border-color: #454d55;
+  vertical-align: middle;
+  text-align: center;
+  position: sticky;
+  top: 0;
+  font-weight: 500;
+}
+
+.excel-like-table th {
+  padding: 12px 8px;
+  white-space: nowrap;
+}
+
+.excel-like-table td {
+  padding: 10px 8px;
+  vertical-align: middle;
+  border-top: 1px solid #e9ecef;
+  text-align: center;
+}
+
+.excel-like-table tr:hover {
+  background-color: rgba(241, 243, 245, 0.5);
+}
+
+.excel-like-table .quantity-cell {
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  color: #2b6cb0;
+}
+
+/* Estilos para los encabezados ordenables */
+.sortable-header {
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.2s;
+}
+
+.sortable-header:hover {
+  background-color: #495057 !important;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.sort-icon {
+  transition: transform 0.2s;
+  color: white;
+  font-size: 0.8rem;
+}
+
+.sort-icon.descending {
+  transform: rotate(180deg);
+}
+
+/* Estilos para la barra de búsqueda */
+.stock-diario-search-container {
+  position: relative;
+  max-width: 500px;
+  margin: 0 auto 1.5rem;
+}
+
+.stock-diario-search-input {
+  padding: 0.5rem 2.5rem;
+  border-radius: 20px;
+  border: 1px solid #ced4da;
+  width: 100%;
+  font-size: 0.9rem;
+}
+
+.stock-diario-search-input:focus {
+  border-color: #4dabf7;
+  box-shadow: 0 0 0 3px rgba(77, 171, 247, 0.2);
+}
+
+.stock-diario-search-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #adb5bd;
+}
+
+.stock-diario-clear-icon {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #adb5bd;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.stock-diario-clear-icon:hover {
+  color: #495057;
+}
+
+/* Mensajes de estado */
+.stock-diario-empty-alert,
+.no-products-message {
+  text-align: center;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f8f9fa;
+}
+
+.stock-diario-empty-alert svg {
+  margin-right: 0.75rem;
+  color: #0dcaf0;
+}
+
+/* Botón de scroll para móviles */
 .scroll-to-top-btn {
   position: fixed;
   bottom: 20px;
   right: 20px;
-  width: 50px;
-  height: 50px;
+  width: 46px;
+  height: 46px;
   border-radius: 50%;
   background-color: #2c7be5;
   color: white;
   border: none;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
   opacity: 0.9;
   transition: all 0.3s ease;
-  transform: rotate(90deg);
   cursor: pointer;
 }
 
 .scroll-to-top-btn:hover {
   opacity: 1;
-  background-color: #2563eb;
-  transform: rotate(90deg) scale(1.05);
+  background-color: #1a68d1;
+  transform: scale(1.05);
 }
 
-/* Animación de aparición */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 0.9; }
+/* Responsive Styles */
+@media (max-width: 991px) {
+  /* Tablet styles */
+  .excel-like-table {
+    font-size: 0.85rem;
+  }
+  
+  .excel-like-table th,
+  .excel-like-table td {
+    padding: 8px 6px;
+  }
+  
+  .stock-diario-title {
+    font-size: 1.4rem;
+  }
 }
 
-.scroll-to-top-btn {
-  animation: fadeIn 0.3s ease-in-out;
+@media (max-width: 767px) {
+  /* Mobile styles */
+  .stock-diario-container {
+    padding: 0.75rem;
+  }
+  
+  .excel-like-table-container {
+    border-radius: 6px;
+    margin: 1rem 0;
+  }
+  
+  .excel-like-table {
+    font-size: 0.8rem;
+    min-width: 100%; /* Full width scrolling on small devices */
+  }
+  
+  .excel-like-table th,
+  .excel-like-table td {
+    padding: 6px 4px;
+  }
+  
+  .stock-diario-title {
+    font-size: 1.3rem;
+    flex-direction: column;
+  }
+  
+  .stock-diario-subtitle {
+    flex-direction: column;
+    font-size: 0.85rem;
+  }
+  
+  .stock-diario-search-input {
+    padding: 0.5rem 2rem;
+    font-size: 0.85rem;
+  }
+  
+  .stock-diario-search-icon,
+  .stock-diario-clear-icon {
+    font-size: 0.9rem;
+  }
+  
+  .scroll-to-top-btn {
+    width: 42px;
+    height: 42px;
+    bottom: 15px;
+    right: 15px;
+  }
 }
 
-/* Ocultar en desktop */
 @media (min-width: 768px) {
   .scroll-to-top-btn {
     display: none !important;
   }
-}
-
-/* Botón de scroll para móviles */
-.scroll-to-top-btn {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background-color: #2c7be5;
-    color: white;
-    border: none;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-    opacity: 0.9;
-    transition: all 0.3s ease;
-    transform: rotate(90deg);
-    cursor: pointer;
-  }
-  
-  .scroll-to-top-btn:hover {
-    opacity: 1;
-    background-color: #2563eb;
-    transform: rotate(90deg) scale(1.05);
-  }
-  
-  /* Animación de aparición */
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 0.9; }
-  }
-  
-  .scroll-to-top-btn {
-    animation: fadeIn 0.3s ease-in-out;
-  }
-  
-  /* Ocultar en desktop */
-  @media (min-width: 768px) {
-    .scroll-to-top-btn {
-      display: none !important;
-    }
-  }
-
-  .disabled-card {
-    opacity: 0.6; /* Hace que se vea más claro */
-    pointer-events: none; /* Evita cualquier interacción */
 }

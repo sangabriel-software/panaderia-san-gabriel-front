@@ -1,8 +1,8 @@
 import { useNavigate, useParams } from "react-router";
 import useGetStockDelDia from "../../../hooks/stock/useGetStockDelDia";
-import { BsArrowLeft, BsX } from "react-icons/bs";
+import { BsArrowLeft, BsX, BsArrowUp } from "react-icons/bs";
 import Title from "../../../components/Title/Title";
-import { Container, Spinner, Alert, Form } from "react-bootstrap";
+import { Container, Spinner, Alert, Form, Table } from "react-bootstrap";
 import "./StockDiarioPage.styles.css";
 import { FaStore, FaCalendarAlt, FaBoxOpen, FaSearch } from "react-icons/fa";
 import DotsMove from "../../../components/Spinners/DotsMove";
@@ -16,6 +16,7 @@ const StockDiarioPage = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [showScrollButton, setShowScrollButton] = useState(false);
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
 
   // Detectar dispositivos
   const isMobile = useMediaQuery({ maxWidth: 767 });
@@ -44,6 +45,15 @@ const StockDiarioPage = () => {
     });
   };
 
+  // Función para ordenar la tabla
+  const requestSort = (key) => {
+    let direction = 'ascending';
+    if (sortConfig.key === key && sortConfig.direction === 'ascending') {
+      direction = 'descending';
+    }
+    setSortConfig({ key, direction });
+  };
+
   const isArray = Array.isArray(stockDelDia);
   const isEmptyStock = useMemo(() => {
     return (
@@ -61,12 +71,29 @@ const StockDiarioPage = () => {
     return sucursalData?.fechaValidez || "";
   }, [sucursalData]);
 
+  // Filtrar y ordenar productos
   const filteredProducts = useMemo(() => {
     if (!isArray) return [];
-    return stockDelDia.filter((producto) =>
+    
+    let filtered = stockDelDia.filter((producto) =>
       producto.nombreProducto.toLowerCase().includes(searchTerm.toLowerCase())
     );
-  }, [stockDelDia, searchTerm, isArray]);
+
+    // Ordenar si hay configuración de ordenamiento
+    if (sortConfig.key) {
+      filtered.sort((a, b) => {
+        if (a[sortConfig.key] < b[sortConfig.key]) {
+          return sortConfig.direction === 'ascending' ? -1 : 1;
+        }
+        if (a[sortConfig.key] > b[sortConfig.key]) {
+          return sortConfig.direction === 'ascending' ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+
+    return filtered;
+  }, [stockDelDia, searchTerm, isArray, sortConfig]);
 
   const handleClearSearch = () => {
     setSearchTerm("");
@@ -144,30 +171,61 @@ const StockDiarioPage = () => {
           </div>
         </div>
       ) : (
-        <div className="stock-diario-grid">
-          {filteredProducts.length > 0 ? (
-            filteredProducts.map((producto) => (
-              <div key={producto.idStockDiario} className="stock-diario-card">
-                <h3 className="stock-diario-product-name">
-                  {producto.nombreProducto}
-                </h3>
-                <div className="stock-diario-quantity-container">
-                  <span className="stock-diario-quantity">
-                    {producto.nombreProducto === "Frances" ?  producto.cantidadExistente / 6 :  producto.cantidadExistente}
-                  </span>
-                  <span className="stock-diario-quantity-label">
-                    {producto.nombreProducto === "Frances" ? "Filas disponibles" : "unidades disponibles"}
-                  </span>
-                </div>
-              </div>
-            ))
-          ) : (
-            <div className="w-100 d-flex justify-content-center">
-              <div className="no-products-message">
-                No se encontraron productos con ese nombre.
-              </div>
-            </div>
-          )}
+        <div className="table-responsive excel-like-table-container">
+          <Table striped bordered hover className="excel-like-table">
+            <thead>
+              <tr>
+                <th 
+                  onClick={() => requestSort('nombreProducto')}
+                  className="sortable-header dark-header text-center align-middle"
+                >
+                  <div className="header-content">
+                    Producto
+                    {sortConfig.key === 'nombreProducto' && (
+                      <BsArrowUp className={`sort-icon ${sortConfig.direction === 'descending' ? 'descending' : ''}`} />
+                    )}
+                  </div>
+                </th>
+                <th 
+                  onClick={() => requestSort('cantidadExistente')}
+                  className="sortable-header dark-header text-center align-middle"
+                >
+                  <div className="header-content">
+                    Cantidad
+                    {sortConfig.key === 'cantidadExistente' && (
+                      <BsArrowUp className={`sort-icon ${sortConfig.direction === 'descending' ? 'descending' : ''}`} />
+                    )}
+                  </div>
+                </th>
+                <th className="dark-header text-center align-middle">Cantidad en</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredProducts.length > 0 ? (
+                filteredProducts.map((producto) => (
+                  <tr key={producto.idStockDiario}>
+                    <td className="text-center align-middle">{producto.nombreProducto}</td>
+                    <td className="quantity-cell text-center align-middle">
+                      {producto.nombreProducto === "Frances" 
+                        ? (producto.cantidadExistente / 6)
+                        : producto.cantidadExistente}
+                    </td>
+                    <td className="text-center align-middle">
+                      {producto.nombreProducto === "Frances" 
+                        ? "Filas" 
+                        : "Unidades"}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="3" className="text-center py-4 align-middle">
+                    No se encontraron productos con ese nombre.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </Table>
         </div>
       )}
 
@@ -178,7 +236,7 @@ const StockDiarioPage = () => {
           className="scroll-to-top-btn"
           aria-label="Volver arriba"
         >
-          <BsArrowLeft size={24} />
+          <BsArrowUp size={24} />
         </button>
       )}
     </Container>
