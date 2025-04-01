@@ -52,7 +52,7 @@ const StockDiarioPage = () => {
           <div className="col-8">
             <Title
               title={`Stock Diario - ${
-                sucursalData.nombreSucursal || "Sucursal"
+                sucursalData.nombreSucursal || " "
               }`}
               description={`Productos disponibles para hoy - ${formatDateToDisplay(
                 fechaValidez

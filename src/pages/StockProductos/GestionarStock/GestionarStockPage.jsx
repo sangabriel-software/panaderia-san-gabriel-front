@@ -59,8 +59,8 @@ const GestionarStockPage = () => {
                                         <div className="gestionar-stock-option-content">
                                             <FaBoxOpen className="gestionar-stock-icon" />
                                             <div>
-                                                <h5>Stock Total</h5>
-                                                <p>Gestionar inventario completo</p>
+                                                <h5>Stock General</h5>
+                                                <p>Productos que se ingresan manualmente</p>
                                             </div>
                                         </div>
                                     </Card.Body>
@@ -74,8 +74,8 @@ const GestionarStockPage = () => {
                                         <div className="gestionar-stock-option-content">
                                             <FaShoppingCart className="gestionar-stock-icon" />
                                             <div>
-                                                <h5>Ventas Diarias</h5>
-                                                <p>Productos vendidos hoy</p>
+                                                <h5>Stock Ventas Diarias</h5>
+                                                <p>Productos que se ingrean por orden de produccion</p>
                                             </div>
                                         </div>
                                     </Card.Body>
