@@ -17,12 +17,12 @@ const PrivateRoute = () => {
   useEffect(() => {
     if (!TokenExpired) {
       toast.error("Necesitas iniciar sesión para acceder.", {
-        autoClose: 5000,
+        autoClose: 3000,
       });
       navigate("/login", { state: { from: "unauthorized" }, replace: true });
     } else if (isTokenExpired(TokenExpired)) {
       toast.error("Tu sesión ha expirado.", {
-        autoClose: 5000,
+        autoClose: 3000,
       });
       removeLocalStorage("token");
       navigate("/login", { state: { from: "expired" }, replace: true });

@@ -13,6 +13,7 @@ const getEndpoints = {
     CONSULTAR_ORDEN_POR_CRITERIOS: "consultar-detalle-por-criterios",
     CONSULTAR_DETALLE_VENTA: "consultar-detalle-venta",
     CONSULTAR_RECETAS: "consultar-recetas",
+    STOCK_DEL_DIA: "consultar-stock-sucursal",
 };
 
 const postEndpoints = {

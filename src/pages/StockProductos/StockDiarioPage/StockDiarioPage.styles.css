@@ -1,0 +1,180 @@
+/* Contenedor principal */
+/* .stock-diario-container {
+    padding: 1.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+} */
+
+/* Encabezado */
+.stock-diario-header {
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.stock-diario-title {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.stock-diario-subtitle {
+    color: #718096;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.stock-diario-date-icon {
+    color: #718096;
+    font-size: 0.9em;
+}
+
+/* Grid de productos */
+.stock-diario-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+/* Tarjeta de producto */
+.stock-diario-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.100);
+    padding: 1.5rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: 1px solid #f0f2f5;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.stock-diario-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+.stock-diario-product-name {
+    font-size: 1.2rem;
+    color: #2d3748;
+    margin-bottom: 1rem;
+    font-weight: 500;
+}
+
+/* Cantidad destacada */
+.stock-diario-quantity-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 0.5rem;
+}
+
+.stock-diario-quantity {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #3182ce;
+    line-height: 1;
+}
+
+.stock-diario-quantity-label {
+    font-size: 0.9rem;
+    color: #718096;
+    margin-top: 0.5rem;
+}
+
+/* Loading */
+.stock-diario-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 70vh;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .stock-diario-title {
+        font-size: 1.5rem;
+    }
+    
+    .stock-diario-grid {
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    }
+    
+    .stock-diario-quantity {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .stock-diario-container {
+        padding: 1rem;
+    }
+    
+    .stock-diario-title {
+        font-size: 1.4rem;
+        flex-direction: column;
+    }
+    
+    .stock-diario-subtitle {
+        flex-direction: column;
+    }
+    
+    .stock-diario-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .stock-diario-quantity {
+        font-size: 1.8rem;
+    }
+}
+
+/* Estilos para el mensaje de stock vacío */
+.stock-diario-empty-alert {
+    text-align: center;
+    margin-top: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    font-size: 1.1rem;
+    border-radius: 10px;
+  }
+  
+  .stock-diario-empty-alert svg {
+    font-size: 1.5rem;
+    margin-right: 0.75rem;
+    color: #0dcaf0;
+  }
+  
+  /* Mejoras para las tarjetas de producto */
+  .stock-diario-card {
+    transition: all 0.3s ease;
+  }
+  
+  .stock-diario-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  }
+  
+  .stock-diario-quantity {
+    font-size: 2.8rem;
+    font-weight: 700;
+    color: #2c7be5;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+  
+  .stock-diario-quantity-label {
+    font-size: 1rem;
+    color: #6e84a3;
+  }

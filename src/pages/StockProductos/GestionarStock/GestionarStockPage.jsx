@@ -3,19 +3,13 @@ import DotsMove from "../../../components/Spinners/DotsMove";
 import useGetSucursales from "../../../hooks/sucursales/useGetSucursales";
 import { useNavigate } from "react-router-dom";
 import "./GestionarStockPage.styles.css";
-import { 
-  FaBoxes, 
-  FaStore, 
-  FaBuilding, 
-  FaMapMarkerAlt, 
-  FaBoxOpen, 
-  FaShoppingCart,
-  FaPlus 
-} from "react-icons/fa";
+import { FaBoxes, FaStore, FaBuilding, FaMapMarkerAlt, FaBoxOpen, FaShoppingCart, FaPlus } from "react-icons/fa";
+import { handleAddProductToSucursal, handleNavigate } from "./GestionarStockPage.utils";
 
 const GestionarStockPage = () => {
     const { sucursales, loadingSucursales } = useGetSucursales();
     const navigate = useNavigate();
+
 
     if (loadingSucursales) {
         return (
@@ -27,14 +21,6 @@ const GestionarStockPage = () => {
             </Container>
         );
     }
-
-    const handleNavigate = (sucursalId, tipoStock) => {
-        navigate(`/stock/${sucursalId}/${tipoStock}`);
-    };
-
-    const handleAddProductToSucursal = (sucursalId) => {
-        navigate(`/stock/agregar-producto/${sucursalId}`);
-    };
 
     return (
         <Container className="gestionar-stock-container">
@@ -67,7 +53,7 @@ const GestionarStockPage = () => {
                             <div className="gestionar-stock-options-container">
                                 <Card 
                                     className="gestionar-stock-option-card stock-total"
-                                    onClick={() => handleNavigate(sucursal.idSucursal, 'general')}
+                                    onClick={() => handleNavigate(navigate, sucursal.idSucursal, 'ventas-generales')}
                                 >
                                     <Card.Body>
                                         <div className="gestionar-stock-option-content">
@@ -82,7 +68,7 @@ const GestionarStockPage = () => {
                                 
                                 <Card 
                                     className="gestionar-stock-option-card stock-diario"
-                                    onClick={() => handleNavigate(sucursal.idSucursal, 'diario')}
+                                    onClick={() => handleNavigate(navigate, sucursal.idSucursal, 'venta-diaria')}
                                 >
                                     <Card.Body>
                                         <div className="gestionar-stock-option-content">
@@ -97,7 +83,7 @@ const GestionarStockPage = () => {
 
                                 <Button
                                     className="gestionar-stock-sucursal-add-button"
-                                    onClick={() => handleAddProductToSucursal(sucursal.idSucursal)}
+                                    onClick={() => handleAddProductToSucursal(navigate, sucursal.idSucursal)}
                                 >
                                     <FaPlus /> Agregar a esta sucursal
                                 </Button>

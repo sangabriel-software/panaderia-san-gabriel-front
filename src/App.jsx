@@ -7,6 +7,7 @@ import "./styles/globalStyles.css";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import GestionarStockPage from "./pages/StockProductos/GestionarStock/GestionarStockPage";
+import StockDiarioPage from "./pages/StockProductos/StockDiarioPage/StockDiarioPage";
 
 const AccessDeniedPage = lazy( ()=> import("./components/AccesoDenegado/AccessDeniedPage"));
 // Lazy-loaded components
@@ -83,6 +84,7 @@ function App() {
 
             <Route path="/stock-productos">
               <Route index element={<GestionarStockPage/>} />
+              <Route path="venta-diaria/:idSucursal" element={<StockDiarioPage/>} />
             </Route>
 
           </Route>
