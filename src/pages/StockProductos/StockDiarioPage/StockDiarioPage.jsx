@@ -7,13 +7,42 @@ import "./StockDiarioPage.styles.css";
 import { FaStore, FaCalendarAlt, FaBoxOpen, FaSearch } from "react-icons/fa";
 import DotsMove from "../../../components/Spinners/DotsMove";
 import { formatDateToDisplay } from "../../../utils/dateUtils";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useMediaQuery } from "react-responsive";
 
 const StockDiarioPage = () => {
   const { idSucursal } = useParams();
   const { stockDelDia, loadingStockDiario } = useGetStockDelDia(idSucursal);
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
+  const [showScrollButton, setShowScrollButton] = useState(false);
+
+  // Detectar dispositivos
+  const isMobile = useMediaQuery({ maxWidth: 767 });
+  const isTablet = useMediaQuery({ minWidth: 768, maxWidth: 991 });
+  const isDesktop = useMediaQuery({ minWidth: 992 });
+
+  // Efecto para mostrar/ocultar el botón de scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 300) {
+        setShowScrollButton(true);
+      } else {
+        setShowScrollButton(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Función para volver al inicio
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
 
   const isArray = Array.isArray(stockDelDia);
   const isEmptyStock = useMemo(() => {
@@ -140,6 +169,17 @@ const StockDiarioPage = () => {
             </div>
           )}
         </div>
+      )}
+
+      {/* Botón de scroll para móviles */}
+      {isMobile && showScrollButton && (
+        <button 
+          onClick={scrollToTop}
+          className="scroll-to-top-btn"
+          aria-label="Volver arriba"
+        >
+          <BsArrowLeft size={24} />
+        </button>
       )}
     </Container>
   );

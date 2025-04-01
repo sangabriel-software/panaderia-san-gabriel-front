@@ -216,3 +216,48 @@
       padding: 0.75rem;
     }
   }
+
+  /* Botón de scroll para móviles */
+.scroll-to-top-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: #2c7be5;
+    color: white;
+    border: none;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0.9;
+    transition: all 0.3s ease;
+    transform: rotate(90deg);
+    cursor: pointer;
+  }
+  
+  .scroll-to-top-btn:hover {
+    opacity: 1;
+    background-color: #2563eb;
+    transform: rotate(90deg) scale(1.05);
+  }
+  
+  /* Animación de aparición */
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 0.9; }
+  }
+  
+  .scroll-to-top-btn {
+    animation: fadeIn 0.3s ease-in-out;
+  }
+  
+  /* Ocultar en desktop */
+  @media (min-width: 768px) {
+    .scroll-to-top-btn {
+      display: none !important;
+    }
+  }
