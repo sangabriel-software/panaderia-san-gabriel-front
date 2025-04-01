@@ -153,10 +153,10 @@ const StockDiarioPage = () => {
                 </h3>
                 <div className="stock-diario-quantity-container">
                   <span className="stock-diario-quantity">
-                    {producto.cantidadExistente}
+                    {producto.nombreProducto === "Frances" ?  producto.cantidadExistente / 6 :  producto.cantidadExistente}
                   </span>
                   <span className="stock-diario-quantity-label">
-                    unidades disponibles
+                    {producto.nombreProducto === "Frances" ? "Filas disponibles" : "unidades disponibles"}
                   </span>
                 </div>
               </div>
