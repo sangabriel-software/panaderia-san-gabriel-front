@@ -82,7 +82,7 @@ const GestionarStockPage = () => {
                                 </Card>
 
                                 <Button
-                                    className="gestionar-stock-sucursal-add-button"
+                                    className="gestionar-stock-sucursal-add-button disabled-card"
                                     onClick={() => handleAddProductToSucursal(navigate, sucursal.idSucursal)}
                                 >
                                     <FaPlus /> Agregar a esta sucursal
