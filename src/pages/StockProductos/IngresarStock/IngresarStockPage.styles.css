@@ -1,0 +1,195 @@
+/* Estilos para la tabla de Excel */
+/* .excel-table-container {
+    margin: 1.5rem 0;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  } */
+  
+  .excel-table {
+    width: 100%;
+    margin-bottom: 0;
+    color: #212529;
+    font-size: 0.9rem;
+    table-layout: fixed;
+  }
+  
+  .excel-table .dark-header {
+    background-color: #343a40;
+    color: white;
+    border-color: #454d55;
+    vertical-align: middle;
+    position: sticky;
+    top: 0;
+    font-weight: 500;
+    text-align: center;
+  }
+  
+  .excel-table th, 
+  .excel-table td {
+    padding: 12px 8px;
+    vertical-align: middle;
+  }
+  
+  .excel-table td {
+    border-top: 1px solid #e9ecef;
+  }
+  
+  .excel-table tr:hover {
+    background-color: rgba(241, 243, 245, 0.5);
+  }
+  
+  /* Estilos para los inputs de cantidad */
+  .quantity-input {
+    width: 100%;
+    max-width: 200px;
+    margin: 0 auto;
+    text-align: center;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+  
+  .quantity-input:focus {
+    border-color: #6a01ac;
+    box-shadow: 0 0 0 0.2rem rgba(106, 1, 172, 0.25);
+  }
+  
+  /* Estilos para la información del producto */
+  .product-info {
+    display: flex;
+    align-items: center;
+    padding: 0 5px;
+    gap: 10px;
+  }
+  
+  .product-badge {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    flex-shrink: 0;
+    font-size: 0.85rem;
+  }
+  
+  .product-name {
+    font-weight: 500;
+    word-break: break-word;
+    text-align: left;
+    font-size: 0.9rem;
+  }
+  
+  /* Botón de guardar */
+  .btn-primary {
+    background-color: #6a01ac;
+    border: none;
+    padding: 0.75rem 2rem;
+    font-weight: 600;
+    min-width: 200px;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 991px) {
+    /* Tablet styles */
+    .excel-table {
+      font-size: 0.85rem;
+    }
+    
+    .excel-table th, 
+    .excel-table td {
+      padding: 10px 6px;
+    }
+    
+    .product-badge {
+      width: 28px;
+      height: 28px;
+    }
+    
+    .product-name {
+      font-size: 0.85rem;
+    }
+    
+    .quantity-input {
+      max-width: 80px;
+    }
+  }
+  
+  @media (max-width: 767px) {
+    /* Mobile styles */
+    .excel-table-container {
+      margin: 1rem 0;
+    }
+    
+    .excel-table {
+      font-size: 0.8rem;
+    }
+    
+    .excel-table th, 
+    .excel-table td {
+      padding: 8px 4px;
+    }
+    
+    .product-info {
+      gap: 8px;
+    }
+    
+    .product-badge {
+      width: 24px;
+      height: 24px;
+      font-size: 0.75rem;
+    }
+    
+    .product-name {
+      font-size: 0.8rem;
+    }
+    
+    .quantity-input {
+      max-width: 70px;
+      padding: 4px 6px;
+      font-size: 0.8rem;
+    }
+    
+    .btn-primary {
+      padding: 0.6rem 1.5rem;
+      min-width: 180px;
+      font-size: 0.9rem;
+    }
+  }
+  
+  @media (max-width: 575px) {
+    /* Small mobile devices */
+    .excel-table {
+      font-size: 0.75rem;
+    }
+    
+    .excel-table th, 
+    .excel-table td {
+      padding: 6px 3px;
+    }
+    
+    .product-badge {
+      width: 22px;
+      height: 22px;
+    }
+    
+    .product-info {
+      gap: 6px;
+    }
+    
+    .quantity-input {
+      max-width: 60px;
+      padding: 3px 5px;
+    }
+    
+    .product-name {
+      font-size: 0.75rem;
+    }
+  }

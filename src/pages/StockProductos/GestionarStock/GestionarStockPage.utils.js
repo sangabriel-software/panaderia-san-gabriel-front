@@ -7,5 +7,5 @@ export const handleNavigate = (navigate, sucursalId, ruta) => {
 
 export const handleAddProductToSucursal = (navigate, sucursalId) => {
     const encryptedId = encryptId(sucursalId.toString());
-    navigate(`/stock-productos/agregar-producto/${sucursalId}`);
+    navigate(`/stock-productos/ingresar-stock/${encodeURIComponent(encryptedId)}`);
 };
