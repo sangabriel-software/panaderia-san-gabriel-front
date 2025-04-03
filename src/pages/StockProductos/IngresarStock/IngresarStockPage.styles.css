@@ -235,3 +235,86 @@
     font-size: 0.9rem;
   }
 }
+
+/* @media (max-width: 767px) {
+  .excel-table {
+    font-size: 0.8rem;
+  }
+  
+  .excel-table th, 
+  .excel-table td {
+    padding: 8px 4px;
+  }
+  
+  .product-info {
+    gap: 8px;
+  }
+  
+  .product-badge {
+    width: 24px;
+    height: 24px;
+    font-size: 0.75rem;
+  }
+  
+  .product-name {
+    font-size: 0.8rem;
+  }
+  
+  .quantity-input {
+    width: 60px;
+    padding: 4px 6px;
+    font-size: 0.8rem;
+  }
+  
+  .btn-guardar-stock {
+    padding: 0.6rem 1.5rem;
+    min-width: 180px;
+    font-size: 0.9rem;
+  }
+  
+  .category-dropdown {
+    min-width: 160px;
+    padding: 0.35rem 0.7rem;
+    font-size: 0.85rem;
+  }
+  
+  .btn-clear-search {
+    padding: 0 0.5rem;
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 575px) {
+  .excel-table {
+    font-size: 0.75rem;
+  }
+  
+  .excel-table th, 
+  .excel-table td {
+    padding: 6px 3px;
+  }
+  
+  .product-badge {
+    width: 22px;
+    height: 22px;
+  }
+  
+  .product-info {
+    gap: 6px;
+  }
+  
+  .quantity-input {
+    width: 50px;
+    padding: 3px 5px;
+    font-size: 0.75rem;
+  }
+  
+  .product-name {
+    font-size: 0.75rem;
+  }
+  
+  .search-input {
+    padding: 0.35rem 0.7rem;
+    font-size: 0.85rem;
+  }
+} */
