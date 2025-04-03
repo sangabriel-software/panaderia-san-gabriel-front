@@ -199,90 +199,6 @@
   transform: scale(1.05);
 }
 
-/* Responsive Styles */
-@media (max-width: 991px) {
-  /* Tablet styles */
-  .excel-like-table {
-    font-size: 0.85rem;
-  }
-  
-  .excel-like-table th,
-  .excel-like-table td {
-    padding: 8px 6px;
-  }
-  
-  .stock-diario-title {
-    font-size: 1.4rem;
-  }
-}
-
-@media (max-width: 767px) {
-  /* Mobile styles */
-  .stock-diario-container {
-    padding: 0.5rem; /* Reducir padding para ganar espacio */
-  }
-  
-  .excel-like-table-container {
-    margin: 0.5rem 0; /* Reducir margen */
-    border-radius: 6px;
-    /* Añadir esto para que la tabla ocupe más ancho */
-    margin-left: -0.5rem;
-    margin-right: -0.5rem;
-    width: calc(100% + 1rem);
-  }
-  
-  .excel-like-table {
-    font-size: 0.9rem; /* Aumentar tamaño de fuente */
-    min-width: 100%;
-    /* Añadir esto para que las celdas ocupen más espacio */
-    border-collapse: separate;
-    border-spacing: 0;
-  }
-  
-  .excel-like-table th,
-  .excel-like-table td {
-    padding: 8px 6px; /* Aumentar padding vertical */
-    font-size: 0.9rem; /* Tamaño de letra más grande */
-    white-space: nowrap; /* Evitar saltos de línea */
-  }
-  
-  /* Ajustar tamaño de los headers */
-  .excel-like-table .dark-header {
-    font-size: 0.95rem;
-    padding: 10px 6px;
-  }
-  
-  .stock-diario-title {
-    font-size: 1.4rem; /* Título más grande */
-  }
-  
-  .stock-diario-subtitle {
-    font-size: 0.9rem;
-  }
-  
-  /* Ajustar barra de búsqueda */
-  .stock-diario-search-input {
-    font-size: 0.95rem;
-    padding: 0.6rem 2.2rem;
-  }
-  
-  /* Aumentar tamaño del botón de scroll */
-  .scroll-to-top-btn {
-    width: 46px;
-    height: 46px;
-    bottom: 20px;
-    right: 20px;
-  }
-  
-  /* Ajustar mensajes */
-  .stock-diario-empty-alert,
-  .no-products-message {
-    font-size: 0.95rem;
-    padding: 1.2rem;
-  }
-}
-
-
 /* Optimización de espacio para nombres de productos */
 .product-info {
   display: flex;
@@ -312,4 +228,120 @@
   text-overflow: ellipsis;
   text-align: left;
   font-size: 0.9rem;
+}
+
+/* Responsive Styles */
+@media (max-width: 991px) {
+  /* Tablet styles */
+  .excel-like-table {
+    font-size: 0.85rem;
+  }
+  
+  .excel-like-table th,
+  .excel-like-table td {
+    padding: 8px 6px;
+  }
+  
+  .stock-diario-title {
+    font-size: 1.4rem;
+  }
+}
+
+@media (max-width: 767px) {
+  /* Mobile styles */
+  .stock-diario-container {
+    padding: 0.5rem;
+  }
+  
+  .excel-like-table-container {
+    margin: 0.5rem 0;
+    border-radius: 6px;
+    margin-left: -0.5rem;
+    margin-right: -0.5rem;
+    width: calc(100% + 1rem);
+  }
+  
+  .excel-like-table {
+    font-size: 0.9rem;
+    min-width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+  
+  .excel-like-table th,
+  .excel-like-table td {
+    padding: 8px 6px;
+    font-size: 0.9rem;
+    white-space: nowrap;
+  }
+  
+  .excel-like-table .dark-header {
+    font-size: 0.95rem;
+    padding: 10px 6px;
+  }
+  
+  .stock-diario-title {
+    font-size: 1.4rem;
+  }
+  
+  .stock-diario-subtitle {
+    font-size: 0.9rem;
+  }
+  
+  .stock-diario-search-input {
+    font-size: 0.95rem;
+    padding: 0.6rem 2.2rem;
+  }
+  
+  .scroll-to-top-btn {
+    width: 46px;
+    height: 46px;
+    bottom: 20px;
+    right: 20px;
+  }
+  
+  .stock-diario-empty-alert,
+  .no-products-message {
+    font-size: 0.95rem;
+    padding: 1.2rem;
+  }
+}
+
+/* Estilos específicos para escritorio (PCs) */
+@media (min-width: 992px) {
+  .excel-like-table {
+    table-layout: fixed;
+    width: 100%;
+  }
+  
+  /* Distribución de columnas más equilibrada */
+  .excel-like-table th:nth-child(1),
+  .excel-like-table td:nth-child(1) {
+    width: 50%; /* Columna de producto más estrecha */
+    text-align: left;
+    padding-left: 15px;
+  }
+  
+  .excel-like-table th:nth-child(2),
+  .excel-like-table td:nth-child(2) {
+    width: 25%; /* Columna de cantidad */
+  }
+  
+  .excel-like-table th:nth-child(3),
+  .excel-like-table td:nth-child(3) {
+    width: 25%; /* Columna de unidad */
+  }
+  
+  /* Ajustes para el contenido del producto */
+  .product-info {
+    max-width: 100%;
+    overflow: hidden;
+  }
+  
+  .product-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+  }
 }
