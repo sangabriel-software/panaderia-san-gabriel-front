@@ -110,7 +110,7 @@
   max-width: 800px; /* Coincide con el ancho de la tabla */
 }
 
-.btn-primary {
+.btn-guardar-stock{
   background-color: #6a01ac;
   border: none;
   padding: 0.75rem 2rem;

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Container, Table, Button, Form, Spinner, Alert, ButtonGroup } from "react-bootstrap";
+import { Container, Table, Button, Form, Spinner, Alert, Dropdown } from "react-bootstrap";
 import DotsMove from "../../../components/Spinners/DotsMove";
 import useGetProductosYPrecios from "../../../hooks/productosprecios/useGetProductosYprecios";
 import SuccessPopup from "../../../components/Popup/SuccessPopup";
@@ -13,13 +13,9 @@ const IngresarStockGeneralPage = () => {
   const [showSuccess, setShowSuccess] = useState(false);
   const [categoriaActiva, setCategoriaActiva] = useState("Todas");
 
-  // Filtrar productos no bandejas y agrupar por categoría
   const prodPorHarina = productos?.filter(item => item.tipoProduccion !== "bandejas");
-  
-  // Obtener categorías únicas
   const categorias = [...new Set(productos?.map(item => item.nombreCategoria) || [])];
 
-  // Filtrar productos por categoría seleccionada
   const productosFiltrados = categoriaActiva === "Todas" 
     ? prodPorHarina 
     : prodPorHarina?.filter(item => item.nombreCategoria === categoriaActiva);
@@ -59,30 +55,37 @@ const IngresarStockGeneralPage = () => {
     <Container className="py-4">
       {showErrorProductos && <Alert variant="danger" className="mb-4">Error al cargar los productos</Alert>}
 
-      {/* Filtros por categoría */}
+      {/* Filtro por categoría - Dropdown */}
       <div className="mb-4">
         <h6 className="mb-3">Filtrar por categoría:</h6>
-        <ButtonGroup className="flex-wrap">
-          <Button
-            variant={categoriaActiva === "Todas" ? "primary" : "outline-primary"}
-            onClick={() => setCategoriaActiva("Todas")}
-            className="m-1"
-          >
-            Todas
-          </Button>
-          {categorias.map(categoria => (
-            <Button
-              key={categoria}
-              variant={categoriaActiva === categoria ? "primary" : "outline-primary"}
-              onClick={() => setCategoriaActiva(categoria)}
-              className="m-1"
+        <Dropdown>
+          <Dropdown.Toggle variant="primary" id="dropdown-categorias" className="category-dropdown">
+            {categoriaActiva === "Todas" ? "Todas las categorías" : categoriaActiva}
+          </Dropdown.Toggle>
+
+          <Dropdown.Menu className="category-dropdown-menu">
+            <Dropdown.Item 
+              active={categoriaActiva === "Todas"}
+              onClick={() => setCategoriaActiva("Todas")}
+              className="category-dropdown-item"
             >
-              {categoria}
-            </Button>
-          ))}
-        </ButtonGroup>
+              Todas
+            </Dropdown.Item>
+            {categorias.map(categoria => (
+              <Dropdown.Item 
+                key={categoria}
+                active={categoriaActiva === categoria}
+                onClick={() => setCategoriaActiva(categoria)}
+                className="category-dropdown-item"
+              >
+                {categoria}
+              </Dropdown.Item>
+            ))}
+          </Dropdown.Menu>
+        </Dropdown>
       </div>
 
+      {/* Resto del componente permanece igual */}
       <div className="table-responsive excel-table-container mb-4">
         <Table striped bordered hover className="excel-table">
           <thead>
@@ -126,7 +129,8 @@ const IngresarStockGeneralPage = () => {
 
       <div className="text-center">
         <Button
-          variant="primary"
+          className="btn-guardar-stock"
+
           size="lg"
           onClick={handleSubmit}
           disabled={isLoading || Object.values(stockValues).every(val => val === null || isNaN(val))}
