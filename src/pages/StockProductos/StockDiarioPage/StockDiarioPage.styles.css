@@ -1,8 +1,9 @@
 /* Contenedor principal */
 .stock-diario-container {
   padding: 1rem;
-  max-width: 1100px;
+  width: 100%;
   margin: 0 auto;
+  box-sizing: border-box;
 }
 
 /* Encabezado */
@@ -39,8 +40,10 @@
   border: 1px solid #e0e0e0;
   border-radius: 8px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-  overflow-x: auto;
+  width: 100%;
+  overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
+  box-sizing: border-box;
 }
 
 .excel-like-table {
@@ -48,7 +51,8 @@
   margin-bottom: 0;
   color: #212529;
   font-size: 0.9rem;
-  min-width: 600px; /* Minimum width for better mobile scrolling */
+  table-layout: auto;
+  border-collapse: collapse;
 }
 
 .excel-like-table .dark-header {
@@ -60,11 +64,12 @@
   position: sticky;
   top: 0;
   font-weight: 500;
+  padding: 12px 8px;
 }
 
 .excel-like-table th {
-  padding: 12px 8px;
   white-space: nowrap;
+  padding: 12px 8px;
 }
 
 .excel-like-table td {
@@ -72,6 +77,7 @@
   vertical-align: middle;
   border-top: 1px solid #e9ecef;
   text-align: center;
+  word-break: break-word;
 }
 
 .excel-like-table tr:hover {
@@ -205,7 +211,7 @@
   align-items: center;
   padding: 0 5px;
   gap: 10px;
-  min-width: 0; /* Permite que el texto se trunque */
+  min-width: 0;
 }
 
 .product-badge {
@@ -223,7 +229,6 @@
 
 .product-name {
   font-weight: 500;
-  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   text-align: left;
@@ -245,6 +250,11 @@
   .stock-diario-title {
     font-size: 1.4rem;
   }
+  
+  .product-name {
+    white-space: normal;
+    text-align: center;
+  }
 }
 
 @media (max-width: 767px) {
@@ -256,36 +266,41 @@
   .excel-like-table-container {
     margin: 0.5rem 0;
     border-radius: 6px;
-    margin-left: -0.5rem;
-    margin-right: -0.5rem;
-    width: calc(100% + 1rem);
   }
   
   .excel-like-table {
     font-size: 0.9rem;
-    min-width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
   }
   
   .excel-like-table th,
   .excel-like-table td {
-    padding: 8px 6px;
+    padding: 8px 4px;
     font-size: 0.9rem;
-    white-space: nowrap;
   }
   
-  .excel-like-table .dark-header {
-    font-size: 0.95rem;
-    padding: 10px 6px;
+  .product-info {
+    flex-direction: column;
+    gap: 4px;
+    align-items: center;
+  }
+  
+  .product-badge {
+    width: 24px;
+    height: 24px;
+    font-size: 0.75rem;
+  }
+  
+  .product-name {
+    text-align: center;
+    font-size: 0.85rem;
   }
   
   .stock-diario-title {
-    font-size: 1.4rem;
+    font-size: 1.3rem;
   }
   
   .stock-diario-subtitle {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
   }
   
   .stock-diario-search-input {
@@ -294,54 +309,13 @@
   }
   
   .scroll-to-top-btn {
-    width: 46px;
-    height: 46px;
-    bottom: 20px;
-    right: 20px;
+    width: 40px;
+    height: 40px;
   }
   
   .stock-diario-empty-alert,
   .no-products-message {
     font-size: 0.95rem;
     padding: 1.2rem;
-  }
-}
-
-/* Estilos específicos para escritorio (PCs) */
-@media (min-width: 992px) {
-  .excel-like-table {
-    table-layout: fixed;
-    width: 100%;
-  }
-  
-  /* Distribución de columnas más equilibrada */
-  .excel-like-table th:nth-child(1),
-  .excel-like-table td:nth-child(1) {
-    width: 50%; /* Columna de producto más estrecha */
-    text-align: left;
-    padding-left: 15px;
-  }
-  
-  .excel-like-table th:nth-child(2),
-  .excel-like-table td:nth-child(2) {
-    width: 25%; /* Columna de cantidad */
-  }
-  
-  .excel-like-table th:nth-child(3),
-  .excel-like-table td:nth-child(3) {
-    width: 25%; /* Columna de unidad */
-  }
-  
-  /* Ajustes para el contenido del producto */
-  .product-info {
-    max-width: 100%;
-    overflow: hidden;
-  }
-  
-  .product-name {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: block;
   }
 }
