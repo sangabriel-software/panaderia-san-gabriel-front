@@ -1,39 +1,22 @@
 import { useState, useMemo } from "react";
-import {
-  Container,
-  Table,
-  Button,
-  Form,
-  Spinner,
-  Dropdown,
-} from "react-bootstrap";
+import { Container, Table, Button, Form, Spinner, Dropdown, } from "react-bootstrap";
 import DotsMove from "../../../components/Spinners/DotsMove";
 import useGetProductosYPrecios from "../../../hooks/productosprecios/useGetProductosYprecios";
 import SuccessPopup from "../../../components/Popup/SuccessPopup";
 import "./IngresarStockPage.styles.css";
-import { getInitials, getUniqueColor } from "./IngresarStock.utils";
-import {
-  BsArrowLeft,
-  BsExclamationTriangleFill,
-  BsFillInfoCircleFill,
-} from "react-icons/bs";
+import { getInitials, getUniqueColor, handleStockChange, handleSubmitGuardarStock } from "./IngresarStock.utils";
+import { BsArrowLeft, BsExclamationTriangleFill, BsFillInfoCircleFill, } from "react-icons/bs";
 import { useNavigate, useParams } from "react-router-dom";
 import Alert from "../../../components/Alerts/Alert";
 import Title from "../../../components/Title/Title";
-import { getUserData } from "../../../utils/Auth/decodedata";
-import { decryptId } from "../../../utils/CryptoParams";
-import { ingresarStockProductos } from "../../../services/stockservices/stock.service";
 import ErrorPopup from "../../../components/Popup/ErrorPopUp";
 
 const IngresarStockGeneralPage = () => {
-  const usuario = getUserData();
   const { idSucursal } = useParams();
   const navigate = useNavigate();
-  const { productos, loadigProducts, showErrorProductos } =
-    useGetProductosYPrecios();
+  const { productos, loadigProducts, showErrorProductos } = useGetProductosYPrecios();
   const [stockValues, setStockValues] = useState({});
   const [isLoading, setIsLoading] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
   const [categoriaActiva, setCategoriaActiva] = useState("Todas");
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -42,18 +25,11 @@ const IngresarStockGeneralPage = () => {
   const [isPopupErrorOpen, setIsPopupErrorOpen] = useState(false);
   const [errorPopupMessage, setErrorPopupMessage] = useState("");
 
-  const prodPorHarina = productos?.filter(
-    (item) => item.tipoProduccion !== "bandejas"
-  );
-  const categorias = [
-    ...new Set(productos?.map((item) => item.nombreCategoria) || []),
-  ];
+  const prodPorHarina = productos?.filter((item) => item.tipoProduccion !== "bandejas");
+  const categorias = [ ...new Set(productos?.map((item) => item.nombreCategoria) || []),];
 
   const productosFiltrados = useMemo(() => {
-    let filtered =
-      categoriaActiva === "Todas"
-        ? prodPorHarina
-        : prodPorHarina?.filter(
+    let filtered = categoriaActiva === "Todas" ? prodPorHarina: prodPorHarina?.filter(
             (item) => item.nombreCategoria === categoriaActiva
           );
 
@@ -66,71 +42,10 @@ const IngresarStockGeneralPage = () => {
     return filtered;
   }, [prodPorHarina, categoriaActiva, searchTerm]);
 
-  const handleStockChange = (idProducto, value) => {
-    setStockValues((prev) => ({
-      ...prev,
-      [idProducto]: value ? parseInt(value) : null,
-    }));
-  };
 
+  /* Guardar Stock */
   const handleSubmit = async () => {
-    setIsLoading(true);
-
-    try {
-      // Obtener la fecha actual en el formato requerido
-      const now = new Date();
-      const fechaActualizacion = now
-        .toISOString()
-        .replace("T", " ")
-        .substring(0, 16);
-      const fechaCreacion = now.toISOString().split("T")[0];
-
-      // Crear payload
-      const payload = {
-        stockProductos: Object.entries(stockValues)
-          .filter(([_, value]) => value !== null && !isNaN(value))
-          .map(([idProducto, cantidad]) => {
-            const producto = productosFiltrados.find(
-              (p) => p.idProducto === parseInt(idProducto)
-            );
-
-            return {
-              idUsuario: usuario.idUsuario,
-              idProducto: parseInt(idProducto),
-              idSucursal: Number(decryptId(decodeURIComponent(idSucursal))),
-              stock: cantidad,
-              tipoProduccion: producto?.tipoProduccion || "",
-              controlarStock: producto?.controlarStock || 0,
-              controlarStockDiario: producto?.controlarStockDiario || 0,
-              fechaActualizacion: fechaActualizacion,
-              fechaCreacion: fechaCreacion,
-            };
-          }),
-      };
-
-      // Llamada a la API
-      const res = await ingresarStockProductos(payload);
-      if (res.status === 201) {
-        setIsPopupOpen(true);
-
-        // Mostrar feedback de éxito
-        setShowSuccess(true);
-
-        setStockValues({});
-        setShowSuccess(false);
-      }
-    } catch (error) {
-      setErrorPopupMessage(
-        "Hubo un error al ingresar el stock, vuelve a intentar"
-      );
-      setIsPopupErrorOpen(true);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const clearSearch = () => {
-    setSearchTerm("");
+    await handleSubmitGuardarStock(stockValues, productosFiltrados, idSucursal, setIsLoading, setIsPopupOpen, setStockValues, setErrorPopupMessage, setIsPopupErrorOpen);
   };
 
   if (loadigProducts) {
@@ -270,7 +185,7 @@ const IngresarStockGeneralPage = () => {
                       min="0"
                       value={stockValues[producto.idProducto] || ""}
                       onChange={(e) =>
-                        handleStockChange(producto.idProducto, e.target.value)
+                        handleStockChange(producto.idProducto, e.target.value, setStockValues)
                       }
                       className="quantity-input"
                       placeholder="0"

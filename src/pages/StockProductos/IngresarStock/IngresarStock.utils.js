@@ -1,3 +1,6 @@
+import { ingresarStockProductos } from "../../../services/stockservices/stock.service";
+import { getUserData } from "../../../utils/Auth/decodedata";
+import { decryptId } from "../../../utils/CryptoParams";
 
 export const getInitials = (name) => {
     const names = name.split(" ");
@@ -22,3 +25,62 @@ export const getInitials = (name) => {
       assignedColors[text] = color;
       return color;
   };
+
+
+export const handleStockChange = (idProducto, value, setStockValues ) => {
+    setStockValues((prev) => ({
+      ...prev,
+      [idProducto]: value ? parseInt(value) : null,
+    }));
+  };
+
+export  const handleSubmitGuardarStock = async (stockValues, productosFiltrados, idSucursal, setIsLoading, setIsPopupOpen, setStockValues, setErrorPopupMessage, setIsPopupErrorOpen) => {
+      setIsLoading(true);
+      const usuario = getUserData();
+  
+      try {
+        // Obtener la fecha actual en el formato requerido
+        const now = new Date();
+        const fechaActualizacion = now
+          .toISOString()
+          .replace("T", " ")
+          .substring(0, 16);
+        const fechaCreacion = now.toISOString().split("T")[0];
+  
+        // Crear payload
+        const payload = {
+          stockProductos: Object.entries(stockValues)
+            .filter(([_, value]) => value !== null && !isNaN(value))
+            .map(([idProducto, cantidad]) => {
+              const producto = productosFiltrados.find(
+                (p) => p.idProducto === parseInt(idProducto)
+              );
+  
+              return {
+                idUsuario: usuario.idUsuario,
+                idProducto: parseInt(idProducto),
+                idSucursal: Number(decryptId(decodeURIComponent(idSucursal))),
+                stock: cantidad,
+                tipoProduccion: producto?.tipoProduccion || "",
+                controlarStock: producto?.controlarStock || 0,
+                controlarStockDiario: producto?.controlarStockDiario || 0,
+                fechaActualizacion: fechaActualizacion,
+                fechaCreacion: fechaCreacion,
+              };
+            }),
+        };
+  
+        // Llamada a la API
+        const res = await ingresarStockProductos(payload);
+        if (res.status === 201) {
+          setIsPopupOpen(true);
+          setStockValues({});
+        }
+      } catch (error) {
+        setErrorPopupMessage("Hubo un error al ingresar el stock, vuelve a intentar");
+        setIsPopupErrorOpen(true);
+      } finally {
+        setIsLoading(false);
+      }
+};
+  
