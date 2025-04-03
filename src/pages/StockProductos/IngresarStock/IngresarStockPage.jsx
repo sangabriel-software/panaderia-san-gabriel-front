@@ -109,14 +109,14 @@ const IngresarStockGeneralPage = () => {
           <div className="col-8">
             <Title
               title={`Stock Diario`}
-              description={`Ingresa la cantidad para cada producto`}
+            //   description={`Ingresa la cantidad para cada producto`}
             />
           </div>
         </div>
       </div>
 
       {/* Search Bar and Category Filter */}
-      <div className="d-flex flex-column flex-md-row justify-content-between gap-3 mb-4">
+      <div className="d-flex flex-column flex-md-row justify-content-between gap-3 mb-4 my-3">
         <div className="flex-grow-1">
           <h6 className="mb-3">Buscar producto:</h6>
           <div className="position-relative">

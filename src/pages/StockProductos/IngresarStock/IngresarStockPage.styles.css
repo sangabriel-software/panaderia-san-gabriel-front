@@ -57,7 +57,7 @@
 
 /* Ajustes para los inputs */
 .quantity-input {
-  width: 80px; /* Ancho fijo reducido */
+  width: 150px; /* Ancho fijo reducido */
   margin: 0 auto;
   text-align: center;
   border: 1px solid #ced4da;
@@ -110,13 +110,90 @@
   max-width: 800px; /* Coincide con el ancho de la tabla */
 }
 
-.btn-guardar-stock{
+/* .btn-guardar-stock{
   background-color: #6a01ac;
   border: none;
   padding: 0.75rem 2rem;
   font-weight: 600;
   min-width: 200px;
+} */
+
+
+/* Dropdown de categorías */
+.category-dropdown {
+  background-color: #6a01ac !important;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  font-weight: 500;
+  min-width: 200px;
+  text-align: left;
 }
+
+.category-dropdown:hover, 
+.category-dropdown:focus {
+  background-color: #5a0199 !important;
+}
+
+.category-dropdown-menu {
+  border-radius: 6px;
+  border: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  padding: 0.5rem 0;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.category-dropdown-item {
+  padding: 0.5rem 1rem;
+  color: #495057;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.category-dropdown-item:hover {
+  background-color: #f8f9fa;
+  color: #6a01ac;
+}
+
+.category-dropdown-item.active, 
+.category-dropdown-item:active {
+  background-color: #6a01ac;
+  color: white;
+}
+
+/* Search Bar Styles */
+.search-input {
+  width: 100%;
+  padding: 0.5rem 1rem;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  transition: all 0.2s;
+  padding-right: 2rem;
+}
+
+.search-input:focus {
+  border-color: #6a01ac;
+  box-shadow: 0 0 0 0.2rem rgba(106, 1, 172, 0.25);
+}
+
+.btn-clear-search {
+  background: transparent;
+  border: none;
+  color: #6c757d;
+  font-size: 1.25rem;
+  padding: 0 0.75rem;
+  line-height: 1;
+  cursor: pointer;
+  transform: translateY(-50%);
+}
+
+.btn-clear-search:hover {
+  color: #495057;
+}
+
+
+
 
 /* Responsive Design - Mantenemos los estilos para móvil/tablet existentes */
 @media (max-width: 991px) {
@@ -124,6 +201,37 @@
     max-width: 100%; /* En tablet/móvil ocupa todo el ancho */
     margin: 1.5rem 0;
   }
+
+  .excel-table {
+    font-size: 0.85rem;
+  }
   
-  /* ... (mantener el resto de estilos responsive existentes) ... */
+  .excel-table th, 
+  .excel-table td {
+    padding: 10px 6px;
+  }
+  
+  .product-badge {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .product-name {
+    font-size: 0.85rem;
+  }
+  
+  .quantity-input {
+    width: 100px;
+    font-size: 0.85rem;
+  }
+  
+  .category-dropdown {
+    min-width: 180px;
+    padding: 0.4rem 0.8rem;
+  }
+  
+  .search-input {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem;
+  }
 }
