@@ -9,6 +9,7 @@ import DotsMove from "../../../components/Spinners/DotsMove";
 import { formatDateToDisplay } from "../../../utils/dateUtils";
 import { useState, useMemo, useEffect } from "react";
 import { useMediaQuery } from "react-responsive";
+import { getInitials, getUniqueColor } from "../IngresarStock/IngresarStock.utils";
 
 const StockDiarioPage = () => {
   const { idSucursal } = useParams();
@@ -175,44 +176,74 @@ const StockDiarioPage = () => {
           <Table striped bordered hover className="excel-like-table">
             <thead>
               <tr>
-                <th 
-                  onClick={() => requestSort('nombreProducto')}
+                <th
+                  onClick={() => requestSort("nombreProducto")}
                   className="sortable-header dark-header text-center align-middle"
                 >
                   <div className="header-content">
                     Producto
-                    {sortConfig.key === 'nombreProducto' && (
-                      <BsArrowUp className={`sort-icon ${sortConfig.direction === 'descending' ? 'descending' : ''}`} />
+                    {sortConfig.key === "nombreProducto" && (
+                      <BsArrowUp
+                        className={`sort-icon ${
+                          sortConfig.direction === "descending"
+                            ? "descending"
+                            : ""
+                        }`}
+                      />
                     )}
                   </div>
                 </th>
-                <th 
-                  onClick={() => requestSort('cantidadExistente')}
+                <th
+                  onClick={() => requestSort("cantidadExistente")}
                   className="sortable-header dark-header text-center align-middle"
                 >
                   <div className="header-content">
                     Cantidad
-                    {sortConfig.key === 'cantidadExistente' && (
-                      <BsArrowUp className={`sort-icon ${sortConfig.direction === 'descending' ? 'descending' : ''}`} />
+                    {sortConfig.key === "cantidadExistente" && (
+                      <BsArrowUp
+                        className={`sort-icon ${
+                          sortConfig.direction === "descending"
+                            ? "descending"
+                            : ""
+                        }`}
+                      />
                     )}
                   </div>
                 </th>
-                <th className="dark-header text-center align-middle">Cantidad en</th>
+                <th className="dark-header text-center align-middle">
+                  Cantidad en
+                </th>
               </tr>
             </thead>
             <tbody>
               {filteredProducts.length > 0 ? (
                 filteredProducts.map((producto) => (
                   <tr key={producto.idStockDiario}>
-                    <td className="text-center align-middle">{producto.nombreProducto}</td>
+                    <td>
+                      <div className="product-info">
+                        <div
+                          className="product-badge"
+                          style={{
+                            backgroundColor: getUniqueColor(
+                              producto.nombreProducto
+                            ),
+                          }}
+                        >
+                          {getInitials(producto.nombreProducto)}
+                        </div>
+                        <span className="product-name">
+                          {producto.nombreProducto}
+                        </span>
+                      </div>
+                    </td>
                     <td className="quantity-cell text-center align-middle">
-                      {producto.nombreProducto === "Frances" 
-                        ? (producto.cantidadExistente / 6)
+                      {producto.nombreProducto === "Frances"
+                        ? producto.cantidadExistente / 6
                         : producto.cantidadExistente}
                     </td>
                     <td className="text-center align-middle">
-                      {producto.nombreProducto === "Frances" 
-                        ? "Filas" 
+                      {producto.nombreProducto === "Frances"
+                        ? "Filas"
                         : "Unidades"}
                     </td>
                   </tr>
@@ -231,7 +262,7 @@ const StockDiarioPage = () => {
 
       {/* Botón de scroll para móviles */}
       {isMobile && showScrollButton && (
-        <button 
+        <button
           onClick={scrollToTop}
           className="scroll-to-top-btn"
           aria-label="Volver arriba"
