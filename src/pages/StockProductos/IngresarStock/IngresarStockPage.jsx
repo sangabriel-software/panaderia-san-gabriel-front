@@ -1,19 +1,28 @@
 import { useState } from "react";
-import { Container, Table, Button, Form, Spinner, Alert } from "react-bootstrap";
+import { Container, Table, Button, Form, Spinner, Alert, ButtonGroup } from "react-bootstrap";
 import DotsMove from "../../../components/Spinners/DotsMove";
 import useGetProductosYPrecios from "../../../hooks/productosprecios/useGetProductosYprecios";
 import SuccessPopup from "../../../components/Popup/SuccessPopup";
 import "./IngresarStockPage.styles.css";
 import { getInitials, getUniqueColor } from "./IngresarStock.utils";
 
-
 const IngresarStockGeneralPage = () => {
   const { productos, loadigProducts, showErrorProductos } = useGetProductosYPrecios();
   const [stockValues, setStockValues] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [categoriaActiva, setCategoriaActiva] = useState("Todas");
 
+  // Filtrar productos no bandejas y agrupar por categoría
   const prodPorHarina = productos?.filter(item => item.tipoProduccion !== "bandejas");
+  
+  // Obtener categorías únicas
+  const categorias = [...new Set(productos?.map(item => item.nombreCategoria) || [])];
+
+  // Filtrar productos por categoría seleccionada
+  const productosFiltrados = categoriaActiva === "Todas" 
+    ? prodPorHarina 
+    : prodPorHarina?.filter(item => item.nombreCategoria === categoriaActiva);
 
   const handleStockChange = (idProducto, value) => {
     setStockValues(prev => ({
@@ -50,6 +59,30 @@ const IngresarStockGeneralPage = () => {
     <Container className="py-4">
       {showErrorProductos && <Alert variant="danger" className="mb-4">Error al cargar los productos</Alert>}
 
+      {/* Filtros por categoría */}
+      <div className="mb-4">
+        <h6 className="mb-3">Filtrar por categoría:</h6>
+        <ButtonGroup className="flex-wrap">
+          <Button
+            variant={categoriaActiva === "Todas" ? "primary" : "outline-primary"}
+            onClick={() => setCategoriaActiva("Todas")}
+            className="m-1"
+          >
+            Todas
+          </Button>
+          {categorias.map(categoria => (
+            <Button
+              key={categoria}
+              variant={categoriaActiva === categoria ? "primary" : "outline-primary"}
+              onClick={() => setCategoriaActiva(categoria)}
+              className="m-1"
+            >
+              {categoria}
+            </Button>
+          ))}
+        </ButtonGroup>
+      </div>
+
       <div className="table-responsive excel-table-container mb-4">
         <Table striped bordered hover className="excel-table">
           <thead>
@@ -59,8 +92,8 @@ const IngresarStockGeneralPage = () => {
             </tr>
           </thead>
           <tbody>
-            {prodPorHarina?.length > 0 ? (
-              prodPorHarina.map(producto => (
+            {productosFiltrados?.length > 0 ? (
+              productosFiltrados.map(producto => (
                 <tr key={producto.idProducto}>
                   <td>
                     <div className="product-info">
@@ -84,7 +117,7 @@ const IngresarStockGeneralPage = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="2" className="text-center py-4">No hay productos disponibles</td>
+                <td colSpan="2" className="text-center py-4">No hay productos disponibles en esta categoría</td>
               </tr>
             )}
           </tbody>
