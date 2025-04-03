@@ -144,7 +144,7 @@ const IngresarStockGeneralPage = () => {
             <Dropdown.Toggle
               variant="primary"
               id="dropdown-categorias"
-              className="category-dropdown"
+            //   className="category-dropdown"
             >
               {categoriaActiva === "Todas"
                 ? "Todas las categorías"
