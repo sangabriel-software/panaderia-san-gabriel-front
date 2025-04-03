@@ -154,7 +154,7 @@ const IngresarStockGeneralPage = () => {
                 Producto
               </th>
               <th className="dark-header text-center" style={{ width: "40%" }}>
-                Cantidad
+                Cantidad de Unidades
               </th>
             </tr>
           </thead>
