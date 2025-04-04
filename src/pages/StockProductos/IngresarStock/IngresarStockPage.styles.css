@@ -81,7 +81,7 @@
   min-width: 0; /* Permite que el texto se trunque */
 }
 
-.product-badge {
+.product-badge-stock {
   width: 32px;
   height: 32px;
   border-radius: 8px;
@@ -211,7 +211,7 @@
     padding: 10px 6px;
   }
   
-  .product-badge {
+  .product-badge-stock {
     width: 28px;
     height: 28px;
   }

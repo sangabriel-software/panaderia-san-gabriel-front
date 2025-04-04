@@ -165,7 +165,7 @@ const IngresarStockGeneralPage = () => {
                   <td>
                     <div className="product-info">
                       <div
-                        className="product-badge"
+                        className="product-badge-stock"
                         style={{
                           backgroundColor: getUniqueColor(
                             producto.nombreProducto

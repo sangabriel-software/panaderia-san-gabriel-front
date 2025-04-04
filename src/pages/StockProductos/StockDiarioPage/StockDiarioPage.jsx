@@ -222,7 +222,7 @@ const StockDiarioPage = () => {
                     <td>
                       <div className="product-info">
                         <div
-                          className="product-badge"
+                          className="product-badge-diario"
                           style={{
                             backgroundColor: getUniqueColor(
                               producto.nombreProducto

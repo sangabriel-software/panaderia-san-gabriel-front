@@ -214,7 +214,7 @@
   min-width: 0;
 }
 
-.product-badge {
+.product-badge-diario {
   width: 32px;
   height: 32px;
   border-radius: 8px;
@@ -284,7 +284,7 @@
     align-items: center;
   }
   
-  .product-badge {
+  .product-badge-diario {
     width: 24px;
     height: 24px;
     font-size: 0.75rem;
