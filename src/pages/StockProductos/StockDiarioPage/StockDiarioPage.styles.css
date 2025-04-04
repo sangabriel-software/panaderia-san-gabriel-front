@@ -326,3 +326,59 @@
     padding: 1.2rem;
   }
 }
+
+/* Category filter styles */
+/* .stock-diario-category-dropdown {
+  background-color: #6a01ac !important;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  font-weight: 500;
+  min-width: 200px;
+  text-align: left;
+} */
+
+/* .stock-diario-category-dropdown:hover, 
+.stock-diario-category-dropdown:focus {
+  background-color: #5a0199 !important;
+} */
+
+.stock-diario-category-dropdown-menu {
+  border-radius: 6px;
+  border: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+  padding: 0.5rem 0;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.stock-diario-category-dropdown-item {
+  padding: 0.5rem 1rem;
+  color: #495057;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.stock-diario-category-dropdown-item:hover {
+  background-color: #f8f9fa;
+  color: #6a01ac;
+}
+
+.stock-diario-category-dropdown-item.active, 
+.stock-diario-category-dropdown-item:active {
+  background-color: #6a01ac;
+  color: white;
+}
+
+/* Responsive adjustments for filters */
+@media (max-width: 767px) {
+  .stock-diario-category-dropdown {
+    min-width: 160px;
+    padding: 0.35rem 0.7rem;
+    font-size: 0.85rem;
+  }
+  
+  .stock-diario-category-dropdown-menu {
+    max-height: 250px;
+  }
+}

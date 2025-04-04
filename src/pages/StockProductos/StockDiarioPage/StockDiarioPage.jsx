@@ -2,7 +2,7 @@ import { useNavigate, useParams } from "react-router";
 import useGetStockDelDia from "../../../hooks/stock/useGetStockDelDia";
 import { BsArrowLeft, BsX, BsArrowUp } from "react-icons/bs";
 import Title from "../../../components/Title/Title";
-import { Container, Spinner, Alert, Form, Table } from "react-bootstrap";
+import { Container, Spinner, Alert, Form, Table, Dropdown } from "react-bootstrap";
 import "./StockDiarioPage.styles.css";
 import { FaStore, FaCalendarAlt, FaBoxOpen, FaSearch } from "react-icons/fa";
 import DotsMove from "../../../components/Spinners/DotsMove";
@@ -18,11 +18,18 @@ const StockDiarioPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showScrollButton, setShowScrollButton] = useState(false);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
+  const [categoriaActiva, setCategoriaActiva] = useState("Todas");
 
   // Detectar dispositivos
   const isMobile = useMediaQuery({ maxWidth: 767 });
   const isTablet = useMediaQuery({ minWidth: 768, maxWidth: 991 });
   const isDesktop = useMediaQuery({ minWidth: 992 });
+
+  // Obtener categorías únicas
+  const categorias = useMemo(() => {
+    if (!Array.isArray(stockDelDia)) return [];
+    return ['Todas', ...new Set(stockDelDia.map(item => item.nombreCategoria))];
+  }, [stockDelDia]);
 
   // Efecto para mostrar/ocultar el botón de scroll
   useEffect(() => {
@@ -76,9 +83,11 @@ const StockDiarioPage = () => {
   const filteredProducts = useMemo(() => {
     if (!isArray) return [];
     
-    let filtered = stockDelDia.filter((producto) =>
-      producto.nombreProducto.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    let filtered = stockDelDia.filter((producto) => {
+      const matchesSearch = producto.nombreProducto.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCategory = categoriaActiva === "Todas" || producto.nombreCategoria === categoriaActiva;
+      return matchesSearch && matchesCategory;
+    });
 
     // Ordenar si hay configuración de ordenamiento
     if (sortConfig.key) {
@@ -94,7 +103,7 @@ const StockDiarioPage = () => {
     }
 
     return filtered;
-  }, [stockDelDia, searchTerm, isArray, sortConfig]);
+  }, [stockDelDia, searchTerm, isArray, sortConfig, categoriaActiva]);
 
   const handleClearSearch = () => {
     setSearchTerm("");
@@ -136,13 +145,10 @@ const StockDiarioPage = () => {
         </div>
       </div>
 
-      {/* Barra de búsqueda */}
-      {!isEmptyStock && (
-        <div className="mb-4">
-          <div
-            className="position-relative"
-            style={{ maxWidth: "500px", margin: "0 auto" }}
-          >
+      {/* Filtros */}
+      <div className="d-flex flex-column flex-md-row justify-content-between gap-3 mb-4 my-3">
+        <div className="flex-grow-1">
+          <div className="position-relative" style={{ maxWidth: "500px", margin: "0 auto" }}>
             <Form.Control
               type="text"
               placeholder="Buscar producto..."
@@ -159,7 +165,34 @@ const StockDiarioPage = () => {
             )}
           </div>
         </div>
-      )}
+
+        <div>
+          <Dropdown>
+            <Dropdown.Toggle variant="primary" id="dropdown-categorias" className="stock-diario-category-dropdown">
+              {categoriaActiva === "Todas" ? "Todas las categorías" : categoriaActiva}
+            </Dropdown.Toggle>
+            <Dropdown.Menu className="stock-diario-category-dropdown-menu">
+              <Dropdown.Item 
+                active={categoriaActiva === "Todas"}
+                onClick={() => setCategoriaActiva("Todas")}
+                className="stock-diario-category-dropdown-item"
+              >
+                Todas
+              </Dropdown.Item>
+              {categorias.filter(cat => cat !== "Todas").map((categoria) => (
+                <Dropdown.Item
+                  key={categoria}
+                  active={categoriaActiva === categoria}
+                  onClick={() => setCategoriaActiva(categoria)}
+                  className="stock-diario-category-dropdown-item"
+                >
+                  {categoria}
+                </Dropdown.Item>
+              ))}
+            </Dropdown.Menu>
+          </Dropdown>
+        </div>
+      </div>
 
       {/* Contenido condicional */}
       {isEmptyStock ? (
@@ -251,7 +284,7 @@ const StockDiarioPage = () => {
               ) : (
                 <tr>
                   <td colSpan="3" className="text-center py-4 align-middle">
-                    No se encontraron productos con ese nombre.
+                    No se encontraron productos con ese nombre en esta categoría.
                   </td>
                 </tr>
               )}
