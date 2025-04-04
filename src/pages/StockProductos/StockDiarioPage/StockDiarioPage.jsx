@@ -2,9 +2,9 @@ import { useNavigate, useParams } from "react-router";
 import useGetStockDelDia from "../../../hooks/stock/useGetStockDelDia";
 import { BsArrowLeft, BsX, BsArrowUp } from "react-icons/bs";
 import Title from "../../../components/Title/Title";
-import { Container, Spinner, Alert, Form, Table, Dropdown } from "react-bootstrap";
+import { Container, Spinner, Alert, Form, Table, Dropdown, Button } from "react-bootstrap";
 import "./StockDiarioPage.styles.css";
-import { FaStore, FaCalendarAlt, FaBoxOpen, FaSearch } from "react-icons/fa";
+import { FaStore, FaCalendarAlt, FaBoxOpen, FaSearch, FaPlus } from "react-icons/fa";
 import DotsMove from "../../../components/Spinners/DotsMove";
 import { formatDateToDisplay } from "../../../utils/dateUtils";
 import { useState, useMemo, useEffect } from "react";
@@ -20,12 +20,17 @@ const StockDiarioPage = () => {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
   const [categoriaActiva, setCategoriaActiva] = useState("Todas");
 
+  // Función para manejar el click en Ingresar Stock
+  const handleIngresarStock = () => {
+    navigate(`/stock-productos/ingresar-stock/${encodeURIComponent(idSucursal)}`);
+  };
+
   // Detectar dispositivos
   const isMobile = useMediaQuery({ maxWidth: 767 });
   const isTablet = useMediaQuery({ minWidth: 768, maxWidth: 991 });
   const isDesktop = useMediaQuery({ minWidth: 992 });
 
-  // Obtener categorías únicas
+  // Obtener categorías únicas (mantenido para posible uso futuro)
   const categorias = useMemo(() => {
     if (!Array.isArray(stockDelDia)) return [];
     return ['Todas', ...new Set(stockDelDia.map(item => item.nombreCategoria))];
@@ -34,18 +39,14 @@ const StockDiarioPage = () => {
   // Efecto para mostrar/ocultar el botón de scroll
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 100) {
-        setShowScrollButton(true);
-      } else {
-        setShowScrollButton(false);
-      }
+      setShowScrollButton(window.scrollY > 100);
     };
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Función para volver al inicio
+  // Resto del código existente sin cambios...
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
@@ -53,7 +54,6 @@ const StockDiarioPage = () => {
     });
   };
 
-  // Función para ordenar la tabla
   const requestSort = (key) => {
     let direction = 'ascending';
     if (sortConfig.key === key && sortConfig.direction === 'ascending') {
@@ -79,7 +79,6 @@ const StockDiarioPage = () => {
     return sucursalData?.fechaValidez || "";
   }, [sucursalData]);
 
-  // Filtrar y ordenar productos
   const filteredProducts = useMemo(() => {
     if (!isArray) return [];
     
@@ -89,7 +88,6 @@ const StockDiarioPage = () => {
       return matchesSearch && matchesCategory;
     });
 
-    // Ordenar si hay configuración de ordenamiento
     if (sortConfig.key) {
       filtered.sort((a, b) => {
         if (a[sortConfig.key] < b[sortConfig.key]) {
@@ -145,9 +143,18 @@ const StockDiarioPage = () => {
         </div>
       </div>
 
-      {/* Filtros - Versión mejorada */}
+      {/* Filtros con nuevo botón */}
       <div className="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 mb-4">
-        {/* Barra de búsqueda con ancho fijo */}
+        {/* Nuevo botón Ingresar Stock */}
+        <Button 
+          variant="success" 
+          onClick={handleIngresarStock}
+          className="d-flex align-items-center gap-2 me-md-3"
+        >
+          <FaPlus /> Ingresar Stock
+        </Button>
+
+        {/* Barra de búsqueda */}
         <div className="flex-grow-1" style={{ minWidth: "300px", maxWidth: "500px" }}>
           <div className="position-relative">
             <Form.Control
@@ -168,7 +175,7 @@ const StockDiarioPage = () => {
           </div>
         </div>
 
-        {/* Dropdown de categorías con ancho fijo */}
+        {/* Dropdown de categorías (mantenido comentado) */}
         {/* <div style={{ minWidth: "250px" }}>
           <Dropdown>
             <Dropdown.Toggle 
@@ -201,7 +208,7 @@ const StockDiarioPage = () => {
         </div> */}
       </div>
 
-      {/* Contenido condicional */}
+      {/* Contenido de la tabla (sin cambios) */}
       {isEmptyStock ? (
         <div className="row justify-content-center">
           <div className="col-md-8">
@@ -300,7 +307,7 @@ const StockDiarioPage = () => {
         </div>
       )}
 
-      {/* Botón de scroll para móviles */}
+      {/* Botón de scroll para móviles (sin cambios) */}
       {isMobile && showScrollButton && (
         <button
           onClick={scrollToTop}

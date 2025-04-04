@@ -21,7 +21,7 @@ const StockGeneralPage = () => {
 
 
   const handleIngresarStock = () => {
-    navigate(`/stock-productos/ingresar-stock/${idSucursal}`);
+    navigate(`/stock-productos/ingresar-stock/${encodeURIComponent(idSucursal)}`);
   };
 
   // Detectar dispositivos
