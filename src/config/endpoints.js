@@ -14,6 +14,7 @@ const getEndpoints = {
     CONSULTAR_DETALLE_VENTA: "consultar-detalle-venta",
     CONSULTAR_RECETAS: "consultar-recetas",
     STOCK_DEL_DIA: "consultar-stock-sucursal",
+    STOCK_DE_PRODUCTOS_GENERALES: "consultar-stock-productos",
 };
 
 const postEndpoints = {

@@ -1,0 +1,345 @@
+/* Contenedor principal */
+.stock-general-container {
+    padding: 1rem;
+    width: 100%;
+    margin: 0 auto;
+    box-sizing: border-box;
+  }
+  
+  /* Encabezado */
+  .stock-general-header {
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+  
+  /* Estilos para la tabla tipo Excel */
+  .excel-like-table-container {
+    margin: 1.5rem 0;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    box-sizing: border-box;
+  }
+  
+  .excel-like-table {
+    width: 100%;
+    margin-bottom: 0;
+    color: #212529;
+    font-size: 1rem;
+    table-layout: auto;
+    border-collapse: collapse;
+  }
+  
+  .excel-like-table .dark-header {
+    background-color: #000000;
+    color: white;
+    border-color: #000000;
+    vertical-align: middle;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    font-weight: 500;
+    padding: 12px 8px;
+  }
+  
+  .excel-like-table th {
+    white-space: nowrap;
+    padding: 12px 8px;
+  }
+  
+  .excel-like-table td {
+    padding: 10px 8px;
+    vertical-align: middle;
+    border-top: 1px solid #e9ecef;
+    text-align: center;
+    word-break: break-word;
+  }
+  
+  .excel-like-table tr:hover {
+    background-color: rgba(241, 243, 245, 0.5);
+  }
+  
+  /* Estilos para los encabezados ordenables */
+  .sortable-header {
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.2s;
+  }
+  
+  .sortable-header:hover {
+    background-color: #333333 !important;
+  }
+  
+  .header-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  
+  .sort-icon {
+    transition: transform 0.2s;
+    color: white;
+    font-size: 1rem;
+  }
+  
+  .sort-icon.descending {
+    transform: rotate(180deg);
+  }
+  
+  /* Estilos para la barra de búsqueda */
+  .stock-general-search-input {
+    padding: 0.5rem 2.5rem;
+    border-radius: 20px;
+    border: 1px solid #ced4da;
+    width: 100%;
+    font-size: 1rem;
+    transition: all 0.2s;
+  }
+  
+  .stock-general-search-input:focus {
+    border-color: #4dabf7;
+    box-shadow: 0 0 0 3px rgba(77, 171, 247, 0.2);
+  }
+  
+  .stock-general-search-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #adb5bd;
+    pointer-events: none;
+  }
+  
+  .stock-general-clear-icon {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #adb5bd;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+  
+  .stock-general-clear-icon:hover {
+    color: #495057;
+  }
+  
+  /* Mensajes de estado */
+  .stock-general-empty-alert {
+    text-align: center;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f8f9fa;
+  }
+  
+  /* Botón de scroll para móviles */
+  .scroll-to-top-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background-color: #2c7be5;
+    color: white;
+    border: none;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0.9;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+  
+  .scroll-to-top-btn:hover {
+    opacity: 1;
+    background-color: #1a68d1;
+    transform: scale(1.05);
+  }
+  
+  /* Optimización de espacio para nombres de productos */
+  .product-info {
+    display: flex;
+    align-items: center;
+    padding: 0 5px;
+    gap: 10px;
+    min-width: 0;
+  }
+  
+  .product-badge-general {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    flex-shrink: 0;
+    font-size: 1rem;
+  }
+  
+  .product-name {
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: left;
+    font-size: 1rem;
+  }
+  
+  .quantity-cell-general {
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    color: #2b6cb0;
+  }
+  
+  /* Dropdown de categorías */
+  .stock-general-category-dropdown {
+    background-color: #6a01ac !important;
+    border: none !important;
+    border-radius: 6px !important;
+    padding: 0.5rem 1rem !important;
+    font-weight: 500;
+    text-align: left;
+    transition: all 0.2s;
+    width: 100%;
+  }
+  
+  .stock-general-category-dropdown:hover, 
+  .stock-general-category-dropdown:focus {
+    background-color: #5a0199 !important;
+  }
+  
+  .stock-general-category-dropdown-menu {
+    border-radius: 6px !important;
+    border: none !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+    padding: 0.5rem 0;
+    max-height: 300px;
+    overflow-y: auto;
+    width: 100%;
+  }
+  
+  .stock-general-category-dropdown-item {
+    padding: 0.5rem 1rem !important;
+    color: #495057 !important;
+    font-weight: 500;
+    transition: all 0.2s !important;
+  }
+  
+  .stock-general-category-dropdown-item:hover {
+    background-color: #f8f9fa !important;
+    color: #6a01ac !important;
+  }
+  
+  .stock-general-category-dropdown-item.active, 
+  .stock-general-category-dropdown-item:active {
+    background-color: #6a01ac !important;
+    color: white !important;
+  }
+  
+  /* Responsive Styles */
+  @media (max-width: 991px) {
+    .excel-like-table {
+      font-size: 0.85rem;
+    }
+    
+    .excel-like-table th,
+    .excel-like-table td {
+      padding: 8px 6px;
+    }
+    
+    .product-name {
+      white-space: normal;
+      text-align: center;
+    }
+  }
+  
+  @media (max-width: 767px) {
+    .stock-general-container {
+      padding: 0.5rem;
+    }
+    
+    .excel-like-table-container {
+      margin: 0.5rem 0;
+      border-radius: 6px;
+    }
+    
+    .excel-like-table {
+      font-size: 0.9rem;
+    }
+    
+    .excel-like-table th,
+    .excel-like-table td {
+      padding: 8px 4px;
+      font-size: 0.9rem;
+    }
+    
+    .product-info {
+      flex-direction: column;
+      gap: 4px;
+      align-items: center;
+    }
+    
+    .product-badge-general {
+      width: 24px;
+      height: 24px;
+      font-size: 0.75rem;
+    }
+    
+    .product-name {
+      text-align: center;
+      font-size: 0.85rem;
+    }
+    
+    .stock-general-search-input {
+      font-size: 0.95rem;
+      padding: 0.6rem 2.2rem;
+    }
+    
+    .scroll-to-top-btn {
+      width: 40px;
+      height: 40px;
+    }
+    
+    .stock-general-empty-alert {
+      font-size: 0.95rem;
+      padding: 1.2rem;
+    }
+    
+    .stock-general-category-dropdown {
+      padding: 0.35rem 0.7rem !important;
+      font-size: 0.85rem;
+    }
+  }
+  
+  /* Estilos específicos para PCs */
+  @media (min-width: 992px) {
+    .product-cell {
+      width: 30%;
+    }
+    
+    .product-badge-general {
+      width: 36px;
+      height: 36px;
+      font-size: 1.1rem;
+    }
+    
+    .product-name {
+      font-size: 1.1rem;
+    }
+    
+    .quantity-cell-general {
+      font-size: 1.2rem;
+    }
+  }

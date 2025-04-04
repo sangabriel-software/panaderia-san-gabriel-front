@@ -33,6 +33,7 @@ const PerfilPage = lazy(() => import("./pages/Configuracioens/PerfilPage/PerfilP
 const GestionarStockPage = lazy(() => import("./pages/StockProductos/GestionarStock/GestionarStockPage"));
 const StockDiarioPage = lazy(() => import("./pages/StockProductos/StockDiarioPage/StockDiarioPage"));
 const IngresarStockGeneralPage = lazy(() => import("./pages/StockProductos/IngresarStock/IngresarStockPage"));
+const StockGeneralPage = lazy(() => import("./pages/StockProductos/StockGeneralPage/StockGeneralPage"));
 
 function App() {
   return (
@@ -87,6 +88,7 @@ function App() {
               <Route index element={<GestionarStockPage/>} />
               <Route path="venta-diaria/:idSucursal" element={<StockDiarioPage/>} />
               <Route path="ingresar-stock/:idSucursal" element={<IngresarStockGeneralPage/>} />
+              <Route path="stock-general/:idSucursal" element={<StockGeneralPage/>} />
             </Route>
 
           </Route>

@@ -11,6 +11,15 @@ export const ingresarStockProductos = async (dataStock) => {
   }
 }
 
+export const consultarStockProductosService = async (idSucursal) => {
+  try {
+      const response = await api.get(`${getEndpoints.STOCK_DE_PRODUCTOS_GENERALES}/${idSucursal}`); 
+      return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
 export const consultarStockProductosDelDiaService = async (idSucursal, fechaDelDia) => {
     try {
         const response = await api.get(`${getEndpoints.STOCK_DEL_DIA}?idSucursal=${idSucursal}&fecha=${fechaDelDia}`); 
