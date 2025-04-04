@@ -219,7 +219,7 @@ const StockDiarioPage = () => {
               {filteredProducts.length > 0 ? (
                 filteredProducts.map((producto) => (
                   <tr key={producto.idStockDiario}>
-                    <td>
+                    <td className="prduct-cell">
                       <div className="product-info">
                         <div
                           className="product-badge-diario"
@@ -236,7 +236,7 @@ const StockDiarioPage = () => {
                         </span>
                       </div>
                     </td>
-                    <td className="quantity-cell text-center align-middle">
+                    <td className="quantity-cell text-center align-middle fw-bold product-quatity">
                       {producto.nombreProducto === "Frances"
                         ? producto.cantidadExistente / 6
                         : producto.cantidadExistente}

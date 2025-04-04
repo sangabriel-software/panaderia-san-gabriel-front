@@ -50,7 +50,7 @@
   width: 100%;
   margin-bottom: 0;
   color: #212529;
-  font-size: 0.9rem;
+  font-size: 1rem;
   table-layout: auto;
   border-collapse: collapse;
 }
@@ -86,8 +86,14 @@
 
 .excel-like-table .quantity-cell {
   font-family: 'Courier New', monospace;
-  font-weight: bold;
+  font-weight: 500;
+  color: #2d3748;
   color: #2b6cb0;
+  font-size: 1.5rem;
+}
+
+.product-cell {
+  width: "30%" !important;
 }
 
 /* Estilos para los encabezados ordenables */
@@ -111,7 +117,7 @@
 .sort-icon {
   transition: transform 0.2s;
   color: white;
-  font-size: 0.8rem;
+  font-size: 1rem;
 }
 
 .sort-icon.descending {
@@ -130,7 +136,7 @@
   border-radius: 20px;
   border: 1px solid #ced4da;
   width: 100%;
-  font-size: 0.9rem;
+  font-size: 1rem;
 }
 
 .stock-diario-search-input:focus {
@@ -224,7 +230,7 @@
   color: white;
   font-weight: 600;
   flex-shrink: 0;
-  font-size: 0.85rem;
+  font-size: 1rem;
 }
 
 .product-name {
@@ -232,8 +238,9 @@
   overflow: hidden;
   text-overflow: ellipsis;
   text-align: left;
-  font-size: 0.9rem;
+  font-size: 1rem;
 }
+
 
 /* Responsive Styles */
 @media (max-width: 991px) {
