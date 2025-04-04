@@ -10,11 +10,14 @@ import { useNavigate, useParams } from "react-router-dom";
 import Alert from "../../../components/Alerts/Alert";
 import Title from "../../../components/Title/Title";
 import ErrorPopup from "../../../components/Popup/ErrorPopUp";
+import useGetSucursales from "../../../hooks/sucursales/useGetSucursales";
+import { decryptId } from "../../../utils/CryptoParams";
 
 const IngresarStockGeneralPage = () => {
   const { idSucursal } = useParams();
   const navigate = useNavigate();
   const { productos, loadigProducts, showErrorProductos } = useGetProductosYPrecios();
+  const { sucursales, loadingSucursales } = useGetSucursales();
   const [stockValues, setStockValues] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [categoriaActiva, setCategoriaActiva] = useState("Todas");
@@ -24,6 +27,11 @@ const IngresarStockGeneralPage = () => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [isPopupErrorOpen, setIsPopupErrorOpen] = useState(false);
   const [errorPopupMessage, setErrorPopupMessage] = useState("");
+
+    const decryptedIdSucursal = decryptId(decodeURIComponent(idSucursal));
+    const sucursal = sucursales?.find(item => 
+      Number(item.idSucursal) === Number(decryptedIdSucursal)
+    );
 
   const prodPorHarina = productos?.filter((item) => item.tipoProduccion !== "bandejas");
   const categorias = [ ...new Set(productos?.map((item) => item.nombreCategoria) || []),];
@@ -48,7 +56,7 @@ const IngresarStockGeneralPage = () => {
     await handleSubmitGuardarStock(stockValues, productosFiltrados, idSucursal, setIsLoading, setIsPopupOpen, setStockValues, setErrorPopupMessage, setIsPopupErrorOpen);
   };
 
-  if (loadigProducts) {
+  if (loadigProducts || loadingSucursales) {
     return (
       <Container
         className="d-flex justify-content-center align-items-center"
@@ -87,7 +95,9 @@ const IngresarStockGeneralPage = () => {
             </button>
           </div>
           <div className="col-8">
-            <Title title="Inventario" />
+            <Title
+             title={`Inventario ${sucursal.nombreSucursal}`}
+             />
           </div>
         </div>
       </div>

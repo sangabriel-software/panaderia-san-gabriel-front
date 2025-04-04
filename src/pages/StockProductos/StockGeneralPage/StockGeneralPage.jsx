@@ -9,16 +9,23 @@ import { useMediaQuery } from "react-responsive";
 import { getInitials, getUniqueColor } from "../IngresarStock/IngresarStock.utils";
 import useGetStockGeneral from "../../../hooks/stock/useGetStockGeneral";
 import "./StockGeneralPage.styles.css";
+import useGetSucursales from "../../../hooks/sucursales/useGetSucursales";
+import { decryptId } from "../../../utils/CryptoParams";
 
 const StockGeneralPage = () => {
   const { idSucursal } = useParams();
   const { stockGeneral, loadingStockGeneral } = useGetStockGeneral(idSucursal);
+  const { sucursales, loadingSucursales } = useGetSucursales();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [showScrollButton, setShowScrollButton] = useState(false);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
   const [categoriaActiva, setCategoriaActiva] = useState("Todas");
 
+  const decryptedIdSucursal = decryptId(decodeURIComponent(idSucursal));
+  const sucursal = sucursales?.find(item => 
+    Number(item.idSucursal) === Number(decryptedIdSucursal)
+  );
 
   const handleIngresarStock = () => {
     navigate(`/stock-productos/ingresar-stock/${encodeURIComponent(idSucursal)}`);
@@ -104,7 +111,7 @@ const StockGeneralPage = () => {
     setSearchTerm("");
   };
 
-  if (loadingStockGeneral) {
+  if (loadingStockGeneral || loadingSucursales) {
     return (
       <Container
         className="d-flex justify-content-center align-items-center"
@@ -131,7 +138,7 @@ const StockGeneralPage = () => {
           </div>
           <div className="col-8">
             <Title
-              title="Stock General"
+              title={`Stock General ${sucursal?.nombreSucursal}`}
               description="Todos los productos disponibles en inventario"
             />
           </div>
