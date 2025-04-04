@@ -169,7 +169,7 @@ const StockDiarioPage = () => {
         </div>
 
         {/* Dropdown de categorías con ancho fijo */}
-        <div style={{ minWidth: "250px" }}>
+        {/* <div style={{ minWidth: "250px" }}>
           <Dropdown>
             <Dropdown.Toggle 
               variant="primary" 
@@ -198,7 +198,7 @@ const StockDiarioPage = () => {
               ))}
             </Dropdown.Menu>
           </Dropdown>
-        </div>
+        </div> */}
       </div>
 
       {/* Contenido condicional */}
