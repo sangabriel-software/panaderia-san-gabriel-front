@@ -92,10 +92,6 @@
   font-size: 1.5rem;
 }
 
-.product-cell {
-  width: "30%" !important;
-}
-
 /* Estilos para los encabezados ordenables */
 .sortable-header {
   cursor: pointer;
@@ -241,6 +237,11 @@
   font-size: 1rem;
 }
 
+/* Estilo específico para la celda de producto */
+.prduct-cell { /* Nota: Hay un error de tipeo aquí (prduct en lugar de product) */
+  /* Estilos base para móviles/tablets */
+  width: auto;
+}
 
 /* Responsive Styles */
 @media (max-width: 991px) {
@@ -327,22 +328,29 @@
   }
 }
 
+/* Estilos específicos para PCs (ancho mayor a 992px) */
+@media (min-width: 992px) {
+  .prduct-cell { /* Nota: Hay un error de tipeo aquí (prduct en lugar de product) */
+    width: 30% !important;
+    /* Otros estilos específicos para desktop si son necesarios */
+  }
+  
+  .excel-like-table .quantity-cell {
+    font-size: 1.2rem;
+  }
+  
+  .product-badge-diario {
+    width: 36px;
+    height: 36px;
+    font-size: 1.1rem;
+  }
+  
+  .product-name {
+    font-size: 1.1rem;
+  }
+}
+
 /* Category filter styles */
-/* .stock-diario-category-dropdown {
-  background-color: #6a01ac !important;
-  border: none;
-  border-radius: 6px;
-  padding: 0.5rem 1rem;
-  font-weight: 500;
-  min-width: 200px;
-  text-align: left;
-} */
-
-/* .stock-diario-category-dropdown:hover, 
-.stock-diario-category-dropdown:focus {
-  background-color: #5a0199 !important;
-} */
-
 .stock-diario-category-dropdown-menu {
   border-radius: 6px;
   border: none;
