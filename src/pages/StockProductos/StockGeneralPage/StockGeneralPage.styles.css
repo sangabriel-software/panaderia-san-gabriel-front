@@ -204,7 +204,7 @@
   }
   
   /* Dropdown de categorías */
-  .stock-general-category-dropdown {
+  /* .stock-general-category-dropdown {
     background-color: #6a01ac !important;
     border: none !important;
     border-radius: 6px !important;
@@ -213,13 +213,13 @@
     text-align: left;
     transition: all 0.2s;
     width: 100%;
-  }
+  } */
   
-  .stock-general-category-dropdown:hover, 
+  /* .stock-general-category-dropdown:hover, 
   .stock-general-category-dropdown:focus {
     background-color: #5a0199 !important;
   }
-  
+   */
   .stock-general-category-dropdown-menu {
     border-radius: 6px !important;
     border: none !important;

@@ -1,8 +1,8 @@
 import { useNavigate, useParams } from "react-router";
 import { BsArrowLeft, BsX, BsArrowUp } from "react-icons/bs";
 import Title from "../../../components/Title/Title";
-import { Container, Spinner, Alert, Form, Table, Dropdown } from "react-bootstrap";
-import { FaBoxOpen, FaSearch } from "react-icons/fa";
+import { Container, Spinner, Alert, Form, Table, Dropdown, Button } from "react-bootstrap";
+import { FaBoxOpen, FaSearch, FaPlus } from "react-icons/fa";
 import DotsMove from "../../../components/Spinners/DotsMove";
 import { useState, useMemo, useEffect } from "react";
 import { useMediaQuery } from "react-responsive";
@@ -19,25 +19,35 @@ const StockGeneralPage = () => {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
   const [categoriaActiva, setCategoriaActiva] = useState("Todas");
 
+
+  const handleIngresarStock = () => {
+    navigate(`/stock-productos/ingresar-stock/${idSucursal}`);
+  };
+
   // Detectar dispositivos
   const isMobile = useMediaQuery({ maxWidth: 767 });
 
-  // Obtener categorías únicas
+  // Obtener categorías únicas con manejo seguro
   const categorias = useMemo(() => {
-    if (!Array.isArray(stockGeneral)) return [];
-    return ['Todas', ...new Set(stockGeneral.map(item => item.nombreCategoria))];
+    try {
+      if (!stockGeneral || !Array.isArray(stockGeneral)) return ['Todas'];
+      const categoriasUnicas = [...new Set(
+        stockGeneral
+          .map(item => item?.nombreCategoria)
+          .filter(Boolean)
+      )];
+      return ['Todas', ...categoriasUnicas];
+    } catch (error) {
+      console.error('Error al obtener categorías:', error);
+      return ['Todas'];
+    }
   }, [stockGeneral]);
 
   // Efecto para mostrar/ocultar el botón de scroll
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 100) {
-        setShowScrollButton(true);
-      } else {
-        setShowScrollButton(false);
-      }
+      setShowScrollButton(window.scrollY > 100);
     };
-
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -130,6 +140,15 @@ const StockGeneralPage = () => {
 
       {/* Filtros */}
       <div className="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 mb-4">
+        {/* Botón Ingresar Stock */}
+        <Button 
+          variant="success" 
+          onClick={handleIngresarStock}
+          className="d-flex align-items-center gap-2 me-md-3"
+        >
+          <FaPlus /> Ingresar Stock
+        </Button>
+
         {/* Barra de búsqueda */}
         <div className="flex-grow-1" style={{ minWidth: "300px", maxWidth: "500px" }}>
           <div className="position-relative">
@@ -162,14 +181,7 @@ const StockGeneralPage = () => {
               {categoriaActiva === "Todas" ? "Todas las categorías" : categoriaActiva}
             </Dropdown.Toggle>
             <Dropdown.Menu className="stock-general-category-dropdown-menu w-100">
-              <Dropdown.Item 
-                active={categoriaActiva === "Todas"}
-                onClick={() => setCategoriaActiva("Todas")}
-                className="stock-general-category-dropdown-item"
-              >
-                Todas
-              </Dropdown.Item>
-              {categorias.filter(cat => cat !== "Todas").map((categoria) => (
+              {categorias.map((categoria) => (
                 <Dropdown.Item
                   key={categoria}
                   active={categoriaActiva === categoria}
