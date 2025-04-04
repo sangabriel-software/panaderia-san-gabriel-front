@@ -71,6 +71,7 @@ export  const handleSubmitGuardarStock = async (stockValues, productosFiltrados,
         };
   
         // Llamada a la API
+        console.log(payload)
         const res = await ingresarStockProductos(payload);
         if (res.status === 201) {
           setIsPopupOpen(true);

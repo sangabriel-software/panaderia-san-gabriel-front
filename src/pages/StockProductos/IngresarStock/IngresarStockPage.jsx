@@ -245,7 +245,7 @@ const IngresarStockGeneralPage = () => {
         message="Se agrego el stock de productos"
         nombreBotonVolver="Ver Stock"
         nombreBotonNuevo="Ingreso nuevo"
-        onView={() => navigate(`/stock-productos/stock-general/${idSucursal}`)}
+        onView={() => navigate(`/stock-productos`)}
         onNew={() => {
           setIsPopupOpen(false);
         }}
