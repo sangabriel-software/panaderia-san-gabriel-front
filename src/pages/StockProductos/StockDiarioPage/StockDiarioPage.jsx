@@ -236,7 +236,7 @@ const StockDiarioPage = () => {
                         </span>
                       </div>
                     </td>
-                    <td className="quantity-cell text-center align-middle fw-bold product-quatity">
+                    <td style={{ fontWeight: "bold", color: "#6B228B" }} className="quantity-cell-diario text-center align-middle fw-bold product-quantity-diario">
                       {producto.nombreProducto === "Frances"
                         ? producto.cantidadExistente / 6
                         : producto.cantidadExistente}
