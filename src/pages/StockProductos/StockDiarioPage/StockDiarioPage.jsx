@@ -145,16 +145,18 @@ const StockDiarioPage = () => {
         </div>
       </div>
 
-      {/* Filtros */}
-      <div className="d-flex flex-column flex-md-row justify-content-between gap-3 mb-4 my-3">
-        <div className="flex-grow-1">
-          <div className="position-relative" style={{ maxWidth: "500px", margin: "0 auto" }}>
+      {/* Filtros - Versión mejorada */}
+      <div className="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 mb-4">
+        {/* Barra de búsqueda con ancho fijo */}
+        <div className="flex-grow-1" style={{ minWidth: "300px", maxWidth: "500px" }}>
+          <div className="position-relative">
             <Form.Control
               type="text"
               placeholder="Buscar producto..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="stock-diario-search-input"
+              style={{ paddingRight: "2.5rem" }}
             />
             <FaSearch className="stock-diario-search-icon" />
             {searchTerm && (
@@ -166,12 +168,17 @@ const StockDiarioPage = () => {
           </div>
         </div>
 
-        <div>
+        {/* Dropdown de categorías con ancho fijo */}
+        <div style={{ minWidth: "250px" }}>
           <Dropdown>
-            <Dropdown.Toggle variant="primary" id="dropdown-categorias" className="stock-diario-category-dropdown">
+            <Dropdown.Toggle 
+              variant="primary" 
+              id="dropdown-categorias" 
+              className="stock-diario-category-dropdown w-100"
+            >
               {categoriaActiva === "Todas" ? "Todas las categorías" : categoriaActiva}
             </Dropdown.Toggle>
-            <Dropdown.Menu className="stock-diario-category-dropdown-menu">
+            <Dropdown.Menu className="stock-diario-category-dropdown-menu w-100">
               <Dropdown.Item 
                 active={categoriaActiva === "Todas"}
                 onClick={() => setCategoriaActiva("Todas")}
