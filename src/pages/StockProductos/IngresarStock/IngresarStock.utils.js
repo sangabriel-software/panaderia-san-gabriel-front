@@ -1,6 +1,7 @@
 import { ingresarStockProductos } from "../../../services/stockservices/stock.service";
 import { getUserData } from "../../../utils/Auth/decodedata";
 import { decryptId } from "../../../utils/CryptoParams";
+import { currentDate, getCurrentDateTimeWithSeconds } from "../../../utils/dateUtils";
 
 export const getInitials = (name) => {
     const names = name.split(" ");
@@ -39,13 +40,6 @@ export  const handleSubmitGuardarStock = async (stockValues, productosFiltrados,
       const usuario = getUserData();
   
       try {
-        // Obtener la fecha actual en el formato requerido
-        const now = new Date();
-        const fechaActualizacion = now
-          .toISOString()
-          .replace("T", " ")
-          .substring(0, 16);
-        const fechaCreacion = now.toISOString().split("T")[0];
   
         // Crear payload
         const payload = {
@@ -64,8 +58,8 @@ export  const handleSubmitGuardarStock = async (stockValues, productosFiltrados,
                 tipoProduccion: producto?.tipoProduccion || "",
                 controlarStock: producto?.controlarStock || 0,
                 controlarStockDiario: producto?.controlarStockDiario || 0,
-                fechaActualizacion: fechaActualizacion,
-                fechaCreacion: fechaCreacion,
+                fechaActualizacion: getCurrentDateTimeWithSeconds(),
+                fechaCreacion: currentDate(),
               };
             }),
         };

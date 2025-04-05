@@ -1,6 +1,6 @@
 import React from 'react';
 import { Page, Text, View, Document, StyleSheet, Image } from '@react-pdf/renderer';
-import { getFormattedDateLetras } from '../../../utils/dateUtils';
+import { getCurrentDateTimeWithSeconds, getFormattedDateLetras } from '../../../utils/dateUtils';
 
 const styles = StyleSheet.create({
   page: {
@@ -165,7 +165,7 @@ const OrderDetailsPdf = ({ detalleOrden, encabezadoOrden, detalleConsumo }) => {
 
   const prodBandejas = detalleOrden?.filter(item => item.tipoProduccion === "bandejas");
   const prodHarina   = detalleOrden?.filter(item => item.tipoProduccion === "harina");
-  const fechaGeneracion = new Date().toLocaleString();
+  const fechaGeneracion = getCurrentDateTimeWithSeconds();
 
   const calcularTotalHarinaProdPorHarina= () => {
     // Verificamos que prodHarina sea un array válido

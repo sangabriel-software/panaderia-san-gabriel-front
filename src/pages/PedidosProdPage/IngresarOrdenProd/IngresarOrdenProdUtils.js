@@ -5,6 +5,7 @@ import { generateAndDownloadPDF } from "../../../utils/PdfUtils/PdfUtils";
 import { consultarDetalleConsumoProduccion } from "../../../services/consumoingredientes/consumoingredientesprod.service";
 import OrderDetailsPdf from "../../../components/PDFs/OrdenDetails/OrderDetailsPdf";
 import { getUserData } from "../../../utils/Auth/decodedata";
+import { getCurrentDateTimeWithSeconds } from "../../../utils/dateUtils";
 
 export const getInitials = (name) => {
   const names = name.split(" ");
@@ -88,6 +89,7 @@ const crearPyaloadOrdenProduccion = (data, trayQuantities) => {
       fechaAProducir: dayjs(data.fechaAProducir).format("YYYY-MM-DD"),
       idUsuario: idUsuario, // Se asume que el usuario está logueado
       fechaCreacion: dayjs().format("YYYY-MM-DD"),
+      fechaActualizacion: getCurrentDateTimeWithSeconds(),
     },
     detalleOrden,
   };

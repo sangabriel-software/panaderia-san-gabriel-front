@@ -43,7 +43,6 @@ export const actualizarProductoSevice = async (dataProducto) => {
     const response = await api.put(`${putEndpoints.ACTUALIZAR_PRODUCTO}`, dataProducto); 
       return response.data;
   } catch (error) {
-    console.log(error)
     throw error;
   }
 }
