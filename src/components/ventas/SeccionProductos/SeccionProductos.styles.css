@@ -274,11 +274,11 @@
     .ventas-quantity-input {
       width: 90px;
       padding: 3px 5px;
-      font-size: 0.75rem;
+      font-size: 1.5rem;
     }
     
     .ventas-product-name {
-      font-size: 0.75rem;
+      font-size: 1rem;
     }
     
     .ventas-search-input {
