@@ -230,20 +230,20 @@
     }
     
     .ventas-product-badge {
-        width: 28px;
-        height: 28px;
-      font-size: 0.95rem;
+        width: 30px;
+        height: 30px;
+      font-size: 1rem;
     }
     
     .ventas-product-name {
-        font-size: 1rem;
+        font-size: 1.2rem;
         font-weight: bold;
     }
     
     .ventas-quantity-input {
       width: 150px;
       padding: 4px 6px;
-      font-size: 0.8rem;
+      font-size: 1rem;
     }
     
     .ventas-category-btn {
