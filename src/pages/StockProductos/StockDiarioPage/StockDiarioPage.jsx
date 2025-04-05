@@ -288,7 +288,7 @@ const StockDiarioPage = () => {
                         ? producto.cantidadExistente / 6
                         : producto.cantidadExistente}
                     </td>
-                    <td className="text-center align-middle">
+                    <td className="text-center align-middle" style={{ fontWeight: "bold", color: "#343A40" }}>
                       {producto.nombreProducto === "Frances"
                         ? "Filas"
                         : "Unidades"}
