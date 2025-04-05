@@ -54,7 +54,7 @@
   /* Ancho específico de columnas */
   .ventas-products-table th:first-child,
   .ventas-products-table td:first-child {
-    width: 55%;
+    width: 60%;
     min-width: 180px;
   }
   
@@ -78,7 +78,7 @@
   
   /* Inputs de cantidad */
   .ventas-quantity-input {
-    width: 150px;
+    width: 200px;
     margin: 0 auto;
     text-align: center;
     border: 1px solid #ced4da;
@@ -215,6 +215,7 @@
   }
   
   @media (max-width: 767px) {
+    
     .ventas-products-table {
       font-size: 0.8rem;
     }
@@ -253,6 +254,7 @@
   @media (max-width: 575px) {
     .ventas-products-table {
       font-size: 0.75rem;
+      width: 100%;
     }
     
     .ventas-products-table th, 
@@ -270,7 +272,7 @@
     }
     
     .ventas-quantity-input {
-      width: 70px;
+      width: 90px;
       padding: 3px 5px;
       font-size: 0.75rem;
     }
