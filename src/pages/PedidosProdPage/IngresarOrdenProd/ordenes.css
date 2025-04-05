@@ -161,7 +161,7 @@
   padding: 0 10px;
 }
 
-.product-badge {
+.product-badge-ingresar-orden{
   width: 36px;
   height: 36px;
   border-radius: 8px;
@@ -251,7 +251,7 @@
     justify-content: flex-start;
   }
   
-  .product-badge {
+  .product-badge-ingresar-orden {
     width: 32px;
     height: 32px;
     font-size: 0.8rem;
@@ -320,7 +320,7 @@
     padding: 6px 3px;
   }
   
-  .product-badge {
+  .product-badge-ingresar-orden {
     width: 28px;
     height: 28px;
     font-size: 0.7rem;

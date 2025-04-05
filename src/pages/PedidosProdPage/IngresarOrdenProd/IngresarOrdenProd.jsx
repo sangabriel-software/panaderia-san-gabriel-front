@@ -298,7 +298,7 @@ const IngresarOrdenProd = () => {
                       <td className="text-center align-middle">
                         <div className="product-info">
                           <div 
-                            className="product-badge"
+                            className="product-badge-ingresar-orden"
                             style={{ backgroundColor: getUniqueColor(producto.nombreProducto) }}
                           >
                             {getInitials(producto.nombreProducto)}
