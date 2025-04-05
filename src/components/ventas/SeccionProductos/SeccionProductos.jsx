@@ -68,6 +68,14 @@ const SeccionProductos = ({
     }
   };
 
+  // Función para determinar el texto del header según la categoría activa
+  const getHeaderText = () => {
+    return activeCategory === "Panaderia" || 
+           productsToShow.some(p => p.idCategoria === 1) 
+      ? "Unidades no vendidas" 
+      : "Unidades vendidas";
+  };
+
   return (
     <div className="ventas-products-section mt-4">
       {/* Barra de búsqueda */}
@@ -108,7 +116,9 @@ const SeccionProductos = ({
           <thead>
             <tr>
               <th className="ventas-table-header-v text-center">Producto</th>
-              <th className="ventas-table-header-v  text-center">Unidades no vendidas</th>
+              <th className="ventas-table-header-v text-center">
+                {getHeaderText()}
+              </th>
             </tr>
           </thead>
           <tbody>
