@@ -107,8 +107,8 @@ const SeccionProductos = ({
         <Table bordered hover className="ventas-products-table">
           <thead>
             <tr>
-              <th className="ventas-table-header text-center">Producto</th>
-              <th className="ventas-table-header text-center">Unidades no vendidas</th>
+              <th className="ventas-table-header-v text-center">Producto</th>
+              <th className="ventas-table-header-v  text-center">Unidades no vendidas</th>
             </tr>
           </thead>
           <tbody>

@@ -25,7 +25,7 @@
     background-color: #000000;
   }
   
-  .ventas-table-header {
+  .ventas-table-header-v {
     background-color: #000000 !important;
     color: #ffffff !important;
     border-bottom: 2px solid #333333 !important;
@@ -274,7 +274,7 @@
     .ventas-quantity-input {
       width: 90px;
       padding: 3px 5px;
-      font-size: 1.5rem;
+      font-size: 1.1rem;
     }
     
     .ventas-product-name {
