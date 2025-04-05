@@ -1,7 +1,8 @@
 import { useRef, useState } from "react";
-import { Container, Form, Row, Col, Button, Card, InputGroup, } from "react-bootstrap";
+import { Container, Form, Row, Col, Button, Card, InputGroup, Table } from "react-bootstrap";
 import { useForm } from "react-hook-form";
-import { BsArrowLeft, BsExclamationTriangleFill, BsFillInfoCircleFill, } from "react-icons/bs";
+import { BsArrowLeft, BsExclamationTriangleFill, BsFillInfoCircleFill } from "react-icons/bs";
+import { FaSearch } from "react-icons/fa";
 import { useNavigate } from "react-router";
 import Title from "../../../components/Title/Title";
 import Alert from "../../../components/Alerts/Alert";
@@ -11,22 +12,30 @@ import dayjs from "dayjs";
 import ErrorPopup from "../../../components/Popup/ErrorPopUp";
 import useGetProductosYPrecios from "../../../hooks/productosprecios/useGetProductosYprecios";
 import { useGetSucursales } from "../../../hooks/sucursales/useGetSucursales";
-import { filterProductsByName, getFilteredProductsByCategory, getInitials, getUniqueColor, handleIngresarOrdenProduccionSubmit, scrollToAlert, } from "./IngresarOrdenProdUtils";
+import { filterProductsByName, getFilteredProductsByCategory, getInitials, getUniqueColor, handleIngresarOrdenProduccionSubmit, scrollToAlert } from "./IngresarOrdenProdUtils";
 import { getUserData } from "../../../utils/Auth/decodedata";
 import "./ordenes.css";
 
 const IngresarOrdenProd = () => {
-  const usuario = getUserData(); // Información de usuario conectado.
+  const usuario = getUserData();
   const alertRef = useRef(null);
   const navigate = useNavigate();
   const { sucursales, loadingSucursales, showErrorSucursales } = useGetSucursales();
   const { productos, loadigProducts, showErrorProductos } = useGetProductosYPrecios();
   const tomorrow = dayjs().add(1, "day").format("YYYY-MM-DD");
   const today = dayjs().format("YYYY-MM-DD");
-  const { register, handleSubmit, formState: { errors }, setValue, watch, reset, getValues, } = useForm({defaultValues: {sucursal: "", turno: "AM", fechaAProducir: usuario.idRol === 1 && usuario.rol === "Admin" ? tomorrow : today, nombrePanadero: "", },});
+  
+  const { register, handleSubmit, formState: { errors }, setValue, watch, reset, getValues } = useForm({
+    defaultValues: {
+      sucursal: "",
+      turno: "AM",
+      fechaAProducir: usuario.idRol === 1 && usuario.rol === "Admin" ? tomorrow : today,
+      nombrePanadero: "",
+    },
+  });
 
   const turnoValue = watch("turno");
-  const [activeCategory, setActiveCategory] = useState("Panaderia"); // Solo panadería por defecto
+  const [activeCategory] = useState("Panaderia");
   const [trayQuantities, setTrayQuantities] = useState({});
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [isPopupErrorOpen, setIsPopupErrorOpen] = useState(false);
@@ -38,11 +47,8 @@ const IngresarOrdenProd = () => {
   const handleShowOrderSummary = () => setShowOrderSummary(true);
   const handleCloseOrderSummary = () => setShowOrderSummary(false);
 
-  // Filtrar solo productos de panadería (idCategoria = 1)
   const filteredProducts = productos.filter((producto) => producto.idCategoria === 1);
-
-  // Usar la función importada para obtener los productos filtrados
-  const productsToShow = getFilteredProductsByCategory( productos, searchTerm, activeCategory, usuario );
+  const productsToShow = getFilteredProductsByCategory(productos, searchTerm, activeCategory, usuario);
 
   const onSubmit = async (data) => {
     setShowOrderSummary(true);
@@ -50,7 +56,16 @@ const IngresarOrdenProd = () => {
 
   const handleConfirmOrder = async () => {
     const data = getValues();
-    await handleIngresarOrdenProduccionSubmit( data, trayQuantities, setTrayQuantities, setIsPopupOpen, setErrorPopupMessage, setIsPopupErrorOpen, setIsLoading, reset );
+    await handleIngresarOrdenProduccionSubmit(
+      data,
+      trayQuantities,
+      setTrayQuantities,
+      setIsPopupOpen,
+      setErrorPopupMessage,
+      setIsPopupErrorOpen,
+      setIsLoading,
+      reset
+    );
     setShowOrderSummary(false);
   };
 
@@ -255,65 +270,79 @@ const IngresarOrdenProd = () => {
       ) : (
         <div className="products-section">
           {/* Barra de búsqueda */}
-          <div className="mb-4">
+          <div className="mb-4 search-container">
             <Form.Control
               type="text"
               placeholder="Buscar producto por nombre..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="input-data search-bar"
+              className="search-input"
             />
+            <FaSearch className="search-icon" />
           </div>
 
-          {/* Lista de productos filtrados */}
-          <Row className="g-4 product-grid">
-            {productsToShow.map((producto) => (
-              <Col key={producto.idProducto} xs={12} md={6} lg={4} xl={3}>
-                <Card className="product-card">
-                  <Card.Body className="product-card-body">
-                    <div
-                      className="product-badge"
-                      style={{
-                        backgroundColor: getUniqueColor(
-                          producto.nombreProducto
-                        ),
-                      }}
-                    >
-                      {getInitials(producto.nombreProducto)}
-                    </div>
-                    <h3 className="product-title">{producto.nombreProducto}</h3>
-                    <p className="product-category">{`${
-                      producto.tipoProduccion === "bandejas"
-                        ? "Bandejas"
-                        : "Libras"
-                    }`}</p>
-                    <InputGroup className="product-input-group">
-                      <Form.Control
-                        type="number"
-                        min="0"
-                        value={
-                          trayQuantities[producto.idProducto]?.cantidad || ""
-                        }
-                        onChange={(e) =>
-                          setTrayQuantities({
-                            ...trayQuantities,
-                            [producto.idProducto]: {
-                              cantidad: parseInt(e.target.value) || 0,
-                              idCategoria: producto.idCategoria, // Siempre será panadería (idCategoria = 1)
-                              tipoProduccion: producto.tipoProduccion,
-                              controlarStock: producto.controlarStock,
-                              controlarStockDiario: producto.controlarStockDiario,
-                            },
-                          })
-                        }
-                        className="product-input"
-                      />
-                    </InputGroup>
-                  </Card.Body>
-                </Card>
-              </Col>
-            ))}
-          </Row>
+          {/* Tabla de productos */}
+          <div className="table-responsive excel-table-container">
+            <Table striped bordered hover className="excel-table">
+              <thead>
+                <tr>
+                  <th className="dark-header text-center">Producto</th>
+                  <th className="dark-header text-center">Tipo</th>
+                  <th className="dark-header text-center">Cantidad a Solicitar</th>
+                </tr>
+              </thead>
+              <tbody>
+                {productsToShow.length > 0 ? (
+                  productsToShow.map((producto) => (
+                    <tr key={producto.idProducto}>
+                      <td className="text-center align-middle">
+                        <div className="product-info">
+                          <div 
+                            className="product-badge"
+                            style={{ backgroundColor: getUniqueColor(producto.nombreProducto) }}
+                          >
+                            {getInitials(producto.nombreProducto)}
+                          </div>
+                          <span className="product-name">{producto.nombreProducto}</span>
+                        </div>
+                      </td>
+                      <td className="text-center align-middle">
+                        {producto.tipoProduccion === "bandejas" ? "Bandejas" : "Libras"}
+                      </td>
+                      <td className="text-center align-middle">
+                        <Form.Control
+                          type="number"
+                          min="0"
+                          value={trayQuantities[producto.idProducto]?.cantidad || ""}
+                          onChange={(e) =>
+                            setTrayQuantities({
+                              ...trayQuantities,
+                              [producto.idProducto]: {
+                                cantidad: parseInt(e.target.value) || 0,
+                                idCategoria: producto.idCategoria,
+                                tipoProduccion: producto.tipoProduccion,
+                                controlarStock: producto.controlarStock,
+                                controlarStockDiario: producto.controlarStockDiario,
+                              },
+                            })
+                          }
+                          className="quantity-input"
+                        />
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="3" className="text-center py-4">
+                      {productos.length === 0 
+                        ? "No se han ingresado Productos." 
+                        : "No se encontraron Productos."}
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </Table>
+          </div>
         </div>
       )}
 
@@ -332,43 +361,18 @@ const IngresarOrdenProd = () => {
         handleClose={handleCloseOrderSummary}
         orderData={getValues()}
         trayQuantities={trayQuantities}
-        productos={filteredProducts} // Usar solo productos filtrados
+        productos={filteredProducts}
         sucursales={sucursales}
         onConfirm={handleConfirmOrder}
         isLoading={isLoading}
       />
-
-      {/* -------------------- Poups y alertas ---------------------- */}
-      {productsToShow.length === 0 && (
-          <div className="row justify-content-center my-3">
-            <div className="col-md-6 col-xsm-12 text-center">
-              <Alert
-                type="primary"
-                message="No se encontraron Productos."
-                icon={<BsFillInfoCircleFill />}
-              />
-            </div>
-          </div>
-        )}
-
-      {productos.length === 0 && (
-        <div className="row justify-content-center my-3">
-          <div className="col-md-6 text-center">
-            <Alert
-              type="primary"
-              message="No se han ingresado Productos."
-              icon={<BsFillInfoCircleFill />}
-            />
-          </div>
-        </div>
-      )}
 
       {/* Popup de Éxito */}
       <SuccessPopup
         isOpen={isPopupOpen}
         onClose={() => setIsPopupOpen(false)}
         title="¡Éxito!"
-        message="La orden se agrego correctamente"
+        message="La orden se agregó correctamente"
         nombreBotonVolver="Ver Ordenes"
         nombreBotonNuevo="Ingresar orden"
         onView={() => navigate("/ordenes-produccion")}

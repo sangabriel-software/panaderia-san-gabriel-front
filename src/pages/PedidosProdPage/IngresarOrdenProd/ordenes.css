@@ -40,26 +40,6 @@
   font-weight: 500;
 }
 
-.modern-calendar {
-  border-radius: 15px !important;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
-  border: 1px solid rgba(255, 255, 255, 0.3) !important;
-}
-
-.modern-calendar .react-datepicker__header {
-  background: rgba(52, 152, 219, 0.1) !important;
-  border-bottom: none !important;
-  border-radius: 15px 15px 0 0 !important;
-}
-
-.shift-selector .shift-btn {
-  flex: 1;
-  border-radius: 12px;
-  padding: 0.75rem;
-  transition: all 0.3s ease;
-  border: 2px solid;
-}
-
 .modern-select {
   border: none;
   background: rgba(241, 243, 245, 0.5) !important;
@@ -75,6 +55,14 @@
   border-radius: 12px !important;
   padding: 0.75rem 1rem !important;
   transition: all 0.3s ease;
+}
+
+.shift-selector .shift-btn-ventas {
+  flex: 1;
+  border-radius: 12px;
+  padding: 0.75rem;
+  transition: all 0.3s ease;
+  border: 2px solid;
 }
 
 .submit-btn {
@@ -104,74 +92,113 @@
   transform: rotate(45deg);
 }
 
-/* Tarjetas de Productos */
-.product-card {
-  border: none;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(10px);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  overflow: hidden;
-  position: relative;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+/* Estilos para la tabla de Excel */
+.excel-table-container {
+  margin: 1.5rem 0;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
-.product-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+.excel-table {
+  width: 100%;
+  margin-bottom: 0;
+  color: #212529;
+  font-size: 0.9rem;
 }
 
-.product-card::before {
-  content: '';
-  position: absolute;
+.excel-table .dark-header {
+  background-color: #343a40;
+  color: white;
+  border-color: #454d55;
+  vertical-align: middle;
+  text-align: center;
+  position: sticky;
   top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.05));
-  z-index: 1;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.excel-table th, 
+.excel-table td {
+  padding: 12px 8px;
+  vertical-align: middle;
+}
+
+.excel-table td {
+  border-top: 1px solid #e9ecef;
+}
+
+.excel-table tr:hover {
+  background-color: rgba(241, 243, 245, 0.5);
+}
+
+/* Estilos para los inputs de cantidad */
+.quantity-input {
+  width: 200px;
+  margin: 0 auto;
+  text-align: center;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.quantity-input:focus {
+  border-color: #6a01ac;
+  box-shadow: 0 0 0 0.2rem rgba(106, 1, 172, 0.25);
+}
+
+/* Estilos para la información del producto */
+.product-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: flex-start;
+  padding: 0 10px;
 }
 
 .product-badge {
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
   font-weight: 600;
+  flex-shrink: 0;
+}
+
+.product-name {
+  font-weight: 500;
+  word-break: break-word;
+}
+
+/* Barra de búsqueda */
+.search-container {
+  position: relative;
+  max-width: 500px;
+  margin: 0 auto 1.5rem;
+}
+
+.search-input {
+  padding-left: 40px;
+  border-radius: 20px;
+  border: 1px solid #ced4da;
+  height: 46px;
+  width: 100%;
+}
+
+.search-icon {
   position: absolute;
-  top: 15px;
-  right: 15px;
-  z-index: 2;
-}
-
-.product-title {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: #2c3e50;
-  margin: 1rem 0 0.5rem;
-  position: relative;
-  z-index: 2;
-}
-
-.product-input {
-  border: 2px solid #e0e0e0 !important;
-  border-radius: 12px !important;
-  padding: 0.75rem !important;
-  text-align: center;
-  font-weight: 600;
-  color: #2c3e50;
-  background: rgba(255, 255, 255, 0.5) !important;
-  transition: all 0.3s ease;
-  position: relative;
-  z-index: 2;
-}
-
-.product-input:focus {
-  border-color: #3498db !important;
-  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2) !important;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6c757d;
 }
 
 /* Botón Flotante */
@@ -195,10 +222,6 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-.product-card {
-  animation: fadeIn 0.6s ease forwards;
-}
-
 @keyframes gradientFlow {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
@@ -211,23 +234,71 @@
 }
 
 /* Responsive Design */
-@media (max-width: 768px) {
+@media (max-width: 991px) {
+  /* Tablet styles */
+  .excel-table {
+    font-size: 0.85rem;
+  }
+  
+  .excel-table th, 
+  .excel-table td {
+    padding: 10px 6px;
+  }
+  
+  .product-info {
+    flex-direction: row;
+    gap: 8px;
+    justify-content: flex-start;
+  }
+  
+  .product-badge {
+    width: 32px;
+    height: 32px;
+    font-size: 0.8rem;
+  }
+  
+  .quantity-input {
+    width: 200px;
+    padding: 5px px;
+  }
+}
+
+@media (max-width: 767px) {
+  /* Mobile styles */
   .glass-card {
     border-radius: 15px;
     margin-left: -15px;
     margin-right: -15px;
   }
   
-  .modern-input-group {
-    margin-bottom: 1rem;
+  .excel-table-container {
+    margin: 1rem 0;
+    border-radius: 6px;
   }
   
-  .shift-selector {
-    flex-direction: column;
+  .excel-table {
+    font-size: 0.8rem;
+    min-width: 100%;
   }
   
-  .product-grid {
-    margin-top: 1rem;
+  .excel-table th, 
+  .excel-table td {
+    padding: 8px 4px;
+  }
+  
+  .product-name {
+    font-size: 0.9rem;
+  }
+  
+  .quantity-input {
+    width: 70px;
+    padding: 4px 6px;
+    font-size: 0.8rem;
+  }
+  
+  .search-input {
+    height: 42px;
+    font-size: 0.9rem;
   }
   
   .floating-scroll-btn {
@@ -235,5 +306,43 @@
     height: 45px;
     bottom: 20px;
     right: 20px;
+  }
+}
+
+@media (max-width: 575px) {
+  /* Small mobile devices */
+  .excel-table {
+    font-size: 0.75rem;
+  }
+  
+  .excel-table th, 
+  .excel-table td {
+    padding: 6px 3px;
+  }
+  
+  .product-badge {
+    width: 28px;
+    height: 28px;
+    font-size: 0.7rem;
+  }
+  
+  .product-info {
+    flex-direction: column;
+    gap: 4px;
+    align-items: center;
+  }
+  
+  .quantity-input {
+    width: 80px;
+    padding: 3px 5px;
+  }
+  
+  .shift-selector {
+    flex-direction: column;
+  }
+  
+  .shift-btn-ventas {
+    width: 100%;
+    margin-bottom: 5px;
   }
 }
