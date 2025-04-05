@@ -1,6 +1,6 @@
 /* Estilos base para la tabla de ventas - Consistentes con ingreso de stock */
 .ventas-table-responsive {
-    margin: 0 auto;
+    margin: auto auto;
     border: 1px solid #e0e0e0;
     border-radius: 8px;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
@@ -8,7 +8,6 @@
     -webkit-overflow-scrolling: touch;
     max-width: 800px;
     background-color: white;
-    width: 95%; /* Cambiado para mejor ajuste en móviles */
   }
   
   .ventas-products-table {
@@ -31,7 +30,6 @@
     color: #ffffff !important;
     border-bottom: 2px solid #333333 !important;
     font-weight: 600;
-    text-transform: uppercase;
     letter-spacing: 0.5px;
     font-size: 0.85rem;
     padding: 12px 8px;
@@ -131,7 +129,29 @@
     position: relative;
     max-width: 500px;
     margin: 0 auto 20px;
-    width: 95%; /* Ajuste para móviles */
+  }
+  
+  .ventas-search-input {
+    width: 100%;
+    padding: 0.5rem 1rem 0.5rem 2.5rem;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+  }
+  
+  .ventas-search-input:focus {
+    border-color: #6a01ac;
+    box-shadow: 0 0 0 0.2rem rgba(106, 1, 172, 0.25);
+  }
+  
+  .ventas-search-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+    pointer-events: none;
   }
   
   /* Selector de categorías */
@@ -141,135 +161,126 @@
     gap: 10px;
     justify-content: center;
     margin-bottom: 20px;
-    padding: 0 2.5%; /* Ajuste para móviles */
   }
   
-  /* Responsive Design - Versión mejorada para móviles */
+  .ventas-category-btn {
+    border-radius: 6px;
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+    font-size: 0.85rem;
+    text-transform: capitalize;
+    transition: all 0.2s;
+  }
+  
+  /* Mensaje cuando no hay productos */
+  .ventas-products-table td[colspan="2"] {
+    color: #6c757d;
+    font-style: italic;
+  }
+  
+  /* Responsive Design */
   @media (max-width: 991px) {
     .ventas-table-responsive {
       max-width: 100%;
-      margin: 1.5rem auto;
-      width: 95%;
+      margin: 1.5rem 0;
     }
   
     .ventas-products-table {
-      font-size: 0.95rem; /* Tamaño de fuente aumentado */
+      font-size: 0.85rem;
     }
     
     .ventas-products-table th, 
     .ventas-products-table td {
-      padding: 12px 8px; /* Padding aumentado */
+      padding: 10px 6px;
     }
     
     .ventas-product-badge {
-      width: 36px; /* Tamaño aumentado */
-      height: 36px;
-      font-size: 0.95rem;
+      width: 28px;
+      height: 28px;
     }
     
     .ventas-product-name {
-      font-size: 0.95rem; /* Tamaño de fuente aumentado */
+      font-size: 0.85rem;
     }
     
     .ventas-quantity-input {
-      width: 120px; /* Ancho aumentado */
-      font-size: 0.95rem;
-      padding: 8px 12px; /* Padding aumentado */
+      width: 100px;
+      font-size: 0.85rem;
     }
     
     .ventas-search-input {
-      padding: 0.6rem 1rem 0.6rem 2.5rem;
-      font-size: 1rem; /* Tamaño de fuente aumentado */
-    }
-    
-    .ventas-category-btn {
-      padding: 0.6rem 1.2rem;
-      font-size: 0.95rem; /* Tamaño de fuente aumentado */
+      padding: 0.4rem 0.8rem 0.4rem 2.2rem;
+      font-size: 0.9rem;
     }
   }
   
   @media (max-width: 767px) {
     .ventas-products-table {
-      font-size: 1rem; /* Tamaño de fuente aumentado */
+      font-size: 0.8rem;
     }
     
     .ventas-products-table th, 
     .ventas-products-table td {
-      padding: 14px 10px; /* Padding aumentado */
+      padding: 8px 4px;
     }
     
     .ventas-product-info {
-      gap: 12px; /* Espacio aumentado */
+      gap: 8px;
     }
     
     .ventas-product-badge {
-      width: 40px; /* Tamaño aumentado */
-      height: 40px;
-      font-size: 1rem;
+      width: 24px;
+      height: 24px;
+      font-size: 0.75rem;
     }
     
     .ventas-product-name {
-      font-size: 1rem; /* Tamaño de fuente aumentado */
+      font-size: 0.8rem;
     }
     
     .ventas-quantity-input {
-      width: 140px; /* Ancho aumentado */
-      padding: 10px 14px; /* Padding aumentado */
-      font-size: 1rem;
+      width: 80px;
+      padding: 4px 6px;
+      font-size: 0.8rem;
     }
     
     .ventas-category-btn {
-      padding: 0.7rem 1.3rem;
-      font-size: 1rem; /* Tamaño de fuente aumentado */
-    }
-    
-    .ventas-table-header {
-      font-size: 0.95rem; /* Tamaño de fuente aumentado */
-      padding: 14px 10px; /* Padding aumentado */
+      padding: 0.4rem 0.8rem;
+      font-size: 0.8rem;
     }
   }
   
   @media (max-width: 575px) {
-    .ventas-table-responsive {
-      width: 98%; /* Ajuste fino para pantallas muy pequeñas */
-    }
-    
     .ventas-products-table {
-      font-size: 1.05rem; /* Tamaño de fuente aumentado */
+      font-size: 0.75rem;
     }
     
     .ventas-products-table th, 
     .ventas-products-table td {
-      padding: 16px 12px; /* Padding aumentado */
+      padding: 6px 3px;
     }
     
     .ventas-product-badge {
-      width: 44px; /* Tamaño aumentado */
-      height: 44px;
-      font-size: 1.05rem;
+      width: 22px;
+      height: 22px;
     }
     
     .ventas-product-info {
-      gap: 14px; /* Espacio aumentado */
+      gap: 6px;
     }
     
     .ventas-quantity-input {
-      width: 150px; /* Ancho aumentado */
-      padding: 12px 16px; /* Padding aumentado */
-      font-size: 1.05rem;
+      width: 70px;
+      padding: 3px 5px;
+      font-size: 0.75rem;
+    }
+    
+    .ventas-product-name {
+      font-size: 0.75rem;
     }
     
     .ventas-search-input {
-      padding: 0.7rem 1.1rem 0.7rem 2.7rem;
-      font-size: 1.05rem; /* Tamaño de fuente aumentado */
-    }
-    
-    .ventas-category-selector {
-      gap: 8px; /* Espacio reducido para más botones en línea */
-    }
-    
-    .ventas-category-btn {
-      padding: 0.6rem 1rem;
-      font-size: 0.95rem; /* Balance entre tamaño y espacio */
+      padding: 0.35rem 0.7rem 0.35rem 2rem;
+      font-size: 0.85rem;
     }
   }
