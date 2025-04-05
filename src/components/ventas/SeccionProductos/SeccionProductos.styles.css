@@ -230,9 +230,9 @@
     }
     
     .ventas-product-badge {
-      width: 24px;
-      height: 24px;
-      font-size: 0.75rem;
+        width: 28px;
+        height: 28px;
+      font-size: 0.95rem;
     }
     
     .ventas-product-name {
