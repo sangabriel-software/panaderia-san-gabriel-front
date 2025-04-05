@@ -3,17 +3,9 @@ import { Form, Table, Button } from "react-bootstrap";
 import { filterProductsByName, getInitials, getUniqueColor } from "../../../pages/VentasPage/IngresarVenta/IngresarVenta.Utils";
 import "./SeccionProductos.styles.css";
 
-const SeccionProductos = ({
-  searchTerm,
-  setSearchTerm,
-  categorias,
-  activeCategory,
-  setActiveCategory,
-  ordenYProductos,
-  productsToShow,
-  trayQuantities,
-  setTrayQuantities,
-}) => {
+const SeccionProductos = ({ searchTerm, setSearchTerm, categorias, activeCategory, setActiveCategory, ordenYProductos, productsToShow, 
+                            trayQuantities, setTrayQuantities }) => {
+                              
   const [focusedInput, setFocusedInput] = useState(null);
 
   // Inicializar trayQuantities con 0 solo para productos de Panaderia
