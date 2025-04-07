@@ -176,6 +176,9 @@ const crearDetalleVenta = (productos, trayQuantities, orden, fechaActual) => {
         if (productoEnOrden) {
           return {
             idProducto: producto.idProducto,
+            tipoProduccion: producto.tipoProduccion,
+            controlarStock: producto.controlarStock,
+            controlarStockDiario: producto.controlarStockDiario,
             idCategoria: producto.idCategoria,
             unidadesNoVendidas: cantidadIngresada, // Siempre se incluye, incluso si es 0
             cantidadVendida: null, // No se usa para la categoría 1 cuando hay orden
@@ -189,6 +192,9 @@ const crearDetalleVenta = (productos, trayQuantities, orden, fechaActual) => {
         if (cantidadIngresada > 0) {
           return {
             idProducto: producto.idProducto,
+            tipoProduccion: producto.tipoProduccion,
+            controlarStock: producto.controlarStock,
+            controlarStockDiario: producto.controlarStockDiario,
             idCategoria: producto.idCategoria,
             unidadesNoVendidas: null, // No aplica
             cantidadVendida: cantidadIngresada, // Solo si se ingresó una cantidad
@@ -235,6 +241,8 @@ export const handleGuardarVenta = async (setIsLoading, orden, sucursalValue, usu
     detalleVenta,
     detalleIngreso,
   };
+
+  console.log(payload);
 
   try {
     const resIngrearVenta = await ingresarVentaService(payload);

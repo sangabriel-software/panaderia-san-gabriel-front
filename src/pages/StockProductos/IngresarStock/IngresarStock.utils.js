@@ -35,10 +35,9 @@ export const handleStockChange = (idProducto, value, setStockValues ) => {
     }));
   };
 
-export  const handleSubmitGuardarStock = async (stockValues, productosFiltrados, idSucursal, setIsLoading, setIsPopupOpen, setStockValues, setErrorPopupMessage, setIsPopupErrorOpen) => {
+export  const handleSubmitGuardarStock = async (stockValues, productos, idSucursal, setIsLoading, setIsPopupOpen, setStockValues, setErrorPopupMessage, setIsPopupErrorOpen) => {
       setIsLoading(true);
       const usuario = getUserData();
-  
       try {
   
         // Crear payload
@@ -46,7 +45,7 @@ export  const handleSubmitGuardarStock = async (stockValues, productosFiltrados,
           stockProductos: Object.entries(stockValues)
             .filter(([_, value]) => value !== null && !isNaN(value))
             .map(([idProducto, cantidad]) => {
-              const producto = productosFiltrados.find(
+              const producto = productos.find(
                 (p) => p.idProducto === parseInt(idProducto)
               );
   
@@ -65,7 +64,6 @@ export  const handleSubmitGuardarStock = async (stockValues, productosFiltrados,
         };
   
         // Llamada a la API
-        console.log(payload)
         const res = await ingresarStockProductos(payload);
         if (res.status === 201) {
           setIsPopupOpen(true);

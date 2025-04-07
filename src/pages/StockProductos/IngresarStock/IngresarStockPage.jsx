@@ -53,7 +53,7 @@ const IngresarStockGeneralPage = () => {
 
   /* Guardar Stock */
   const handleSubmit = async () => {
-    await handleSubmitGuardarStock(stockValues, productosFiltrados, idSucursal, setIsLoading, setIsPopupOpen, setStockValues, setErrorPopupMessage, setIsPopupErrorOpen);
+    await handleSubmitGuardarStock(stockValues, productos, idSucursal, setIsLoading, setIsPopupOpen, setStockValues, setErrorPopupMessage, setIsPopupErrorOpen);
   };
 
   if (loadigProducts || loadingSucursales) {
