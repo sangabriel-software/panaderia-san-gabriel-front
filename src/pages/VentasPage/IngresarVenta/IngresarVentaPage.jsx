@@ -37,8 +37,6 @@ const IngresarVentaPage = () => {
   const [ventaReal, setVentaReal] = useState(null); // Estado para la venta real
   const navigate = useNavigate();
 
-  //console.log(ordenYProductos);
-  //console.log(productos);
 
   const { register, watch, setValue, formState: { errors }, reset } = useForm({ defaultValues: { turno: "AM", sucursal: "" } });
   const turnoValue = watch("turno");
