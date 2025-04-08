@@ -282,67 +282,69 @@ const IngresarOrdenProd = () => {
           </div>
 
           {/* Tabla de productos */}
-          <div className="table-responsive excel-table-container">
-            <Table striped bordered hover className="excel-table">
-              <thead>
-                <tr>
-                  <th className="dark-header text-center">Producto</th>
-                  <th className="dark-header text-center">Tipo</th>
-                  <th className="dark-header text-center">Cantidad a Solicitar</th>
-                </tr>
-              </thead>
-              <tbody>
-                {productsToShow.length > 0 ? (
-                  productsToShow.map((producto) => (
-                    <tr key={producto.idProducto}>
-                      <td className="text-center align-middle">
-                        <div className="product-info">
-                          <div 
-                            className="product-badge-ingresar-orden"
-                            style={{ backgroundColor: getUniqueColor(producto.nombreProducto) }}
-                          >
-                            {getInitials(producto.nombreProducto)}
-                          </div>
-                          <span className="product-name">{producto.nombreProducto}</span>
-                        </div>
-                      </td>
-                      <td className="text-center align-middle">
-                        {producto.tipoProduccion === "bandejas" ? "Bandejas" : "Libras"}
-                      </td>
-                      <td className="text-center align-middle">
-                        <Form.Control
-                          type="number"
-                          min="0"
-                          value={trayQuantities[producto.idProducto]?.cantidad || ""}
-                          onChange={(e) =>
-                            setTrayQuantities({
-                              ...trayQuantities,
-                              [producto.idProducto]: {
-                                cantidad: parseInt(e.target.value) || 0,
-                                idCategoria: producto.idCategoria,
-                                tipoProduccion: producto.tipoProduccion,
-                                controlarStock: producto.controlarStock,
-                                controlarStockDiario: producto.controlarStockDiario,
-                              },
-                            })
-                          }
-                          className="quantity-input"
-                        />
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="3" className="text-center py-4">
-                      {productos.length === 0 
-                        ? "No se han ingresado Productos." 
-                        : "No se encontraron Productos."}
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </Table>
-          </div>
+{/* Tabla de productos */}
+<div className="table-responsive excel-table-container">
+  <Table striped bordered hover className="excel-table">
+    <thead>
+      <tr>
+        <th className="dark-header text-center">Producto</th>
+        <th className="dark-header text-center">Cantidad a Solicitar</th>
+      </tr>
+    </thead>
+    <tbody>
+      {productsToShow.length > 0 ? (
+        productsToShow.map((producto) => (
+          <tr key={producto.idProducto}>
+            <td className="text-center align-middle">
+              <div className="product-info">
+                <div 
+                  className="product-badge-ingresar-orden"
+                  style={{ backgroundColor: getUniqueColor(producto.nombreProducto) }}
+                >
+                  {getInitials(producto.nombreProducto)}
+                </div>
+                <span className="product-name">{producto.nombreProducto}</span>
+              </div>
+            </td>
+            <td className="text-center align-middle">
+              <div className="quantity-input-container">
+                <span className="quantity-type-label">
+                  {producto.tipoProduccion === "bandejas" ? "Bandejas" : "Libras"}
+                </span>
+                <Form.Control
+                  type="number"
+                  min="0"
+                  value={trayQuantities[producto.idProducto]?.cantidad || ""}
+                  onChange={(e) =>
+                    setTrayQuantities({
+                      ...trayQuantities,
+                      [producto.idProducto]: {
+                        cantidad: parseInt(e.target.value) || 0,
+                        idCategoria: producto.idCategoria,
+                        tipoProduccion: producto.tipoProduccion,
+                        controlarStock: producto.controlarStock,
+                        controlarStockDiario: producto.controlarStockDiario,
+                      },
+                    })
+                  }
+                  className="quantity-input"
+                />
+              </div>
+            </td>
+          </tr>
+        ))
+      ) : (
+        <tr>
+          <td colSpan="2" className="text-center py-4">
+            {productos.length === 0 
+              ? "No se han ingresado Productos." 
+              : "No se encontraron Productos."}
+          </td>
+        </tr>
+      )}
+    </tbody>
+  </Table>
+</div>
         </div>
       )}
 
