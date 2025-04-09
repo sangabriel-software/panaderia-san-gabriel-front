@@ -169,9 +169,7 @@ const crearDetalleVenta = (productos, trayQuantities, orden, fechaActual) => {
       // Solo para la categoría 1 (Panaderia) y si hay idOrdenProduccion
       if (producto.idCategoria === 1 && idOrdenProduccion) {
         // Verificar si el producto está en la orden
-        const productoEnOrden = orden.detalleOrden.some(
-          (detalle) => detalle.idProducto === producto.idProducto
-        );
+        const productoEnOrden = orden.detalleOrden.some((detalle) => detalle.idProducto === producto.idProducto);
 
         if (productoEnOrden) {
           return {
@@ -180,29 +178,23 @@ const crearDetalleVenta = (productos, trayQuantities, orden, fechaActual) => {
             controlarStock: producto.controlarStock,
             controlarStockDiario: producto.controlarStockDiario,
             idCategoria: producto.idCategoria,
-            unidadesNoVendidas: cantidadIngresada, // Siempre se incluye, incluso si es 0
-            cantidadVendida: null, // No se usa para la categoría 1 cuando hay orden
+            unidadesNoVendidas: cantidadIngresada, 
             fechaCreacion: fechaActual,
           };
         } else {
           return null; // No se incluye si no está en la orden
         }
       } else {
-        // Para otras categorías o si no hay idOrdenProduccion
-        if (cantidadIngresada > 0) {
+        // Para otras categorías
           return {
             idProducto: producto.idProducto,
             tipoProduccion: producto.tipoProduccion,
             controlarStock: producto.controlarStock,
             controlarStockDiario: producto.controlarStockDiario,
             idCategoria: producto.idCategoria,
-            unidadesNoVendidas: null, // No aplica
-            cantidadVendida: cantidadIngresada, // Solo si se ingresó una cantidad
+            unidadesNoVendidas: cantidadIngresada, 
             fechaCreacion: fechaActual,
           };
-        } else {
-          return null; // No se incluye en el payload si no se ingresó cantidad
-        }
       }
     })
     .filter(Boolean); // Filtrar elementos nulos (productos no incluidos)
@@ -241,8 +233,6 @@ export const handleGuardarVenta = async (setIsLoading, orden, sucursalValue, usu
     detalleVenta,
     detalleIngreso,
   };
-
-  console.log(payload);
 
   try {
     const resIngrearVenta = await ingresarVentaService(payload);

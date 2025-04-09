@@ -352,7 +352,7 @@ const IngresarOrdenProd = () => {
       <Button
         variant="primary"
         className="floating-scroll-btn d-md-none"
-        onClick={() => window.scrollTo({ top: 240, behavior: "smooth" })}
+        onClick={() => window.scrollTo({ top: 100, behavior: "smooth" })}
       >
         ↑
       </Button>

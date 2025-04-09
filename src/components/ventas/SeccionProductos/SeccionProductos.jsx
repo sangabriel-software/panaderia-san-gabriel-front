@@ -8,14 +8,11 @@ const SeccionProductos = ({ searchTerm, setSearchTerm, categorias, activeCategor
                               
   const [focusedInput, setFocusedInput] = useState(null);
 
-  // Inicializar trayQuantities con 0 solo para productos de Panaderia
+  // Inicializar trayQuantities con 0
   useEffect(() => {
-    const productosPanaderia = ordenYProductos.filter(
-      (producto) => producto.nombreCategoria === "Panaderia"
-    );
-
     const initialQuantities = {};
-    productosPanaderia.forEach((producto) => {
+    
+    ordenYProductos.forEach((producto) => {
       if (trayQuantities[producto.idProducto] === undefined) {
         initialQuantities[producto.idProducto] = {
           cantidad: 0,
@@ -23,11 +20,12 @@ const SeccionProductos = ({ searchTerm, setSearchTerm, categorias, activeCategor
         };
       }
     });
-
+  
     if (Object.keys(initialQuantities).length > 0) {
       setTrayQuantities((prev) => ({ ...prev, ...initialQuantities }));
     }
   }, [ordenYProductos]);
+  
 
   const handleFocus = (idProducto) => {
     setFocusedInput(idProducto);
@@ -49,24 +47,20 @@ const SeccionProductos = ({ searchTerm, setSearchTerm, categorias, activeCategor
   const getInputValue = (producto) => {
     const cantidad = trayQuantities[producto.idProducto]?.cantidad ?? 0;
 
-    if (producto.nombreCategoria === "Panaderia") {
-      if (focusedInput === producto.idProducto) {
-        return cantidad === 0 ? "" : cantidad.toString();
-      } else {
-        return cantidad.toString();
-      }
-    } else {
+    if (focusedInput === producto.idProducto) {
       return cantidad === 0 ? "" : cantidad.toString();
+    } else {
+      return cantidad.toString();
     }
   };
 
   // Función para determinar el texto del header según la categoría activa
-  const getHeaderText = () => {
-    return activeCategory === "Panaderia" || 
-           productsToShow.some(p => p.idCategoria === 1) 
-      ? "Unidades no vendidas" 
-      : "Unidades vendidas";
-  };
+  // const getHeaderText = () => {
+  //   return activeCategory === "Panaderia" || 
+  //          productsToShow.some(p => p.idCategoria === 1) 
+  //     ? "Unidades no vendidas" 
+  //     : "Unidades vendidas";
+  // };
 
   return (
     <div className="ventas-products-section mt-4">
@@ -109,7 +103,7 @@ const SeccionProductos = ({ searchTerm, setSearchTerm, categorias, activeCategor
             <tr>
               <th className="ventas-table-header-v text-center">Producto</th>
               <th className="ventas-table-header-v text-center">
-                {getHeaderText()}
+                {"Unidades no vendidas"}
               </th>
             </tr>
           </thead>
