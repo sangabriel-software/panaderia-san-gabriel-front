@@ -9,14 +9,22 @@ export const getInitials = (name) => {
   return words.map((word) => word[0]).join("").toUpperCase();
 };
 
-// Función para generar un color único basado en el nombre del producto
-export const getUniqueColor = (name) => {
-  const colors = [
-    "#FF6B6B", "#4ECDC4", "#45B7D5", "#A4D555", "#D4A5A5",
-    "#FFD166", "#06D6A0", "#118AB2", "#EF476F", "#073B4C"
-  ];
-  const hash = name.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  return colors[hash % colors.length];
+// Function to get a unique color for each product
+export const getUniqueColor = (text) => {
+  const assignedColors = {}; // Almacena los colores asignados de manera persistente
+  
+      if (assignedColors[text]) {
+          return assignedColors[text]; // Retorna el color si ya está asignado
+      }
+      // Generar un hash basado en el texto
+      let hash = 0;
+      for (let i = 0; i < text.length; i++) {
+          hash = text.charCodeAt(i) + ((hash << 5) - hash);
+      }
+      // Convertir el hash en un color hexadecimal
+      const color = `#${((hash & 0xFFFFFF) >>> 0).toString(16).padStart(6, '0')}`;
+      assignedColors[text] = color;
+      return color;
 };
 
 // Función para cerrar el modal y redirigir a /ventas
@@ -109,14 +117,9 @@ export const handleBuscarVentas = async ( setIsLoading, turnoValue, sucursalValu
 
       let nuevosProductos;
 
-      // Verificar si existe una orden y si tiene detalles
-      if (orden && orden.detalleOrden && orden.detalleOrden.length > 0) {
-        // Filtrar productos de la categoría "Panaderia" que estén en la orden
-        nuevosProductos = filtrarProductosPanaderia(productos, orden.detalleOrden);
-      } else {
-        // Si no hay orden, devolver todos los productos
+
         nuevosProductos = productos;
-      }
+      
 
       // Guardar el nuevo conjunto de datos en el estado
       setOrdenYProductos(nuevosProductos);
@@ -167,7 +170,7 @@ const crearDetalleVenta = (productos, trayQuantities, orden, fechaActual) => {
       const cantidadIngresada = producto.cantidadIngresada; // Usar la cantidad obtenida
 
       // Solo para la categoría 1 (Panaderia) y si hay idOrdenProduccion
-      if (producto.idCategoria === 1 && idOrdenProduccion) {
+      if (producto.idCategoria === 1 && idOrdenProduccion && producto.controlarStock === 0 && producto.controlarStockDiario === 1) {
         // Verificar si el producto está en la orden
         const productoEnOrden = orden.detalleOrden.some((detalle) => detalle.idProducto === producto.idProducto);
 
@@ -233,6 +236,8 @@ export const handleGuardarVenta = async (setIsLoading, orden, sucursalValue, usu
     detalleVenta,
     detalleIngreso,
   };
+
+  //console.log(payload);
 
   try {
     const resIngrearVenta = await ingresarVentaService(payload);
