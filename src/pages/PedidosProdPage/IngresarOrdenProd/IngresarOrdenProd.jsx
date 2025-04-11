@@ -349,7 +349,7 @@ const IngresarOrdenProd = () => {
               <thead>
                 <tr>
                   <th className="dark-header text-center">Producto</th>
-                  <th className="dark-header text-center">Cantidad a Solicitar</th>
+                  <th className="dark-header text-center">Cantidad</th>
                 </tr>
               </thead>
               <tbody>
