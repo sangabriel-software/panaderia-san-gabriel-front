@@ -1,8 +1,8 @@
-import * as XLSX from 'xlsx';
+import { utils, writeFile } from 'xlsx-js-style';
 
 export const generateOrderExcel = (ordenId, detalleOrden = [], detalleConsumo = [], encabezadoOrden = {}) => {
   try {
-    const workbook = XLSX.utils.book_new();
+    const workbook = utils.book_new();
     
     // Función para formatear fecha
     const formatDate = (dateString) => {
@@ -13,167 +13,198 @@ export const generateOrderExcel = (ordenId, detalleOrden = [], detalleConsumo = 
 
     // Configuración de estilos
     const headerStyle = {
-      fill: { fgColor: { rgb: "FFD3D3D3" } }, // Color gris claro
-      font: { bold: true },
+      fill: { fgColor: { rgb: "37474F" } }, // Color oscuro como en el PDF
+      font: { bold: true, color: { rgb: "FFFFFF" }, sz: 14 },
       alignment: { horizontal: "center", vertical: "center" }
+    };
+
+    const titleStyle = {
+      font: { bold: true, color: { rgb: "62019F" }, sz: 16 },
+      alignment: { horizontal: "left", vertical: "center" }
+    };
+
+    const detailBoxStyle = {
+      fill: { fgColor: { rgb: "ECEFF1" } },
+      font: { bold: true, color: { rgb: "37474F" }, sz: 9 },
+      alignment: { horizontal: "center", vertical: "center" },
+      border: {
+        top: { style: "thin", color: { rgb: "90A4AE" } },
+        bottom: { style: "thin", color: { rgb: "90A4AE" } },
+        left: { style: "thin", color: { rgb: "90A4AE" } },
+        right: { style: "thin", color: { rgb: "90A4AE" } }
+      }
     };
 
     const tableHeaderStyle = {
-      fill: { fgColor: { rgb: "FFE6E6E6" } }, // Color gris más claro
-      font: { bold: true },
-      alignment: { horizontal: "center", vertical: "center" }
+      fill: { fgColor: { rgb: "455A64" } },
+      font: { bold: true, color: { rgb: "FFFFFF" }, sz: 10 },
+      alignment: { horizontal: "center", vertical: "center" },
+      border: {
+        top: { style: "thin", color: { rgb: "90A4AE" } },
+        bottom: { style: "thin", color: { rgb: "90A4AE" } },
+        left: { style: "thin", color: { rgb: "90A4AE" } },
+        right: { style: "thin", color: { rgb: "90A4AE" } }
+      }
     };
 
-    const centerAlignment = {
-      alignment: { horizontal: "center", vertical: "center" }
+    const tableCellStyle = {
+      font: { sz: 9 },
+      alignment: { horizontal: "center", vertical: "center" },
+      border: {
+        top: { style: "thin", color: { rgb: "90A4AE" } },
+        bottom: { style: "thin", color: { rgb: "90A4AE" } },
+        left: { style: "thin", color: { rgb: "90A4AE" } },
+        right: { style: "thin", color: { rgb: "90A4AE" } }
+      }
     };
 
-    // Datos comunes para el encabezado
-    const commonHeader = [
-      [formatDate(encabezadoOrden.fechaAProducir || new Date())],
-      [`ORDEN #${ordenId}`],
-      [], // línea vacía
-      [`Sucursal: ${encabezadoOrden.nombreSucursal || ''}`],
-      [`Turno: ${encabezadoOrden.ordenTurno || ''}`],
-      [`Panadero: ${encabezadoOrden.nombrePanadero || ''}`],
-      [] // línea vacía
-    ];
-
-    // Datos comunes para el pie de página
-    const commonFooter = [
-      [], // línea vacía
-      [`Archivo generado el ${new Date().toISOString().replace('T', ' ').substring(0, 19)}`]
-    ];
-
-    // Hoja "Orden Productos" (primera hoja)
-    const productosData = [
-      ...commonHeader,
-      ['#', 'Producto', 'Bandejas', 'Unidades'], // Encabezados de tabla
-      ...detalleOrden
-        .filter(item => item.tipoProduccion === "bandejas")
-        .map((item, index) => [
-          index + 1,
-          item.nombreProducto,
-          item.cantidadBandejas,
-          item.cantidadUnidades || ''
-        ]),
-      [], // línea vacía
-      ['Harina'], // Subtítulo
-      ['#', 'Producto', 'Harina'], // Encabezados de tabla harina
-      ...detalleOrden
-        .filter(item => item.tipoProduccion === "harina")
-        .map((item, index) => [
-          index + 1,
-          item.nombreProducto,
-          `${item.cantidadHarina} Lb`
-        ]),
-      [], // línea vacía
-      [`TOTAL HARINA: ${detalleOrden
-        .filter(item => item.tipoProduccion === "harina")
-        .reduce((sum, item) => sum + parseFloat(item.cantidadHarina), 0)
-        .toFixed(2)} LB`],
-      ...commonFooter
-    ];
-
-    // Crear hoja "Orden Productos"
-    const productosSheet = XLSX.utils.aoa_to_sheet(productosData);
-    
-    // Aplicar estilos y merges
-    if (!productosSheet['!merges']) productosSheet['!merges'] = [];
-    productosSheet['!merges'].push(
-      { s: { r: 0, c: 0 }, e: { r: 0, c: 3 } },
-      { s: { r: 1, c: 0 }, e: { r: 1, c: 3 } },
-      { s: { r: 3, c: 0 }, e: { r: 3, c: 3 } },
-      { s: { r: 4, c: 0 }, e: { r: 4, c: 3 } },
-      { s: { r: 5, c: 0 }, e: { r: 5, c: 3 } }
-    );
-
-    // Aplicar estilos al encabezado (filas 0 a 5)
-    for (let i = 0; i <= 5; i++) {
-      if (productosSheet[XLSX.utils.encode_cell({r: i, c: 0})]) {
-        productosSheet[XLSX.utils.encode_cell({r: i, c: 0})].s = headerStyle;
+    const flourSummaryStyle = {
+      fill: { fgColor: { rgb: "FFF3E0" } },
+      font: { bold: true, color: { rgb: "5D4037" }, sz: 14 },
+      alignment: { horizontal: "center", vertical: "center" },
+      border: {
+        top: { style: "medium", color: { rgb: "FFA000" } },
+        bottom: { style: "medium", color: { rgb: "FFA000" } },
+        left: { style: "medium", color: { rgb: "FFA000" } },
+        right: { style: "medium", color: { rgb: "FFA000" } }
       }
-    }
+    };
 
-    // Aplicar estilos a los encabezados de tabla
-    const tableHeaderRows = [7, 10]; // Filas con encabezados de tabla
-    tableHeaderRows.forEach(row => {
-      for (let c = 0; c < 4; c++) {
-        const cell = productosSheet[XLSX.utils.encode_cell({r: row, c})];
-        if (cell) cell.s = tableHeaderStyle;
-      }
-    });
+    const flourTotalStyle = {
+      font: { bold: true, color: { rgb: "BF360C" }, sz: 16 }
+    };
 
-    // Centrar datos de la tabla
-    const tableDataRows = [
-      ...Array.from({length: detalleOrden.filter(item => item.tipoProduccion === "bandejas").length}, (_, i) => 8 + i),
-      ...Array.from({length: detalleOrden.filter(item => item.tipoProduccion === "harina").length}, (_, i) => 11 + i)
-    ];
-    
-    tableDataRows.forEach(row => {
-      for (let c = 0; c < 4; c++) {
-        const cell = productosSheet[XLSX.utils.encode_cell({r: row, c})];
-        if (cell) cell.s = centerAlignment;
-      }
-    });
+    // Filtrar productos
+    const prodBandejas = detalleOrden.filter(item => item.tipoProduccion === "bandejas");
+    const prodHarina = detalleOrden.filter(item => item.tipoProduccion === "harina");
 
-    // Agregar hoja de productos al workbook
-    XLSX.utils.book_append_sheet(workbook, productosSheet, "Orden Productos");
-
-    // Hoja "Materia Prima" (segunda hoja, solo si hay datos)
-    if (detalleConsumo && detalleConsumo.length > 0) {
-      const materiaPrimaData = [
-        ...commonHeader,
-        ['#', 'Ingrediente', 'Cantidad', 'Unidad', 'Producto'],
-        ...detalleConsumo.map((item, index) => [
-          index + 1,
-          item.Ingrediente,
-          item.CantidadUsada,
-          item.UnidadMedida,
-          item.Producto
-        ]),
-        ...commonFooter
-      ];
-
-      const materiaPrimaSheet = XLSX.utils.aoa_to_sheet(materiaPrimaData);
+    // Calcular total de harina (similar a tu lógica en el PDF)
+    const calcularTotalHarina = () => {
+      const harinasConsumo = detalleConsumo?.filter(item => 
+        item.Ingrediente.toLowerCase().includes('harina')
+      ) || [];
       
-      // Aplicar merges
-      if (!materiaPrimaSheet['!merges']) materiaPrimaSheet['!merges'] = [];
-      materiaPrimaSheet['!merges'].push(
-        { s: { r: 0, c: 0 }, e: { r: 0, c: 4 } },
-        { s: { r: 1, c: 0 }, e: { r: 1, c: 4 } },
-        { s: { r: 3, c: 0 }, e: { r: 3, c: 4 } },
-        { s: { r: 4, c: 0 }, e: { r: 4, c: 4 } },
-        { s: { r: 5, c: 0 }, e: { r: 5, c: 4 } }
-      );
+      const totalConsumo = harinasConsumo.reduce((sum, item) => sum + (parseFloat(item.CantidadUsada) || 0), 0);
+      const totalProdHarina = prodHarina.reduce((sum, item) => sum + (parseFloat(item.cantidadHarina) || 0), 0);
+      
+      return Math.round(totalConsumo + totalProdHarina);
+    };
 
-      // Aplicar estilos al encabezado
-      for (let i = 0; i <= 5; i++) {
-        if (materiaPrimaSheet[XLSX.utils.encode_cell({r: i, c: 0})]) {
-          materiaPrimaSheet[XLSX.utils.encode_cell({r: i, c: 0})].s = headerStyle;
-        }
-      }
+    const totalHarina = calcularTotalHarina();
+    const unidadMedida = detalleConsumo?.find(item => 
+      item.Ingrediente.toLowerCase().includes('harina')
+    )?.UnidadMedida || 'Lb';
 
-      // Aplicar estilos a encabezados de tabla (fila 7)
-      for (let c = 0; c < 5; c++) {
-        const cell = materiaPrimaSheet[XLSX.utils.encode_cell({r: 7, c})];
-        if (cell) cell.s = tableHeaderStyle;
-      }
+    // Crear hoja de cálculo
+    const worksheetData = [
+      // Fecha (como en el header del PDF)
+      [{ v: formatDate(encabezadoOrden.fechaAProducir || new Date()), s: headerStyle }],
+      [],
+      // Número de orden (morado como en el PDF)
+      [{ v: `ORDEN #${ordenId}`, s: titleStyle }],
+      [],
+      // Detalles (sucursal, turno, etc.)
+      [
+        { v: `Sucursal: ${encabezadoOrden.nombreSucursal || ''}`, s: detailBoxStyle },
+        { v: `Turno: ${encabezadoOrden.ordenTurno || ''}`, s: { 
+          ...detailBoxStyle,
+          font: { 
+            ...detailBoxStyle.font, 
+            color: { rgb: encabezadoOrden.ordenTurno === 'AM' ? 'FFFFFF' : 'FFFFFF' },
+          },
+          fill: { fgColor: { rgb: encabezadoOrden.ordenTurno === 'AM' ? 'FF6F00' : '2E7D32' } }
+        }},
+        { v: `Solicitado por: ${encabezadoOrden.nombreUsuario || ''}`, s: detailBoxStyle },
+        { v: `Panadero: ${encabezadoOrden.nombrePanadero || ''}`, s: detailBoxStyle }
+      ],
+      [],
+      // Tabla de bandejas
+      [{ v: 'BANDEJAS', s: { 
+        fill: { fgColor: { rgb: "263238" } },
+        font: { bold: true, color: { rgb: "FFFFFF" }, sz: 12 },
+        alignment: { horizontal: "left", vertical: "center" }
+      }}],
+      [],
+      // Encabezados de tabla
+      [
+        { v: '#', s: tableHeaderStyle },
+        { v: 'Producto', s: tableHeaderStyle },
+        { v: 'Bandejas', s: tableHeaderStyle },
+        { v: 'Unidades', s: tableHeaderStyle }
+      ],
+      // Datos de bandejas
+      ...prodBandejas.map((item, index) => [
+        { v: index + 1, s: tableCellStyle },
+        { v: item.nombreProducto || 'N/A', s: tableCellStyle },
+        { v: item.cantidadBandejas || 'N/A', s: tableCellStyle },
+        { v: item.cantidadUnidades || 'N/A', s: tableCellStyle }
+      ]),
+      [],
+      // Tabla de harina
+      [{ v: 'HARINA', s: { 
+        fill: { fgColor: { rgb: "263238" } },
+        font: { bold: true, color: { rgb: "FFFFFF" }, sz: 12 },
+        alignment: { horizontal: "left", vertical: "center" }
+      }}],
+      [],
+      // Encabezados de tabla harina
+      [
+        { v: '#', s: tableHeaderStyle },
+        { v: 'Producto', s: tableHeaderStyle },
+        { v: 'Harina', s: tableHeaderStyle }
+      ],
+      // Fila fija de Frances (como en tu PDF)
+      [
+        { v: 1, s: tableCellStyle },
+        { v: 'Frances', s: tableCellStyle },
+        { v: `${totalHarina - prodHarina.reduce((sum, item) => sum + (parseFloat(item.cantidadHarina) || 0), 0)} ${unidadMedida}`, s: tableCellStyle }
+      ],
+      // Datos de harina
+      ...prodHarina.map((item, index) => [
+        { v: index + 2, s: tableCellStyle },
+        { v: item.nombreProducto || 'N/A', s: tableCellStyle },
+        { v: `${item.cantidadHarina || 'N/A'} ${unidadMedida}`, s: tableCellStyle }
+      ]),
+      [],
+      // Total harina
+      [
+        { v: 'TOTAL HARINA:', s: flourSummaryStyle },
+        { v: `${totalHarina} ${unidadMedida}`, s: { ...flourSummaryStyle, ...flourTotalStyle } }
+      ],
+      [],
+      // Pie de página
+      [{ v: `Archivo generado el ${new Date().toISOString().replace('T', ' ').substring(0, 19)}`, s: { 
+        font: { color: { rgb: "9E9E9E" }, sz: 9 },
+        alignment: { horizontal: "left", vertical: "center" }
+      }}]
+    ];
 
-      // Centrar datos de la tabla
-      for (let r = 8; r < 8 + detalleConsumo.length; r++) {
-        for (let c = 0; c < 5; c++) {
-          const cell = materiaPrimaSheet[XLSX.utils.encode_cell({r, c})];
-          if (cell) cell.s = centerAlignment;
-        }
-      }
-
-      // Agregar hoja de materia prima al workbook
-      XLSX.utils.book_append_sheet(workbook, materiaPrimaSheet, "Materia Prima");
-    }
+    // Crear hoja de cálculo
+    const worksheet = utils.aoa_to_sheet(worksheetData);
     
-    // Generar y descargar archivo
-    XLSX.writeFile(workbook, `Orden_${ordenId}.xlsx`);
+    // Ajustar anchos de columnas
+    worksheet['!cols'] = [
+      { wch: 5 },  // Columna #
+      { wch: 30 }, // Columna Producto
+      { wch: 15 }, // Columna Bandejas/Harina
+      { wch: 15 }  // Columna Unidades
+    ];
+
+    // Aplicar merges para celdas combinadas
+    worksheet['!merges'] = [
+      // Combinar celdas de título
+      { s: { r: 0, c: 0 }, e: { r: 0, c: 3 } },
+      { s: { r: 2, c: 0 }, e: { r: 2, c: 3 } },
+      // Combinar celdas de sección
+      { s: { r: 6, c: 0 }, e: { r: 6, c: 3 } },
+      { s: { r: 8 + prodBandejas.length, c: 0 }, e: { r: 8 + prodBandejas.length, c: 3 } },
+      // Combinar total harina
+      { s: { r: worksheetData.length - 4, c: 0 }, e: { r: worksheetData.length - 4, c: 1 } },
+      { s: { r: worksheetData.length - 4, c: 2 }, e: { r: worksheetData.length - 4, c: 3 } }
+    ];
+
+    utils.book_append_sheet(workbook, worksheet, `Orden ${ordenId}`);
+    writeFile(workbook, `Orden_${ordenId}.xlsx`);
     return true;
   } catch (error) {
     console.error("Error al generar Excel:", error);

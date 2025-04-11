@@ -23,7 +23,7 @@ const DetallesOrdenesProduccionPage = () => {
   const { detalleConsumo } = useGetConsumoIngredientes(decryptedIdRol);
   const [view, setView] = useState("productos");
   
-  console.log("detalleOrden", detalleOrden.encabezadoOrden);
+  console.log(detalleOrden.detalleOrden);
 
   const handleDownloadExcel = () => {
     const success = generateOrderExcel(
