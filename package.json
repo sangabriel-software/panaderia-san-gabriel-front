@@ -20,6 +20,7 @@
     "darkreader": "^4.9.104",
     "dayjs": "^1.11.13",
     "dotenv": "^16.4.7",
+    "file-saver": "^2.0.5",
     "html2canvas": "^1.4.1",
     "jspdf": "^2.5.2",
     "react": "^18.3.1",
@@ -33,7 +34,9 @@
     "react-router": "^7.1.1",
     "react-router-dom": "^7.1.1",
     "react-toastify": "^11.0.3",
-    "styled-components": "^6.1.15"
+    "styled-components": "^6.1.15",
+    "xlsx": "^0.18.5",
+    "xlsx-style": "^0.8.13"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
