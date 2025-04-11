@@ -203,6 +203,14 @@ const OrderDetailsPdf = ({ detalleOrden, encabezadoOrden, detalleConsumo }) => {
     };
   };
 
+  const redondearASiguienteMultiploDe5 = (numero) => {
+    const num = parseFloat(numero) || 0;
+    if (num <= 5) return 5; // Si es menor o igual a 5, devolver 5
+    
+    // Para números mayores a 5, redondear al siguiente múltiplo de 5
+    return Math.ceil(num / 5) * 5;
+  };
+
   const totalHarinaBandejas = calcularTotalHarinaProdPorBandejas();
 
   const totalHarinaNecesaria = totalHarinaBandejas.total + calcularTotalHarinaProdPorHarina();
@@ -311,7 +319,7 @@ const OrderDetailsPdf = ({ detalleOrden, encabezadoOrden, detalleConsumo }) => {
           <View style={styles.flourSummaryContainer}>
             <Text style={styles.flourSummaryText}>TOTAL HARINA:</Text>
             <Text style={styles.flourTotal}>
-              {totalHarinaNecesaria.toFixed(2)} {totalHarinaBandejas?.unidad.toUpperCase()}
+              {redondearASiguienteMultiploDe5(totalHarinaNecesaria).toFixed(2)} {totalHarinaBandejas?.unid}
             </Text>
           </View>
 

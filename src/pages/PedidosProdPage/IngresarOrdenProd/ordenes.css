@@ -140,7 +140,7 @@
 /* Ancho específico de columnas */
 .excel-table th:first-child,
 .excel-table td:first-child {
-  width: 60%;
+  width: 40%;
   min-width: 180px;
 }
 
