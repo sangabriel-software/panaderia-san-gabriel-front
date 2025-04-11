@@ -2,6 +2,7 @@ import React from "react";
 import { Badge, Card, Col, Container, Row, Table } from "react-bootstrap";
 import DownloadDropdown from "../DownloadDropdown/DownloadDropdown";
 import { formatDateToDisplay } from "../../utils/dateUtils";
+import { redondearASiguienteMultiploDe5 } from "../../utils/utils";
 
 const DesktopMateriaPrimaDetails = ({ order, detalleConsumo, onDownloadXLS, onDownloadPDF }) => {
   const encabezado = order?.encabezadoOrden;
@@ -138,7 +139,7 @@ const DesktopMateriaPrimaDetails = ({ order, detalleConsumo, onDownloadXLS, onDo
                 <Card.Body>
                   <h6 className="fw-bold text-center mb-3">Productos Solicitados por bandejas</h6>
                   <div className="text-center">
-                  <span className="fw-bold h4">{Math.round(totalHarinaIngredientes.toFixed(2))} Lb</span>
+                  <span className="fw-bold h4">{redondearASiguienteMultiploDe5(totalHarinaIngredientes)} Lb</span>
                   </div>
                 </Card.Body>
               </Card>
@@ -148,7 +149,7 @@ const DesktopMateriaPrimaDetails = ({ order, detalleConsumo, onDownloadXLS, onDo
                 <Card.Body>
                   <h6 className="fw-bold text-center mb-3">Productos Solicitados por harina</h6>
                   <div className="text-center">
-                  <span className="fw-bold h4">{Math.round(totalHarinaProductos.toFixed(2))} Lb</span>
+                  <span className="fw-bold h4">{redondearASiguienteMultiploDe5(totalHarinaProductos)} Lb</span>
                   </div>
                 </Card.Body>
               </Card>
@@ -162,7 +163,7 @@ const DesktopMateriaPrimaDetails = ({ order, detalleConsumo, onDownloadXLS, onDo
                 <div className="d-flex justify-content-between align-items-center p-3 bg-light rounded">
                   <span className="fw-bold h5">TOTAL GENERAL DE HARINA:</span>
                   <span className="fw-bold h4 text-danger">
-                    {Math.round(totalGeneralHarina.toFixed(2))} Lb
+                    {redondearASiguienteMultiploDe5(totalGeneralHarina)} Lb
                   </span>
                 </div>
               </Col>

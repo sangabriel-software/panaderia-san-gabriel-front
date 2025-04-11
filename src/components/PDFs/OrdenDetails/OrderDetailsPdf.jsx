@@ -1,6 +1,7 @@
 import React from 'react';
 import { Page, Text, View, Document, StyleSheet, Image } from '@react-pdf/renderer';
 import { getCurrentDateTimeWithSeconds, getFormattedDateLetras } from '../../../utils/dateUtils';
+import { redondearASiguienteMultiploDe5 } from '../../../utils/utils';
 
 const styles = StyleSheet.create({
   page: {
@@ -203,13 +204,6 @@ const OrderDetailsPdf = ({ detalleOrden, encabezadoOrden, detalleConsumo }) => {
     };
   };
 
-  const redondearASiguienteMultiploDe5 = (numero) => {
-    const num = parseFloat(numero) || 0;
-    if (num <= 5) return 5; // Si es menor o igual a 5, devolver 5
-    
-    // Para números mayores a 5, redondear al siguiente múltiplo de 5
-    return Math.ceil(num / 5) * 5;
-  };
 
   const totalHarinaBandejas = calcularTotalHarinaProdPorBandejas();
 
@@ -299,7 +293,7 @@ const OrderDetailsPdf = ({ detalleOrden, encabezadoOrden, detalleConsumo }) => {
                 <Text style={styles.tableCellItem}>1</Text>
                 <Text style={styles.tableCell}>Frances</Text>
                 <Text style={styles.tableCell}>
-                  {totalHarinaBandejas ? `${totalHarinaBandejas.total.toFixed(2)} ${totalHarinaBandejas.unidad}` : 'N/A'}
+                  {totalHarinaBandejas ? `${redondearASiguienteMultiploDe5(totalHarinaBandejas.total).toFixed(2)} ${totalHarinaBandejas.unidad}` : 'N/A'}
                 </Text>
               </View>
               {/* Resto de productos */}
