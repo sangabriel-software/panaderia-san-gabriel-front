@@ -18,3 +18,6 @@ export const getCurrentDateTimeWithSeconds = () => {
     return dayjs().format("YYYY-MM-DD HH:mm:ss");
 };
 
+export const getCurrentDateTimeWithSecondsFiles = () => {
+    return dayjs().format("DD-MM-YYYY HH:mm:ss");
+};

@@ -1,4 +1,6 @@
 import { utils, writeFile } from 'xlsx-js-style';
+import { getCurrentDateTimeWithSeconds, getCurrentDateTimeWithSecondsFiles } from '../dateUtils';
+import { redondearASiguienteMultiploDe5 } from '../utils';
 
 // Función para formatear fecha
 const formatDate = (dateString) => {
@@ -190,7 +192,7 @@ export const generateOrderExcel = (ordenId, detalleOrden = [], detalleConsumo = 
       [
         { v: 1, s: tableCellStyle },
         { v: 'Frances', s: tableCellLeftStyle },
-        { v: `${harinaFrances >= 0 ? harinaFrances : 0} ${unidadMedida}`, s: tableCellStyle }
+        { v: `${harinaFrances >= 0 ? redondearASiguienteMultiploDe5(harinaFrances) : 0} ${unidadMedida}`, s: tableCellStyle }
       ],
       // Datos de harina con validación
       ...prodHarina.map((item, index) => [
@@ -202,11 +204,11 @@ export const generateOrderExcel = (ordenId, detalleOrden = [], detalleConsumo = 
       // Total harina con validación
       [
         { v: 'TOTAL HARINA:', s: flourSummaryStyle },
-        { v: `${totalHarina >= 0 ? totalHarina : 0} ${unidadMedida}`, s: { ...flourSummaryStyle, ...flourTotalStyle } }
+        { v: `${totalHarina >= 0 ? redondearASiguienteMultiploDe5(totalHarina) : 0} ${unidadMedida}`, s: { ...flourSummaryStyle, ...flourTotalStyle } }
       ],
       [],
       // Pie de página
-      [{ v: `Archivo generado el ${new Date().toISOString().replace('T', ' ').substring(0, 19)}`, s: footerStyle }]
+      [{ v: `Archivo generado el ${getCurrentDateTimeWithSecondsFiles()}` }]
     ];
 
     // ==================== CONFIGURACIÓN DE LA HOJA ====================
