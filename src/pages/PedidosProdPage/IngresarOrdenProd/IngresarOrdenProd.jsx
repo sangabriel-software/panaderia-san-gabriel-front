@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { Container, Form, Row, Col, Button, Card, InputGroup, Table, } from "react-bootstrap";
+import { Container, Form, Row, Col, Button, Card, InputGroup, Table, Dropdown } from "react-bootstrap";
 import { useForm } from "react-hook-form";
-import { BsArrowLeft, BsArrowUp, BsExclamationTriangleFill, } from "react-icons/bs";
+import { BsArrowLeft, BsArrowUp, BsExclamationTriangleFill, BsFilter } from "react-icons/bs";
 import { FaSearch } from "react-icons/fa";
 import { useNavigate } from "react-router";
 import Title from "../../../components/Title/Title";
@@ -12,7 +12,7 @@ import dayjs from "dayjs";
 import ErrorPopup from "../../../components/Popup/ErrorPopUp";
 import useGetProductosYPrecios from "../../../hooks/productosprecios/useGetProductosYprecios";
 import { useGetSucursales } from "../../../hooks/sucursales/useGetSucursales";
-import { filterProductsByName, getFilteredProductsByCategory, getInitials, getUniqueColor, handleIngresarOrdenProduccionSubmit, scrollToAlert, } from "./IngresarOrdenProdUtils";
+import { filterProductsByName, getFilteredProductsByCategory, getInitials, getUniqueColor, handleIngresarOrdenProduccionSubmit, scrollToAlert } from "./IngresarOrdenProdUtils";
 import { getUserData } from "../../../utils/Auth/decodedata";
 import "./ordenes.css";
 
@@ -20,19 +20,16 @@ const IngresarOrdenProd = () => {
   const usuario = getUserData();
   const alertRef = useRef(null);
   const navigate = useNavigate();
-  const { sucursales, loadingSucursales, showErrorSucursales } =
-    useGetSucursales();
-  const { productos, loadigProducts, showErrorProductos } =
-    useGetProductosYPrecios();
+  const { sucursales, loadingSucursales, showErrorSucursales } = useGetSucursales();
+  const { productos, loadigProducts, showErrorProductos } = useGetProductosYPrecios();
   const tomorrow = dayjs().add(1, "day").format("YYYY-MM-DD");
   const today = dayjs().format("YYYY-MM-DD");
-
-  const { register, handleSubmit, formState: { errors }, setValue, watch, reset, getValues, } = useForm({
+  
+  const { register, handleSubmit, formState: { errors }, setValue, watch, reset, getValues } = useForm({
     defaultValues: {
       sucursal: "",
       turno: "AM",
-      fechaAProducir:
-        usuario.idRol === 1 && usuario.rol === "Admin" ? tomorrow : today,
+      fechaAProducir: usuario.idRol === 1 && usuario.rol === "Admin" ? tomorrow : today,
       nombrePanadero: "",
     },
   });
@@ -46,14 +43,17 @@ const IngresarOrdenProd = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showOrderSummary, setShowOrderSummary] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [productionTypeFilter, setProductionTypeFilter] = useState("todos");
 
   const handleShowOrderSummary = () => setShowOrderSummary(true);
   const handleCloseOrderSummary = () => setShowOrderSummary(false);
 
-  const filteredProducts = productos.filter(
-    (producto) => producto.idCategoria === 1
-  );
-  const productsToShow = getFilteredProductsByCategory(productos, searchTerm, activeCategory, usuario );
+  const filteredProducts = productos.filter((producto) => producto.idCategoria === 1);
+  const productsToShow = getFilteredProductsByCategory(productos, searchTerm, activeCategory, usuario)
+    .filter(producto => {
+      if (productionTypeFilter === "todos") return true;
+      return producto.tipoProduccion === productionTypeFilter;
+    });
 
   const onSubmit = async (data) => {
     setShowOrderSummary(true);
@@ -61,7 +61,16 @@ const IngresarOrdenProd = () => {
 
   const handleConfirmOrder = async () => {
     const data = getValues();
-    await handleIngresarOrdenProduccionSubmit(data, trayQuantities, setTrayQuantities, setIsPopupOpen, setErrorPopupMessage, setIsPopupErrorOpen, setIsLoading, reset );
+    await handleIngresarOrdenProduccionSubmit(
+      data,
+      trayQuantities,
+      setTrayQuantities,
+      setIsPopupOpen,
+      setErrorPopupMessage,
+      setIsPopupErrorOpen,
+      setIsLoading,
+      reset
+    );
     setShowOrderSummary(false);
   };
 
@@ -83,6 +92,14 @@ const IngresarOrdenProd = () => {
 
   const scrollToTop = () => {
     window.scrollTo({ top: 30, behavior: "smooth" });
+  };
+
+  const getFilterLabel = () => {
+    switch(productionTypeFilter) {
+      case "bandejas": return "Bandejas";
+      case "harina": return "Harina";
+      default: return "Todos los productos";
+    }
   };
 
   return (
@@ -283,28 +300,56 @@ const IngresarOrdenProd = () => {
         </div>
       ) : (
         <div className="products-section">
-          {/* Barra de búsqueda */}
-          <div className="mb-4 search-container">
-            <Form.Control
-              type="text"
-              placeholder="Buscar producto por nombre..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="search-input"
-            />
-            <FaSearch className="search-icon" />
+          {/* Barra de búsqueda y filtros */}
+          <div className="mb-4 search-filter-container">
+            <div className="search-wrapper">
+              <Form.Control
+                type="text"
+                placeholder="Buscar producto por nombre..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="search-input"
+              />
+              <FaSearch className="search-icon" />
+            </div>
+            
+            {/* Dropdown de filtro */}
+            <Dropdown className="filter-dropdown">
+              <Dropdown.Toggle variant="primary" id="dropdown-filter">
+                <BsFilter className="me-2" />
+                {getFilterLabel()}
+              </Dropdown.Toggle>
+
+              <Dropdown.Menu>
+                <Dropdown.Item 
+                  active={productionTypeFilter === "todos"}
+                  onClick={() => setProductionTypeFilter("todos")}
+                >
+                  Todos los productos
+                </Dropdown.Item>
+                <Dropdown.Item 
+                  active={productionTypeFilter === "bandejas"}
+                  onClick={() => setProductionTypeFilter("bandejas")}
+                >
+                  Bandejas
+                </Dropdown.Item>
+                <Dropdown.Item 
+                  active={productionTypeFilter === "harina"}
+                  onClick={() => setProductionTypeFilter("harina")}
+                >
+                  Harina
+                </Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
           </div>
 
-          {/* Tabla de productos */}
           {/* Tabla de productos */}
           <div className="table-responsive excel-table-container">
             <Table striped bordered hover className="excel-table">
               <thead>
                 <tr>
                   <th className="dark-header text-center">Producto</th>
-                  <th className="dark-header text-center">
-                    Cantidad a Solicitar
-                  </th>
+                  <th className="dark-header text-center">Cantidad a Solicitar</th>
                 </tr>
               </thead>
               <tbody>
@@ -313,38 +358,31 @@ const IngresarOrdenProd = () => {
                     <tr key={producto.idProducto}>
                       <td className="text-center align-middle">
                         <div className="product-info">
-                          <div
+                          <div 
                             className="product-badge-ingresar-orden"
-                            style={{
-                              backgroundColor: getUniqueColor(
-                                producto.nombreProducto
-                              ),
-                            }}
+                            style={{ backgroundColor: getUniqueColor(producto.nombreProducto) }}
                           >
                             {getInitials(producto.nombreProducto)}
                           </div>
-                          <span className="product-name">
-                            {producto.nombreProducto}
-                          </span>
+                          <span className="product-name">{producto.nombreProducto}</span>
                         </div>
                       </td>
                       <td className="text-center align-middle">
                         <div className="quantity-input-container">
-                          <span
-                            style={{ fontSize: "16px", fontWeight: "bold" }}
+                          <span 
+                            style={{ 
+                              fontSize: "16px", 
+                              fontWeight: "bold",
+                              color: producto.tipoProduccion === "bandejas" ? "#28a745" : "#007bff"
+                            }} 
                             className="quantity-type-label"
                           >
-                            {producto.tipoProduccion === "bandejas"
-                              ? "Bandejas"
-                              : "Libras"}
+                            {producto.tipoProduccion === "bandejas" ? "Bandejas" : "Libras"}
                           </span>
                           <Form.Control
                             type="number"
                             min="0"
-                            value={
-                              trayQuantities[producto.idProducto]?.cantidad ||
-                              ""
-                            }
+                            value={trayQuantities[producto.idProducto]?.cantidad || ""}
                             onChange={(e) =>
                               setTrayQuantities({
                                 ...trayQuantities,
@@ -353,8 +391,7 @@ const IngresarOrdenProd = () => {
                                   idCategoria: producto.idCategoria,
                                   tipoProduccion: producto.tipoProduccion,
                                   controlarStock: producto.controlarStock,
-                                  controlarStockDiario:
-                                    producto.controlarStockDiario,
+                                  controlarStockDiario: producto.controlarStockDiario,
                                 },
                               })
                             }
@@ -367,8 +404,8 @@ const IngresarOrdenProd = () => {
                 ) : (
                   <tr>
                     <td colSpan="2" className="text-center py-4">
-                      {productos.length === 0
-                        ? "No se han ingresado Productos."
+                      {productos.length === 0 
+                        ? "No se han ingresado Productos." 
                         : "No se encontraron Productos."}
                     </td>
                   </tr>
@@ -386,13 +423,18 @@ const IngresarOrdenProd = () => {
           className="btn btn-dark rounded-circle shadow"
           style={{
             position: "fixed",
-            bottom: "0px",
+            bottom: "1px",
             right: "1px",
             width: "40px",
             height: "40px",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
+            transition: "opacity 0.3s ease, transform 0.3s ease",
+            opacity: showScrollButton ? 1 : 0,
+            transform: showScrollButton ? "translateY(0)" : "translateY(20px)",
+            pointerEvents: showScrollButton ? "auto" : "none",
+            zIndex: 1000
           }}
         >
           <BsArrowUp size={20} />
