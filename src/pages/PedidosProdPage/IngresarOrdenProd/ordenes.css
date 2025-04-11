@@ -94,12 +94,14 @@
 
 /* Estilos para la tabla de Excel */
 .excel-table-container {
-  margin: 1.5rem 0;
+  margin: 1.5rem auto;
   border: 1px solid #e0e0e0;
   border-radius: 8px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+  max-width: 800px;
+  background-color: white;
 }
 
 .excel-table {
@@ -107,27 +109,50 @@
   margin-bottom: 0;
   color: #212529;
   font-size: 0.9rem;
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 0;
 }
 
 .excel-table .dark-header {
-  background-color: #343a40;
+  background-color: #000000;
   color: white;
   border-color: #454d55;
-  vertical-align: middle;
-  text-align: center;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  font-size: 0.85rem;
+  padding: 12px 8px;
   position: sticky;
   top: 0;
-  font-weight: 500;
-  white-space: nowrap;
+  vertical-align: middle;
+  text-align: center;
+}
+
+/* Esquinas redondeadas */
+.excel-table thead th:first-child {
+  border-top-left-radius: 8px;
+}
+
+.excel-table thead th:last-child {
+  border-top-right-radius: 8px;
+}
+
+/* Ancho específico de columnas */
+.excel-table th:first-child,
+.excel-table td:first-child {
+  width: 60%;
+  min-width: 180px;
+}
+
+.excel-table th:last-child,
+.excel-table td:last-child {
+  width: 40%;
 }
 
 .excel-table th, 
 .excel-table td {
   padding: 12px 8px;
   vertical-align: middle;
-}
-
-.excel-table td {
   border-top: 1px solid #e9ecef;
 }
 
@@ -143,14 +168,6 @@
   gap: 5px;
   max-width: 200px;
   margin: 0 auto;
-}
-
-/* Etiqueta del tipo de cantidad */
-.quantity-type-label {
-  font-size: 0.8rem;
-  color: #6c757d;
-  font-weight: 500;
-  white-space: nowrap;
 }
 
 /* Input de cantidad */
@@ -192,65 +209,12 @@
 
 .product-name {
   font-weight: 500;
-  word-break: break-word;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* Barra de búsqueda */
-.search-container {
-  position: relative;
-  max-width: 500px;
-  margin: 0 auto 1.5rem;
-}
-
-.search-input {
-  padding-left: 40px;
-  border-radius: 20px;
-  border: 1px solid #ced4da;
-  height: 46px;
-  width: 100%;
-}
-
-.search-icon {
-  position: absolute;
-  left: 15px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #6c757d;
-}
-
-/* Botón Flotante */
-.floating-scroll-btn {
-  width: 50px;
-  height: 50px;
-  border-radius: 50% !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  position: fixed;
-  bottom: 30px;
-  right: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-/* Animaciones */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes gradientFlow {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-.submit-btn {
-  background-size: 200% auto;
-  animation: gradientFlow 4s ease infinite;
-}
-
-/* Responsive Design */
+/* Mantener los estilos responsive existentes sin cambios */
 @media (max-width: 991px) {
   /* Tablet styles */
   .excel-table {
@@ -290,6 +254,7 @@
   .excel-table-container {
     margin: 1rem 0;
     border-radius: 6px;
+    max-width: 100%;
   }
   
   .excel-table {
@@ -370,4 +335,59 @@
     width: 100%;
     margin-bottom: 5px;
   }
+}
+
+/* Barra de búsqueda */
+.search-container {
+  position: relative;
+  max-width: 500px;
+  margin: 0 auto 1.5rem;
+}
+
+.search-input {
+  padding-left: 40px;
+  border-radius: 20px;
+  border: 1px solid #ced4da;
+  height: 46px;
+  width: 100%;
+}
+
+.search-icon {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6c757d;
+}
+
+/* Botón Flotante */
+.floating-scroll-btn {
+  width: 50px;
+  height: 50px;
+  border-radius: 50% !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes gradientFlow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.submit-btn {
+  background-size: 200% auto;
+  animation: gradientFlow 4s ease infinite;
 }

@@ -308,7 +308,7 @@ const IngresarOrdenProd = () => {
             </td>
             <td className="text-center align-middle">
               <div className="quantity-input-container">
-                <span className="quantity-type-label">
+                <span style={{fontSize: "16px", fontWeight: "bold"}} className="quantity-type-label">
                   {producto.tipoProduccion === "bandejas" ? "Bandejas" : "Libras"}
                 </span>
                 <Form.Control
