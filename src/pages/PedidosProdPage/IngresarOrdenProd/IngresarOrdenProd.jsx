@@ -1,7 +1,7 @@
-import { useRef, useState } from "react";
-import { Container, Form, Row, Col, Button, Card, InputGroup, Table } from "react-bootstrap";
+import { useEffect, useRef, useState } from "react";
+import { Container, Form, Row, Col, Button, Card, InputGroup, Table, } from "react-bootstrap";
 import { useForm } from "react-hook-form";
-import { BsArrowLeft, BsExclamationTriangleFill, BsFillInfoCircleFill } from "react-icons/bs";
+import { BsArrowLeft, BsArrowUp, BsExclamationTriangleFill, sFillInfoCircleFill, } from "react-icons/bs";
 import { FaSearch } from "react-icons/fa";
 import { useNavigate } from "react-router";
 import Title from "../../../components/Title/Title";
@@ -12,7 +12,7 @@ import dayjs from "dayjs";
 import ErrorPopup from "../../../components/Popup/ErrorPopUp";
 import useGetProductosYPrecios from "../../../hooks/productosprecios/useGetProductosYprecios";
 import { useGetSucursales } from "../../../hooks/sucursales/useGetSucursales";
-import { filterProductsByName, getFilteredProductsByCategory, getInitials, getUniqueColor, handleIngresarOrdenProduccionSubmit, scrollToAlert } from "./IngresarOrdenProdUtils";
+import { filterProductsByName, getFilteredProductsByCategory, getInitials, getUniqueColor, handleIngresarOrdenProduccionSubmit, scrollToAlert, } from "./IngresarOrdenProdUtils";
 import { getUserData } from "../../../utils/Auth/decodedata";
 import "./ordenes.css";
 
@@ -20,16 +20,19 @@ const IngresarOrdenProd = () => {
   const usuario = getUserData();
   const alertRef = useRef(null);
   const navigate = useNavigate();
-  const { sucursales, loadingSucursales, showErrorSucursales } = useGetSucursales();
-  const { productos, loadigProducts, showErrorProductos } = useGetProductosYPrecios();
+  const { sucursales, loadingSucursales, showErrorSucursales } =
+    useGetSucursales();
+  const { productos, loadigProducts, showErrorProductos } =
+    useGetProductosYPrecios();
   const tomorrow = dayjs().add(1, "day").format("YYYY-MM-DD");
   const today = dayjs().format("YYYY-MM-DD");
-  
-  const { register, handleSubmit, formState: { errors }, setValue, watch, reset, getValues } = useForm({
+
+  const { register, handleSubmit, formState: { errors }, setValue, watch, reset, getValues, } = useForm({
     defaultValues: {
       sucursal: "",
       turno: "AM",
-      fechaAProducir: usuario.idRol === 1 && usuario.rol === "Admin" ? tomorrow : today,
+      fechaAProducir:
+        usuario.idRol === 1 && usuario.rol === "Admin" ? tomorrow : today,
       nombrePanadero: "",
     },
   });
@@ -47,8 +50,10 @@ const IngresarOrdenProd = () => {
   const handleShowOrderSummary = () => setShowOrderSummary(true);
   const handleCloseOrderSummary = () => setShowOrderSummary(false);
 
-  const filteredProducts = productos.filter((producto) => producto.idCategoria === 1);
-  const productsToShow = getFilteredProductsByCategory(productos, searchTerm, activeCategory, usuario);
+  const filteredProducts = productos.filter(
+    (producto) => producto.idCategoria === 1
+  );
+  const productsToShow = getFilteredProductsByCategory(productos, searchTerm, activeCategory, usuario );
 
   const onSubmit = async (data) => {
     setShowOrderSummary(true);
@@ -56,20 +61,29 @@ const IngresarOrdenProd = () => {
 
   const handleConfirmOrder = async () => {
     const data = getValues();
-    await handleIngresarOrdenProduccionSubmit(
-      data,
-      trayQuantities,
-      setTrayQuantities,
-      setIsPopupOpen,
-      setErrorPopupMessage,
-      setIsPopupErrorOpen,
-      setIsLoading,
-      reset
-    );
+    await handleIngresarOrdenProduccionSubmit(data, trayQuantities, setTrayQuantities, setIsPopupOpen, setErrorPopupMessage, setIsPopupErrorOpen, setIsLoading, reset );
     setShowOrderSummary(false);
   };
 
   scrollToAlert(errorPopupMessage, isPopupErrorOpen, alertRef);
+
+  const [showScrollButton, setShowScrollButton] = useState(false);
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 20) {
+        setShowScrollButton(true);
+      } else {
+        setShowScrollButton(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 30, behavior: "smooth" });
+  };
 
   return (
     <Container className="glassmorphism-container py-4">
@@ -282,80 +296,108 @@ const IngresarOrdenProd = () => {
           </div>
 
           {/* Tabla de productos */}
-{/* Tabla de productos */}
-<div className="table-responsive excel-table-container">
-  <Table striped bordered hover className="excel-table">
-    <thead>
-      <tr>
-        <th className="dark-header text-center">Producto</th>
-        <th className="dark-header text-center">Cantidad a Solicitar</th>
-      </tr>
-    </thead>
-    <tbody>
-      {productsToShow.length > 0 ? (
-        productsToShow.map((producto) => (
-          <tr key={producto.idProducto}>
-            <td className="text-center align-middle">
-              <div className="product-info">
-                <div 
-                  className="product-badge-ingresar-orden"
-                  style={{ backgroundColor: getUniqueColor(producto.nombreProducto) }}
-                >
-                  {getInitials(producto.nombreProducto)}
-                </div>
-                <span className="product-name">{producto.nombreProducto}</span>
-              </div>
-            </td>
-            <td className="text-center align-middle">
-              <div className="quantity-input-container">
-                <span style={{fontSize: "16px", fontWeight: "bold"}} className="quantity-type-label">
-                  {producto.tipoProduccion === "bandejas" ? "Bandejas" : "Libras"}
-                </span>
-                <Form.Control
-                  type="number"
-                  min="0"
-                  value={trayQuantities[producto.idProducto]?.cantidad || ""}
-                  onChange={(e) =>
-                    setTrayQuantities({
-                      ...trayQuantities,
-                      [producto.idProducto]: {
-                        cantidad: parseInt(e.target.value) || 0,
-                        idCategoria: producto.idCategoria,
-                        tipoProduccion: producto.tipoProduccion,
-                        controlarStock: producto.controlarStock,
-                        controlarStockDiario: producto.controlarStockDiario,
-                      },
-                    })
-                  }
-                  className="quantity-input"
-                />
-              </div>
-            </td>
-          </tr>
-        ))
-      ) : (
-        <tr>
-          <td colSpan="2" className="text-center py-4">
-            {productos.length === 0 
-              ? "No se han ingresado Productos." 
-              : "No se encontraron Productos."}
-          </td>
-        </tr>
-      )}
-    </tbody>
-  </Table>
-</div>
+          {/* Tabla de productos */}
+          <div className="table-responsive excel-table-container">
+            <Table striped bordered hover className="excel-table">
+              <thead>
+                <tr>
+                  <th className="dark-header text-center">Producto</th>
+                  <th className="dark-header text-center">
+                    Cantidad a Solicitar
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {productsToShow.length > 0 ? (
+                  productsToShow.map((producto) => (
+                    <tr key={producto.idProducto}>
+                      <td className="text-center align-middle">
+                        <div className="product-info">
+                          <div
+                            className="product-badge-ingresar-orden"
+                            style={{
+                              backgroundColor: getUniqueColor(
+                                producto.nombreProducto
+                              ),
+                            }}
+                          >
+                            {getInitials(producto.nombreProducto)}
+                          </div>
+                          <span className="product-name">
+                            {producto.nombreProducto}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="text-center align-middle">
+                        <div className="quantity-input-container">
+                          <span
+                            style={{ fontSize: "16px", fontWeight: "bold" }}
+                            className="quantity-type-label"
+                          >
+                            {producto.tipoProduccion === "bandejas"
+                              ? "Bandejas"
+                              : "Libras"}
+                          </span>
+                          <Form.Control
+                            type="number"
+                            min="0"
+                            value={
+                              trayQuantities[producto.idProducto]?.cantidad ||
+                              ""
+                            }
+                            onChange={(e) =>
+                              setTrayQuantities({
+                                ...trayQuantities,
+                                [producto.idProducto]: {
+                                  cantidad: parseInt(e.target.value) || 0,
+                                  idCategoria: producto.idCategoria,
+                                  tipoProduccion: producto.tipoProduccion,
+                                  controlarStock: producto.controlarStock,
+                                  controlarStockDiario:
+                                    producto.controlarStockDiario,
+                                },
+                              })
+                            }
+                            className="quantity-input"
+                          />
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="2" className="text-center py-4">
+                      {productos.length === 0
+                        ? "No se han ingresado Productos."
+                        : "No se encontraron Productos."}
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </Table>
+          </div>
         </div>
       )}
 
       {/* Botón Flotante para Móvil */}
-      <Button
-        variant="primary"
-        className="floating-scroll-btn d-md-none"
-        onClick={() => window.scrollTo({ top: 100, behavior: "smooth" })}
-      >
-        ↑
-      </Button>
+      {showScrollButton && (
+        <button
+          onClick={scrollToTop}
+          className="btn btn-dark rounded-circle shadow"
+          style={{
+            position: "fixed",
+            bottom: "0px",
+            right: "1px",
+            width: "40px",
+            height: "40px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <BsArrowUp size={20} />
+        </button>
+      )}
 
       {/* Resumen de Orden */}
       <OrderSummary

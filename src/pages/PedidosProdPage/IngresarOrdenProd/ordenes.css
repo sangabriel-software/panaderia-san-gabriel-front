@@ -360,20 +360,7 @@
   color: #6c757d;
 }
 
-/* Botón Flotante */
-.floating-scroll-btn {
-  width: 50px;
-  height: 50px;
-  border-radius: 50% !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  position: fixed;
-  bottom: 0px;
-  right: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
+
 
 /* Animaciones */
 @keyframes fadeIn {
