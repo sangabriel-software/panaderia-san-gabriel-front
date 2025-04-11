@@ -367,7 +367,7 @@
   border-radius: 50% !important;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   position: fixed;
-  bottom: 30px;
+  bottom: 0px;
   right: 30px;
   display: flex;
   align-items: center;
