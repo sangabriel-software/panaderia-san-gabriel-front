@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Container, Form, Row, Col, Button, Card, InputGroup, Table, } from "react-bootstrap";
 import { useForm } from "react-hook-form";
-import { BsArrowLeft, BsArrowUp, BsExclamationTriangleFill, sFillInfoCircleFill, } from "react-icons/bs";
+import { BsArrowLeft, BsArrowUp, BsExclamationTriangleFill, } from "react-icons/bs";
 import { FaSearch } from "react-icons/fa";
 import { useNavigate } from "react-router";
 import Title from "../../../components/Title/Title";
