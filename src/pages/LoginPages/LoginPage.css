@@ -179,8 +179,6 @@
 }
 
 /* Para tablets 7" en portrait (ej: 600x1024px) */
-/* Para tablets 7" en portrait (ej: 600x1024px) */
-/* Para tablets 7" en portrait (ej: 600x1024px) */
 @media (min-width: 600px) and (max-width: 767px) and (orientation: portrait) {
   .contenedorLados {
     background-color: #F5F5F5;
