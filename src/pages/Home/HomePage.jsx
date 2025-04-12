@@ -2,15 +2,32 @@ import React from 'react';
 import { 
   FiBox, FiDollarSign, FiUsers, FiPieChart, 
   FiShoppingCart, FiPlus, FiTrendingUp, FiFileText,
-  FiClock, FiUser, FiPackage 
+  FiClock, FiUser, FiPackage, 
+  FiSun,
+  FiMoon
 } from 'react-icons/fi';
 import "./HomePage.styles.css";
 import { getUserData } from '../../utils/Auth/decodedata';
 import { useNavigate } from 'react-router-dom';
+import dayjs from 'dayjs';
+import { FaMoon, FaSun } from 'react-icons/fa';
 
 const HomePage = () => {
   const userData = getUserData();
   const navigate = useNavigate();
+  const currentHour = dayjs().hour();
+
+  const getGreeting = () => {
+    if (currentHour >= 5 && currentHour < 12) {
+      return { text: "Buenos días", icon: <FaSun className="me-2 text-warning" /> };
+    } else if (currentHour >= 12 && currentHour < 19) {
+      return { text: "Buenas tardes", icon: <FaSun className="me-2 text-amber-500" /> };
+    } else {
+      return { text: "Buenas noches", icon: <FaMoon className="me-2 text-indigo-300" /> };
+    }
+  };
+
+  const greeting = getGreeting();
 
   // Datos de ejemplo
   const stats = [
@@ -57,7 +74,7 @@ const HomePage = () => {
     <div className="container-fluid p-0 min-vh-100 bg-light">
       {/* Header */}
       <header className="bg-white shadow-sm p-3 d-flex justify-content-between align-items-center">
-        <h1 className="h4 mb-0 fw-bold text-primary">Benvenido</h1>
+        <h1 className="h4 mb-0 fw-bold text-primary">{greeting.icon} {greeting.text}</h1>
         <div className="d-flex align-items-center">
           <span className="me-3 fw-semibold">{`${userData.nombre} ${userData.apellido}`}</span>
           <div className="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style={{ width: '40px', height: '40px' }}>
