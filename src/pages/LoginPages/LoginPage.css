@@ -157,6 +157,7 @@
   .divlogo {
     height: 120px !important;
   }
+
 }
 
 /* Pantallas grandes (desktop) */
@@ -178,9 +179,12 @@
 }
 
 /* Para tablets 7" en portrait (ej: 600x1024px) */
+/* Para tablets 7" en portrait (ej: 600x1024px) */
 @media (min-width: 600px) and (max-width: 767px) and (orientation: portrait) {
   .contenedorLados {
     background-color: #F5F5F5;
+    align-items: flex-start;
+    padding-top: 5vh;
   }
   
   .izquierdo {
@@ -188,40 +192,78 @@
   }
 
   .derecho {
-    width: 100% !important;
-    margin-left: 0 !important;
-    margin-top: 0 !important;
-    padding: 100px !important;
+    width: 90% !important;
+    margin: 0 auto !important;
+    padding: 6vh 5vw !important;
     background-color: #F5F5F5 !important;
-    transform: translateY(-10%); /* Mueve todo el contenedor hacia arriba */
-    position: relative; /* Necesario para transform */
+    transform: none !important;
+    position: relative;
+    border-radius: 10px;
   }
 
   .logo-login {
-    width: 350px !important;
-    margin-top: 1px;
-    transform: translateY(-30%); /* Mueve todo el contenedor hacia arriba */
-    position: relative; /* Necesario para transform */
+    width: 55vw !important;
+    max-width: 350px;
+    margin: 0 auto 4vh !important;
+    transform: none !important;
+    display: block;
   }
 
   .divlogo {
-    height: 120px !important;
+    height: auto !important;
+    margin-bottom: 2vh !important;
+  }
+
+  /* Estilos para formulario */
+  .form-floating {
+    margin-bottom: 3vh !important;
+  }
+
+  .form-floating input {
+    height: 7vh !important;
+    font-size: 2vh !important;
+    padding: 2.5vh 1vw 0 1vw !important;
+    border: 1px solid #8D6E63;
+    border-radius: 5px;
+  }
+
+  .form-floating label {
+    font-size: 2vh !important;
+    color: #8D6E63;
+    padding: 0 0.5vw !important;
+    transform: translateY(1.5vh) !important;
+    transition: all 0.2s ease;
+  }
+
+  /* Efecto cuando el input tiene foco o contenido */
+  .form-floating input:focus + label,
+  .form-floating input:not(:placeholder-shown) + label {
+    transform: translateY(-0.5vh) scale(0.85) !important;
+    padding: 0 0.3vw !important;
+    color: #FFD54F;
+    background-color: #F5F5F5;
   }
 
   /* Estilos para el botón de login */
-.loginbtn {
-  background-color: #FFD54F;
-  color: #3E2723;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  width: 150px;
-}
+  .loginbtn {
+    background-color: #FFD54F;
+    color: #3E2723;
+    border: none;
+    border-radius: 5px;
+    font-size: 2.3vh !important;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    width: 40vw !important;
+    max-width: 200px;
+    height: 6.5vh !important;
+    padding: 1vh !important;
+    margin-top: 2vh !important;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
 
-.loginbtn:hover {
-  background-color: #FBC02D;
-}
+  .loginbtn:hover {
+    background-color: #FBC02D;
+  }
 }
