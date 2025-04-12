@@ -142,7 +142,7 @@
     margin-left: 0 !important;
     margin-top: 0 !important;
     padding: 100px !important;
-    background-color: #F5F5F5 !important;
+    background-color: green !important;
     transform: translateY(-10%); /* Mueve todo el contenedor hacia arriba */
     position: relative; /* Necesario para transform */
   }
@@ -177,34 +177,3 @@
   }
 }
 
-/* Para tablets 7" en portrait (ej: 600x1024px) */
-@media (min-width: 600px) and (max-width: 800px) and (orientation: portrait) {
-  .contenedorLados {
-    background-color: #F5F5F5;
-  }
-  
-  .izquierdo {
-    display: none !important;
-  }
-
-  .derecho {
-    width: 100% !important;
-    margin-left: 0 !important;
-    margin-top: 0 !important;
-    padding: 100px !important;
-    background-color: green !important;
-    transform: translateY(-10%); /* Mueve todo el contenedor hacia arriba */
-    position: relative; /* Necesario para transform */
-  }
-
-  .logo-login {
-    width: 450px !important;
-    margin-top: 1px;
-    transform: translateY(-30%); /* Mueve todo el contenedor hacia arriba */
-    position: relative; /* Necesario para transform */
-  }
-
-  .divlogo {
-    height: 120px !important;
-  }
-}
