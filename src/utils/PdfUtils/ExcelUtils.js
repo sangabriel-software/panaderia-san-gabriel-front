@@ -27,7 +27,7 @@ export const generateOrderExcel = (ordenId, detalleOrden = [], detalleConsumo = 
 
     const detailBoxStyle = {
       fill: { fgColor: { rgb: "ECEFF1" } },
-      font: { bold: true, color: { rgb: "37474F" }, sz: 9 },
+      font: { bold: true, color: { rgb: "37474F" }, sz: 12 },
       alignment: { horizontal: "center", vertical: "center" },
       border: {
         top: { style: "thin", color: { rgb: "90A4AE" } },
@@ -39,7 +39,7 @@ export const generateOrderExcel = (ordenId, detalleOrden = [], detalleConsumo = 
 
     const tableHeaderStyle = {
       fill: { fgColor: { rgb: "455A64" } },
-      font: { bold: true, color: { rgb: "FFFFFF" }, sz: 10 },
+      font: { bold: true, color: { rgb: "FFFFFF" }, sz: 12 },
       alignment: { horizontal: "center", vertical: "center" },
       border: {
         top: { style: "thin", color: { rgb: "90A4AE" } },
@@ -50,7 +50,7 @@ export const generateOrderExcel = (ordenId, detalleOrden = [], detalleConsumo = 
     };
 
     const tableCellStyle = {
-      font: { sz: 9 },
+      font: { sz: 12 },
       alignment: { horizontal: "center", vertical: "center" },
       border: {
         top: { style: "thin", color: { rgb: "90A4AE" } },
