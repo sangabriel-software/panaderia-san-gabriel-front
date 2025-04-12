@@ -195,7 +195,7 @@
     width: 90% !important;
     margin: 0 auto !important;
     padding: 6vh 5vw !important;
-    background-color: #F5F5F5 !important;
+    background-color: green !important;
     transform: none !important;
     position: relative;
     border-radius: 10px;
@@ -231,7 +231,7 @@
     font-size: 2vh !important;
     color: #8D6E63;
     padding: 0 0.5vw !important;
-    transform: translateY(1.5vh) !important;
+    transform: translateY(1vh) !important;
     transition: all 0.2s ease;
   }
 
