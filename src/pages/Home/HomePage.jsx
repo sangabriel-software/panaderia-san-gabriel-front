@@ -10,7 +10,7 @@ import "./HomePage.styles.css";
 import { getUserData } from '../../utils/Auth/decodedata';
 import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
-import { FaMoon, FaSun } from 'react-icons/fa';
+import { FaClock, FaMoon, FaSun } from 'react-icons/fa';
 
 const HomePage = () => {
   const userData = getUserData();
@@ -74,7 +74,7 @@ const HomePage = () => {
     <div className="container-fluid p-0 min-vh-100 bg-light">
       {/* Header */}
       <header className="bg-white shadow-sm p-3 d-flex justify-content-between align-items-center">
-        <h1 className="h4 mb-0 fw-bold text-primary">{greeting.icon} {greeting.text}</h1>
+        <h1 className="h4 mb-0 fw-bold text-dark">{greeting.icon} {greeting.text}</h1>
         <div className="d-flex align-items-center">
           <span className="me-3 fw-semibold">{`${userData.nombre} ${userData.apellido}`}</span>
           <div className="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style={{ width: '40px', height: '40px' }}>
@@ -88,7 +88,7 @@ const HomePage = () => {
         {/* Sección de Acciones Rápidas (Destacada) */}
         <section className="mb-5">
           <h2 className="h5 fw-bold mb-4 d-flex align-items-center">
-            <FiClock className="me-2 text-warning" /> Acciones Rápidas
+            <FaClock className="me-2 text-info" /> Acciones Rápidas
           </h2>
           <div className="row g-4">
             {quickActions.map((action, index) => (
