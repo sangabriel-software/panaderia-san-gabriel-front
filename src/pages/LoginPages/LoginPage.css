@@ -178,45 +178,62 @@
 }
 
 @media (min-width: 600px) and (max-width: 767px) and (orientation: portrait) {
-  /* ... (mantén tus estilos existentes) ... */
-
-  /* Ajustes proporcionales basados en el viewport */
-  .logo-login {
-    width: 58vw !important; /* 58% del ancho de la pantalla */
-    max-width: 350px;
-    margin: 0 auto 2vh !important; /* 2% de la altura de la pantalla */
-    display: block;
-  }
-
-  .form-floating input {
-    height: 8vh !important; /* 8% de la altura de la pantalla */
-    font-size: 2.5vw !important;
-    padding: 1.5vh 1vw !important;
-  }
-
-  .form-floating label {
-    font-size: 2.5vw !important;
-    transform: translateY(-120%) scale(0.9) !important;
-  }
-
-  .loginbtn {
-    width: 40vw !important; /* 40% del ancho de la pantalla */
-    max-width: 200px;
-    height: 8vh !important;
-    font-size: 3vw !important;
-    padding: 1vh !important;
-    margin-top: 2vh !important;
-  }
+  /* ... (otros estilos existentes) ... */
 
   /* Contenedor del formulario */
   .derecho {
-    padding: 5vh 5vw !important; /* Padding relativo */
+    padding: 5vh 8vw !important;
     transform: none !important;
   }
 
-  /* Ajuste específico para el contenedor del logo */
+  /* Inputs */
+  .form-floating {
+    margin-bottom: 4vh !important;
+  }
+
+  .form-floating input {
+    height: 8vh !important;
+    font-size: 2.2vh !important; /* Tamaño relativo a la altura */
+    padding: 2.5vh 1vw 0 1vw !important; /* Padding superior aumentado */
+    border: 1px solid #8D6E63;
+    border-radius: 5px;
+  }
+
+  /* Labels */
+  .form-floating label {
+    font-size: 2.2vh !important;
+    color: #8D6E63;
+    padding: 0 0.5vw !important;
+    transform: translateY(1.5vh) !important; /* Posición inicial centrada */
+    transition: all 0.2s ease;
+  }
+
+  /* Efecto cuando el input tiene foco o contenido */
+  .form-floating input:focus + label,
+  .form-floating input:not(:placeholder-shown) + label {
+    transform: translateY(-0.5vh) scale(0.85) !important;
+    padding: 0 0.3vw !important;
+    color: #FFD54F;
+    background-color: #F5F5F5;
+  }
+
+  /* Botón */
+  .loginbtn {
+    width: 40vw !important;
+    max-width: 200px;
+    height: 7vh !important;
+    font-size: 2.5vh !important;
+    margin-top: 3vh !important;
+  }
+
+  /* Logo */
+  .logo-login {
+    width: 58vw !important;
+    max-width: 350px;
+    margin: 0 auto 3vh !important;
+  }
+
   .divlogo {
-    height: auto !important;
-    margin-bottom: 3vh !important;
+    margin-bottom: 4vh !important;
   }
 }
