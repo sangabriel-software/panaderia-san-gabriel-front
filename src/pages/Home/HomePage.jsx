@@ -1,98 +1,151 @@
 import React from 'react';
 import { 
   FiBox, FiDollarSign, FiUsers, FiPieChart, 
-  FiShoppingCart, FiSettings, FiLogOut 
+  FiShoppingCart, FiPlus, FiTrendingUp, FiFileText,
+  FiClock, FiUser, FiPackage 
 } from 'react-icons/fi';
 import "./HomePage.styles.css";
 import { getUserData } from '../../utils/Auth/decodedata';
+import { useNavigate } from 'react-router-dom';
 
 const HomePage = () => {
-    const userData = getUserData();
-    console.log(userData);
-  // Datos de ejemplo (puedes reemplazar con datos reales de tu API)
+  const userData = getUserData();
+  const navigate = useNavigate();
+
+  // Datos de ejemplo
   const stats = [
-    { title: "Stock Crítico", value: "15", icon: <FiBox size={24} />, color: "bg-danger" },
-    { title: "Ventas Hoy", value: "$1,240,500", icon: <FiDollarSign size={24} />, color: "bg-success" },
-    { title: "Usuarios Activos", value: "8", icon: <FiUsers size={24} />, color: "bg-info" },
-    { title: "Sucursales", value: "3", icon: <FiPieChart size={24} />, color: "bg-warning" }
+    { title: "Stock Crítico", value: "15", icon: <FiBox size={24} />, color: "bg-danger", link: "/inventory" },
+    { title: "Ventas Hoy", value: "$1,240,500", icon: <FiDollarSign size={24} />, color: "bg-success", link: "/sales" },
+    { title: "Usuarios", value: "8", icon: <FiUsers size={24} />, color: "bg-info", link: "/users" },
+    { title: "Sucursales", value: "3", icon: <FiPieChart size={24} />, color: "bg-warning", link: "/branches" }
+  ];
+
+  const quickActions = [
+    { 
+      title: "Nueva Venta", 
+      icon: <FiShoppingCart size={20} />, 
+      variant: "primary",
+      action: () => navigate('/ventas/ingresar-venta')
+    },
+    { 
+      title: "Agregar Stock", 
+      icon: <FiPlus size={20} />, 
+      variant: "success",
+      action: () => navigate('/stock-productos')
+    },
+    { 
+      title: "Ver Reportes", 
+      icon: <FiTrendingUp size={20} />, 
+      variant: "warning",
+      action: () => navigate('/reports')
+    },
+    { 
+      title: "Ingresar Orden", 
+      icon: <FiFileText size={20} />, 
+      variant: "info",
+      action: () => navigate('/ordenes-produccion/ingresar-orden')
+    },
   ];
 
   const recentActivities = [
-    { id: 1, action: "Nueva venta registrada", time: "Hace 15 min", user: "Juan Pérez" },
-    { id: 2, action: "Stock actualizado (Harina)", time: "Hace 1 hora", user: "María Gómez" },
-    { id: 3, action: "Usuario creado (Carlos R.)", time: "Hace 3 horas", user: "Admin" }
+    { id: 1, action: "Nueva venta registrada", time: "Hace 15 min", user: "Juan Pérez", icon: <FiShoppingCart /> },
+    { id: 2, action: "Stock actualizado (Harina)", time: "Hace 1 hora", user: "María Gómez", icon: <FiPackage /> },
+    { id: 3, action: "Usuario creado (Carlos R.)", time: "Hace 3 horas", user: "Admin", icon: <FiUser /> }
   ];
 
   return (
-    <div className="dashboard-container">
-      {/* --- Sidebar --- */}
-
-
-      {/* --- Main Content --- */}
-      <div className="main-content">
-        {/* Header */}
-        <header className="bg-light p-3 d-flex justify-content-between align-items-center">
-          <h1 className="h4 mb-0">Resumen General</h1>
-          <div className="user-profile d-flex align-items-center">
-            <span  className="me-2 name-user">{`${userData.nombre} ${userData.apellido}`}</span>
-            <div className="avatar bg-primary text-white rounded-circle">{userData.nombre.charAt(0).toUpperCase()}</div>
+    <div className="container-fluid p-0 min-vh-100 bg-light">
+      {/* Header */}
+      <header className="bg-white shadow-sm p-3 d-flex justify-content-between align-items-center">
+        <h1 className="h4 mb-0 fw-bold text-primary">Benvenido</h1>
+        <div className="d-flex align-items-center">
+          <span className="me-3 fw-semibold">{`${userData.nombre} ${userData.apellido}`}</span>
+          <div className="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style={{ width: '40px', height: '40px' }}>
+            {userData.nombre.charAt(0).toUpperCase()}
           </div>
-        </header>
+        </div>
+      </header>
 
-
-
-        {/* Recent Activities & Quick Actions */}
-        <div className="container-fluid mt-4">
-          <div className="row">
-            {/* Actividades Recientes */}
-            <div className="col-lg-8 mb-4">
-              <div className="card shadow-sm">
-                <div className="card-header bg-white">
-                  <h5 className="mb-0">Actividad Reciente</h5>
-                </div>
-                <div className="card-body">
-                  <ul className="list-group list-group-flush">
-                    {recentActivities.map(activity => (
-                      <li key={activity.id} className="list-group-item">
-                        <div className="d-flex justify-content-between">
-                          <div>
-                            <strong>{activity.action}</strong>
-                            <p className="small text-muted mb-0">Por: {activity.user}</p>
-                          </div>
-                          <span className="text-muted small">{activity.time}</span>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+      {/* Contenido Principal */}
+      <main className="container-fluid py-4">
+        {/* Sección de Acciones Rápidas (Destacada) */}
+        <section className="mb-5">
+          <h2 className="h5 fw-bold mb-4 d-flex align-items-center">
+            <FiClock className="me-2 text-warning" /> Acciones Rápidas
+          </h2>
+          <div className="row g-4">
+            {quickActions.map((action, index) => (
+              <div key={index} className="col-xl-3 col-lg-4 col-md-6">
+                <button 
+                  className={`btn btn-${action.variant} w-100 py-3 d-flex flex-column align-items-center shadow-sm`}
+                  onClick={action.action}
+                >
+                  <div className="mb-2">{action.icon}</div>
+                  <span>{action.title}</span>
+                </button>
               </div>
-            </div>
+            ))}
+          </div>
+        </section>
 
-            {/* Acciones Rápidas */}
-            <div className="col-lg-4 mb-4">
-              <div className="card shadow-sm">
-                <div className="card-header bg-white">
-                  <h5 className="mb-0">Acciones Rápidas</h5>
+        <div className="row">
+          {/* Estadísticas */}
+          <div className="col-lg-8 mb-4">
+            <h2 className="h5 fw-bold mb-4">Resumen General</h2>
+            <div className="row g-4">
+              {stats.map((item, index) => (
+                <div key={index} className="col-md-6 col-xl-3">
+                  <div 
+                    className={`card text-white ${item.color} h-100 border-0 shadow-sm cursor-pointer`}
+                    onClick={() => navigate(item.link)}
+                  >
+                    <div className="card-body d-flex justify-content-between align-items-center">
+                      <div>
+                        <h3 className="card-title fw-bold mb-1">{item.value}</h3>
+                        <p className="card-text mb-0">{item.title}</p>
+                      </div>
+                      <div className="bg-white bg-opacity-25 p-2 rounded-circle">
+                        {item.icon}
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div className="card-body">
-                  <button className="btn btn-outline-primary w-100 mb-2">
-                    <FiShoppingCart className="me-2" /> Nueva Venta
-                  </button>
-                  <button className="btn btn-outline-success w-100 mb-2">
-                    <FiBox className="me-2" /> Agregar Stock
-                  </button>
-                  <button className="btn btn-outline-info w-100 mb-2">
-                    <FiUsers className="me-2" /> Crear Usuario
-                  </button>
-                  <button className="btn btn-outline-warning w-100">
-                    <FiSettings className="me-2" /> Reportes
-                  </button>
-                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Actividades Recientes */}
+          <div className="col-lg-4">
+            <div className="card shadow-sm h-100">
+              <div className="card-header bg-white border-0">
+                <h2 className="h5 fw-bold mb-0 d-flex align-items-center">
+                  <FiClock className="me-2 text-muted" /> Actividad Reciente
+                </h2>
+              </div>
+              <div className="card-body p-0">
+                <ul className="list-group list-group-flush">
+                  {recentActivities.map(activity => (
+                    <li key={activity.id} className="list-group-item border-0 py-3">
+                      <div className="d-flex align-items-start">
+                        <div className="bg-light p-2 rounded me-3">
+                          {activity.icon}
+                        </div>
+                        <div className="flex-grow-1">
+                          <p className="mb-1 fw-semibold">{activity.action}</p>
+                          <small className="text-muted d-block">
+                            <span className="me-2">Por: {activity.user}</span>
+                            <span>{activity.time}</span>
+                          </small>
+                        </div>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 };

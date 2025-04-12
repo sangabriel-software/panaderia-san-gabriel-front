@@ -48,3 +48,47 @@
   font-weight: bold;
 }
 
+/* Efectos adicionales */
+.cursor-pointer {
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  
+  .cursor-pointer:hover {
+    transform: translateY(-3px);
+  }
+  
+  /* Ajustes específicos para tarjetas */
+  .card-hover {
+    transition: all 0.3s ease;
+  }
+  
+  .card-hover:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1) !important;
+  }
+  
+  /* Botones de acciones rápidas */
+  .btn-action {
+    min-height: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-action:hover {
+    transform: translateY(-5px);
+  }
+  
+  /* Responsive para móviles */
+  @media (max-width: 768px) {
+    .btn-action {
+      min-height: 80px;
+      padding: 1rem 0.5rem !important;
+    }
+    
+    .card-body {
+      padding: 1.25rem !important;
+    }
+  }
