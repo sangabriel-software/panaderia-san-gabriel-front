@@ -34,7 +34,7 @@ function CreateUsers() {
             <button
               className="btn bt-return rounded-circle d-flex align-items-center justify-content-center shadow"
               style={{ width: "40px", height: "40px" }}
-              onClick={() => navigate("/users/users")}
+              onClick={() => navigate("/users")}
             >
               <BsArrowLeft size={20} />
             </button>

@@ -34,6 +34,7 @@ const GestionarStockPage = lazy(() => import("./pages/StockProductos/GestionarSt
 const StockDiarioPage = lazy(() => import("./pages/StockProductos/StockDiarioPage/StockDiarioPage"));
 const IngresarStockGeneralPage = lazy(() => import("./pages/StockProductos/IngresarStock/IngresarStockPage"));
 const StockGeneralPage = lazy(() => import("./pages/StockProductos/StockGeneralPage/StockGeneralPage"));
+const HomePage = lazy(() => import("./pages/Home/HomePage"));
 
 function App() {
   return (
@@ -47,6 +48,8 @@ function App() {
         {/* Rutas protegidas */}
         <Route element={<PrivateRoute />}>
           <Route element={<MainLayout />}>
+            <Route path="/home" element={<HomePage />} />
+
             <Route path="/dashboard" element={<DashboardPage />} />
 
             <Route path="/users">

@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Nav, Collapse } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
-import { FaHome, FaUsers, FaCalendar, FaFolder, FaUserPlus, FaUsersCog, FaChevronRight, FaCog, FaSun, FaMoon, FaShoppingBag, FaStore, FaLayerGroup, } from "react-icons/fa";
+import { FaHome, FaUsers, FaCalendar, FaFolder, FaUserPlus, FaUsersCog, FaChevronRight, FaCog, FaSun, FaMoon, FaShoppingBag, FaStore, FaLayerGroup, FaThLarge, } from "react-icons/fa";
 import { MdDashboard, MdOutlineBakeryDining } from "react-icons/md";
 import * as DarkReader from "darkreader";
 import "./Sidebar.css";
 import { getUserData, getUserPermissions } from "../../utils/Auth/decodedata";
 import { getColorFromName } from "./Sidebar.uitils";
+import { FiBox, FiCalendar, FiHome, FiMapPin, FiPieChart, FiSettings, FiShoppingBag, FiShoppingCart, FiUsers } from "react-icons/fi";
 
 function Sidebar({ show, onClose }) {
   const [usersOpen, setUsersOpen] = useState(false);
@@ -119,7 +120,15 @@ function Sidebar({ show, onClose }) {
         </div>
       </div>
 
-      <Nav className="flex-column">
+       <Nav className="flex-column">
+          <Nav.Link
+            as={NavLink}
+            to="/home"
+            className="text-light"
+            onClick={handleNavLinkClick}
+          >
+            <FiHome size={25} className="me-2" /> Inicio
+          </Nav.Link>
         {isRouteAllowed("/dashboard") && (
           <Nav.Link
             as={NavLink}
@@ -127,7 +136,7 @@ function Sidebar({ show, onClose }) {
             className="text-light"
             onClick={handleNavLinkClick}
           >
-            <FaHome size={25} className="me-2" /> Dashboard
+            <FiPieChart size={25} className="me-2" /> Dashboard
           </Nav.Link>
         )}
 
@@ -138,7 +147,7 @@ function Sidebar({ show, onClose }) {
             className="text-light"
             onClick={handleNavLinkClick}
           >
-            <FaLayerGroup size={25} className="me-2" /> Productos en existencia
+            <FiBox size={25} className="me-2" /> Inventario
           </Nav.Link>
         )}
 
@@ -149,7 +158,7 @@ function Sidebar({ show, onClose }) {
             className="text-light"
             onClick={handleNavLinkClick}
           >
-            <FaCalendar size={25} className="me-2" /> Ordenes de producción
+            <FiCalendar size={25} className="me-2" /> Ordenes de producción
           </Nav.Link>
         )}
 
@@ -160,7 +169,7 @@ function Sidebar({ show, onClose }) {
             className="text-light"
             onClick={handleNavLinkClick}
           >
-            <FaShoppingBag size={25} className="me-2" /> Pedido Especial
+            <FiShoppingBag size={25} className="me-2" /> Pedido Especial
           </Nav.Link>
         )}
 
@@ -171,7 +180,7 @@ function Sidebar({ show, onClose }) {
             className="text-light"
             onClick={handleNavLinkClick}
           >
-            <FaFolder size={25} className="me-2" /> Ventas
+            <FiShoppingCart size={25} className="me-2" /> Ventas
           </Nav.Link>
         )}
 
@@ -195,7 +204,7 @@ function Sidebar({ show, onClose }) {
               style={{ cursor: "pointer" }}
             >
               <span>
-                <FaUsers size={25} className="me-2" /> Usuarios
+                <FiUsers size={25} className="me-2" /> Usuarios
               </span>
               <FaChevronRight
                 className={`dropdown-arrow ${usersOpen ? "open" : ""}`}
@@ -236,7 +245,7 @@ function Sidebar({ show, onClose }) {
             className="text-light"
             onClick={handleNavLinkClick}
           >
-            <FaStore size={25} className="me-2" /> Sucursales
+            <FiMapPin size={25} className="me-2" /> Sucursales
           </Nav.Link>
         )}
 
@@ -248,7 +257,7 @@ function Sidebar({ show, onClose }) {
               style={{ cursor: "pointer" }}
             >
               <span>
-                <FaCog size={25} className="me-2" /> Configuraciones
+                <FiSettings size={25} className="me-2" /> Configuraciones
               </span>
               <FaChevronRight
                 className={`dropdown-arrow ${configOpen ? "open" : ""}`}

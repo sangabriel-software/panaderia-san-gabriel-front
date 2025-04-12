@@ -70,7 +70,9 @@
 
 /* Active link styles */
 .nav-link.active {
-  background-color: rgba(124, 58, 237, 0.2) !important; /* Fondo morado claro moderno */
+  color: white;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-left: 3px solid #ffc107;
 }
 
 /* Sidebar links */

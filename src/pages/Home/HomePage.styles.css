@@ -1,0 +1,50 @@
+/* Layout Principal */
+.dashboard-container {
+    display: flex;
+    min-height: 100vh;
+  }
+  
+  
+  .main-content {
+    flex: 1;
+    background-color: #f8f9fa;
+    min-height: 100vh;
+  }
+  
+  .logout-section {
+    margin-top: auto;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  /* Tarjetas de Estadísticas */
+  .card {
+    border: none;
+    transition: transform 0.2s;
+  }
+  
+  .card:hover {
+    transform: translateY(-5px);
+  }
+  
+  .icon-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  
+  /* Avatar de Usuario */
+  .avatar {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+  }
+
+.name-user {
+  font-size: 2rem;
+  font-weight: bold;
+}
+

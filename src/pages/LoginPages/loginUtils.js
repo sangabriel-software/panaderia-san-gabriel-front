@@ -25,7 +25,7 @@ export const handleLogin = async (data, navigate, setIsLoading) => {
 
       // Redirigir al dashboard después de un pequeño retraso
       setTimeout(() => {
-        navigate("/dashboard");
+        navigate("/home");
       }, 500); // 1 segundo de retraso
     }
 

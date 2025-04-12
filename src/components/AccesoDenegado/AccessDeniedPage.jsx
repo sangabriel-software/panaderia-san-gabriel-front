@@ -5,7 +5,7 @@ const AccessDeniedPage = () => {
   const navigate = useNavigate();
 
   const handleRedirectToDashboard = () => {
-    navigate("/dashboard");
+    navigate("/home");
   };
 
   return (

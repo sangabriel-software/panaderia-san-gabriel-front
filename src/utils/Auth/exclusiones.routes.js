@@ -2,4 +2,5 @@
   export const exclusiones = {
     config: "/config",
     config_permil: "/config/configuracion-perfil",
+    home: "/home",
   };
