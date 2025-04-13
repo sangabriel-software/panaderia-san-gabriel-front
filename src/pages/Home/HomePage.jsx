@@ -83,25 +83,25 @@ const HomePage = () => {
   const specialOrders = [
     {
       id: 1,
-      title: "Pedido especial - Boda",
+      title: "Orden Especial",
       start: new Date(new Date().setDate(new Date().getDate() + 2)),
       end: new Date(new Date().setDate(new Date().getDate() + 2)),
       client: "Hotel Las Palmas",
       products: "200 panes especiales, 50 tortas",
       notes: "Entregar antes de las 10 AM",
       status: "pendiente",
-      color: "#ff9f89"
+      color: "#0D6EFD"
     },
     {
       id: 2,
-      title: "Pedido semanal - Colegio",
+      title: "Orden Especial",
       start: new Date(new Date().setDate(new Date().getDate() + 4)),
       end: new Date(new Date().setDate(new Date().getDate() + 4)),
       client: "Colegio San José",
       products: "300 panes integrales, 200 panes blancos",
       notes: "Empacar en bolsas individuales",
       status: "confirmado",
-      color: "#a4bdfc"
+      color: "#0D6EFD"
     }
   ];
 
@@ -157,7 +157,7 @@ const HomePage = () => {
                 </h2>
               </div>
               <div className="card-body p-3">
-                <div style={{ height: 400 }}>
+                <div style={{ height: 530 }}>
                   <Calendar
                     localizer={localizer}
                     events={specialOrders}
