@@ -243,7 +243,7 @@ const HomePage = () => {
 
       {/* Modal */}
       <Modal show={showModal} onHide={() => setShowModal(false)} centered size="lg" className="homepage-modal">
-        <Modal.Header className="bg-primary text-white">
+        <Modal.Header className=" text-white">
           <Modal.Title>Detalles del Pedido Especial</Modal.Title>
           <button 
             type="button" 
