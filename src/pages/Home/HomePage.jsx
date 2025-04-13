@@ -52,9 +52,9 @@ const HomePage = () => {
     if (currentHour >= 5 && currentHour < 12) {
       return { text: "Buenos días", icon: <FaSun className="me-2 text-warning" /> };
     } else if (currentHour >= 12 && currentHour < 19) {
-      return { text: "Buenas tardes", icon: <FaSun className="me-2 text-amber-500" /> };
+      return { text: "Buenas tardes", icon: <FaSun className="me-2 text-warning text-amber-500" /> };
     } else {
-      return { text: "Buenas noches", icon: <FaMoon className="me-2 text-indigo-300" /> };
+      return { text: "Buenas noches", icon: <FaMoon className="me-2 text-warning text-indigo-300" /> };
     }
   };
 
@@ -133,31 +133,36 @@ const HomePage = () => {
   };
 
   return (
-    <div className="dashboard-container">
-      {/* Header */}
-      <header className="header">
-        <h1 className="h4 mb-0 fw-bold text-dark">{greeting.icon} {greeting.text}</h1>
+    <div className="homepage-dashboard">
+      {/* Header optimizado para móviles con avatar visible */}
+      <header className="homepage-header">
         <div className="d-flex align-items-center">
-          <span className="me-3 fw-semibold">{`${userData.nombre} ${userData.apellido}`}</span>
-          <div className="avatar">
+          <h1 className="h4 mb-0 fw-bold text-dark homepage-greeting-text">
+            {greeting.icon} {greeting.text}
+          </h1>
+        </div>
+        
+        <div className="homepage-user-info">
+          <span className="homepage-user-name">{`${userData.nombre} ${userData.apellido}`}</span>
+          <div className="homepage-avatar">
             {userData.nombre.charAt(0).toUpperCase()}
           </div>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="main-content container-fluid py-4">
+      {/* Contenido Principal */}
+      <main className="homepage-main-content container-fluid py-4">
         <div className="row">
-          {/* Calendario (8 columnas) */}
-          <div className="col-lg-8 col-md-12 mb-4 calendar-container">
-            <div className="card shadow-sm h-100">
-              <div className="card-header">
+          {/* Calendario (8 columnas en desktop, 12 en móvil) */}
+          <div className="col-lg-8 col-md-12 mb-4">
+            <div className="homepage-card shadow-sm h-100">
+              <div className="homepage-card-header">
                 <h2 className="h5 fw-bold mb-0 d-flex align-items-center">
                   <FiClock className="me-2 text-muted" /> Calendario de Órdenes Especiales
                 </h2>
               </div>
-              <div className="card-body p-3">
-                <div style={{ height: 530 }}>
+              <div className="homepage-card-body p-3">
+                <div className="homepage-calendar" style={{ height: 530 }}>
                   <Calendar
                     localizer={localizer}
                     events={specialOrders}
@@ -176,20 +181,20 @@ const HomePage = () => {
             </div>
           </div>
 
-          {/* Acciones Rápidas (4 columnas) */}
-          <div className="col-lg-4 col-md-12 mb-4 quick-actions-container">
-            <div className="card shadow-sm h-100">
-              <div className="card-header">
+          {/* Acciones Rápidas (4 columnas en desktop, 12 en móvil) */}
+          <div className="col-lg-4 col-md-12 mb-4">
+            <div className="homepage-card shadow-sm h-100">
+              <div className="homepage-card-header">
                 <h2 className="h5 fw-bold mb-0 d-flex align-items-center">
                   <FaClock className="me-2 text-info" /> Acciones Rápidas
                 </h2>
               </div>
-              <div className="card-body">
+              <div className="homepage-card-body">
                 <div className="d-grid gap-3">
                   {quickActions.map((action, index) => (
                     <button
                       key={index}
-                      className={`quick-action-btn btn btn-${action.variant}`}
+                      className={`homepage-quick-action-btn btn btn-${action.variant}`}
                       onClick={action.action}
                     >
                       <div className="mb-2">{action.icon}</div>
@@ -203,20 +208,20 @@ const HomePage = () => {
         </div>
 
         {/* Actividades Recientes (12 columnas - ancho completo) */}
-        <div className="row activities-container">
-          <div className="col-lg-6 col-md-12 mb-4">
-            <div className="card shadow-sm">
-              <div className="card-header">
+        <div className="row">
+          <div className="col-12">
+            <div className="homepage-card shadow-sm">
+              <div className="homepage-card-header">
                 <h2 className="h5 fw-bold mb-0 d-flex align-items-center">
                   <FiClock className="me-2 text-muted" /> Actividad Reciente
                 </h2>
               </div>
-              <div className="card-body p-0">
+              <div className="homepage-card-body p-0">
                 <ul className="list-group list-group-flush">
                   {recentActivities.map(activity => (
-                    <li key={activity.id} className="list-group-item border-0 py-3 activity-item">
+                    <li key={activity.id} className="list-group-item border-0 py-3 homepage-activity-item">
                       <div className="d-flex align-items-start">
-                        <div className="activity-icon">
+                        <div className="homepage-activity-icon">
                           {activity.icon}
                         </div>
                         <div className="flex-grow-1">
@@ -237,7 +242,7 @@ const HomePage = () => {
       </main>
 
       {/* Modal */}
-      <Modal show={showModal} onHide={() => setShowModal(false)} centered size="lg">
+      <Modal show={showModal} onHide={() => setShowModal(false)} centered size="lg" className="homepage-modal">
         <Modal.Header className="bg-primary text-white">
           <Modal.Title>Detalles del Pedido Especial</Modal.Title>
           <button 
@@ -247,7 +252,7 @@ const HomePage = () => {
             aria-label="Cerrar"
           />
         </Modal.Header>
-        <Modal.Body className="animate-fade">
+        <Modal.Body className="homepage-animate-fade">
           {selectedOrder && (
             <div className="row">
               <div className="col-md-6">
@@ -271,7 +276,7 @@ const HomePage = () => {
 
                 <div className="mb-3">
                   <h6 className="text-muted mb-2">Estado</h6>
-                  <span className={`badge ${
+                  <span className={`homepage-badge ${
                     selectedOrder.status === 'pendiente' ? 'bg-warning text-dark' : 
                     selectedOrder.status === 'confirmado' ? 'bg-success' : 'bg-secondary'
                   }`}>
@@ -281,11 +286,11 @@ const HomePage = () => {
               </div>
               
               <div className="col-md-6">
-                <div className="card h-100">
-                  <div className="card-header bg-light">
+                <div className="homepage-card h-100">
+                  <div className="homepage-card-header bg-light">
                     <h5 className="mb-0">Detalles del Pedido</h5>
                   </div>
-                  <div className="card-body">
+                  <div className="homepage-card-body">
                     <div className="mb-3">
                       <h6 className="text-muted mb-2">Productos</h6>
                       <p>{selectedOrder.products}</p>

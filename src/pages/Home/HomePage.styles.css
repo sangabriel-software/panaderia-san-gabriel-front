@@ -1,30 +1,50 @@
 /* Layout Principal */
-.dashboard-container {
+.homepage-dashboard {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
   background-color: #f8f9fa;
 }
 
-.main-content {
+.homepage-main-content {
   flex: 1;
   padding: 1rem;
 }
 
-/* Header */
-.header {
+/* Header - Optimizado para móviles con avatar */
+.homepage-header {
   background-color: white;
-  padding: 1rem;
+  padding: 0.75rem 1rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 1rem;
 }
 
-/* Avatar */
-.avatar {
-  width: 40px;
-  height: 40px;
+.homepage-greeting-text {
+  white-space: nowrap;
+  font-size: 1.1rem;
+  margin-bottom: 0;
+}
+
+.homepage-user-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.homepage-user-name {
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
+}
+
+.homepage-avatar {
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -32,10 +52,11 @@
   color: white;
   border-radius: 50%;
   font-weight: bold;
+  flex-shrink: 0;
 }
 
-/* Cards */
-.card {
+/* Cards - Clases personalizadas */
+.homepage-card {
   border: none;
   border-radius: 0.5rem;
   box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
@@ -44,23 +65,23 @@
   height: 100%;
 }
 
-.card:hover {
+.homepage-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
 }
 
-.card-header {
+.homepage-card-header {
   background-color: white;
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   padding: 1rem;
 }
 
-.card-body {
+.homepage-card-body {
   padding: 1.25rem;
 }
 
 /* Quick Actions */
-.quick-action-btn {
+.homepage-quick-action-btn {
   min-height: 100px;
   display: flex;
   flex-direction: column;
@@ -70,81 +91,93 @@
   border-radius: 0.5rem;
 }
 
-.quick-action-btn:hover {
+.homepage-quick-action-btn:hover {
   transform: translateY(-5px);
 }
 
-/* Calendar */
-.rbc-calendar {
-  background-color: white;
+/* Calendar - Estilos mejorados */
+.homepage-calendar .rbc-calendar {
+  background-color: #f8f9fa;
   border-radius: 0.5rem;
   border: 1px solid #dee2e6;
   overflow: hidden;
 }
 
-.rbc-header {
+.homepage-calendar .rbc-month-view {
+  background-color: white;
+}
+
+.homepage-calendar .rbc-header {
   padding: 0.75rem 0;
   background-color: #f8f9fa;
-  font-weight: 500;
+  font-weight: 600;
+  color: #495057;
   text-transform: capitalize;
 }
 
-.rbc-month-view {
-  border: none;
+.homepage-calendar .rbc-day-bg + .rbc-day-bg {
+  border-left: 1px solid #e9ecef;
 }
 
-.rbc-day-bg + .rbc-day-bg {
-  border-left: 1px solid #dee2e6;
-}
-
-.rbc-off-range-bg {
+.homepage-calendar .rbc-off-range-bg {
   background-color: #f8f9fa;
+  opacity: 0.6;
 }
 
-.rbc-today {
-  background-color: #e7f5ff;
+/* Día actual - Estilo destacado */
+.homepage-calendar .rbc-today {
+  background-color: #e3f2fd;
+  font-weight: bold;
+  position: relative;
 }
 
-.rbc-event {
+.homepage-calendar .rbc-today::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background-color: #2196f3;
+}
+
+/* Eventos (órdenes) */
+.homepage-calendar .rbc-event {
   cursor: pointer;
   padding: 0.125rem 0.25rem;
   font-size: 0.85em;
   border-radius: 0.25rem;
   border: none;
-}
-
-.rbc-event-content {
-  white-space: normal !important;
-}
-
-.rbc-toolbar {
-  padding: 0.5rem;
-}
-
-.rbc-toolbar button {
-  color: #495057;
-  border: 1px solid #dee2e6;
-  background-color: white;
-  transition: all 0.2s;
-}
-
-.rbc-toolbar button:hover {
-  background-color: #f8f9fa;
-}
-
-.rbc-toolbar button.rbc-active {
-  background-color: #0d6efd;
+  background-color: #9c27b0;
   color: white;
-  border-color: #0d6efd;
+  font-weight: 500;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.homepage-calendar .rbc-event:hover {
+  background-color: #7b1fa2;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+}
+
+.homepage-calendar .rbc-event-content {
+  white-space: normal !important;
+  padding: 0.125rem;
 }
 
 /* Recent Activities */
-.activity-item {
+.homepage-activity-item {
   border-left: none;
   border-right: none;
+  transition: background-color 0.2s;
 }
 
-.activity-icon {
+.homepage-activity-item:hover {
+  background-color: #f8f9fa;
+}
+
+.homepage-activity-icon {
   background-color: #f8f9fa;
   border-radius: 50%;
   width: 36px;
@@ -152,35 +185,43 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.2s;
+}
+
+.homepage-activity-item:hover .homepage-activity-icon {
+  background-color: #e9ecef;
 }
 
 /* Modal */
-.modal-content {
+.homepage-modal .modal-content {
   border: none;
   border-radius: 0.75rem;
   box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.15);
 }
 
-.modal-header {
+.homepage-modal .modal-header {
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   padding: 1.25rem;
+  background-color: #f8f9fa;
 }
 
-.modal-title {
+.homepage-modal .modal-title {
   font-weight: 600;
+  color: #212529;
 }
 
-.modal-body {
+.homepage-modal .modal-body {
   padding: 1.5rem;
 }
 
-.modal-footer {
+.homepage-modal .modal-footer {
   border-top: 1px solid rgba(0, 0, 0, 0.05);
   padding: 1rem 1.5rem;
+  background-color: #f8f9fa;
 }
 
 /* Badges */
-.badge {
+.homepage-badge {
   padding: 0.5em 0.75em;
   font-weight: 600;
   letter-spacing: 0.5px;
@@ -188,66 +229,47 @@
 }
 
 /* Animations */
-@keyframes fadeIn {
+@keyframes homepage-fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-.animate-fade {
-  animation: fadeIn 0.3s ease-out forwards;
+.homepage-animate-fade {
+  animation: homepage-fadeIn 0.3s ease-out forwards;
 }
 
 /* Responsive Adjustments */
-@media (max-width: 992px) {
-  .calendar-container,
-  .quick-actions-container {
-    width: 100%;
-    max-width: 100%;
-    flex: 0 0 100%;
+@media (max-width: 768px) {
+  .homepage-header {
+    padding: 0.75rem;
   }
   
-  .quick-action-btn {
+  .homepage-greeting-text {
+    font-size: 1rem;
+  }
+  
+  .homepage-user-name {
+    max-width: 120px;
+    font-size: 0.9rem;
+  }
+  
+  .homepage-avatar {
+    width: 32px;
+    height: 32px;
+    font-size: 0.9rem;
+  }
+  
+  .homepage-quick-action-btn {
     min-height: 80px;
   }
 }
 
-@media (max-width: 768px) {
-  .rbc-toolbar {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  
-  .rbc-toolbar .rbc-toolbar-label {
-    margin: 0.5rem 0;
-  }
-  
-  .rbc-btn-group {
-    margin-bottom: 0.5rem;
-  }
-  
-  .modal-body .row {
-    flex-direction: column;
-  }
-  
-  .modal-body .col-md-6 {
-    width: 100%;
-    margin-bottom: 1.25rem;
-  }
-}
-
 @media (max-width: 576px) {
-  .header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
+  .homepage-user-name {
+    max-width: 100px;
   }
   
-  .rbc-header {
-    font-size: 0.8em;
-    padding: 0.5rem 0;
-  }
-  
-  .card-body {
-    padding: 1rem;
+  .homepage-header {
+    gap: 0.5rem;
   }
 }
