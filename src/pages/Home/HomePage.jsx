@@ -1,21 +1,52 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   FiBox, FiDollarSign, FiUsers, FiPieChart, 
   FiShoppingCart, FiPlus, FiTrendingUp, FiFileText,
-  FiClock, FiUser, FiPackage, 
-  FiSun,
-  FiMoon
+  FiClock, FiUser, FiPackage, FiX,
+  FiSun, FiMoon
 } from 'react-icons/fi';
 import "./HomePage.styles.css";
 import { getUserData } from '../../utils/Auth/decodedata';
 import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { FaClock, FaMoon, FaSun } from 'react-icons/fa';
+import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
+import { format, parse, startOfWeek, getDay } from 'date-fns';
+import { es } from 'date-fns/locale';
+import 'react-big-calendar/lib/css/react-big-calendar.css';
+import Modal from 'react-bootstrap/Modal';
+import Button from 'react-bootstrap/Button';
+
+const localizer = dateFnsLocalizer({
+  format,
+  parse,
+  startOfWeek: date => startOfWeek(date, { weekStartsOn: 1 }),
+  getDay,
+  locales: { es }
+});
+
+const calendarMessages = {
+  allDay: 'Todo el día',
+  previous: '<',
+  next: '>',
+  today: 'Hoy',
+  month: 'Mes',
+  week: 'Semana',
+  day: 'Día',
+  agenda: 'Agenda',
+  date: 'Fecha',
+  time: 'Hora',
+  event: 'Evento',
+  noEventsInRange: 'No hay órdenes programadas',
+  showMore: total => `+ Ver más (${total})`
+};
 
 const HomePage = () => {
   const userData = getUserData();
   const navigate = useNavigate();
   const currentHour = dayjs().hour();
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [showModal, setShowModal] = useState(false);
 
   const getGreeting = () => {
     if (currentHour >= 5 && currentHour < 12) {
@@ -29,7 +60,6 @@ const HomePage = () => {
 
   const greeting = getGreeting();
 
-  // Datos de ejemplo
   const stats = [
     { title: "Stock Crítico", value: "15", icon: <FiBox size={24} />, color: "bg-danger", link: "/inventory" },
     { title: "Ventas Hoy", value: "$1,240,500", icon: <FiDollarSign size={24} />, color: "bg-success", link: "/sales" },
@@ -38,30 +68,10 @@ const HomePage = () => {
   ];
 
   const quickActions = [
-    { 
-      title: "Nueva Venta", 
-      icon: <FiShoppingCart size={20} />, 
-      variant: "primary",
-      action: () => navigate('/ventas/ingresar-venta')
-    },
-    { 
-      title: "Agregar Stock", 
-      icon: <FiPlus size={20} />, 
-      variant: "success",
-      action: () => navigate('/stock-productos')
-    },
-    { 
-      title: "Ver Reportes", 
-      icon: <FiTrendingUp size={20} />, 
-      variant: "warning",
-      action: () => navigate('/reports')
-    },
-    { 
-      title: "Ingresar Orden", 
-      icon: <FiFileText size={20} />, 
-      variant: "info",
-      action: () => navigate('/ordenes-produccion/ingresar-orden')
-    },
+    { title: "Nueva Venta", icon: <FiShoppingCart size={20} />, variant: "primary", action: () => navigate('/ventas/ingresar-venta') },
+    { title: "Agregar Stock", icon: <FiPlus size={20} />, variant: "success", action: () => navigate('/stock-productos') },
+    { title: "Ver Reportes", icon: <FiTrendingUp size={20} />, variant: "warning", action: () => navigate('/reports') },
+    { title: "Ingresar Orden", icon: <FiFileText size={20} />, variant: "info", action: () => navigate('/ordenes-produccion/ingresar-orden') },
   ];
 
   const recentActivities = [
@@ -70,71 +80,133 @@ const HomePage = () => {
     { id: 3, action: "Usuario creado (Carlos R.)", time: "Hace 3 horas", user: "Admin", icon: <FiUser /> }
   ];
 
+  const specialOrders = [
+    {
+      id: 1,
+      title: "Pedido especial - Boda",
+      start: new Date(new Date().setDate(new Date().getDate() + 2)),
+      end: new Date(new Date().setDate(new Date().getDate() + 2)),
+      client: "Hotel Las Palmas",
+      products: "200 panes especiales, 50 tortas",
+      notes: "Entregar antes de las 10 AM",
+      status: "pendiente",
+      color: "#ff9f89"
+    },
+    {
+      id: 2,
+      title: "Pedido semanal - Colegio",
+      start: new Date(new Date().setDate(new Date().getDate() + 4)),
+      end: new Date(new Date().setDate(new Date().getDate() + 4)),
+      client: "Colegio San José",
+      products: "300 panes integrales, 200 panes blancos",
+      notes: "Empacar en bolsas individuales",
+      status: "confirmado",
+      color: "#a4bdfc"
+    }
+  ];
+
+  const handleSelectEvent = (event) => {
+    setSelectedOrder(event);
+    setShowModal(true);
+  };
+
+  const eventStyleGetter = (event) => ({
+    style: {
+      backgroundColor: event.color,
+      borderRadius: '4px',
+      opacity: 0.8,
+      color: 'white',
+      border: '0px',
+      display: 'block'
+    }
+  });
+
+  const formatDate = (date) => {
+    return date.toLocaleDateString('es-ES', { 
+      weekday: 'long', 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
   return (
-    <div className="container-fluid p-0 min-vh-100 bg-light">
+    <div className="dashboard-container">
       {/* Header */}
-      <header className="bg-white shadow-sm p-3 d-flex justify-content-between align-items-center">
+      <header className="header">
         <h1 className="h4 mb-0 fw-bold text-dark">{greeting.icon} {greeting.text}</h1>
         <div className="d-flex align-items-center">
           <span className="me-3 fw-semibold">{`${userData.nombre} ${userData.apellido}`}</span>
-          <div className="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style={{ width: '40px', height: '40px' }}>
+          <div className="avatar">
             {userData.nombre.charAt(0).toUpperCase()}
           </div>
         </div>
       </header>
 
-      {/* Contenido Principal */}
-      <main className="container-fluid py-4">
-        {/* Sección de Acciones Rápidas (Destacada) */}
-        <section className="mb-5">
-          <h2 className="h5 fw-bold mb-4 d-flex align-items-center">
-            <FaClock className="me-2 text-info" /> Acciones Rápidas
-          </h2>
-          <div className="row g-4">
-            {quickActions.map((action, index) => (
-              <div key={index} className="col-xl-3 col-lg-4 col-md-6">
-                <button 
-                  className={`btn btn-${action.variant} w-100 py-3 d-flex flex-column align-items-center shadow-sm`}
-                  onClick={action.action}
-                >
-                  <div className="mb-2">{action.icon}</div>
-                  <span>{action.title}</span>
-                </button>
-              </div>
-            ))}
-          </div>
-        </section>
-
+      {/* Main Content */}
+      <main className="main-content container-fluid py-4">
         <div className="row">
-          {/* Estadísticas */}
-          <div className="col-lg-8 mb-4">
-            <h2 className="h5 fw-bold mb-4">Resumen General</h2>
-            <div className="row g-4">
-              {stats.map((item, index) => (
-                <div key={index} className="col-md-6 col-xl-3">
-                  <div 
-                    className={`card text-white ${item.color} h-100 border-0 shadow-sm cursor-pointer`}
-                    onClick={() => navigate(item.link)}
-                  >
-                    <div className="card-body d-flex justify-content-between align-items-center">
-                      <div>
-                        <h3 className="card-title fw-bold mb-1">{item.value}</h3>
-                        <p className="card-text mb-0">{item.title}</p>
-                      </div>
-                      <div className="bg-white bg-opacity-25 p-2 rounded-circle">
-                        {item.icon}
-                      </div>
-                    </div>
-                  </div>
+          {/* Calendario (8 columnas) */}
+          <div className="col-lg-8 col-md-12 mb-4 calendar-container">
+            <div className="card shadow-sm h-100">
+              <div className="card-header">
+                <h2 className="h5 fw-bold mb-0 d-flex align-items-center">
+                  <FiClock className="me-2 text-muted" /> Calendario de Órdenes Especiales
+                </h2>
+              </div>
+              <div className="card-body p-3">
+                <div style={{ height: 400 }}>
+                  <Calendar
+                    localizer={localizer}
+                    events={specialOrders}
+                    startAccessor="start"
+                    endAccessor="end"
+                    style={{ height: "100%" }}
+                    onSelectEvent={handleSelectEvent}
+                    eventPropGetter={eventStyleGetter}
+                    messages={calendarMessages}
+                    defaultView="month"
+                    views={['month', 'week', 'day']}
+                    culture="es"
+                  />
                 </div>
-              ))}
+              </div>
             </div>
           </div>
 
-          {/* Actividades Recientes */}
-          <div className="col-lg-4">
+          {/* Acciones Rápidas (4 columnas) */}
+          <div className="col-lg-4 col-md-12 mb-4 quick-actions-container">
             <div className="card shadow-sm h-100">
-              <div className="card-header bg-white border-0">
+              <div className="card-header">
+                <h2 className="h5 fw-bold mb-0 d-flex align-items-center">
+                  <FaClock className="me-2 text-info" /> Acciones Rápidas
+                </h2>
+              </div>
+              <div className="card-body">
+                <div className="d-grid gap-3">
+                  {quickActions.map((action, index) => (
+                    <button
+                      key={index}
+                      className={`quick-action-btn btn btn-${action.variant}`}
+                      onClick={action.action}
+                    >
+                      <div className="mb-2">{action.icon}</div>
+                      <span>{action.title}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Actividades Recientes (12 columnas - ancho completo) */}
+        <div className="row activities-container">
+          <div className="col-lg-6 col-md-12 mb-4">
+            <div className="card shadow-sm">
+              <div className="card-header">
                 <h2 className="h5 fw-bold mb-0 d-flex align-items-center">
                   <FiClock className="me-2 text-muted" /> Actividad Reciente
                 </h2>
@@ -142,9 +214,9 @@ const HomePage = () => {
               <div className="card-body p-0">
                 <ul className="list-group list-group-flush">
                   {recentActivities.map(activity => (
-                    <li key={activity.id} className="list-group-item border-0 py-3">
+                    <li key={activity.id} className="list-group-item border-0 py-3 activity-item">
                       <div className="d-flex align-items-start">
-                        <div className="bg-light p-2 rounded me-3">
+                        <div className="activity-icon">
                           {activity.icon}
                         </div>
                         <div className="flex-grow-1">
@@ -163,6 +235,80 @@ const HomePage = () => {
           </div>
         </div>
       </main>
+
+      {/* Modal */}
+      <Modal show={showModal} onHide={() => setShowModal(false)} centered size="lg">
+        <Modal.Header className="bg-primary text-white">
+          <Modal.Title>Detalles del Pedido Especial</Modal.Title>
+          <button 
+            type="button" 
+            className="btn-close btn-close-white" 
+            onClick={() => setShowModal(false)}
+            aria-label="Cerrar"
+          />
+        </Modal.Header>
+        <Modal.Body className="animate-fade">
+          {selectedOrder && (
+            <div className="row">
+              <div className="col-md-6">
+                <div className="d-flex align-items-center mb-4">
+                  <div 
+                    className="rounded-circle me-3" 
+                    style={{ width: '20px', height: '20px', backgroundColor: selectedOrder.color }}
+                  />
+                  <h4 className="mb-0 fw-bold">{selectedOrder.title}</h4>
+                </div>
+                
+                <div className="mb-3">
+                  <h6 className="text-muted mb-2">Fecha de Entrega</h6>
+                  <p className="fs-5">{formatDate(selectedOrder.start)}</p>
+                </div>
+
+                <div className="mb-3">
+                  <h6 className="text-muted mb-2">Cliente</h6>
+                  <p className="fs-5">{selectedOrder.client}</p>
+                </div>
+
+                <div className="mb-3">
+                  <h6 className="text-muted mb-2">Estado</h6>
+                  <span className={`badge ${
+                    selectedOrder.status === 'pendiente' ? 'bg-warning text-dark' : 
+                    selectedOrder.status === 'confirmado' ? 'bg-success' : 'bg-secondary'
+                  }`}>
+                    {selectedOrder.status.toUpperCase()}
+                  </span>
+                </div>
+              </div>
+              
+              <div className="col-md-6">
+                <div className="card h-100">
+                  <div className="card-header bg-light">
+                    <h5 className="mb-0">Detalles del Pedido</h5>
+                  </div>
+                  <div className="card-body">
+                    <div className="mb-3">
+                      <h6 className="text-muted mb-2">Productos</h6>
+                      <p>{selectedOrder.products}</p>
+                    </div>
+                    <div className="mb-3">
+                      <h6 className="text-muted mb-2">Notas Especiales</h6>
+                      <p className="fst-italic">{selectedOrder.notes}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="outline-secondary" onClick={() => setShowModal(false)}>
+            Cerrar
+          </Button>
+          <Button variant="primary" onClick={() => navigate('/ordenes-produccion')}>
+            Ver orden completa
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };

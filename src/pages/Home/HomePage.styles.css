@@ -1,94 +1,253 @@
 /* Layout Principal */
 .dashboard-container {
-    display: flex;
-    min-height: 100vh;
-  }
-  
-  
-  .main-content {
-    flex: 1;
-    background-color: #f8f9fa;
-    min-height: 100vh;
-  }
-  
-  .logout-section {
-    margin-top: auto;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-  }
-  
-  /* Tarjetas de Estadísticas */
-  .card {
-    border: none;
-    transition: transform 0.2s;
-  }
-  
-  .card:hover {
-    transform: translateY(-5px);
-  }
-  
-  .icon-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  
-  /* Avatar de Usuario */
-  .avatar {
-    width: 36px;
-    height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-  }
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #f8f9fa;
+}
 
-.name-user {
-  font-size: 2rem;
+.main-content {
+  flex: 1;
+  padding: 1rem;
+}
+
+/* Header */
+.header {
+  background-color: white;
+  padding: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Avatar */
+.avatar {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #0d6efd;
+  color: white;
+  border-radius: 50%;
   font-weight: bold;
 }
 
-/* Efectos adicionales */
-.cursor-pointer {
-    cursor: pointer;
-    transition: transform 0.2s;
+/* Cards */
+.card {
+  border: none;
+  border-radius: 0.5rem;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  transition: all 0.3s ease;
+  margin-bottom: 1.5rem;
+  height: 100%;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+  background-color: white;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 1rem;
+}
+
+.card-body {
+  padding: 1.25rem;
+}
+
+/* Quick Actions */
+.quick-action-btn {
+  min-height: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.3s ease;
+  border-radius: 0.5rem;
+}
+
+.quick-action-btn:hover {
+  transform: translateY(-5px);
+}
+
+/* Calendar */
+.rbc-calendar {
+  background-color: white;
+  border-radius: 0.5rem;
+  border: 1px solid #dee2e6;
+  overflow: hidden;
+}
+
+.rbc-header {
+  padding: 0.75rem 0;
+  background-color: #f8f9fa;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.rbc-month-view {
+  border: none;
+}
+
+.rbc-day-bg + .rbc-day-bg {
+  border-left: 1px solid #dee2e6;
+}
+
+.rbc-off-range-bg {
+  background-color: #f8f9fa;
+}
+
+.rbc-today {
+  background-color: #e7f5ff;
+}
+
+.rbc-event {
+  cursor: pointer;
+  padding: 0.125rem 0.25rem;
+  font-size: 0.85em;
+  border-radius: 0.25rem;
+  border: none;
+}
+
+.rbc-event-content {
+  white-space: normal !important;
+}
+
+.rbc-toolbar {
+  padding: 0.5rem;
+}
+
+.rbc-toolbar button {
+  color: #495057;
+  border: 1px solid #dee2e6;
+  background-color: white;
+  transition: all 0.2s;
+}
+
+.rbc-toolbar button:hover {
+  background-color: #f8f9fa;
+}
+
+.rbc-toolbar button.rbc-active {
+  background-color: #0d6efd;
+  color: white;
+  border-color: #0d6efd;
+}
+
+/* Recent Activities */
+.activity-item {
+  border-left: none;
+  border-right: none;
+}
+
+.activity-icon {
+  background-color: #f8f9fa;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Modal */
+.modal-content {
+  border: none;
+  border-radius: 0.75rem;
+  box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.15);
+}
+
+.modal-header {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 1.25rem;
+}
+
+.modal-title {
+  font-weight: 600;
+}
+
+.modal-body {
+  padding: 1.5rem;
+}
+
+.modal-footer {
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 1rem 1.5rem;
+}
+
+/* Badges */
+.badge {
+  padding: 0.5em 0.75em;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  border-radius: 0.375rem;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 992px) {
+  .calendar-container,
+  .quick-actions-container {
+    width: 100%;
+    max-width: 100%;
+    flex: 0 0 100%;
   }
   
-  .cursor-pointer:hover {
-    transform: translateY(-3px);
+  .quick-action-btn {
+    min-height: 80px;
   }
-  
-  /* Ajustes específicos para tarjetas */
-  .card-hover {
-    transition: all 0.3s ease;
-  }
-  
-  .card-hover:hover {
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1) !important;
-  }
-  
-  /* Botones de acciones rápidas */
-  .btn-action {
-    min-height: 100px;
-    display: flex;
+}
+
+@media (max-width: 768px) {
+  .rbc-toolbar {
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    transition: all 0.3s ease;
+    align-items: flex-start;
   }
   
-  .btn-action:hover {
-    transform: translateY(-5px);
+  .rbc-toolbar .rbc-toolbar-label {
+    margin: 0.5rem 0;
   }
   
-  /* Responsive para móviles */
-  @media (max-width: 768px) {
-    .btn-action {
-      min-height: 80px;
-      padding: 1rem 0.5rem !important;
-    }
-    
-    .card-body {
-      padding: 1.25rem !important;
-    }
+  .rbc-btn-group {
+    margin-bottom: 0.5rem;
   }
+  
+  .modal-body .row {
+    flex-direction: column;
+  }
+  
+  .modal-body .col-md-6 {
+    width: 100%;
+    margin-bottom: 1.25rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .rbc-header {
+    font-size: 0.8em;
+    padding: 0.5rem 0;
+  }
+  
+  .card-body {
+    padding: 1rem;
+  }
+}
