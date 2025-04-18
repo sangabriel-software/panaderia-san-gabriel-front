@@ -15,6 +15,8 @@ const getEndpoints = {
     CONSULTAR_RECETAS: "consultar-recetas",
     STOCK_DEL_DIA: "consultar-stock-sucursal",
     STOCK_DE_PRODUCTOS_GENERALES: "consultar-stock-productos",
+    CONSULTAR_ORDENES_ESPECIALES: "consultar-ordenes-especiales",
+    CONSULTAR_ORDENES_ESPECIALES_POR_ID: "consultar-orden-especial-id",
 };
 
 const postEndpoints = {
@@ -31,6 +33,7 @@ const postEndpoints = {
     INGRESAR_SUCURSAL: "/ingresarSucursal",
     INGRESAR_RECETA: "/ingresar-receta",
     INGRESAR_STOCK: "ingresar-stock-productos",
+    INGRESAR_ORDEN_ESPECIAL: "/ingresar-orden-especial",
 };
 
 const putEndpoints = {

@@ -1,10 +1,5 @@
-import React, { useState } from 'react';
-import { 
-  FiBox, FiDollarSign, FiUsers, FiPieChart, 
-  FiShoppingCart, FiPlus, FiTrendingUp, FiFileText,
-  FiClock, FiUser, FiPackage, FiX,
-  FiSun, FiMoon
-} from 'react-icons/fi';
+import React, { useState, useEffect } from 'react';
+import { FiBox, FiDollarSign, FiUsers, FiPieChart, FiShoppingCart, FiPlus, FiTrendingUp, FiFileText, FiClock, FiUser, FiPackage, FiX, FiSun, FiMoon } from 'react-icons/fi';
 import "./HomePage.styles.css";
 import { getUserData } from '../../utils/Auth/decodedata';
 import { useNavigate } from 'react-router-dom';
@@ -16,6 +11,9 @@ import { es } from 'date-fns/locale';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
+import { useGetOrdenEDetalle } from '../../hooks/orenesEspeciales/useGetOrenEDetalle';
+import useGetOrdenEHeader from '../../hooks/orenesEspeciales/useGetOrdenEHeader';
+import { consultarOrdenEspecialByIdService } from '../../services/ordenesEspeciales/ordenesEspeciales.service';
 
 const localizer = dateFnsLocalizer({
   format,
@@ -47,6 +45,34 @@ const HomePage = () => {
   const currentHour = dayjs().hour();
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [orderDetails, setOrderDetails] = useState(null);
+  const [loadingDetails, setLoadingDetails] = useState(false);
+  const { ordenesEspeciales, loadingOrdenEspecial, showErrorOrdenEspecial, setOrdenesEspeciales } = useGetOrdenEHeader();
+  const [calendarEvents, setCalendarEvents] = useState([]);
+
+  // Transformar los datos de órdenes especiales a eventos del calendario
+useEffect(() => {
+  if (ordenesEspeciales && ordenesEspeciales.length > 0) {
+    const events = ordenesEspeciales.map(orden => {
+      // Crear objetos dayjs para las fechas
+      const fechaEntrega = dayjs(orden.fechaEntrega);
+      
+      return {
+        id: orden.idOrdenEspecial,
+        title: `Orden #${orden.idOrdenEspecial}`,
+        start: fechaEntrega.startOf('day').toDate(), // Inicio del día local
+        end: fechaEntrega.endOf('day').toDate(),    // Fin del día local
+        client: orden.nombreCliente,
+        phone: orden.telefonoCliente,
+        branch: orden.sucursalEntrega,
+        status: orden.estado === 'A' ? 'Activo' : 'Inactivo',
+        color: "#0D6EFD",
+        orderData: orden
+      };
+    });
+    setCalendarEvents(events);
+  }
+}, [ordenesEspeciales]);
 
   const getGreeting = () => {
     if (currentHour >= 5 && currentHour < 12) {
@@ -80,34 +106,19 @@ const HomePage = () => {
     { id: 3, action: "Usuario creado (Carlos R.)", time: "Hace 3 horas", user: "Admin", icon: <FiUser /> }
   ];
 
-  const specialOrders = [
-    {
-      id: 1,
-      title: "Orden Especial",
-      start: new Date(new Date().setDate(new Date().getDate() + 2)),
-      end: new Date(new Date().setDate(new Date().getDate() + 2)),
-      client: "Hotel Las Palmas",
-      products: "200 panes especiales, 50 tortas",
-      notes: "Entregar antes de las 10 AM",
-      status: "pendiente",
-      color: "#0D6EFD"
-    },
-    {
-      id: 2,
-      title: "Orden Especial",
-      start: new Date(new Date().setDate(new Date().getDate() + 4)),
-      end: new Date(new Date().setDate(new Date().getDate() + 4)),
-      client: "Colegio San José",
-      products: "300 panes integrales, 200 panes blancos",
-      notes: "Empacar en bolsas individuales",
-      status: "confirmado",
-      color: "#0D6EFD"
-    }
-  ];
-
-  const handleSelectEvent = (event) => {
+  const handleSelectEvent = async (event) => {
     setSelectedOrder(event);
     setShowModal(true);
+    setLoadingDetails(true);
+    
+    try {
+      const response = await consultarOrdenEspecialByIdService(event.id);
+      setOrderDetails(response.ordenEspecial);
+    } catch (error) {
+      console.error("Error al cargar los detalles de la orden:", error);
+    } finally {
+      setLoadingDetails(false);
+    }
   };
 
   const eventStyleGetter = (event) => ({
@@ -163,19 +174,27 @@ const HomePage = () => {
               </div>
               <div className="homepage-card-body p-3">
                 <div className="homepage-calendar" style={{ height: 530 }}>
-                  <Calendar
-                    localizer={localizer}
-                    events={specialOrders}
-                    startAccessor="start"
-                    endAccessor="end"
-                    style={{ height: "100%" }}
-                    onSelectEvent={handleSelectEvent}
-                    eventPropGetter={eventStyleGetter}
-                    messages={calendarMessages}
-                    defaultView="month"
-                    views={['month', 'week', 'day']}
-                    culture="es"
-                  />
+                  {loadingOrdenEspecial ? (
+                    <div className="d-flex justify-content-center align-items-center h-100">
+                      <div className="spinner-border text-primary" role="status">
+                        <span className="visually-hidden">Cargando...</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <Calendar
+                      localizer={localizer}
+                      events={calendarEvents}
+                      startAccessor="start"
+                      endAccessor="end"
+                      style={{ height: "100%" }}
+                      onSelectEvent={handleSelectEvent}
+                      eventPropGetter={eventStyleGetter}
+                      messages={calendarMessages}
+                      defaultView="month"
+                      views={['month', 'week', 'day']}
+                      culture="es"
+                    />
+                  )}
                 </div>
               </div>
             </div>
@@ -243,7 +262,7 @@ const HomePage = () => {
 
       {/* Modal */}
       <Modal show={showModal} onHide={() => setShowModal(false)} centered size="lg" className="homepage-modal">
-        <Modal.Header className=" text-white">
+        <Modal.Header className="text-white bg-primary">
           <Modal.Title>Detalles del Pedido Especial</Modal.Title>
           <button 
             type="button" 
@@ -253,7 +272,13 @@ const HomePage = () => {
           />
         </Modal.Header>
         <Modal.Body className="homepage-animate-fade">
-          {selectedOrder && (
+          {loadingDetails ? (
+            <div className="d-flex justify-content-center align-items-center py-5">
+              <div className="spinner-border text-primary" role="status">
+                <span className="visually-hidden">Cargando detalles...</span>
+              </div>
+            </div>
+          ) : selectedOrder && (
             <div className="row">
               <div className="col-md-6">
                 <div className="d-flex align-items-center mb-4">
@@ -261,7 +286,7 @@ const HomePage = () => {
                     className="rounded-circle me-3" 
                     style={{ width: '20px', height: '20px', backgroundColor: selectedOrder.color }}
                   />
-                  <h4 className="mb-0 fw-bold">{selectedOrder.title}</h4>
+                  <h4 className="mb-0 fw-bold">Orden Especial #{selectedOrder.id}</h4>
                 </div>
                 
                 <div className="mb-3">
@@ -275,13 +300,13 @@ const HomePage = () => {
                 </div>
 
                 <div className="mb-3">
-                  <h6 className="text-muted mb-2">Estado</h6>
-                  <span className={`homepage-badge ${
-                    selectedOrder.status === 'pendiente' ? 'bg-warning text-dark' : 
-                    selectedOrder.status === 'confirmado' ? 'bg-success' : 'bg-secondary'
-                  }`}>
-                    {selectedOrder.status.toUpperCase()}
-                  </span>
+                  <h6 className="text-muted mb-2">Teléfono</h6>
+                  <p className="fs-5">{selectedOrder.phone}</p>
+                </div>
+
+                <div className="mb-3">
+                  <h6 className="text-muted mb-2">Sucursal de Entrega</h6>
+                  <p className="fs-5">{selectedOrder.branch}</p>
                 </div>
               </div>
               
@@ -291,14 +316,29 @@ const HomePage = () => {
                     <h5 className="mb-0">Detalles del Pedido</h5>
                   </div>
                   <div className="homepage-card-body">
-                    <div className="mb-3">
-                      <h6 className="text-muted mb-2">Productos</h6>
-                      <p>{selectedOrder.products}</p>
-                    </div>
-                    <div className="mb-3">
-                      <h6 className="text-muted mb-2">Notas Especiales</h6>
-                      <p className="fst-italic">{selectedOrder.notes}</p>
-                    </div>
+                    {orderDetails && orderDetails?.ordenDetalle?.length > 0 ? (
+                      <>
+                        <div className="mb-3">
+                          <h6 className="text-muted mb-2">Productos</h6>
+                          <ul className="list-group">
+                            {orderDetails.ordenDetalle.map((producto, index) => (
+                              <li key={index} className="list-group-item border-0 px-0 py-2">
+                                <div className="d-flex justify-content-between">
+                                  <span>{producto.nombreProducto}</span>
+                                  <span className="fw-bold">{producto.cantidadUnidades} unidades</span>
+                                </div>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                        <div className="mb-3">
+                          <h6 className="text-muted mb-2">Ingresado por</h6>
+                          <p>{selectedOrder.orderData?.ordenIngresadaPor || 'N/A'}</p>
+                        </div>
+                      </>
+                    ) : (
+                      <p>No hay detalles de productos para esta orden.</p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -309,7 +349,7 @@ const HomePage = () => {
           <Button variant="outline-secondary" onClick={() => setShowModal(false)}>
             Cerrar
           </Button>
-          <Button variant="primary" onClick={() => navigate('/ordenes-produccion')}>
+          <Button variant="primary" onClick={() => navigate(`/ordenes-produccion/${selectedOrder?.id}`)}>
             Ver orden completa
           </Button>
         </Modal.Footer>
