@@ -14,6 +14,7 @@ import Button from 'react-bootstrap/Button';
 import { useGetOrdenEDetalle } from '../../hooks/orenesEspeciales/useGetOrenEDetalle';
 import useGetOrdenEHeader from '../../hooks/orenesEspeciales/useGetOrdenEHeader';
 import { consultarOrdenEspecialByIdService } from '../../services/ordenesEspeciales/ordenesEspeciales.service';
+import { getUniqueColor } from '../../utils/utils';
 
 const localizer = dateFnsLocalizer({
   format,
@@ -66,7 +67,7 @@ useEffect(() => {
         phone: orden.telefonoCliente,
         branch: orden.sucursalEntrega,
         status: orden.estado === 'A' ? 'Activo' : 'Inactivo',
-        color: "#0D6EFD",
+        color: getUniqueColor(orden.sucursalEntrega + "orden1256"),
         orderData: orden
       };
     });
