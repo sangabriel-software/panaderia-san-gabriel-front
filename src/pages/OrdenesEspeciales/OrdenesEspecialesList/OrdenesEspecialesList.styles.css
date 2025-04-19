@@ -1,26 +1,26 @@
-/* Variables de color */
+/* Variables de color específicas para este componente */
 :root {
-    --primary-color: #4361ee;
-    --primary-light: #e0e7ff;
-    --secondary-color: #3f37c9;
-    --success-color: #4cc9f0;
-    --danger-color: #f72585;
-    --text-color: #2b2d42;
-    --text-light: #8d99ae;
-    --background-light: #f8f9fa;
-    --border-color: #e9ecef;
-    --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    --card-radius: 12px;
+    --oel-primary-color: #4361ee;
+    --oel-primary-light: #e0e7ff;
+    --oel-secondary-color: #3f37c9;
+    --oel-success-color: #4cc9f0;
+    --oel-danger-color: #f72585;
+    --oel-text-color: #2b2d42;
+    --oel-text-light: #8d99ae;
+    --oel-background-light: #f8f9fa;
+    --oel-border-color: #e9ecef;
+    --oel-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --oel-card-radius: 12px;
   }
   
-  /* Estilos generales */
-  .orders-container {
+  /* Estilos generales del componente */
+  .oel-container {
     padding: 1rem;
     max-width: 1400px;
     margin: 0 auto;
   }
   
-  .orders-header {
+  .oel-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -29,8 +29,8 @@
     gap: 1rem;
   }
   
-  .new-order-button {
-    background-color: var(--primary-color);
+  .oel-new-order-button {
+    background-color: var(--oel-primary-color);
     color: white;
     border: none;
     padding: 0.75rem 1.5rem;
@@ -41,204 +41,191 @@
     align-items: center;
     gap: 0.5rem;
     transition: all 0.3s ease;
-    box-shadow: var(--shadow);
+    box-shadow: var(--oel-shadow);
   }
   
-  .new-order-button:hover {
-    background-color: var(--secondary-color);
+  .oel-new-order-button:hover {
+    background-color: var(--oel-secondary-color);
     transform: translateY(-2px);
   }
   
-  .icon {
+  .oel-icon {
     font-size: 1.2rem;
   }
   
   /* Estilos para la tabla (Desktop) */
-  .orders-table {
+  .oel-table-container {
     width: 100%;
     overflow-x: auto;
-    border-radius: var(--card-radius);
-    box-shadow: var(--shadow);
+    border-radius: var(--oel-card-radius);
+    box-shadow: var(--oel-shadow);
     background: white;
   }
   
-  .orders-table table {
+  .oel-table {
     width: 100%;
     border-collapse: collapse;
   }
   
-  .orders-table th {
-    background-color: var(--primary-color);
+  .oel-table th {
+    background-color: var(--oel-primary-color);
     color: white;
     padding: 1rem;
     text-align: left;
     font-weight: 500;
   }
   
-  .orders-table td {
+  .oel-table td {
     padding: 1rem;
-    border-bottom: 1px solid var(--border-color);
-    color: var(--text-color);
+    border-bottom: 1px solid var(--oel-border-color);
+    color: var(--oel-text-color);
   }
   
-  .orders-table tr:last-child td {
+  .oel-table-row:last-child td {
     border-bottom: none;
   }
   
-  .orders-table tr:hover {
-    background-color: var(--primary-light);
+  .oel-table-row:hover {
+    background-color: var(--oel-primary-light);
   }
   
   /* Estilos para las cards (Tablet) */
-  .orders-grid {
+  .oel-grid-container {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 1.5rem;
   }
   
-  .order-card {
+  .oel-card {
     background: white;
-    border-radius: var(--card-radius);
+    border-radius: var(--oel-card-radius);
     padding: 1.5rem;
-    box-shadow: var(--shadow);
+    box-shadow: var(--oel-shadow);
     transition: transform 0.3s ease;
   }
   
-  .order-card:hover {
+  .oel-card:hover {
     transform: translateY(-5px);
   }
   
-  .card-header {
+  .oel-card-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
     margin-bottom: 1rem;
   }
   
-  .client-info {
+  .oel-client-info {
     display: flex;
     align-items: center;
     gap: 0.75rem;
   }
   
-  .client-info .icon {
+  .oel-client-info .oel-icon {
     font-size: 1.5rem;
-    color: var(--primary-color);
+    color: var(--oel-primary-color);
   }
   
-  .card-header h3 {
+  .oel-client-name {
     margin: 0;
-    color: var(--text-color);
+    color: var(--oel-text-color);
     font-size: 1.1rem;
   }
   
-  .card-details {
+  .oel-card-details {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
     margin-bottom: 1.5rem;
   }
   
-  .detail {
+  .oel-detail {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    color: var(--text-light);
+    color: var(--oel-text-light);
     font-size: 0.9rem;
   }
   
-  .detail .icon {
-    color: var(--primary-color);
+  .oel-detail .oel-icon {
+    color: var(--oel-primary-color);
     width: 20px;
     text-align: center;
   }
   
-  .card-actions {
+  .oel-card-actions {
     display: flex;
     gap: 0.75rem;
   }
   
   /* Estilos para móviles */
-  .orders-list-mobile {
+  .oel-mobile-container {
     display: flex;
     flex-direction: column;
     gap: 1rem;
   }
   
-  .mobile-order-card {
+  .oel-mobile-card {
     background: white;
-    border-radius: var(--card-radius);
+    border-radius: var(--oel-card-radius);
     padding: 1.25rem;
-    box-shadow: var(--shadow);
+    box-shadow: var(--oel-shadow);
     display: flex;
     flex-direction: column;
     gap: 1rem;
   }
   
-  .mobile-card-header {
+  .oel-mobile-header {
     display: flex;
     justify-content: space-between;
   }
   
-  .client-info {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-  }
-  
-  .profile-icon {
+  .oel-profile-icon {
     font-size: 1.75rem;
-    color: var(--primary-color);
+    color: var(--oel-primary-color);
   }
   
-  .client-info h4 {
-    margin: 0;
-    color: var(--text-color);
-    font-weight: 600;
-    font-size: 1rem;
-  }
-  
-  .client-meta {
+  .oel-client-meta {
     display: flex;
     align-items: center;
     gap: 0.5rem;
     margin-top: 0.25rem;
   }
   
-  .order-id {
-    color: var(--text-light);
+  .oel-order-id {
+    color: var(--oel-text-light);
     font-size: 0.75rem;
   }
   
-  .mobile-card-details {
+  .oel-mobile-details {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
     padding-left: 2.5rem;
   }
   
-  .detail-row {
+  .oel-detail-row {
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    color: var(--text-light);
+    color: var(--oel-text-light);
     font-size: 0.9rem;
   }
   
-  .detail-row .icon {
-    color: var(--primary-color);
+  .oel-detail-row .oel-icon {
+    color: var(--oel-primary-color);
     width: 20px;
     text-align: center;
   }
   
-  .mobile-card-actions {
+  .oel-mobile-actions {
     display: flex;
     gap: 0.75rem;
     padding-top: 0.75rem;
-    border-top: 1px solid var(--border-color);
+    border-top: 1px solid var(--oel-border-color);
   }
   
-  .mobile-action-button {
+  .oel-mobile-action-button {
     flex: 1;
     display: flex;
     align-items: center;
@@ -252,45 +239,41 @@
     transition: all 0.2s ease;
   }
   
-  .mobile-action-button.view {
-    background-color: var(--primary-light);
-    color: var(--primary-color);
+  .oel-mobile-action-button.oel-view {
+    background-color: var(--oel-primary-light);
+    color: var(--oel-primary-color);
   }
   
-  .mobile-action-button.delete {
+  .oel-mobile-action-button.oel-delete {
     background-color: #fee2e2;
-    color: var(--danger-color);
-  }
-  
-  .mobile-action-button .icon {
-    font-size: 1rem;
+    color: var(--oel-danger-color);
   }
   
   /* Badges */
-  .status-badge {
+  .oel-status-badge {
     padding: 0.25rem 0.75rem;
     border-radius: 20px;
     font-size: 0.75rem;
     font-weight: 600;
   }
   
-  .status-badge.active {
+  .oel-status-badge.oel-active {
     background-color: #dcfce7;
     color: #166534;
   }
   
-  .status-badge.inactive {
+  .oel-status-badge.oel-inactive {
     background-color: #fee2e2;
     color: #991b1b;
   }
   
   /* Botones de acción */
-  .actions {
+  .oel-actions {
     display: flex;
     gap: 0.5rem;
   }
   
-  .action-button {
+  .oel-action-button {
     width: 36px;
     height: 36px;
     border-radius: 50%;
@@ -302,22 +285,22 @@
     transition: all 0.2s ease;
   }
   
-  .action-button.view {
-    background-color: var(--primary-light);
-    color: var(--primary-color);
+  .oel-action-button.oel-view {
+    background-color: var(--oel-primary-light);
+    color: var(--oel-primary-color);
   }
   
-  .action-button.delete {
+  .oel-action-button.oel-delete {
     background-color: #fee2e2;
-    color: var(--danger-color);
+    color: var(--oel-danger-color);
   }
   
-  .action-button:hover {
+  .oel-action-button:hover {
     transform: scale(1.1);
   }
   
   /* Modal */
-  .modal-overlay {
+  .oel-modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -330,52 +313,52 @@
     z-index: 1000;
   }
   
-  .modal-content {
+  .oel-modal-content {
     background: white;
-    border-radius: var(--card-radius);
+    border-radius: var(--oel-card-radius);
     width: 90%;
     max-width: 500px;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-    animation: modalFadeIn 0.3s ease;
+    animation: oel-modalFadeIn 0.3s ease;
   }
   
-  @keyframes modalFadeIn {
+  @keyframes oel-modalFadeIn {
     from { opacity: 0; transform: translateY(-20px); }
     to { opacity: 1; transform: translateY(0); }
   }
   
-  .modal-header {
+  .oel-modal-header {
     padding: 1.5rem 1.5rem 1rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
   }
   
-  .modal-header h3 {
+  .oel-modal-header h3 {
     margin: 0;
-    color: var(--text-color);
+    color: var(--oel-text-color);
   }
   
-  .modal-close {
+  .oel-modal-close {
     background: none;
     border: none;
     cursor: pointer;
-    color: var(--text-light);
+    color: var(--oel-text-light);
   }
   
-  .modal-body {
+  .oel-modal-body {
     padding: 1rem 1.5rem;
-    color: var(--text-color);
+    color: var(--oel-text-color);
   }
   
-  .modal-footer {
+  .oel-modal-footer {
     padding: 1rem 1.5rem;
     display: flex;
     justify-content: flex-end;
     gap: 1rem;
   }
   
-  .modal-button {
+  .oel-modal-button {
     padding: 0.5rem 1.5rem;
     border-radius: 6px;
     font-weight: 500;
@@ -383,46 +366,46 @@
     transition: all 0.2s ease;
   }
   
-  .modal-button.cancel {
+  .oel-modal-button.oel-cancel {
     background-color: white;
-    border: 1px solid var(--border-color);
-    color: var(--text-color);
+    border: 1px solid var(--oel-border-color);
+    color: var(--oel-text-color);
   }
   
-  .modal-button.confirm {
-    background-color: var(--danger-color);
+  .oel-modal-button.oel-confirm {
+    background-color: var(--oel-danger-color);
     color: white;
     border: none;
   }
   
-  .modal-button:hover {
+  .oel-modal-button:hover {
     opacity: 0.9;
   }
   
   /* Loading */
-  .loading-container {
+  .oel-loading-container {
     display: flex;
     justify-content: center;
     align-items: center;
     height: 200px;
   }
   
-  .spinner {
+  .oel-spinner {
     width: 50px;
     height: 50px;
-    border: 5px solid var(--primary-light);
-    border-top-color: var(--primary-color);
+    border: 5px solid var(--oel-primary-light);
+    border-top-color: var(--oel-primary-color);
     border-radius: 50%;
-    animation: spin 1s linear infinite;
+    animation: oel-spin 1s linear infinite;
   }
   
-  @keyframes spin {
+  @keyframes oel-spin {
     to { transform: rotate(360deg); }
   }
   
-  .error-message {
+  .oel-error-message {
     background-color: #fee2e2;
-    color: var(--danger-color);
+    color: var(--oel-danger-color);
     padding: 1rem;
     border-radius: 8px;
     text-align: center;
@@ -431,12 +414,12 @@
   
   /* Responsive */
   @media (max-width: 768px) {
-    .orders-header {
+    .oel-header {
       flex-direction: column;
       align-items: flex-start;
     }
     
-    .new-order-button {
+    .oel-new-order-button {
       width: 100%;
       justify-content: center;
     }

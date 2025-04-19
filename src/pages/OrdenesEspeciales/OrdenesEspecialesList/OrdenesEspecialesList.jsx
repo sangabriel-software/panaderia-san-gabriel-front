@@ -48,39 +48,39 @@ const OrdenesEspecialesList = () => {
 
   if (loadingOrdenEspecial) {
     return (
-      <div className="loading-container">
-        <div className="spinner"></div>
+      <div className="oel-loading-container">
+        <div className="oel-spinner"></div>
       </div>
     );
   }
 
   if (showErrorOrdenEspecial) {
     return (
-      <div className="error-message">
+      <div className="oel-error-message">
         Error al cargar las órdenes especiales
       </div>
     );
   }
 
   return (
-    <div className="orders-container">
-      <div className="orders-header">
+    <div className="oel-container">
+      <div className="oel-header">
         <Title
           title="Órdenes Especiales"
           description="Gestión de las ordenes especiales"
         />
         <button 
-          className="new-order-button"
+          className="oel-new-order-button"
           onClick={handleNewOrder}
         >
-          <FiPlusCircle className="icon" /> Ingresar Orden Especial
+          <FiPlusCircle className="oel-icon" /> Ingresar Orden Especial
         </button>
       </div>
 
       {/* Versión Desktop */}
       {!isMobile && !isTablet && (
-        <div className="orders-table">
-          <table>
+        <div className="oel-table-container">
+          <table className="oel-table">
             <thead>
               <tr>
                 <th>ID</th>
@@ -94,28 +94,28 @@ const OrdenesEspecialesList = () => {
             </thead>
             <tbody>
               {ordenesEspeciales.map((orden) => (
-                <tr key={orden.idOrdenEspecial}>
+                <tr key={orden.idOrdenEspecial} className="oel-table-row">
                   <td data-label="ID">{orden.idOrdenEspecial}</td>
                   <td data-label="Cliente">{orden.nombreCliente}</td>
                   <td data-label="Teléfono">{orden.telefonoCliente}</td>
                   <td data-label="Sucursal">{orden.sucursalEntrega}</td>
                   <td data-label="Fecha Entrega">{new Date(orden.fechaEntrega).toLocaleDateString()}</td>
                   <td data-label="Estado">
-                    <span className={`status-badge ${orden.estado === 'A' ? 'active' : 'inactive'}`}>
+                    <span className={`oel-status-badge ${orden.estado === 'A' ? 'oel-active' : 'oel-inactive'}`}>
                       {orden.estado === 'A' ? 'Activo' : 'Inactivo'}
                     </span>
                   </td>
                   <td data-label="Acciones">
-                    <div className="actions">
-                      <button className="action-button view" title="Ver detalles">
-                        <FiEye className="icon" />
+                    <div className="oel-actions">
+                      <button className="oel-action-button oel-view" title="Ver detalles">
+                        <FiEye className="oel-icon" />
                       </button>
                       <button 
-                        className="action-button delete"
+                        className="oel-action-button oel-delete"
                         onClick={() => handleDeleteClick(orden)}
                         title="Eliminar orden"
                       >
-                        <FiTrash2 className="icon" />
+                        <FiTrash2 className="oel-icon" />
                       </button>
                     </div>
                   </td>
@@ -128,42 +128,42 @@ const OrdenesEspecialesList = () => {
 
       {/* Versión Tablet */}
       {isTablet && (
-        <div className="orders-grid">
+        <div className="oel-grid-container">
           {ordenesEspeciales.map((orden) => (
-            <div key={orden.idOrdenEspecial} className="order-card">
-              <div className="card-header">
-                <div className="client-info">
-                  <FiUser className="icon" />
-                  <h3>{orden.nombreCliente}</h3>
+            <div key={orden.idOrdenEspecial} className="oel-card">
+              <div className="oel-card-header">
+                <div className="oel-client-info">
+                  <FiUser className="oel-icon" />
+                  <h3 className="oel-client-name">{orden.nombreCliente}</h3>
                 </div>
-                <span className={`status-badge ${orden.estado === 'A' ? 'active' : 'inactive'}`}>
+                <span className={`oel-status-badge ${orden.estado === 'A' ? 'oel-active' : 'oel-inactive'}`}>
                   {orden.estado === 'A' ? 'Activo' : 'Inactivo'}
                 </span>
               </div>
-              <div className="card-details">
-                <div className="detail">
-                  <FiPhone className="icon" />
+              <div className="oel-card-details">
+                <div className="oel-detail">
+                  <FiPhone className="oel-icon" />
                   <span>{orden.telefonoCliente}</span>
                 </div>
-                <div className="detail">
-                  <FiShoppingBag className="icon" />
+                <div className="oel-detail">
+                  <FiShoppingBag className="oel-icon" />
                   <span>{orden.sucursalEntrega}</span>
                 </div>
-                <div className="detail">
-                  <FiCalendar className="icon" />
+                <div className="oel-detail">
+                  <FiCalendar className="oel-icon" />
                   <span>{new Date(orden.fechaEntrega).toLocaleDateString()}</span>
                 </div>
               </div>
-              <div className="card-actions">
-                <button className="action-button view" title="Ver detalles">
-                  <FiEye className="icon" /> Ver
+              <div className="oel-card-actions">
+                <button className="oel-card-action-button oel-view" title="Ver detalles">
+                  <FiEye className="oel-icon" /> Ver
                 </button>
                 <button 
-                  className="action-button delete"
+                  className="oel-card-action-button oel-delete"
                   onClick={() => handleDeleteClick(orden)}
                   title="Eliminar orden"
                 >
-                  <FiTrash2 className="icon" /> Eliminar
+                  <FiTrash2 className="oel-icon" /> Eliminar
                 </button>
               </div>
             </div>
@@ -173,50 +173,50 @@ const OrdenesEspecialesList = () => {
 
       {/* Versión Mobile */}
       {isMobile && (
-        <div className="orders-list-mobile">
+        <div className="oel-mobile-container">
           {ordenesEspeciales.map((orden) => (
-            <div key={orden.idOrdenEspecial} className="mobile-order-card">
-              <div className="mobile-card-header">
-                <div className="client-info">
-                  <FiUser className="icon profile-icon" />
+            <div key={orden.idOrdenEspecial} className="oel-mobile-card">
+              <div className="oel-mobile-header">
+                <div className="oel-client-info">
+                  <FiUser className="oel-icon oel-profile-icon" />
                   <div>
-                    <h4>{orden.nombreCliente}</h4>
-                    <div className="client-meta">
-                      <span className={`status-badge ${orden.estado === 'A' ? 'active' : 'inactive'}`}>
+                    <h4 className="oel-client-name">{orden.nombreCliente}</h4>
+                    <div className="oel-client-meta">
+                      <span className={`oel-status-badge ${orden.estado === 'A' ? 'oel-active' : 'oel-inactive'}`}>
                         {orden.estado === 'A' ? 'Activo' : 'Inactivo'}
                       </span>
-                      <span className="order-id">#{orden.idOrdenEspecial}</span>
+                      <span className="oel-order-id">#{orden.idOrdenEspecial}</span>
                     </div>
                   </div>
                 </div>
               </div>
               
-              <div className="mobile-card-details">
-                <div className="detail-row">
-                  <FiPhone className="icon" />
+              <div className="oel-mobile-details">
+                <div className="oel-detail-row">
+                  <FiPhone className="oel-icon" />
                   <span>{orden.telefonoCliente}</span>
                 </div>
-                <div className="detail-row">
-                  <FiShoppingBag className="icon" />
+                <div className="oel-detail-row">
+                  <FiShoppingBag className="oel-icon" />
                   <span>{orden.sucursalEntrega}</span>
                 </div>
-                <div className="detail-row">
-                  <FiCalendar className="icon" />
+                <div className="oel-detail-row">
+                  <FiCalendar className="oel-icon" />
                   <span>{new Date(orden.fechaEntrega).toLocaleDateString()}</span>
                 </div>
               </div>
               
-              <div className="mobile-card-actions">
-                <button className="mobile-action-button view" title="Ver detalles">
-                  <FiEye className="icon" />
+              <div className="oel-mobile-actions">
+                <button className="oel-mobile-action-button oel-view" title="Ver detalles">
+                  <FiEye className="oel-icon" />
                   <span>Ver</span>
                 </button>
                 <button 
-                  className="mobile-action-button delete"
+                  className="oel-mobile-action-button oel-delete"
                   onClick={() => handleDeleteClick(orden)}
                   title="Eliminar orden"
                 >
-                  <FiTrash2 className="icon" />
+                  <FiTrash2 className="oel-icon" />
                   <span>Eliminar</span>
                 </button>
               </div>
@@ -227,29 +227,29 @@ const OrdenesEspecialesList = () => {
 
       {/* Modal de confirmación */}
       {openDeleteDialog && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <div className="modal-header">
+        <div className="oel-modal-overlay">
+          <div className="oel-modal-content">
+            <div className="oel-modal-header">
               <h3>Confirmar eliminación</h3>
               <button 
-                className="modal-close"
+                className="oel-modal-close"
                 onClick={handleDeleteCancel}
               >
-                <FiX className="icon" />
+                <FiX className="oel-icon" />
               </button>
             </div>
-            <div className="modal-body">
+            <div className="oel-modal-body">
               <p>¿Estás seguro que deseas eliminar la orden especial #{selectedOrder?.idOrdenEspecial} de {selectedOrder?.nombreCliente}?</p>
             </div>
-            <div className="modal-footer">
+            <div className="oel-modal-footer">
               <button 
-                className="modal-button cancel"
+                className="oel-modal-button oel-cancel"
                 onClick={handleDeleteCancel}
               >
                 Cancelar
               </button>
               <button 
-                className="modal-button confirm"
+                className="oel-modal-button oel-confirm"
                 onClick={handleDeleteConfirm}
               >
                 Eliminar
