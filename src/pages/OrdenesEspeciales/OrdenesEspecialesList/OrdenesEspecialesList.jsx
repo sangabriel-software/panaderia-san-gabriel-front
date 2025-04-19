@@ -4,6 +4,16 @@ import { useMediaQuery } from 'react-responsive';
 import { useNavigate } from 'react-router-dom';
 import './OrdenesEspecialesList.styles.css';
 import Title from "../../../components/Title/Title";
+import { 
+  FiPlusCircle, 
+  FiEye, 
+  FiTrash2,
+  FiUser,
+  FiPhone,
+  FiCalendar,
+  FiShoppingBag,
+  FiX
+} from 'react-icons/fi';
 
 const OrdenesEspecialesList = () => {
   const { ordenesEspeciales, loadingOrdenEspecial, showErrorOrdenEspecial, setOrdenesEspeciales } = useGetOrdenEHeader();
@@ -63,7 +73,7 @@ const OrdenesEspecialesList = () => {
           className="new-order-button"
           onClick={handleNewOrder}
         >
-          <i className="icon-plus"></i> Ingresar Orden Especial
+          <FiPlusCircle className="icon" /> Ingresar Orden Especial
         </button>
       </div>
 
@@ -97,14 +107,15 @@ const OrdenesEspecialesList = () => {
                   </td>
                   <td data-label="Acciones">
                     <div className="actions">
-                      <button className="action-button view">
-                        <i className="icon-eye"></i>
+                      <button className="action-button view" title="Ver detalles">
+                        <FiEye className="icon" />
                       </button>
                       <button 
                         className="action-button delete"
                         onClick={() => handleDeleteClick(orden)}
+                        title="Eliminar orden"
                       >
-                        <i className="icon-trash"></i>
+                        <FiTrash2 className="icon" />
                       </button>
                     </div>
                   </td>
@@ -121,30 +132,38 @@ const OrdenesEspecialesList = () => {
           {ordenesEspeciales.map((orden) => (
             <div key={orden.idOrdenEspecial} className="order-card">
               <div className="card-header">
-                <h3>{orden.nombreCliente}</h3>
+                <div className="client-info">
+                  <FiUser className="icon" />
+                  <h3>{orden.nombreCliente}</h3>
+                </div>
                 <span className={`status-badge ${orden.estado === 'A' ? 'active' : 'inactive'}`}>
                   {orden.estado === 'A' ? 'Activo' : 'Inactivo'}
                 </span>
               </div>
               <div className="card-details">
                 <div className="detail">
-                  <i className="icon-shop"></i>
+                  <FiPhone className="icon" />
+                  <span>{orden.telefonoCliente}</span>
+                </div>
+                <div className="detail">
+                  <FiShoppingBag className="icon" />
                   <span>{orden.sucursalEntrega}</span>
                 </div>
                 <div className="detail">
-                  <i className="icon-calendar"></i>
+                  <FiCalendar className="icon" />
                   <span>{new Date(orden.fechaEntrega).toLocaleDateString()}</span>
                 </div>
               </div>
               <div className="card-actions">
-                <button className="action-button view">
-                  <i className="icon-eye"></i> Ver
+                <button className="action-button view" title="Ver detalles">
+                  <FiEye className="icon" /> Ver
                 </button>
                 <button 
                   className="action-button delete"
                   onClick={() => handleDeleteClick(orden)}
+                  title="Eliminar orden"
                 >
-                  <i className="icon-trash"></i> Eliminar
+                  <FiTrash2 className="icon" /> Eliminar
                 </button>
               </div>
             </div>
@@ -154,30 +173,51 @@ const OrdenesEspecialesList = () => {
 
       {/* Versión Mobile */}
       {isMobile && (
-        <div className="orders-list">
+        <div className="orders-list-mobile">
           {ordenesEspeciales.map((orden) => (
-            <div key={orden.idOrdenEspecial} className="list-item">
-              <div className="item-main">
-                <div className="item-info">
-                  <h4>{orden.nombreCliente}</h4>
-                  <span className={`status-badge ${orden.estado === 'A' ? 'active' : 'inactive'}`}>
-                    {orden.estado === 'A' ? 'Activo' : 'Inactivo'}
-                  </span>
-                </div>
-                <div className="item-secondary">
-                  <span><i className="icon-shop"></i> {orden.sucursalEntrega}</span>
-                  <span><i className="icon-calendar"></i> {new Date(orden.fechaEntrega).toLocaleDateString()}</span>
+            <div key={orden.idOrdenEspecial} className="mobile-order-card">
+              <div className="mobile-card-header">
+                <div className="client-info">
+                  <FiUser className="icon profile-icon" />
+                  <div>
+                    <h4>{orden.nombreCliente}</h4>
+                    <div className="client-meta">
+                      <span className={`status-badge ${orden.estado === 'A' ? 'active' : 'inactive'}`}>
+                        {orden.estado === 'A' ? 'Activo' : 'Inactivo'}
+                      </span>
+                      <span className="order-id">#{orden.idOrdenEspecial}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div className="item-actions">
-                <button className="icon-button">
-                  <i className="icon-eye"></i>
+              
+              <div className="mobile-card-details">
+                <div className="detail-row">
+                  <FiPhone className="icon" />
+                  <span>{orden.telefonoCliente}</span>
+                </div>
+                <div className="detail-row">
+                  <FiShoppingBag className="icon" />
+                  <span>{orden.sucursalEntrega}</span>
+                </div>
+                <div className="detail-row">
+                  <FiCalendar className="icon" />
+                  <span>{new Date(orden.fechaEntrega).toLocaleDateString()}</span>
+                </div>
+              </div>
+              
+              <div className="mobile-card-actions">
+                <button className="mobile-action-button view" title="Ver detalles">
+                  <FiEye className="icon" />
+                  <span>Ver</span>
                 </button>
                 <button 
-                  className="icon-button delete"
+                  className="mobile-action-button delete"
                   onClick={() => handleDeleteClick(orden)}
+                  title="Eliminar orden"
                 >
-                  <i className="icon-trash"></i>
+                  <FiTrash2 className="icon" />
+                  <span>Eliminar</span>
                 </button>
               </div>
             </div>
@@ -195,7 +235,7 @@ const OrdenesEspecialesList = () => {
                 className="modal-close"
                 onClick={handleDeleteCancel}
               >
-                &times;
+                <FiX className="icon" />
               </button>
             </div>
             <div className="modal-body">
