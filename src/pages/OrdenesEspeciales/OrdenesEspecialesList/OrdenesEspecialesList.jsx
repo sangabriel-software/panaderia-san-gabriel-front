@@ -14,6 +14,7 @@ import {
   FiShoppingBag,
   FiX
 } from 'react-icons/fi';
+import { formatDateToDisplay } from "../../../utils/dateUtils";
 
 const OrdenesEspecialesList = () => {
   const { ordenesEspeciales, loadingOrdenEspecial, showErrorOrdenEspecial, setOrdenesEspeciales } = useGetOrdenEHeader();
@@ -99,7 +100,7 @@ const OrdenesEspecialesList = () => {
                   <td data-label="Cliente">{orden.nombreCliente}</td>
                   <td data-label="Teléfono">{orden.telefonoCliente}</td>
                   <td data-label="Sucursal">{orden.sucursalEntrega}</td>
-                  <td data-label="Fecha Entrega">{new Date(orden.fechaEntrega).toLocaleDateString()}</td>
+                  <td data-label="Fecha Entrega">{formatDateToDisplay(orden.fechaEntrega)}</td>
                   <td data-label="Estado">
                     <span className={`oel-status-badge ${orden.estado === 'A' ? 'oel-active' : 'oel-inactive'}`}>
                       {orden.estado === 'A' ? 'Activo' : 'Inactivo'}
@@ -151,7 +152,7 @@ const OrdenesEspecialesList = () => {
                 </div>
                 <div className="oel-detail">
                   <FiCalendar className="oel-icon" />
-                  <span>{new Date(orden.fechaEntrega).toLocaleDateString()}</span>
+                  <span>{formatDateToDisplay(orden.fechaEntrega)}</span>
                 </div>
               </div>
               <div className="oel-card-actions">
@@ -202,7 +203,7 @@ const OrdenesEspecialesList = () => {
                 </div>
                 <div className="oel-detail-row">
                   <FiCalendar className="oel-icon" />
-                  <span>{new Date(orden.fechaEntrega).toLocaleDateString()}</span>
+                  <span>{formatDateToDisplay(orden.fechaEntrega)}</span>
                 </div>
               </div>
               
