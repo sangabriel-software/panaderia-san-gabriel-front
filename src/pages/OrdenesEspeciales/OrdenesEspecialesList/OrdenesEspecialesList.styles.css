@@ -1,0 +1,405 @@
+/* Variables de color */
+:root {
+    --primary-color: #4361ee;
+    --primary-light: #e0e7ff;
+    --secondary-color: #3f37c9;
+    --success-color: #4cc9f0;
+    --danger-color: #f72585;
+    --text-color: #2b2d42;
+    --text-light: #8d99ae;
+    --background-light: #f8f9fa;
+    --border-color: #e9ecef;
+    --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Estilos generales */
+  .orders-container {
+    padding: 1rem;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  
+  .orders-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  
+  .new-order-button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow);
+  }
+  
+  .new-order-button:hover {
+    background-color: var(--secondary-color);
+    transform: translateY(-2px);
+  }
+  
+  /* Estilos para la tabla (Desktop) */
+  .orders-table {
+    width: 100%;
+    overflow-x: auto;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    background: white;
+  }
+  
+  .orders-table table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .orders-table th {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 1rem;
+    text-align: left;
+    font-weight: 500;
+  }
+  
+  .orders-table td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-color);
+  }
+  
+  .orders-table tr:last-child td {
+    border-bottom: none;
+  }
+  
+  .orders-table tr:hover {
+    background-color: var(--primary-light);
+  }
+  
+  /* Estilos para las cards (Tablet) */
+  .orders-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  .order-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+    transition: transform 0.3s ease;
+  }
+  
+  .order-card:hover {
+    transform: translateY(-5px);
+  }
+  
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+  
+  .card-header h3 {
+    margin: 0;
+    color: var(--text-color);
+  }
+  
+  .card-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .detail {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-light);
+  }
+  
+  .card-actions {
+    display: flex;
+    gap: 0.75rem;
+  }
+  
+  /* Estilos para lista (Mobile) */
+  .orders-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .list-item {
+    background: white;
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: var(--shadow);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .item-main {
+    flex: 1;
+  }
+  
+  .item-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .item-info h4 {
+    margin: 0;
+    color: var(--text-color);
+  }
+  
+  .item-secondary {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    font-size: 0.875rem;
+    color: var(--text-light);
+  }
+  
+  .item-secondary span {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .item-actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+  
+  /* Estilos para botones */
+  .action-button {
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+  }
+  
+  .action-button.view {
+    background-color: var(--primary-light);
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+  }
+  
+  .action-button.delete {
+    background-color: #fee2e2;
+    color: var(--danger-color);
+    border-color: var(--danger-color);
+  }
+  
+  .action-button:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+  }
+  
+  .icon-button {
+    background: none;
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .icon-button.delete {
+    color: var(--danger-color);
+    background-color: #fee2e2;
+  }
+  
+  .icon-button:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+  
+  /* Badges */
+  .status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  
+  .status-badge.active {
+    background-color: #dcfce7;
+    color: #166534;
+  }
+  
+  .status-badge.inactive {
+    background-color: #fee2e2;
+    color: #991b1b;
+  }
+  
+  /* Modal */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .modal-content {
+    background: white;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    animation: modalFadeIn 0.3s ease;
+  }
+  
+  @keyframes modalFadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  .modal-header {
+    padding: 1.5rem 1.5rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .modal-header h3 {
+    margin: 0;
+    color: var(--text-color);
+  }
+  
+  .modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--text-light);
+  }
+  
+  .modal-body {
+    padding: 1rem 1.5rem;
+    color: var(--text-color);
+  }
+  
+  .modal-footer {
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+  }
+  
+  .modal-button {
+    padding: 0.5rem 1.5rem;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .modal-button.cancel {
+    background-color: white;
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+  }
+  
+  .modal-button.confirm {
+    background-color: var(--danger-color);
+    color: white;
+    border: none;
+  }
+  
+  .modal-button:hover {
+    opacity: 0.9;
+  }
+  
+  /* Loading */
+  .loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+  }
+  
+  .spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid var(--primary-light);
+    border-top-color: var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  
+  .error-message {
+    background-color: #fee2e2;
+    color: var(--danger-color);
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+    margin: 2rem;
+  }
+  
+  /* Iconos */
+  .icon-plus:before {
+    content: "+";
+  }
+  
+  .icon-eye:before {
+    content: "👁️";
+  }
+  
+  .icon-trash:before {
+    content: "🗑️";
+  }
+  
+  .icon-shop:before {
+    content: "🏪";
+  }
+  
+  .icon-calendar:before {
+    content: "📅";
+  }
+  
+  /* Responsive */
+  @media (max-width: 768px) {
+    .orders-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    .new-order-button {
+      width: 100%;
+      justify-content: center;
+    }
+  }
