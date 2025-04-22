@@ -4,16 +4,7 @@ import { useMediaQuery } from 'react-responsive';
 import { useNavigate } from 'react-router-dom';
 import './OrdenesEspecialesList.styles.css';
 import Title from "../../../components/Title/Title";
-import { 
-  FiPlusCircle, 
-  FiEye, 
-  FiTrash2,
-  FiUser,
-  FiPhone,
-  FiCalendar,
-  FiShoppingBag,
-  FiX
-} from 'react-icons/fi';
+import { FiPlusCircle, FiEye, FiTrash2, FiUser, FiPhone, FiCalendar, FiShoppingBag, FiX } from 'react-icons/fi';
 import { formatDateToDisplay } from "../../../utils/dateUtils";
 
 const OrdenesEspecialesList = () => {

@@ -2,14 +2,14 @@ import api from "../../config/api";
 import { getEndpoints, postEndpoints, deleteEndpoints } from "../../config/endpoints";
 
 
-export const ingresarOrdenProduccionService = async (ordenEspecial) => {
+export const ingresarOrdenEspecialService = async (ordenEspecial) => {
     try {
         const response = await api.post(`${postEndpoints.INGRESAR_ORDEN_ESPECIAL}`, ordenEspecial); 
         return response.data;
     } catch (error) {
       throw error;
     }
-  }
+}
 
 export const consultarOrdenesEspecialesService = async () => {
   try {

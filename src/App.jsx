@@ -6,6 +6,7 @@ import "./styles/App.css";
 import "./styles/globalStyles.css";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import IngresarOrdenEspecialPage from "./pages/OrdenesEspeciales/ingresar-orden-especial/IngresarIOrdenEspecial";
 
 const AccessDeniedPage = lazy( ()=> import("./components/AccesoDenegado/AccessDeniedPage"));
 // Lazy-loaded components
@@ -97,6 +98,7 @@ function App() {
 
             <Route path="/pedido-especial">
               <Route index element={<OrdenesEspecialesList/>} />
+              <Route path="/pedido-especial/ingresar-orden-especial" element={<IngresarOrdenEspecialPage/>} />
             </Route>
 
           </Route>
