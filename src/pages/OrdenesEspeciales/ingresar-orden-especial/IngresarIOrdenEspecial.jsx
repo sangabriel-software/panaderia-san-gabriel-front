@@ -37,13 +37,13 @@ const IngresarOrdenEspecialPage = () => {
   const [isPopupErrorOpen, setIsPopupErrorOpen] = useState(false);
   const [errorPopupMessage, setErrorPopupMessage] = useState("");
 
-  const prodPorHarina = productos?.filter((item) => item.tipoProduccion !== "bandejas");
+  // Eliminado el filtro por tipoProducción !== "bandejas"
   const categorias = [...new Set(productos?.map((item) => item.nombreCategoria) || [])];
 
   const productosFiltrados = useMemo(() => {
     let filtered = categoriaActiva === "Todas" 
-      ? prodPorHarina 
-      : prodPorHarina?.filter((item) => item.nombreCategoria === categoriaActiva);
+      ? productos // Mostramos todos los productos sin filtrar por tipo
+      : productos?.filter((item) => item.nombreCategoria === categoriaActiva);
 
     if (searchTerm) {
       filtered = filtered?.filter((producto) =>
@@ -52,7 +52,7 @@ const IngresarOrdenEspecialPage = () => {
     }
 
     return filtered;
-  }, [prodPorHarina, categoriaActiva, searchTerm]);
+  }, [productos, categoriaActiva, searchTerm]);
 
   const clearSearch = () => {
     setSearchTerm("");
@@ -395,7 +395,7 @@ const IngresarOrdenEspecialPage = () => {
         message="La orden especial ha sido creada correctamente"
         nombreBotonVolver="Ver Órdenes"
         nombreBotonNuevo="Crear otra"
-        onView={() => navigate(`/ordenes-especiales`)}
+        onView={() => navigate(`/pedido-especial`)}
         onNew={() => {
           setIsPopupOpen(false);
           setNombreCliente("");
