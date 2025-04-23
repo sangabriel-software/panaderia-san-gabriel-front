@@ -178,7 +178,7 @@ const IngresarOrdenEspecialPage = () => {
       </div>
 
       {/* Información del cliente */}
-      <div className="card p-4 mb-4 shadow-sm">
+      <div className="card card-info-cliente p-4 mb-4 shadow-sm">
         <h5 className="mb-4">Información del Cliente</h5>
         <Row>
           <Col md={6} className="mb-3">
@@ -219,12 +219,13 @@ const IngresarOrdenEspecialPage = () => {
             <Form.Group>
               <Form.Label>Sucursal de Entrega *</Form.Label>
               <Dropdown>
-                <Dropdown.Toggle variant="light" className="w-100 text-start" style={{ border: "1px solid #ced4da" }}>
+                <Dropdown.Toggle variant="light" className="dropdown-toggle-custom w-100 text-start" style={{ border: "1px solid #e2e8f0" }}>
                   {sucursalSeleccionada ? sucursalSeleccionada.nombreSucursal : "Seleccione una sucursal"}
                 </Dropdown.Toggle>
-                <Dropdown.Menu className="w-100">
+                <Dropdown.Menu className="dropdown-menu-custom w-100">
                   {sucursales?.map((sucursal) => (
                     <Dropdown.Item 
+                      className="dropdown-item-custom"
                       key={sucursal.idSucursal}
                       onClick={() => setSucursalSeleccionada(sucursal)}
                       active={sucursalSeleccionada?.idSucursal === sucursal.idSucursal}

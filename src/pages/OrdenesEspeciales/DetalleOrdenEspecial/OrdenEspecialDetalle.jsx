@@ -74,6 +74,8 @@ const OrdenEspecialDetail = () => {
       );
     }
 
+    filtered = filtered?.filter((producto) => (cantidadValues[producto.idProducto] || 0) > 0);
+
     return filtered || [];
   }, [productos, categoriaActiva, searchTerm]);
 
@@ -253,7 +255,7 @@ const OrdenEspecialDetail = () => {
       </div>
 
       {/* Información del cliente */}
-      <div className="card p-4 mb-4 shadow-sm">
+      <div className="card card-info-cliente p-4 mb-4 shadow-sm">
         <div className="d-flex justify-content-between align-items-center mb-4">
           <h5>Información del Cliente</h5>
           {!isEditing ? (
@@ -298,7 +300,7 @@ const OrdenEspecialDetail = () => {
           </Col>
           <Col md={6} className="mb-3">
             <Form.Group>
-              <Form.Label>Teléfono del Cliente *</Form.Label>
+              <Form.Label>Teléfono de la orden *</Form.Label>
               <Form.Control
                 type="text"
                 placeholder="Ingrese el número de teléfono"
@@ -338,15 +340,16 @@ const OrdenEspecialDetail = () => {
               <Dropdown>
                 <Dropdown.Toggle 
                   variant="light" 
-                  className="w-100 text-start" 
-                  style={{ border: "1px solid #ced4da" }}
+                  className="w-100 text-start dropdown-toggle-custom" 
+                  style={{ border: "1px solid #e2e8f0" }}
                   disabled={!isEditing}
                 >
                   {sucursalSeleccionada ? `${sucursalSeleccionada.nombreSucursal} - ${sucursalSeleccionada.municipioSucursal}` : "Seleccione una sucursal"}
                 </Dropdown.Toggle>
-                <Dropdown.Menu className="w-100">
+                <Dropdown.Menu className="w-100 dropdown-menu-custom">
                   {sucursales?.map((sucursal) => (
                     <Dropdown.Item 
+                    className="dropdown-item-custom"
                       key={sucursal.idSucursal}
                       onClick={() => setDetalleOrdenEspecial({
                         ...detalleOrdenEspecial,
@@ -363,24 +366,6 @@ const OrdenEspecialDetail = () => {
                   ))}
                 </Dropdown.Menu>
               </Dropdown>
-            </Form.Group>
-          </Col>
-          <Col md={12} className="mb-3">
-            <Form.Group>
-              <Form.Label>Observaciones</Form.Label>
-              <Form.Control
-                as="textarea"
-                rows={3}
-                value={detalleOrdenEspecial.ordenEncabezado.observaciones || ""}
-                onChange={(e) => setDetalleOrdenEspecial({
-                  ...detalleOrdenEspecial,
-                  ordenEncabezado: {
-                    ...detalleOrdenEspecial.ordenEncabezado,
-                    observaciones: e.target.value
-                  }
-                })}
-                readOnly={!isEditing}
-              />
             </Form.Group>
           </Col>
         </Row>

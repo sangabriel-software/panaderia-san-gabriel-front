@@ -370,3 +370,180 @@
     margin-bottom: 1.5rem;
     font-weight: 600;
   }
+
+  /* OrdenEspecialDetalle.css */
+
+/* Estilos generales para la tarjeta de información del cliente */
+.card-info-cliente {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  background-color: #ffffff;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.card-info-cliente:hover {
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
+}
+
+/* Encabezado de la tarjeta */
+.card-info-cliente h5 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #2d3748;
+  margin-bottom: 0;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #edf2f7;
+}
+
+/* Botones */
+.btn-modificar {
+  background-color: #4f46e5;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.btn-modificar:hover {
+  background-color: #4338ca;
+  transform: translateY(-1px);
+}
+
+.btn-guardar {
+  background-color: #10b981;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.btn-guardar:hover {
+  background-color: #0d9f6e;
+  transform: translateY(-1px);
+}
+
+.btn-cancelar {
+  background-color: #f3f4f6;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-weight: 500;
+  color: #4b5563;
+  transition: all 0.2s ease;
+}
+
+.btn-cancelar:hover {
+  background-color: #e5e7eb;
+  color: #374151;
+}
+
+/* Campos del formulario */
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #4a5568;
+}
+
+.form-control {
+  display: block;
+  width: 100%;
+  padding: 0.625rem 0.875rem;
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #2d3748;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.form-control:focus {
+  color: #2d3748;
+  background-color: #fff;
+  border-color: #a0aec0;
+  outline: 0;
+  box-shadow: 0 0 0 3px rgba(160, 174, 192, 0.2);
+}
+
+.form-control[readonly] {
+  background-color: #f8fafc;
+  border-color: #e2e8f0;
+  cursor: not-allowed;
+}
+
+/* Dropdown personalizado */
+.dropdown-toggle-custom {
+  background-color: #fff;
+  color: #4a5568;
+  border: 1px solid #e2e8f0;
+  text-align: left;
+  padding: 0.625rem 0.875rem;
+  border-radius: 8px;
+}
+
+.dropdown-toggle-custom::after {
+  float: right;
+  margin-top: 0.5rem;
+}
+
+.dropdown-menu-custom {
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  padding: 0.5rem 0;
+}
+
+.dropdown-item-custom {
+  padding: 0.5rem 1.5rem;
+  font-size: 0.875rem;
+  color: #4a5568;
+  transition: all 0.2s ease;
+}
+
+.dropdown-item-custom:hover, 
+.dropdown-item-custom:focus {
+  background-color: #f8fafc;
+  color: #2d3748;
+}
+
+.dropdown-item-custom.active {
+  background-color: #edf2f7;
+  color: #2d3748;
+  font-weight: 500;
+}
+
+/* Textarea */
+textarea.form-control {
+  min-height: 100px;
+  resize: vertical;
+}
+
+/* Efectos de transición */
+.form-control, 
+.dropdown-toggle, 
+.btn {
+  transition: all 0.2s ease;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .card-info-cliente {
+    padding: 1.5rem;
+  }
+  
+  .form-group {
+    margin-bottom: 1rem;
+  }
+}
