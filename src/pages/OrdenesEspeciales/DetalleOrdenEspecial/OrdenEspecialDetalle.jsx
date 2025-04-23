@@ -16,9 +16,11 @@ import dayjs from "dayjs";
 import { actualizarOrdenEspecialService } from "../../../services/ordenesEspeciales/ordenesEspeciales.service";
 import { FiEdit, FiSave, FiX } from "react-icons/fi";
 import useGetOrdenEDetalle from "../../../hooks/orenesEspeciales/useGetOrenEDetalle";
+import { getUserData } from "../../../utils/Auth/decodedata";
 
 const OrdenEspecialDetail = () => {
   const { idOrdenEspecial } = useParams();
+   const userData = getUserData();
   const navigate = useNavigate();
   
   // Custom hook para cargar los datos de la orden
@@ -30,7 +32,6 @@ const OrdenEspecialDetail = () => {
     setDetalleOrdenEspecial
   } = useGetOrdenEDetalle(idOrdenEspecial);
 
-  console.log(detalleOrdenEspecial)
 
   // Hooks para productos y sucursales
   const { productos, loadigProducts, showErrorProductos } = useGetProductosYPrecios();
@@ -154,7 +155,7 @@ const OrdenEspecialDetail = () => {
           idSucursal: detalleOrdenEspecial.ordenEncabezado.idSucursal,
           fechaEntrega: dayjs(detalleOrdenEspecial.ordenEncabezado.fechaEntrega).format("YYYY-MM-DD"),
           fechaAProducir: dayjs(detalleOrdenEspecial.ordenEncabezado.fechaEntrega).format("YYYY-MM-DD"),
-          idUsuario: 1
+          idUsuario: userData.idUsuario,
         },
         ordenDetalle: productosSeleccionados
       };
@@ -268,28 +269,32 @@ const OrdenEspecialDetail = () => {
 
       {/* Información del cliente */}
       <div className="card card-info-cliente p-4 mb-4 shadow-sm">
-        <div className="d-flex justify-content-between align-items-center mb-4">
-          <h5>Información del Cliente</h5>
-          {!isEditing ? (
-            <Button variant="primary" onClick={() => setIsEditing(true)}>
-              <FiEdit className="me-2" /> Modificar
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <h5>Información del Cliente</h5>
+        {!isEditing ? (
+          <Button
+            variant="primary"
+            onClick={() => setIsEditing(true)}
+            disabled={dayjs(detalleOrdenEspecial.ordenEncabezado.fechaEntrega).isBefore(dayjs(), 'day')}
+          >
+            <FiEdit className="me-2" /> Modificar
+          </Button>
+        ) : (
+          <div>
+            <Button variant="success" onClick={handleSubmit} disabled={isLoading} className="me-2">
+              {isLoading ? (
+                <Spinner animation="border" size="sm" className="me-2" />
+              ) : (
+                <FiSave className="me-2" />
+              )}
+              Guardar Cambios
             </Button>
-          ) : (
-            <div>
-              <Button variant="success" onClick={handleSubmit} disabled={isLoading} className="me-2">
-                {isLoading ? (
-                  <Spinner animation="border" size="sm" className="me-2" />
-                ) : (
-                  <FiSave className="me-2" />
-                )}
-                Guardar Cambios
-              </Button>
-              <Button variant="secondary" onClick={handleCancelEdit}>
-                <FiX className="me-2" /> Cancelar
-              </Button>
-            </div>
-          )}
-        </div>
+            <Button variant="secondary" onClick={handleCancelEdit}>
+              <FiX className="me-2" /> Cancelar
+            </Button>
+          </div>
+        )}
+      </div>
         
         <Row>
           <Col md={6} className="mb-3">

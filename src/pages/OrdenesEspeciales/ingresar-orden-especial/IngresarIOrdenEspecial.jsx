@@ -16,6 +16,7 @@ import "./IngresarOrdenEspecial.styles.css";
 import useGetSucursales from "../../../hooks/sucursales/useGetSucursales";
 import dayjs from "dayjs";
 import { ingresarOrdenEspecialService } from "../../../services/ordenesEspeciales/ordenesEspeciales.service";
+import { getUserData } from "../../../utils/Auth/decodedata";
 
 const IngresarOrdenEspecialPage = () => {
   const navigate = useNavigate();
@@ -25,6 +26,7 @@ const IngresarOrdenEspecialPage = () => {
   const [categoriaActiva, setCategoriaActiva] = useState("Todas");
   const [searchTerm, setSearchTerm] = useState("");
   const { sucursales, loadingSucursales, showErrorSucursales } = useGetSucursales();
+  const userData = getUserData();
   
   // Datos del cliente y fechas
   const [nombreCliente, setNombreCliente] = useState("");
@@ -98,7 +100,7 @@ const IngresarOrdenEspecialPage = () => {
       const payload = {
         ordenEncabezado: {
           idSucursal: sucursalSeleccionada.idSucursal,
-          idUsuario: 1, // Usuario por defecto
+          idUsuario: userData.idUsuario, // Usuario por defecto
           nombreCliente: nombreCliente.trim(),
           telefonoCliente: telefonoCliente.trim(),
           fechaEntrega: dayjs(fechaEntrega).format("YYYY-MM-DD"),

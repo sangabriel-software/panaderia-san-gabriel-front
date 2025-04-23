@@ -11,6 +11,7 @@ import ErrorPopup from "../../../components/Popup/ErrorPopUp";
 import { Spinner, Form } from "react-bootstrap";
 import { BsExclamationTriangleFill, BsInfoCircleFill } from 'react-icons/bs';
 import { formatDateToDisplay } from "../../../utils/dateUtils";
+import dayjs from "dayjs";
 
 const OrdenesEspecialesList = () => {
   const { ordenesEspeciales, loadingOrdenEspecial, showErrorOrdenEspecial, setOrdenesEspeciales } = useGetOrdenEHeader();
@@ -235,8 +236,8 @@ const handleViewDetails = (idOrdenEspecial) => {
                     <td data-label="Sucursal">{orden.sucursalEntrega}</td>
                     <td data-label="Fecha Entrega">{formatDateToDisplay(orden.fechaEntrega)}</td>
                     <td data-label="Estado">
-                      <span className={`oel-status-badge ${orden.estado === 'A' ? 'oel-active' : 'oel-inactive'}`}>
-                        {orden.estado === 'A' ? 'Activo' : 'Inactivo'}
+                      <span className={`oel-status-badge ${dayjs(orden.fechaEntrega).isBefore(dayjs(), 'day') ? 'oel-active' : 'oel-inactive'}`}>
+                        {dayjs(orden.fechaEntrega).isBefore(dayjs(), 'day') ? 'Entregado' : 'Sin entregar'}
                       </span>
                     </td>
                     <td data-label="Acciones">

@@ -77,7 +77,6 @@ const HomePage = () => {
       const events = ordenesEspeciales.map((orden) => {
         // Crear objetos dayjs para las fechas
         const fechaEntrega = dayjs(orden.fechaEntrega);
-
         return {
           id: orden.idOrdenEspecial,
           title: `Orden #${orden.idOrdenEspecial}`,
@@ -405,6 +404,16 @@ const HomePage = () => {
                   <div className="mb-3">
                     <h6 className="text-muted mb-2">Sucursal de Entrega</h6>
                     <p className="fs-5">{selectedOrder.branch}</p>
+                  </div>
+                  <div className="mb-3">
+                    <h6 className="text-muted mb-2">Estado de la orden</h6>
+                    <p className="fs-5">
+                      {dayjs(selectedOrder.orderData.fechaEntrega).isBefore(dayjs(), 'day') ? (
+                        <span className="badge bg-success">Entregado</span>
+                      ) : (
+                        <span className="badge bg-danger text-light">Sin entregar</span>
+                      )}
+                    </p>
                   </div>
                 </div>
 
