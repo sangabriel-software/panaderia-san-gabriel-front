@@ -456,10 +456,9 @@
 
 .form-control {
   display: block;
-  width: 100%;
   padding: 0.625rem 0.875rem;
-  font-size: 0.875rem;
-  font-weight: 400;
+  font-size: 1rem;
+  font-weight: bold;
   line-height: 1.5;
   color: #2d3748;
   background-color: #fff;
@@ -514,7 +513,7 @@
 
 .dropdown-item-custom:hover, 
 .dropdown-item-custom:focus {
-  background-color: #f8fafc;
+  background-color: #afc;
   color: #2d3748;
 }
 

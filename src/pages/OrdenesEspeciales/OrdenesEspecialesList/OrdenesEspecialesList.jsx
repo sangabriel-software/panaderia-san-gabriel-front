@@ -21,6 +21,7 @@ const OrdenesEspecialesList = () => {
   const [isPopupErrorOpen, setIsPopupErrorOpen] = useState(false);
   const [errorPopupMessage, setErrorPopupMessage] = useState("");
   
+  
   // Filtros
   const [sucursalFilter, setSucursalFilter] = useState("");
   const [fechaFilter, setFechaFilter] = useState("");
@@ -119,12 +120,15 @@ const handleViewDetails = (idOrdenEspecial) => {
 
   if (showErrorOrdenEspecial) {
     return (
-      <div className="oel-error-message">
-        <Alert
-          type="danger"
-          message="Error al cargar las órdenes especiales"
-          icon={<BsExclamationTriangleFill />}
-        />
+      <div className="row">
+        <div className="col-lg-3"></div>
+        <div className="col-lg-6">
+          <Alert
+            type="danger"
+            message="Error al cargar las órdenes especiales"
+            icon={<BsExclamationTriangleFill />}
+          />
+        </div>
       </div>
     );
   }
@@ -198,7 +202,7 @@ const handleViewDetails = (idOrdenEspecial) => {
               message={
                 sucursalFilter || fechaFilter 
                   ? "No hay órdenes que coincidan con los filtros aplicados"
-                  : "No hay órdenes especiales registradas. Haz clic en 'Ingresar Orden Especial' para crear una nueva."
+                  : "No hay órdenes especiales registradas."
               }
               icon={<BsInfoCircleFill />}
             />
