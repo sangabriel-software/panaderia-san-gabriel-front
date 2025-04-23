@@ -1,31 +1,45 @@
+// src/hooks/ordenesEspeciales/useGetOrdenEDetalle.js
 import { useEffect, useState } from "react";
 import { consultarOrdenEspecialByIdService } from "../../services/ordenesEspeciales/ordenesEspeciales.service";
 
-/* Consulta a BD los permisoso */
 export const useGetOrdenEDetalle = (idOrdenEspecial) => {
-    const [detalleOrdenEspecial, setDetalleOrdenEspecial] = useState([]);
+    const [detalleOrdenEspecial, setDetalleOrdenEspecial] = useState(null);
     const [loadingDetalleOrdenEspecial, setLoadingDetalleOrdenEspecial] = useState(true);
     const [showErrorDetalleOrdenEspecial, setShowErrorDetalleOrdenEspecial] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
   
     useEffect(() => {
       const fetchDetalleOrdenEspecial = async () => {
         try {
+          setLoadingDetalleOrdenEspecial(true);
           const response = await consultarOrdenEspecialByIdService(idOrdenEspecial);
-          const data = response;
-          if (data.status === 200) {
-            setDetalleOrdenEspecial(data.ordenEspecial);
+          
+          if (response.status === 200) {
+            setDetalleOrdenEspecial(response.ordenEspecial);
+          } else {
+            setShowErrorDetalleOrdenEspecial(true);
+            setErrorMessage(response.message || 'Error al cargar el detalle');
           }
         } catch (error) {
-            setShowErrorDetalleOrdenEspecial(true);
+          setShowErrorDetalleOrdenEspecial(true);
+          setErrorMessage(error.message || 'Error al cargar el detalle');
         } finally {
-            setLoadingDetalleOrdenEspecial(false);
+          setLoadingDetalleOrdenEspecial(false);
         }
       };
 
-      fetchDetalleOrdenEspecial();
-    }, []);
+      if (idOrdenEspecial) {
+        fetchDetalleOrdenEspecial();
+      }
+    }, [idOrdenEspecial]);
   
-    return { detalleOrdenEspecial, loadingDetalleOrdenEspecial, showErrorDetalleOrdenEspecial };
-  };
+    return { 
+      detalleOrdenEspecial, 
+      loadingDetalleOrdenEspecial, 
+      showErrorDetalleOrdenEspecial,
+      errorMessage,
+      setDetalleOrdenEspecial // Para permitir actualización local
+    };
+};
   
-  export default useGetOrdenEDetalle;
+export default useGetOrdenEDetalle;

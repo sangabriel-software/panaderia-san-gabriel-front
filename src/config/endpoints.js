@@ -47,6 +47,7 @@ const putEndpoints = {
     ACTUALIZAR_SUCURSALES: "/actualizar-sucursal",
     ACTUALIZAR_RECETA: "/actualizar-receta",
     CAMBIAR_PASS: "/actualizar-pass",
+    ACTUALIZAR_ORDEN_ESPECIAL: "/actualizar-orden-especial",
 };
 
 const deleteEndpoints = {

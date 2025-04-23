@@ -1,5 +1,5 @@
 import api from "../../config/api";
-import { getEndpoints, postEndpoints, deleteEndpoints } from "../../config/endpoints";
+import { getEndpoints, postEndpoints, deleteEndpoints, putEndpoints } from "../../config/endpoints";
 
 
 export const ingresarOrdenEspecialService = async (ordenEspecial) => {
@@ -38,12 +38,12 @@ export const eliminarOrdenEspecialService = async (idOrdenEspecial) => {
   }
 }
 
-/*
-export const consultarDetalleOrdenPorCriterio = async (ordenTurno, fechaAprducir, idSucursal) => {
+export const actualizarOrdenEspecialService = async (ordenEspecial) => {
   try {
-    const response = await api.get(`${getEndpoints.CONSULTAR_ORDEN_POR_CRITERIOS}?ordenTurno=${ordenTurno}&fechaAproducir=${fechaAprducir}&idSucursal=${idSucursal}`);
+    const response = await api.put(`${putEndpoints.ACTUALIZAR_ORDEN_ESPECIAL}`, ordenEspecial);
     return response.data;
   } catch (error) {
     throw error;
   }
-};*/
+};
+

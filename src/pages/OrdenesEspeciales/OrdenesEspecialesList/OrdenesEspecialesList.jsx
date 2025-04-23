@@ -98,6 +98,11 @@ const OrdenesEspecialesList = () => {
     navigate('/pedido-especial/ingresar-orden-especial');
   };
 
+  // En el componente OrdenesEspecialesList, modificar los botones de "Ver detalles"
+const handleViewDetails = (idOrdenEspecial) => {
+  navigate(`/pedido-especial/detalle-orden-especial/${idOrdenEspecial}`);
+};
+
   const clearFilters = () => {
     setSucursalFilter("");
     setFechaFilter("");
@@ -232,7 +237,7 @@ const OrdenesEspecialesList = () => {
                     </td>
                     <td data-label="Acciones">
                       <div className="oel-actions">
-                        <button className="oel-action-button oel-view" title="Ver detalles">
+                        <button className="oel-action-button oel-view" title="Ver detalles" onClick={() => handleViewDetails(orden.idOrdenEspecial)}>
                           <FiEye className="oel-icon" />
                         </button>
                         <button 
@@ -316,7 +321,7 @@ const OrdenesEspecialesList = () => {
                   </div>
                 </div>
                 <div className="oel-card-actions">
-                  <button className="oel-card-action-button oel-view" title="Ver detalles">
+                  <button className="oel-card-action-button oel-view" title="Ver detalles" onClick={() => handleViewDetails(orden.idOrdenEspecial)}>
                     <FiEye className="oel-icon" /> Ver
                   </button>
                   <button 
@@ -400,7 +405,7 @@ const OrdenesEspecialesList = () => {
                 </div>
                 
                 <div className="oel-mobile-actions">
-                  <button className="oel-mobile-action-button oel-view" title="Ver detalles">
+                  <button className="oel-mobile-action-button oel-view" title="Ver detalles" onClick={() => handleViewDetails(orden.idOrdenEspecial)}>
                     <FiEye className="oel-icon" />
                     <span>Ver</span>
                   </button>
