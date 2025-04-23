@@ -344,7 +344,7 @@ const OrdenEspecialDetail = () => {
                   style={{ border: "1px solid #e2e8f0" }}
                   disabled={!isEditing}
                 >
-                  {sucursalSeleccionada ? `${sucursalSeleccionada.nombreSucursal} - ${sucursalSeleccionada.municipioSucursal}` : "Seleccione una sucursal"}
+                  {sucursalSeleccionada ? `${sucursalSeleccionada.nombreSucursal}` : "Seleccione una sucursal"}
                 </Dropdown.Toggle>
                 <Dropdown.Menu className="w-100 dropdown-menu-custom">
                   {sucursales?.map((sucursal) => (
@@ -361,7 +361,7 @@ const OrdenEspecialDetail = () => {
                       })}
                       active={detalleOrdenEspecial.ordenEncabezado.idSucursal === sucursal.idSucursal}
                     >
-                      {sucursal.nombreSucursal} - {sucursal.municipioSucursal}
+                      {sucursal.nombreSucursal}
                     </Dropdown.Item>
                   ))}
                 </Dropdown.Menu>

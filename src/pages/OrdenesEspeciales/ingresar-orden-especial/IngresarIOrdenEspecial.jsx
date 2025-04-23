@@ -230,7 +230,7 @@ const IngresarOrdenEspecialPage = () => {
                       onClick={() => setSucursalSeleccionada(sucursal)}
                       active={sucursalSeleccionada?.idSucursal === sucursal.idSucursal}
                     >
-                      {sucursal.nombreSucursal} - {sucursal.municipioSucursal}
+                      {sucursal.nombreSucursal}
                     </Dropdown.Item>
                   ))}
                 </Dropdown.Menu>
