@@ -92,10 +92,10 @@ const SalesSummary = ({ show, handleClose, orderData, trayQuantities, productos,
   };
 
   // Filtrar y separar productos por categoría
-  const productosPanaderia = productos.filter((p) => p.nombreCategoria === "Panadería");
-  const productosOtros = productos.filter((p) => p.nombreCategoria !== "Panadería");
+  const productosPanaderia = productos.filter((p) => p.nombreCategoria === "Panaderia");
+  const productosOtros = productos.filter((p) => p.nombreCategoria !== "Panaderia");
 
-  // Obtener la cantidad no vendida para productos de Panadería
+  // Obtener la cantidad no vendida para productos de Panaderia
   const productosPanaderiaConCantidad = productosPanaderia.map((producto) => {
     const cantidadNoVendida = trayQuantities[producto.idProducto]?.cantidad || 0;
     return {
@@ -113,7 +113,7 @@ const SalesSummary = ({ show, handleClose, orderData, trayQuantities, productos,
     };
   });
 
-  // Verificar si todos los productos de Panadería fueron vendidos
+  // Verificar si todos los productos de Panaderia fueron vendidos
   const todosProductosPanaderiaVendidos = productosPanaderiaConCantidad.every(
     (producto) => producto.cantidadNoVendida === 0
   );
@@ -168,10 +168,10 @@ const SalesSummary = ({ show, handleClose, orderData, trayQuantities, productos,
           </div>
         </div>
 
-        {/* Sección de Panadería */}
-        <h5 className="mb-3 fw-semibold text-primary">Panadería</h5>
+        {/* Sección de Panaderia */}
+        <h5 className="mb-3 fw-semibold text-primary">Panaderia</h5>
         {todosProductosPanaderiaVendidos ? (
-          <p className="text-center text-muted">Todos los productos de Panadería fueron vendidos.</p>
+          <p className="text-center text-muted">Todos los productos de Panaderia fueron vendidos.</p>
         ) : (
           <div className="table-responsive">
             <Table hover>

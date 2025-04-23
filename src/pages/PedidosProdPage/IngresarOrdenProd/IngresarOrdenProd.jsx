@@ -1,7 +1,8 @@
-import { useRef, useState } from "react";
-import { Container, Form, Row, Col, Button, Card, InputGroup } from "react-bootstrap";
+import { useEffect, useRef, useState } from "react";
+import { Container, Form, Row, Col, Button, Card, InputGroup, Table, Dropdown } from "react-bootstrap";
 import { useForm } from "react-hook-form";
-import { BsArrowLeft, BsExclamationTriangleFill } from "react-icons/bs";
+import { BsArrowLeft, BsArrowUp, BsExclamationTriangleFill, BsFilter } from "react-icons/bs";
+import { FaSearch } from "react-icons/fa";
 import { useNavigate } from "react-router";
 import Title from "../../../components/Title/Title";
 import Alert from "../../../components/Alerts/Alert";
@@ -16,20 +17,25 @@ import { getUserData } from "../../../utils/Auth/decodedata";
 import "./ordenes.css";
 
 const IngresarOrdenProd = () => {
-  const usuario = getUserData(); // Información de usuario conectado.
+  const usuario = getUserData();
   const alertRef = useRef(null);
   const navigate = useNavigate();
   const { sucursales, loadingSucursales, showErrorSucursales } = useGetSucursales();
   const { productos, loadigProducts, showErrorProductos } = useGetProductosYPrecios();
   const tomorrow = dayjs().add(1, "day").format("YYYY-MM-DD");
   const today = dayjs().format("YYYY-MM-DD");
-
+  
   const { register, handleSubmit, formState: { errors }, setValue, watch, reset, getValues } = useForm({
-    defaultValues: { sucursal: "", turno: "AM", fechaAProducir: usuario.idRol === 1 && usuario.rol === "Admin" ? tomorrow : today, nombrePanadero: "" },
+    defaultValues: {
+      sucursal: "",
+      turno: "AM",
+      fechaAProducir: usuario.idRol === 1 && usuario.rol === "Admin" ? tomorrow : today,
+      nombrePanadero: "",
+    },
   });
 
   const turnoValue = watch("turno");
-  const [activeCategory, setActiveCategory] = useState(usuario.idRol === 1 && usuario.rol === "Admin" ? "Panadería" : "Repostería");
+  const [activeCategory] = useState("Panaderia");
   const [trayQuantities, setTrayQuantities] = useState({});
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [isPopupErrorOpen, setIsPopupErrorOpen] = useState(false);
@@ -37,12 +43,17 @@ const IngresarOrdenProd = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showOrderSummary, setShowOrderSummary] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [productionTypeFilter, setProductionTypeFilter] = useState("todos");
 
   const handleShowOrderSummary = () => setShowOrderSummary(true);
   const handleCloseOrderSummary = () => setShowOrderSummary(false);
 
-  // Usar la función importada para obtener los productos filtrados
-  const productsToShow = getFilteredProductsByCategory(productos, searchTerm, activeCategory, usuario);
+  const filteredProducts = productos.filter((producto) => producto.idCategoria === 1);
+  const productsToShow = getFilteredProductsByCategory(productos, searchTerm, activeCategory, usuario)
+    .filter(producto => {
+      if (productionTypeFilter === "todos") return true;
+      return producto.tipoProduccion === productionTypeFilter;
+    });
 
   const onSubmit = async (data) => {
     setShowOrderSummary(true);
@@ -50,12 +61,46 @@ const IngresarOrdenProd = () => {
 
   const handleConfirmOrder = async () => {
     const data = getValues();
-    await handleIngresarOrdenProduccionSubmit(data, trayQuantities, setTrayQuantities, setIsPopupOpen, setErrorPopupMessage, setIsPopupErrorOpen,
-      setIsLoading, reset);
+    await handleIngresarOrdenProduccionSubmit(
+      data,
+      trayQuantities,
+      setTrayQuantities,
+      setIsPopupOpen,
+      setErrorPopupMessage,
+      setIsPopupErrorOpen,
+      setIsLoading,
+      reset
+    );
     setShowOrderSummary(false);
   };
 
   scrollToAlert(errorPopupMessage, isPopupErrorOpen, alertRef);
+
+  const [showScrollButton, setShowScrollButton] = useState(false);
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 20) {
+        setShowScrollButton(true);
+      } else {
+        setShowScrollButton(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 30, behavior: "smooth" });
+  };
+
+  const getFilterLabel = () => {
+    switch(productionTypeFilter) {
+      case "bandejas": return "Bandejas";
+      case "harina": return "Harina";
+      default: return "Todos los productos";
+    }
+  };
 
   return (
     <Container className="glassmorphism-container py-4">
@@ -110,7 +155,11 @@ const IngresarOrdenProd = () => {
                             required: "Seleccione una fecha",
                           })}
                           className="form-control modern-datepicker"
-                          min={usuario.idRol === 1 && usuario.rol === "Admin" ? tomorrow : today }
+                          min={
+                            usuario.idRol === 1 && usuario.rol === "Admin"
+                              ? tomorrow
+                              : today
+                          }
                         />
                       </InputGroup>
                       {errors.fechaAProducir && (
@@ -128,14 +177,18 @@ const IngresarOrdenProd = () => {
                       </label>
                       <div className="d-flex gap-2 shift-selector">
                         <Button
-                          variant={turnoValue === "AM" ? "primary" : "outline-primary"}
+                          variant={
+                            turnoValue === "AM" ? "primary" : "outline-primary"
+                          }
                           className="shift-btn-ventas"
                           onClick={() => setValue("turno", "AM")}
                         >
                           🌅 AM
                         </Button>
                         <Button
-                          variant={turnoValue === "PM" ? "primary" : "outline-primary"}
+                          variant={
+                            turnoValue === "PM" ? "primary" : "outline-primary"
+                          }
                           className="shift-btn-ventas"
                           onClick={() => setValue("turno", "PM")}
                         >
@@ -157,7 +210,10 @@ const IngresarOrdenProd = () => {
                       </label>
                       {loadingSucursales ? (
                         <div className="loading-spinner">
-                          <div className="spinner-border text-primary" role="status" />
+                          <div
+                            className="spinner-border text-primary"
+                            role="status"
+                          />
                         </div>
                       ) : (
                         <Form.Select
@@ -221,7 +277,10 @@ const IngresarOrdenProd = () => {
                 }
               >
                 {isLoading ? (
-                  <span className="spinner-border spinner-border-sm" role="status" />
+                  <span
+                    className="spinner-border spinner-border-sm"
+                    role="status"
+                  />
                 ) : (
                   <>
                     <span className="btn-icon">🚀</span>
@@ -241,88 +300,146 @@ const IngresarOrdenProd = () => {
         </div>
       ) : (
         <div className="products-section">
-          {/* Barra de búsqueda */}
-          <div className="mb-4">
-            <Form.Control
-              type="text"
-              placeholder="Buscar producto por nombre..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="input-data search-bar"
-            />
+          {/* Barra de búsqueda y filtros */}
+          <div className="mb-4 search-filter-container">
+            <div className="search-wrapper">
+              <Form.Control
+                type="text"
+                placeholder="Buscar producto por nombre..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="search-input"
+              />
+              <FaSearch className="search-icon" />
+            </div>
+            
+            {/* Dropdown de filtro */}
+            <Dropdown className="filter-dropdown">
+              <Dropdown.Toggle variant="primary" id="dropdown-filter">
+                <BsFilter className="me-2" />
+                {getFilterLabel()}
+              </Dropdown.Toggle>
+
+              <Dropdown.Menu>
+                <Dropdown.Item 
+                  active={productionTypeFilter === "todos"}
+                  onClick={() => setProductionTypeFilter("todos")}
+                >
+                  Todos los productos
+                </Dropdown.Item>
+                <Dropdown.Item 
+                  active={productionTypeFilter === "bandejas"}
+                  onClick={() => setProductionTypeFilter("bandejas")}
+                >
+                  Bandejas
+                </Dropdown.Item>
+                <Dropdown.Item 
+                  active={productionTypeFilter === "harina"}
+                  onClick={() => setProductionTypeFilter("harina")}
+                >
+                  Harina
+                </Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
           </div>
 
-          {/* Selector de categoría */}
-          <div className="category-selector mb-4">
-            {usuario.idRol === 1 && usuario.rol === "Admin" && (
-              <Button
-                variant={activeCategory === "Panadería" ? "primary" : "outline-primary"}
-                onClick={() => setActiveCategory("Panadería")}
-                className="category-btn"
-              >
-                Panadería ({searchTerm ? filterProductsByName(productos, searchTerm, usuario).length : productos.filter((p) => p.nombreCategoria === "Panadería").length})
-              </Button>
-            )}
-            <Button
-              variant={activeCategory === "Repostería" ? "primary" : "outline-primary"}
-              onClick={() => setActiveCategory("Repostería")}
-              className="category-btn"
-            >
-              Repostería ({searchTerm ? filterProductsByName(productos, searchTerm, usuario).length : productos.filter((p) => p.nombreCategoria === "Repostería").length})
-            </Button>
+          {/* Tabla de productos */}
+          <div className="table-responsive excel-table-container">
+            <Table striped bordered hover className="excel-table">
+              <thead>
+                <tr>
+                  <th className="dark-header text-center">Producto</th>
+                  <th className="dark-header text-center">Cantidad</th>
+                </tr>
+              </thead>
+              <tbody>
+                {productsToShow.length > 0 ? (
+                  productsToShow.map((producto) => (
+                    <tr key={producto.idProducto}>
+                      <td className="text-center align-middle">
+                        <div className="product-info">
+                          <div 
+                            className="product-badge-ingresar-orden"
+                            style={{ backgroundColor: getUniqueColor(producto.nombreProducto) }}
+                          >
+                            {getInitials(producto.nombreProducto)}
+                          </div>
+                          <span className="product-name">{producto.nombreProducto}</span>
+                        </div>
+                      </td>
+                      <td className="text-center align-middle">
+                        <div className="quantity-input-container">
+                          <span 
+                            style={{ 
+                              fontSize: "16px", 
+                              fontWeight: "bold",
+                              color: producto.tipoProduccion === "bandejas" ? "#28a745" : "#007bff"
+                            }} 
+                            className="quantity-type-label"
+                          >
+                            {producto.tipoProduccion === "bandejas" ? "Bandejas" : "Libras"}
+                          </span>
+                          <Form.Control
+                            type="number"
+                            min="0"
+                            value={trayQuantities[producto.idProducto]?.cantidad || ""}
+                            onChange={(e) =>
+                              setTrayQuantities({
+                                ...trayQuantities,
+                                [producto.idProducto]: {
+                                  cantidad: parseInt(e.target.value) || 0,
+                                  idCategoria: producto.idCategoria,
+                                  tipoProduccion: producto.tipoProduccion,
+                                  controlarStock: producto.controlarStock,
+                                  controlarStockDiario: producto.controlarStockDiario,
+                                },
+                              })
+                            }
+                            className="quantity-input"
+                          />
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="2" className="text-center py-4">
+                      {productos.length === 0 
+                        ? "No se han ingresado Productos." 
+                        : "No se encontraron Productos."}
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </Table>
           </div>
-
-          {/* Lista de productos filtrados */}
-          <Row className="g-4 product-grid">
-            {productsToShow.map((producto) => (
-              <Col key={producto.idProducto} xs={12} md={6} lg={4} xl={3}>
-                <Card className="product-card">
-                  <Card.Body className="product-card-body">
-                    <div
-                      className="product-badge"
-                      style={{
-                        backgroundColor: getUniqueColor(producto.nombreProducto),
-                      }}
-                    >
-                      {getInitials(producto.nombreProducto)}
-                    </div>
-                    <h3 className="product-title">{producto.nombreProducto}</h3>
-                    <p className="product-category">
-                      {producto.nombreCategoria === "Panadería" ? "Bandejas" : "Unidades"}
-                    </p>
-                    <InputGroup className="product-input-group">
-                      <Form.Control
-                        type="number"
-                        min="0"
-                        value={trayQuantities[producto.idProducto]?.cantidad || ""}
-                        onChange={(e) =>
-                          setTrayQuantities({
-                            ...trayQuantities,
-                            [producto.idProducto]: {
-                              cantidad: parseInt(e.target.value) || 0,
-                              idCategoria: producto.idCategoria, // Incluye la categoría
-                            },
-                          })
-                        }
-                        className="product-input"
-                      />
-                    </InputGroup>
-                  </Card.Body>
-                </Card>
-              </Col>
-            ))}
-          </Row>
         </div>
       )}
 
       {/* Botón Flotante para Móvil */}
-      <Button
-        variant="primary"
-        className="floating-scroll-btn d-md-none"
-        onClick={() => window.scrollTo({ top: 240, behavior: "smooth" })}
-      >
-        ↑
-      </Button>
+      {showScrollButton && (
+        <button
+          onClick={scrollToTop}
+          className="btn btn-dark rounded-circle shadow"
+          style={{
+            position: "fixed",
+            bottom: "1px",
+            right: "1px",
+            width: "40px",
+            height: "40px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            transition: "opacity 0.3s ease, transform 0.3s ease",
+            opacity: showScrollButton ? 1 : 0,
+            transform: showScrollButton ? "translateY(0)" : "translateY(20px)",
+            pointerEvents: showScrollButton ? "auto" : "none",
+            zIndex: 1000
+          }}
+        >
+          <BsArrowUp size={20} />
+        </button>
+      )}
 
       {/* Resumen de Orden */}
       <OrderSummary
@@ -330,7 +447,7 @@ const IngresarOrdenProd = () => {
         handleClose={handleCloseOrderSummary}
         orderData={getValues()}
         trayQuantities={trayQuantities}
-        productos={productos}
+        productos={filteredProducts}
         sucursales={sucursales}
         onConfirm={handleConfirmOrder}
         isLoading={isLoading}
@@ -341,7 +458,7 @@ const IngresarOrdenProd = () => {
         isOpen={isPopupOpen}
         onClose={() => setIsPopupOpen(false)}
         title="¡Éxito!"
-        message="La orden se agrego correctamente"
+        message="La orden se agregó correctamente"
         nombreBotonVolver="Ver Ordenes"
         nombreBotonNuevo="Ingresar orden"
         onView={() => navigate("/ordenes-produccion")}

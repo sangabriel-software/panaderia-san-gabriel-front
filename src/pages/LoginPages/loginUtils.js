@@ -25,7 +25,7 @@ export const handleLogin = async (data, navigate, setIsLoading) => {
 
       // Redirigir al dashboard después de un pequeño retraso
       setTimeout(() => {
-        navigate("/dashboard");
+        navigate("/home");
       }, 500); // 1 segundo de retraso
     }
 
@@ -33,19 +33,19 @@ export const handleLogin = async (data, navigate, setIsLoading) => {
     if (error.response) {
       if (error.response.status === 401 || error.response.status === 404) {
         toast.error("Usuario o contraseña incorrectos.", {
-          autoClose: 5000,
+          autoClose: 2000,
         });
       } 
 
       if(error.response.status === 403){
         toast.error("Usuario Bloqueado, comunicate con el administrador", {
-          autoClose: 5000,
+          autoClose: 2000,
         });
       }
       
     } else {
       toast.error("Servicio no disponible, intenta más tarde.", {
-        autoClose: 5000,
+        autoClose: 2000,
       });
     }
   } finally {

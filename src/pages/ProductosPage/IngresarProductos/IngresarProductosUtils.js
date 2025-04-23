@@ -4,18 +4,32 @@ import { capitalizeFirstLetter } from "../../../utils/utils"
 
 /* Funcion para crear paylod datos de productos */
 export const crearPayloadProducto = (data) => {
-  // Convertir idCategoria y unidadesPorBandeja a números
+
   const idCategoria = Number(data.idCategoria);
   const unidadesPorBandeja = Number(data.unidadesPorBandeja);
+  const badejasUnidades = (idCategoria === 1) ? unidadesPorBandeja : null;   // Determinar bandejasUnidades basado en la categoría
+  //determinar tipo produccion
+  let tipoProduccion
+  if(idCategoria === 1){
+    tipoProduccion = data.tipoProduccion;
+  }else{
+    tipoProduccion = "Otros";
+  }
 
-  // Determinar bandejasUnidades basado en la categoría
-  const badejasUnidades = (idCategoria === 1) ? unidadesPorBandeja : null;
+  //determinar control stock 
+  let controlStock;
+  if(idCategoria === 1){
+    controlStock = data.controlStock;
+  }else{
+    controlStock = 1;
+  }
 
-  // Crear el payload del producto
-  const productoPayload = {
+  const productoPayload = {  // Crear el payload del producto
     nombreProducto: capitalizeFirstLetter(data.nombreProducto),
-    idCategoria: idCategoria, // Usar el valor convertido a número
-    controlarStock: data.controlStock,
+    idCategoria: idCategoria, 
+    controlarStock: controlStock,
+    controlarStockDiario: data.stockDiario,
+    tipoProduccion: tipoProduccion, 
     fechaCreacion: currentDate(),
     ...(badejasUnidades !== null && { unidadesPorBandeja: badejasUnidades }) // Agregar solo si no es null
   };
@@ -64,6 +78,7 @@ export const handleIngresarProductoSubmit = async (data, setIsPopupOpen, setErro
   
       // Crea el payload del producto y lo envía
       const payloadProducto = crearPayloadProducto(data);
+
       resIngresoProducto = await ingresarProducto(payloadProducto);
   
       if (resIngresoProducto.status === 201) {

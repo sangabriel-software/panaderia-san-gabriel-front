@@ -1,6 +1,7 @@
 import React from 'react';
 import { Page, Text, View, Document, StyleSheet, Image } from '@react-pdf/renderer';
-import { getFormattedDateLetras } from '../../../utils/dateUtils';
+import { getCurrentDateTimeWithSeconds, getFormattedDateLetras } from '../../../utils/dateUtils';
+import { redondearASiguienteMultiploDe5 } from '../../../utils/utils';
 
 const styles = StyleSheet.create({
   page: {
@@ -136,19 +137,84 @@ const styles = StyleSheet.create({
     fontSize: 9,
     color: '#9E9E9E',
   },
+  flourSummaryContainer: {
+    marginTop: 15,
+    backgroundColor: '#FFF3E0',
+    padding: 12,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: '#FFA000',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  flourSummaryText: {
+    fontSize: 14,
+    fontWeight: 'extrabold',
+    color: '#5D4037',
+    textAlign: 'center',
+  },
+  flourTotal: {
+    fontSize: 16,
+    fontWeight: 'extrabold',
+    color: '#BF360C',
+    marginLeft: 5,
+  },
 });
 
 const OrderDetailsPdf = ({ detalleOrden, encabezadoOrden, detalleConsumo }) => {
-  const panaderia = detalleOrden?.filter(item => item.idCategoria === 1);
-  const reposteria = detalleOrden?.filter(item => item.idCategoria === 2);
-  const fechaGeneracion = new Date().toLocaleString();
+
+  const prodBandejas = detalleOrden?.filter(item => item.tipoProduccion === "bandejas");
+  const prodHarina   = detalleOrden?.filter(item => item.tipoProduccion === "harina");
+  const fechaGeneracion = getCurrentDateTimeWithSeconds();
+
+  const calcularTotalHarinaProdPorHarina= () => {
+    // Verificamos que prodHarina sea un array válido
+    if (!Array.isArray(prodHarina)) return 0;
+    
+    // Sumamos todas las cantidades de harina
+    const totalHarina = prodHarina.reduce((total, producto) => {
+      // Convertimos a número y sumamos (si no es número, suma 0)
+      return total + (Number(producto.cantidadHarina) || 0);
+    }, 0);
+  
+    return totalHarina;
+  };
+
+
+  // Calcular total de harina
+  const calcularTotalHarinaProdPorBandejas = () => {
+    if (!detalleConsumo || detalleConsumo.length === 0) return null;
+    
+    const harinas = detalleConsumo.filter(item => 
+      item.Ingrediente.toLowerCase().includes('harina')
+    );
+
+    if (harinas.length === 0) return null;
+
+    const totalHarina = harinas.reduce((sum, item) => {
+      return sum + parseFloat(item.CantidadUsada);
+    }, 0);
+
+    const unidad = harinas[0]?.UnidadMedida || '';
+
+    return {
+      total: Math.round(totalHarina),
+      unidad: unidad
+    };
+  };
+
+
+  const totalHarinaBandejas = calcularTotalHarinaProdPorBandejas();
+
+  const totalHarinaNecesaria = totalHarinaBandejas.total + calcularTotalHarinaProdPorHarina();
 
   return (
     <Document>
       <Page style={styles.page}>
         <View style={styles.logoContainer}>
           <Image 
-            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSFVkyNISVjpl9Sqk0A4bbegVdZz0P-FwndQSr_fhYHPwwQ-MKYRpl7Nzii0L3nWWUFzJo&usqp=CAU" 
+            src="https://sangabrielpiloto.vercel.app/assets/logo-Qf7fe2hw.png" 
             style={styles.logo} 
           />
         </View>
@@ -187,10 +253,10 @@ const OrderDetailsPdf = ({ detalleOrden, encabezadoOrden, detalleConsumo }) => {
           </View>
         </View>
 
-        {panaderia.length > 0 && (
+        {prodBandejas.length > 0 && (
           <View style={styles.tableContainer}>
             <View style={styles.tableTitleContainer}>
-              <Text style={styles.tableTitle}>Productos de Panadería</Text>
+              <Text style={styles.tableTitle}>Bandejas</Text>
             </View>
             <View style={styles.table}>
               <View style={styles.tableRow}>
@@ -199,7 +265,7 @@ const OrderDetailsPdf = ({ detalleOrden, encabezadoOrden, detalleConsumo }) => {
                 <Text style={styles.tableHeader}>Bandejas</Text>
                 <Text style={styles.tableHeader}>Unidades</Text>
               </View>
-              {panaderia.map((item, index) => (
+              {prodBandejas.map((item, index) => (
                 <View style={styles.tableRow} key={index}>
                   <Text style={styles.tableCellItem}>{index + 1}</Text>
                   <Text style={styles.tableCell}>{item.nombreProducto}</Text>
@@ -211,53 +277,46 @@ const OrderDetailsPdf = ({ detalleOrden, encabezadoOrden, detalleConsumo }) => {
           </View>
         )}
 
-        {reposteria.length > 0 && (
+        {prodHarina.length > 0 && (
           <View style={styles.tableContainer}>
             <View style={styles.tableTitleContainer}>
-              <Text style={styles.tableTitle}>Productos de Repostería</Text>
+              <Text style={styles.tableTitle}>Harina</Text>
             </View>
             <View style={styles.table}>
               <View style={styles.tableRow}>
                 <Text style={styles.tableCellItem}>#</Text>
                 <Text style={styles.tableHeader}>Producto</Text>
-                <Text style={styles.tableHeader}>Unidades</Text>
+                <Text style={styles.tableHeader}>Harina</Text>
               </View>
-              {reposteria.map((item, index) => (
+              {/* Fila fija */}
+              <View style={[styles.tableRow, styles.fixedRow]}>
+                <Text style={styles.tableCellItem}>1</Text>
+                <Text style={styles.tableCell}>Frances</Text>
+                <Text style={styles.tableCell}>
+                  {totalHarinaBandejas ? `${redondearASiguienteMultiploDe5(totalHarinaBandejas.total).toFixed(2)} ${totalHarinaBandejas.unidad}` : 'N/A'}
+                </Text>
+              </View>
+              {/* Resto de productos */}
+              {prodHarina.map((item, index) => (
                 <View style={styles.tableRow} key={index}>
-                  <Text style={styles.tableCellItem}>{index + 1}</Text>
-                  <Text style={styles.tableCell}>{item.nombreProducto}</Text>
-                  <Text style={styles.tableCell}>{item.cantidadUnidades || 'N/A'}</Text>
+                  <Text style={styles.tableCellItem}>{index + 2}</Text>
+                  <Text style={styles.tableCell}>{item.nombreProducto || 'N/A'}</Text>
+                  <Text style={styles.tableCell}>{item.cantidadHarina ? `${item.cantidadHarina} ${totalHarinaBandejas.unidad}` : 'N/A'}</Text>
                 </View>
               ))}
             </View>
           </View>
         )}
 
-        {detalleConsumo && detalleConsumo.length > 0 && (
-          <View style={styles.tableContainer}>
-            <View style={styles.tableTitleContainer}>
-              <Text style={styles.tableTitle}>Detalles de Ingredientes Utilizados</Text>
-            </View>
-                              <View style={styles.tableRow}>
-                    <Text style={styles.tableCellItem}>#</Text>
-                    <Text style={styles.tableHeader}>Producto</Text>
-                    <Text style={styles.tableHeader}>Ingrediente</Text>
-                    <Text style={styles.tableHeader}>Cantidad Usada</Text>
-                  </View>
-            <View style={styles.table}>
-              {detalleConsumo.map((item, index) => (
-                <React.Fragment key={index}>
-                  <View style={styles.tableRow}>
-                    <Text style={styles.tableCellItem}>{index + 1}</Text>
-                    <Text style={styles.tableCell}>{item.Producto}</Text>
-                    <Text style={styles.tableCell}>{item.Ingrediente}</Text>
-                    <Text style={styles.tableCell}>{`${item.CantidadUsada} ${item.UnidadMedida}`}</Text>
-                  </View>
-                </React.Fragment>
-              ))}
-            </View>
+
+
+          <View style={styles.flourSummaryContainer}>
+            <Text style={styles.flourSummaryText}>TOTAL HARINA:</Text>
+            <Text style={styles.flourTotal}>
+              {redondearASiguienteMultiploDe5(totalHarinaNecesaria).toFixed(2)} {totalHarinaBandejas?.unid}
+            </Text>
           </View>
-        )}
+
 
         <Text style={styles.footer}>Generado el {fechaGeneracion}</Text>
       </Page>

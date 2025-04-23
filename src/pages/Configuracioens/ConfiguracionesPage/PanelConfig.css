@@ -1,0 +1,82 @@
+.panel-config-container {
+    padding: 20px;
+    font-family: "Arial, sans-serif";
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .panel-title {
+    color: #333;
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 2rem;
+    font-weight: bold;
+  }
+  
+  .config-col {
+    margin-bottom: 20px;
+  }
+  
+  .config-section {
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    height: 100%;
+  }
+  
+  .config-section.clickable:hover {
+    background-color: #f0f0f0;
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  .config-section.disabled {
+    opacity: 0.6; /* Reduce la opacidad para indicar que está deshabilitado */
+    cursor: not-allowed; /* Cambia el cursor a "no permitido" */
+    pointer-events: none; /* Deshabilita los eventos de clic */
+  }
+  
+  .section-title {
+    display: flex;
+    align-items: center;
+    color: #333;
+    font-size: 1.5rem;
+    margin: 0 0 10px 0;
+  }
+  
+  .section-icon {
+    margin-right: 10px;
+  }
+  
+  .section-description {
+    color: #666;
+    font-size: 0.9rem;
+    margin: 0;
+  }
+  
+  /* Colores personalizados para los íconos */
+  .icon-materia-prima {
+    color: #4CAF50; /* Verde */
+  }
+  
+  .icon-recetas {
+    color: #FF9800; /* Naranja */
+  }
+  
+  .icon-otras-config {
+    color: #3F51B5; /* Azul */
+  }
+
+/* Estilo para el ícono del título */
+.config-title-icon {
+  color: #007bff; /* Color azul */
+  margin-right: 10px; /* Espaciado a la derecha */
+}
+
+/* Estilo para el contenedor del título */
+.config-title-container {
+  margin-bottom: 20px; /* Espaciado inferior */
+}

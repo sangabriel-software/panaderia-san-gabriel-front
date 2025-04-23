@@ -20,7 +20,7 @@ const ModalSeleccionarSucursalTurno = ({ showModal, handleCloseModal, turnoValue
     >
       <Modal.Header className="bg-purple text-white">
         <Modal.Title className="w-100 text-center">
-          Selecciona turno y sucursal
+          ¿En que sucursal y en que turno te encuntras?
         </Modal.Title>
         <Button
           variant="link"

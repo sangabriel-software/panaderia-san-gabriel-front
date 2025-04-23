@@ -5,6 +5,7 @@ import { generateAndDownloadPDF } from "../../../utils/PdfUtils/PdfUtils";
 import { consultarDetalleConsumoProduccion } from "../../../services/consumoingredientes/consumoingredientesprod.service";
 import OrderDetailsPdf from "../../../components/PDFs/OrdenDetails/OrderDetailsPdf";
 import { getUserData } from "../../../utils/Auth/decodedata";
+import { getCurrentDateTimeWithSeconds } from "../../../utils/dateUtils";
 
 export const getInitials = (name) => {
   const names = name.split(" ");
@@ -35,44 +36,44 @@ const assignedColors = {}; // Almacena los colores asignados de manera persisten
 export const filterProductsByName = (products, searchTerm, usuario) => {
   if (!searchTerm) return products;
 
-  // Si el usuario no es admin, excluir los productos de "Panadería"
+  // Si el usuario no es admin, excluir los productos de "Panaderia"
   const filteredProducts = usuario.idRol === 1 && usuario.rol === "Admin"
     ? products
-    : products.filter((p) => p.nombreCategoria !== "Panadería");
+    : products.filter((p) => p.nombreCategoria !== "Panaderia");
 
   return filteredProducts.filter((producto) =>
     producto.nombreProducto.toLowerCase().includes(searchTerm.toLowerCase())
   );
 };
 
-export const getFilteredProductsByCategory = (productos, searchTerm, activeCategory, usuario) => {
-  const panaderiaProducts = productos.filter((p) => p.nombreCategoria === "Panadería");
-  const reposteriaProducts = productos.filter((p) => p.nombreCategoria === "Repostería");
+export const getFilteredProductsByCategory = (productos, searchTerm) => {
+  // Filtrar solo productos de panadería (idCategoria = 1)
+  const panaderiaProducts = productos.filter((p) => p.idCategoria === 1);
 
-  const filteredProducts = filterProductsByName(productos, searchTerm, usuario);
-  const filteredPanaderiaProducts = searchTerm
-    ? filteredProducts.filter((p) => p.nombreCategoria === "Panadería")
-    : panaderiaProducts;
-  const filteredReposteriaProducts = searchTerm
-    ? filteredProducts.filter((p) => p.nombreCategoria === "Repostería")
-    : reposteriaProducts;
+  // Si hay término de búsqueda, filtrar por nombre dentro de los productos de panadería
+  if (searchTerm) {
+    const searchTermLower = searchTerm.toLowerCase();
+    return panaderiaProducts.filter((p) => 
+      p.nombreProducto.toLowerCase().includes(searchTermLower)
+    );
+  }
 
-  return searchTerm
-    ? filteredProducts
-    : activeCategory === "Panadería"
-    ? filteredPanaderiaProducts
-    : filteredReposteriaProducts;
+  // Si no hay término de búsqueda, devolver todos los productos de panadería
+  return panaderiaProducts;
 };
 
 const crearPyaloadOrdenProduccion = (data, trayQuantities) => {
   const {idUsuario} = getUserData();
   const detalleOrden = Object.entries(trayQuantities)
     .filter(([_, { cantidad }]) => cantidad > 0) // Filtra por cantidad > 0
-    .map(([idProducto, { cantidad, idCategoria }]) => ({
+    .map(([idProducto, { cantidad, idCategoria, tipoProduccion, controlarStock, controlarStockDiario }]) => ({
       idProducto: Number(idProducto),
       idCategoria: idCategoria,
-      cantidadBandejas: idCategoria === 1 ? cantidad : 0,
-      cantidadUnidades: idCategoria !== 1 ? cantidad : 0,
+      cantidadBandejas: tipoProduccion === "bandejas" ? cantidad : 0,
+      cantidadHarina: tipoProduccion !== "bandejas" ? cantidad : 0,
+      tipoProduccion: tipoProduccion,
+      controlarStock: controlarStock,
+      controlarStockDiario: controlarStockDiario,
       fechaCreacion: dayjs().format("YYYY-MM-DD"),
     }));
 
@@ -88,6 +89,7 @@ const crearPyaloadOrdenProduccion = (data, trayQuantities) => {
       fechaAProducir: dayjs(data.fechaAProducir).format("YYYY-MM-DD"),
       idUsuario: idUsuario, // Se asume que el usuario está logueado
       fechaCreacion: dayjs().format("YYYY-MM-DD"),
+      fechaActualizacion: getCurrentDateTimeWithSeconds(),
     },
     detalleOrden,
   };

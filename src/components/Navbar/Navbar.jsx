@@ -14,7 +14,7 @@ function NavigationBar({ onMenuClick }) {
           
           {/* Título de la aplicación */}
           <Navbar.Brand
-            href="/dashboard"
+            href="/home"
             className="me-auto ms-2 text-truncate"
             style={{ maxWidth: '200px', fontSize: '20px' }}
           >

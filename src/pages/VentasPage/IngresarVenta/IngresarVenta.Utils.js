@@ -9,14 +9,22 @@ export const getInitials = (name) => {
   return words.map((word) => word[0]).join("").toUpperCase();
 };
 
-// Función para generar un color único basado en el nombre del producto
-export const getUniqueColor = (name) => {
-  const colors = [
-    "#FF6B6B", "#4ECDC4", "#45B7D5", "#A4D555", "#D4A5A5",
-    "#FFD166", "#06D6A0", "#118AB2", "#EF476F", "#073B4C"
-  ];
-  const hash = name.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  return colors[hash % colors.length];
+// Function to get a unique color for each product
+export const getUniqueColor = (text) => {
+  const assignedColors = {}; // Almacena los colores asignados de manera persistente
+  
+      if (assignedColors[text]) {
+          return assignedColors[text]; // Retorna el color si ya está asignado
+      }
+      // Generar un hash basado en el texto
+      let hash = 0;
+      for (let i = 0; i < text.length; i++) {
+          hash = text.charCodeAt(i) + ((hash << 5) - hash);
+      }
+      // Convertir el hash en un color hexadecimal
+      const color = `#${((hash & 0xFFFFFF) >>> 0).toString(16).padStart(6, '0')}`;
+      assignedColors[text] = color;
+      return color;
 };
 
 // Función para cerrar el modal y redirigir a /ventas
@@ -51,11 +59,11 @@ const fetchProductos = async () => {
   return resProductos.status === 200 ? resProductos.preciosProductos : [];
 };
 
-// Función para filtrar productos de Panadería que estén en la orden
+// Función para filtrar productos de Panaderia que estén en la orden
 const filtrarProductosPanaderia = (productos, detalleOrden) => {
-  // Obtener los productos de Panadería que están en la orden
+  // Obtener los productos de Panaderia que están en la orden
   const productosPanaderiaEnOrden = detalleOrden
-    .filter((item) => item.idCategoria === 1) // Filtrar por categoría 1 (Panadería)
+    .filter((item) => item.idCategoria === 1) // Filtrar por categoría 1 (Panaderia)
     .map((item) => ({
       idProducto: item.idProducto,
       cantidadUnidades: item.cantidadUnidades, // Incluir el campo cantidadUnidades
@@ -63,7 +71,7 @@ const filtrarProductosPanaderia = (productos, detalleOrden) => {
 
   return productos.map((producto) => {
     if (producto.idCategoria === 1) {
-      // Si es de la categoría "Panadería", buscar si está en la orden
+      // Si es de la categoría "Panaderia", buscar si está en la orden
       const productoEnOrden = productosPanaderiaEnOrden.find(
         (item) => item.idProducto === producto.idProducto
       );
@@ -82,7 +90,7 @@ const filtrarProductosPanaderia = (productos, detalleOrden) => {
       // Incluir todos los productos de otras categorías sin cambios
       return producto;
     }
-  }).filter((producto) => producto !== null); // Filtrar los productos nulos (Panadería no incluidos en la orden)
+  }).filter((producto) => producto !== null); // Filtrar los productos nulos (Panaderia no incluidos en la orden)
 };
 
 // Función principal para manejar la búsqueda de ventas
@@ -109,14 +117,9 @@ export const handleBuscarVentas = async ( setIsLoading, turnoValue, sucursalValu
 
       let nuevosProductos;
 
-      // Verificar si existe una orden y si tiene detalles
-      if (orden && orden.detalleOrden && orden.detalleOrden.length > 0) {
-        // Filtrar productos de la categoría "Panadería" que estén en la orden
-        nuevosProductos = filtrarProductosPanaderia(productos, orden.detalleOrden);
-      } else {
-        // Si no hay orden, devolver todos los productos
+
         nuevosProductos = productos;
-      }
+      
 
       // Guardar el nuevo conjunto de datos en el estado
       setOrdenYProductos(nuevosProductos);
@@ -166,37 +169,35 @@ const crearDetalleVenta = (productos, trayQuantities, orden, fechaActual) => {
     .map((producto) => {
       const cantidadIngresada = producto.cantidadIngresada; // Usar la cantidad obtenida
 
-      // Solo para la categoría 1 (Panadería) y si hay idOrdenProduccion
-      if (producto.idCategoria === 1 && idOrdenProduccion) {
+      // Solo para la categoría 1 (Panaderia) y si hay idOrdenProduccion
+      if (producto.idCategoria === 1 && idOrdenProduccion && producto.controlarStock === 0 && producto.controlarStockDiario === 1) {
         // Verificar si el producto está en la orden
-        const productoEnOrden = orden.detalleOrden.some(
-          (detalle) => detalle.idProducto === producto.idProducto
-        );
+        const productoEnOrden = orden.detalleOrden.some((detalle) => detalle.idProducto === producto.idProducto);
 
         if (productoEnOrden) {
           return {
             idProducto: producto.idProducto,
+            tipoProduccion: producto.tipoProduccion,
+            controlarStock: producto.controlarStock,
+            controlarStockDiario: producto.controlarStockDiario,
             idCategoria: producto.idCategoria,
-            unidadesNoVendidas: cantidadIngresada, // Siempre se incluye, incluso si es 0
-            cantidadVendida: null, // No se usa para la categoría 1 cuando hay orden
+            unidadesNoVendidas: cantidadIngresada, 
             fechaCreacion: fechaActual,
           };
         } else {
           return null; // No se incluye si no está en la orden
         }
       } else {
-        // Para otras categorías o si no hay idOrdenProduccion
-        if (cantidadIngresada > 0) {
+        // Para otras categorías
           return {
             idProducto: producto.idProducto,
+            tipoProduccion: producto.tipoProduccion,
+            controlarStock: producto.controlarStock,
+            controlarStockDiario: producto.controlarStockDiario,
             idCategoria: producto.idCategoria,
-            unidadesNoVendidas: null, // No aplica
-            cantidadVendida: cantidadIngresada, // Solo si se ingresó una cantidad
+            unidadesNoVendidas: cantidadIngresada, 
             fechaCreacion: fechaActual,
           };
-        } else {
-          return null; // No se incluye en el payload si no se ingresó cantidad
-        }
       }
     })
     .filter(Boolean); // Filtrar elementos nulos (productos no incluidos)
@@ -235,6 +236,8 @@ export const handleGuardarVenta = async (setIsLoading, orden, sucursalValue, usu
     detalleVenta,
     detalleIngreso,
   };
+
+  //console.log(payload);
 
   try {
     const resIngrearVenta = await ingresarVentaService(payload);

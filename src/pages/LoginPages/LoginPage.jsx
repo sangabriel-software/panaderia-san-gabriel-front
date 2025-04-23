@@ -1,12 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-
+import logo from "../../assets/logo.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { handleLogin } from "./loginUtils";
 import "./LoginPage.css";
-
 
 function LoginPage() {
   const navigate = useNavigate();
@@ -14,14 +13,14 @@ function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Alternar visibilidad de la contraseña
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
 
   return (
     <section className="contenedorLados vh-100">
       <div className="container-fluid">
         <div className="row">
-          <div className="izquierdo col-sm-6 px-0 d-none d-sm-block">
+          {/* Columna izquierda - Solo visible en desktop (lg+) */}
+          <div className="izquierdo col-lg-6 px-0 d-none d-lg-block">
             <img
               src="https://i.pinimg.com/originals/d3/a2/9d/d3a29d4e0fa8e004b274880ec979b1e2.jpg"
               alt="San Miguel Dueñas"
@@ -30,11 +29,13 @@ function LoginPage() {
               draggable="false"
             />
           </div>
-          <div className="derecho col-sm-6 text-black">
+
+          {/* Columna derecha - Siempre visible */}
+          <div className="derecho col-12 col-lg-6 text-black">
             <div className="divlogo px-5 ms-xl-4">
               <img
                 className="logo-login"
-                src="https://png.pngtree.com/png-vector/20221122/ourmid/pngtree-bread-logo-illustration-png-image_6458295.png"
+                src={logo}
                 alt="Logo"
                 draggable="false"
               />

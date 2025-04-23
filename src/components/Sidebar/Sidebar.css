@@ -5,13 +5,15 @@
 
 /* Estilos para el toggle switch */
 .theme-toggle-container {
-  position: relative;
-  top: 100px;
+  position: sticky; /* Hace que el toggle se quede pegado al final del sidebar */
+  bottom: 0; /* Lo coloca en la parte inferior */
   left: 0;
   right: 0;
-  padding: 0 15px;
-  display: flex;
-  justify-content: center;
+  padding: 15px;
+  background-color: var(--bg-sidebar); /* Fondo para que no se superponga con el contenido */
+  z-index: 1; /* Asegura que esté por encima del contenido */
+  border-top: 1px solid var(--border-color); /* Línea divisoria */
+  margin-bottom: 5rem;
 }
 
 .theme-switch {
@@ -76,4 +78,99 @@ input:checked + .slider:before {
 /* Spinner */
 .spinner-border {
   margin: 0 auto;
+}
+
+/* Estilos para el avatar y el nombre de usuario */
+.user-panel {
+  border-bottom: 1px solid var(--border-color);
+  padding-left: 12px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.user-panel .image {
+  margin-bottom: 10px;
+  display: inline-block;
+  margin-right: 10px;
+}
+
+.user-panel .image img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.user-panel .info {
+  display: inline-block;
+}
+
+.user-panel .info a {
+  color: var(--text-primary);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.user-panel .info a:hover {
+  color: var(--text-white);
+}
+
+.avatar-circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 250px;
+  min-height: calc(100vh - 56px);
+  padding-top: 0.1rem;
+  border-right: 1px solid var(--border-color);
+  transition: transform 0.3s ease;
+  background-color: var(--bg-sidebar) !important;
+  overflow-y: auto; /* Asegúrate de que el scroll esté habilitado */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Sidebar links */
+.sidebar .nav-link {
+  padding: 0.8rem 1rem;
+  transition: background-color 0.3s;
+  color: var(--text-primary);
+}
+
+.sidebar .nav-link:hover {
+  background-color: var(--bg-hover) !important;
+  color: var(--text-white);
+}
+
+/* Submenu */
+.submenu-item {
+  background-color: var(--border-color) !important;
+  border-left: 3px solid var(--text-primary) !important;
+  border-right: 1px solid var(--border-color) !important;
+  margin: 3px 2px;
+  color: var(--text-white);
+}
+
+.submenu-item:hover {
+  background-color: #9333ea !important; /* Fondo morado más oscuro al hacer hover */
+}
+
+/* Dropdown arrow */
+.dropdown-arrow {
+  transition: transform 0.3s ease;
+  color: var(--text-primary);
+}
+
+.dropdown-arrow.open {
+  transform: rotate(90deg);
 }

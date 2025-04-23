@@ -1,25 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useGetProductosYPrecios } from "../../../hooks/productosprecios/useGetProductosYprecios";
-import {
-  checkForChanges,
-  handleConfirmDeletePreoducto,
-  handleDeleleProducto,
-  handleModifyClick,
-  handleUpdateProduct,
-  useCategoriasYFiltrado,
-  useSerchPrductos,
-} from "./ManageProductsUtils";
+import { checkForChanges, handleConfirmDeletePreoducto, handleDeleleProducto, handleUpdateProduct, useCategoriasYFiltrado, useSerchPrductos, resetFormToInitialValues, useProductFormSetup, useCheckFormChanges, useSwitchExclusivity, handleModify, handleCloseModal } from "./ManageProductsUtils";
 import SearchInput from "../../../components/SerchInput/SerchInput";
 import Title from "../../../components/Title/Title";
 import CardProductos from "../../../components/CardProductos/CardPoductos";
 import { useNavigate } from "react-router";
 import Alert from "../../../components/Alerts/Alert";
-import {
-  BsExclamationTriangleFill,
-  BsFillInfoCircleFill,
-  BsX,
-} from "react-icons/bs";
+import { BsExclamationTriangleFill, BsFillInfoCircleFill, BsX } from "react-icons/bs";
 import ConfirmPopUp from "../../../components/Popup/ConfirmPopup";
 import ErrorPopup from "../../../components/Popup/ErrorPopUp";
 import ModalIngreso from "../../../components/ModalGenerico/Modal";
@@ -29,21 +17,9 @@ import "./ManageProducts.css";
 import AddButton from "../../../components/AddButton/AddButton";
 
 const ManageProducts = () => {
-  const {
-    productos,
-    loadigProducts,
-    showErrorProductos,
-    showInfoProductos,
-    setProductos,
-  } = useGetProductosYPrecios();
-  const { filteredProductos, searchQuery, showNoResults, handleSearch } =
-    useSerchPrductos(productos);
-  const {
-    categorias,
-    filteredByCategory,
-    selectedCategory,
-    setSelectedCategory,
-  } = useCategoriasYFiltrado(productos, filteredProductos);
+  const { productos, loadigProducts, showErrorProductos, showInfoProductos, setProductos, } = useGetProductosYPrecios();
+  const { filteredProductos, searchQuery, showNoResults, handleSearch } = useSerchPrductos(productos);
+  const { categorias, filteredByCategory, selectedCategory, setSelectedCategory, } = useCategoriasYFiltrado(productos, filteredProductos);
   const [productoToDelete, setProductoToDelete] = useState(null);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [errorPopupMessage, setErrorPopupMessage] = useState(false);
@@ -53,41 +29,28 @@ const ManageProducts = () => {
   const [initialProductValues, setInitialProductValues] = useState(null);
   const [hasChanges, setHasChanges] = useState(false);
   const navigate = useNavigate();
-  const { categorias: categoriasModify, loadingCategorias, showErrorCategorias, showInfoCategorias, } = useGetCategorias();
+  const { categorias: categoriasModify, loadingCategorias, showErrorCategorias, showInfoCategorias } = useGetCategorias();
   const [loadingModificar, setLoadingModificar] = useState(false);
+  const { register, handleSubmit, reset, watch, setValue, formState: { errors } } = useForm();  // React Hook Form
 
-  // React Hook Form
-  const { register, handleSubmit, reset, watch, setValue, formState: { errors }, } = useForm();
+  // Estado para controlar la visibilidad de los controles de Panaderia
+  const [isPanaderia, setIsPanaderia] = useState(false);
+  const [tipoProduccion, setTipoProduccion] = useState("bandejas");
 
-  // Estado para controlar la visibilidad del input de unidades por bandeja
-  const [showUnidadesPorBandeja, setShowUnidadesPorBandeja] = useState(false);
+  // Observar todos los valores relevantes
+  const formValues = watch();
+  const controlStock = watch("controlStock") === 1; 
+  const stockDiario = watch("stockDiario") === 1;
 
-  // Observar el valor del campo idCategoria
-  const selectedCategoryModal = watch("idCategoria");
+  // Custom hooks para manejar la lógica del formulario
+  useProductFormSetup(selectedProduct, setValue, reset, setIsPanaderia, setTipoProduccion, setInitialProductValues);
+  useCheckFormChanges(selectedProduct, initialProductValues, formValues, isPanaderia, setHasChanges);
+  useSwitchExclusivity(controlStock, stockDiario, setValue, setHasChanges);
 
-  // Efecto para mostrar/ocultar el input de unidades por bandeja
-  useEffect(() => {
-    if (selectedCategoryModal && selectedCategoryModal == 1) {
-      setShowUnidadesPorBandeja(true);
-    } else {
-      setShowUnidadesPorBandeja(false);
-    }
-  }, [selectedCategoryModal]);
-
-  // Efecto para verificar cambios cada vez que se modifica el formulario
-  useEffect(() => {
-    checkForChanges(
-      selectedProduct,
-      initialProductValues,
-      setHasChanges,
-      watch
-    );
-  }, [watch()]);
 
   // Función para guardar los cambios del producto
   const onSubmit = async (data) => {
-    handleUpdateProduct( data, selectedProduct, setProductos, setShowModifyModal, setSelectedProduct, setInitialProductValues, setHasChanges,
-                         setErrorPopupMessage, setIsPopupErrorOpen, setLoadingModificar );
+    handleUpdateProduct( data, selectedProduct, setProductos, setShowModifyModal, setSelectedProduct, setInitialProductValues, setHasChanges, setErrorPopupMessage, setIsPopupErrorOpen, setLoadingModificar);
   };
 
   if (loadigProducts) {
@@ -156,16 +119,7 @@ const ManageProducts = () => {
                     setIsPopupOpen
                   )
                 }
-                onModify={() =>
-                  handleModifyClick(
-                    producto,
-                    setSelectedProduct,
-                    setInitialProductValues,
-                    setShowModifyModal,
-                    reset,
-                    setHasChanges
-                  )
-                }
+                onModify={() => handleModify(producto, setSelectedProduct, setShowModifyModal, reset, setIsPanaderia, setTipoProduccion, setInitialProductValues, setHasChanges)}
               />
             </div>
           ))}
@@ -175,7 +129,7 @@ const ManageProducts = () => {
       {/* Modal para modificación de productos */}
       <ModalIngreso
         show={showModifyModal}
-        onHide={() => setShowModifyModal(false)}
+        onHide={() => {handleCloseModal(resetFormToInitialValues, setShowModifyModal)}}
         title="Modificar Producto"
         onConfirm={handleSubmit(onSubmit)}
         confirmText="Modificar"
@@ -191,6 +145,7 @@ const ManageProducts = () => {
                 <Form.Control
                   type="text"
                   placeholder="Ingrese el nombre"
+                  defaultValue={selectedProduct.nombreProducto}
                   {...register("nombreProducto", {
                     required: "El nombre del producto es obligatorio.",
                   })}
@@ -214,12 +169,30 @@ const ManageProducts = () => {
               <Form.Label>Categoría</Form.Label>
               <div className="input-wrapper">
                 <Form.Select
-                  {...register("idCategoria", {
-                    required: "La categoría es obligatoria.",
-                  })}
-                  isInvalid={!!errors.idCategoria}
-                  className="input-field input-data"
-                >
+                      defaultValue={selectedProduct.idCategoria}
+                      {...register("idCategoria", {
+                        required: "La categoría es obligatoria.",
+                      })}
+                      isInvalid={!!errors.idCategoria}
+                      className="input-field input-data"
+                      onChange={(e) => {
+                        const newValue = e.target.value;
+                        setValue("idCategoria", newValue);
+                        const isNowPanaderia = newValue == 1;
+                        setIsPanaderia(isNowPanaderia);
+                        
+                        // Cambio clave aquí: establecer "bandejas" como valor por defecto si es Panaderia
+                        if (isNowPanaderia) {
+                          setTipoProduccion("bandejas");
+                          setValue("tipoProduccion", "bandejas");
+                        } else {
+                          setTipoProduccion(null);
+                          setValue("tipoProduccion", null);
+                        }
+                        
+                        setHasChanges(checkForChanges(watch(), initialProductValues));
+                      }}
+                    >
                   <option value="">Selecciona una categoría...</option>
                   {loadingCategorias ? (
                     <option>Cargando categorías...</option>
@@ -253,6 +226,7 @@ const ManageProducts = () => {
                     <Form.Control
                       type="number"
                       placeholder="Ingrese la cantidad"
+                      defaultValue={selectedProduct.cantidad}
                       {...register("cantidad", {
                         required: "La cantidad es obligatoria.",
                         min: {
@@ -283,6 +257,7 @@ const ManageProducts = () => {
                       type="number"
                       step="0.01"
                       placeholder="Ingrese el precio"
+                      defaultValue={selectedProduct.precio}
                       {...register("precio", {
                         required: "El precio es obligatorio.",
                         min: {
@@ -307,46 +282,116 @@ const ManageProducts = () => {
               </Col>
             </Row>
 
-            {/* Switch para control de stock */}
-            <Form.Group className="mb-3">
-              <Form.Label className="label-title">Control de Stock</Form.Label>
-              <div className="d-flex align-items-center">
-                <span className="me-2">No</span>
-                <Form.Check
-                  type="switch"
-                  id="controlStock"
-                  {...register("controlarStock")}
-                />
-                <span className="ms-2">Sí</span>
-              </div>
-            </Form.Group>
+            {/* Sección específica para Panaderia */}
+            {isPanaderia && (
+              <>
+                <div className="mb-3">
+                  <h6 className="label-title">Configuración para Producción y Stock</h6>
+                </div>
 
-            {/* Input de Unidades por Bandeja (solo visible si la categoría es Panadería) */}
-            {showUnidadesPorBandeja && (
-              <Form.Group className="mb-4">
-                <Form.Label className="label-title my-2">
-                  Unidades por Bandeja
-                  <small className="text-bold" style={{ fontSize: "0.8em" }}>
-                    <strong> (Información para producción)</strong>
-                  </small>
-                </Form.Label>
-                <Form.Control
-                  className="input-data"
-                  type="number"
-                  placeholder="Ingrese las unidades por bandeja"
-                  {...register("unidadesPorBandeja", {
-                    required: "Las unidades por bandeja son obligatorias.",
-                    min: {
-                      value: 1,
-                      message: "Las unidades por bandeja deben ser mayor a 0.",
-                    },
-                  })}
-                  isInvalid={!!errors.unidadesPorBandeja}
-                />
-                <Form.Control.Feedback type="invalid">
-                  {errors.unidadesPorBandeja?.message}
-                </Form.Control.Feedback>
-              </Form.Group>
+                {/* Controles de stock en una fila */}
+                <Row className="mb-3">
+                  <Col xs={6}>
+                    <Form.Group>
+                      <Form.Label className="label-title">Control de Stock</Form.Label>
+                      <div className="d-flex align-items-center">
+                        <span className="me-2">No</span>
+                        <Form.Check
+                          type="switch"
+                          id="controlStock"
+                          checked={controlStock}
+                          onChange={(e) => {
+                            setValue("controlStock", e.target.checked ? 1 : 0);
+                            setHasChanges(true);
+                          }}
+                          disabled={stockDiario}
+                        />
+                        <span className="ms-2">Sí</span>
+                      </div>
+                    </Form.Group>
+                  </Col>
+                  <Col xs={6}>
+                    <Form.Group>
+                      <Form.Label className="label-title">Stock Diario</Form.Label>
+                      <div className="d-flex align-items-center">
+                        <span className="me-2">No</span>
+                        <Form.Check
+                          type="switch"
+                          id="stockDiario"
+                          checked={stockDiario}
+                          onChange={(e) => {
+                            setValue("stockDiario", e.target.checked ? 1 : 0);
+                            setHasChanges(true);
+                          }}
+                          disabled={controlStock}
+                        />
+                        <span className="ms-2">Sí</span>
+                      </div>
+                    </Form.Group>
+                  </Col>
+                </Row>
+
+                {/* Selector de tipo de producción */}
+                <Form.Group className="mb-3">
+                  <Form.Label className="label-title">Tipo de Producción</Form.Label>
+                  <div className="d-flex align-items-center">
+                    <Form.Check
+                      type="radio"
+                      id="bandejas"
+                      label="Bandejas"
+                      value="bandejas"
+                      checked={tipoProduccion === "bandejas"}
+                      onChange={() => {
+                        setTipoProduccion("bandejas");
+                        setValue("tipoProduccion", "bandejas");
+                        setHasChanges(true);
+                      }}
+                      className="me-3 tipoProd"
+                    />
+                    <Form.Check
+                      className="tipoProd"
+                      type="radio"
+                      id="harina"
+                      label="Harina"
+                      value="harina"
+                      checked={tipoProduccion === "harina"}
+                      onChange={() => {
+                        setTipoProduccion("harina");
+                        setValue("tipoProduccion", "harina");
+                        setHasChanges(true);
+                      }}
+                    />
+                  </div>
+                </Form.Group>
+
+                {/* Input para unidades por bandeja */}
+                {tipoProduccion === "bandejas" && (
+                  <Form.Group className="mb-3">
+                    <Form.Label className="label-title">Unidades por Bandeja</Form.Label>
+                    <Form.Control
+                    className="input-data"
+                    type="number"
+                    placeholder="Ingrese las unidades por bandeja"
+                    defaultValue={selectedProduct.unidadesPorBandeja || ''}
+                    {...register("unidadesPorBandeja", {
+                      required: tipoProduccion === "bandejas" ? "Las unidades por bandeja son obligatorias." : false,
+                      min: {
+                        value: 1,
+                        message: "Las unidades por bandeja deben ser mayor a 0.",
+                      },
+                    })}
+                    isInvalid={!!errors.unidadesPorBandeja}
+                    onChange={(e) => {
+                      setValue("unidadesPorBandeja", e.target.value);
+                      setHasChanges(checkForChanges(watch(), initialProductValues));
+                    }}
+                  />
+                    <Form.Control.Feedback type="invalid">
+                      {errors.unidadesPorBandeja?.message}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+                )}
+              </>
             )}
           </Form>
         )}

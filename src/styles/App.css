@@ -7,8 +7,8 @@
 
 /* Definición de colores */
 :root {
-  --bg-topbar: #3c3658; /* Un poco más oscuro que el sidebar */
-  --bg-sidebar: #262335; /* Morado oscuro extraído de la imagen */
+  --bg-topbar: #343A40; /* Un poco más oscuro que el sidebar */
+  --bg-sidebar: #343A40; /* Morado oscuro extraído de la imagen */
   --bg-hover: #332e45; /* Hover en sidebar, un tono más claro */
   --text-primary: #d8b4fe; /* Morado claro para textos */
   --text-white: #ffffff; /* Texto blanco */
@@ -70,7 +70,9 @@
 
 /* Active link styles */
 .nav-link.active {
-  background-color: rgba(124, 58, 237, 0.2) !important; /* Fondo morado claro moderno */
+  color: white;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-left: 3px solid #ffc107;
 }
 
 /* Sidebar links */
@@ -130,4 +132,24 @@
   .main-content {
     width: 100%;
   }
+}
+
+
+/* Estilos personalizados para el scrollbar del sidebar */
+.sidebar::-webkit-scrollbar {
+  width: 8px; /* Ancho del scrollbar */
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: var(--bg-sidebar); /* Color de fondo del track */
+  border-radius: 4px; /* Bordes redondeados */
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: #6c757d; /* Color del thumb (barra deslizante) */
+  border-radius: 4px; /* Bordes redondeados */
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background: #5a6268; /* Color del thumb al pasar el mouse */
 }

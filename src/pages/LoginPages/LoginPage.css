@@ -1,140 +1,228 @@
 /* Estilos generales para el contenedor */
 .contenedorLados {
-    background-color: #1E3032;
-    height: 100vh; /* Forzar que ocupe toda la altura de la pantalla */
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  background-color: #ffff;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Estilos para el contenedor derecho */
+.derecho {
+  background-color: #ffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  padding: 40px;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.derecho h3, 
+.derecho span {
+  color: #3E2723;
+}
+
+/* Estilos del formulario flotante */
+.form-floating {
+  position: relative;
+  width: 100%;
+}
+
+.form-floating input {
+  height: 3.5rem;
+  padding: 1rem 0.75rem;
+  font-size: 1rem;
+  border: 1px solid #8D6E63;
+  border-radius: 5px;
+}
+
+.form-floating label {
+  position: absolute;
+  top: 50%;
+  left: 0.75rem;
+  transform: translateY(-50%);
+  font-size: 1rem;
+  color: #8D6E63;
+  transition: all 0.2s;
+  pointer-events: none;
+}
+
+.form-floating input:focus + label,
+.form-floating input:not(:placeholder-shown) + label {
+  top: -0.9rem;
+  left: 0.75rem;
+  font-size: 1rem;
+  color: #FFD54F;
+}
+
+.form-floating input:focus {
+  border-color: #FFD54F;
+  box-shadow: 0 0 0 0.2rem rgba(255, 213, 79, 0.25);
+}
+
+/* Estilos para el botón de login */
+.loginbtn {
+  background-color: #FFD54F;
+  color: #3E2723;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.loginbtn:hover {
+  background-color: #FBC02D;
+}
+
+/* Estilos para el logo de login */
+.logo-login {
+  width: 250px;
+  height: auto;
+  margin: 15px;
+  padding: 0;
+}
+
+/* Estilos para el contenedor izquierdo */
+.izquierdo {
+  position: relative;
+}
+
+.izquierdo img {
+  object-fit: cover;
+  object-position: center;
+  width: 100%;
+  height: 100%;
+}
+
+/* ========== MEDIA QUERIES ========== */
+
+/* Pantallas pequeñas (móviles) */
+@media (max-width: 767px) {
+  .contenedorLados {
+    background-color: #F5F5F5;
   }
-  
-  /* Estilos para el contenedor derecho */
-  .derecho {
-    background-color: #1E3032;
-    display: flex; /* Asegura el centrado del contenido */
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    height: 100%; /* Asegura que el contenido ocupe toda la altura del contenedor */
-    padding: 20px; /* Un poco de margen interno para móviles */
-    overflow: hidden; /* Evitar el scroll */
+
+  .col-sm-6.text-black {
+    margin-top: -160px;
   }
-  
-  .derecho h3, 
-  .derecho span {
-    color: #D8D83D;
-  }
-  
-  /* Estilos del formulario flotante */
-  .form-floating {
-    position: relative;
-    width: 100%; /* Asegúrate de que los inputs ocupen el ancho disponible */
-  }
-  
-  /* Estilo del input */
-  .form-floating input {
-    height: 3.5rem;
-    padding: 1rem 0.75rem;
-    font-size: 1rem;
-  }
-  
-  /* Estilo inicial del label (centrado verticalmente) */
-  .form-floating label {
-    position: absolute;
-    top: 50%;
-    left: 0.75rem;
-    transform: translateY(-50%);
-    font-size: 1rem; /* Tamaño más grande */
-    color: #6c757d;
-    transition: all 0.2s;
-    pointer-events: none;
-  }
-  
-  /* Cuando el input está enfocado o tiene texto */
-  .form-floating input:focus + label,
-  .form-floating input:not(:placeholder-shown) + label {
-    top: -0.9rem; /* Ajusta la posición */
-    left: 0.75rem;
-    font-size: 1rem; /* Tamaño más grande en estado enfocado */
-    color: #D8D83D; /* Cambia el color del label */
-  }
-  
-  /* Estilo para el input cuando está enfocado */
-  .form-floating input:focus {
-    border-color: #D8D83D; /* Cambia el color del borde */
-    box-shadow: 0 0 0 0.2rem rgba(216, 216, 61, 0.25); /* Agrega un sombreado para el enfoque */
-  }
-  
-  /* Estilos adicionales para dispositivos móviles */
-  @media (max-width: 768px) {
-    .col-sm-6.text-black {
-      margin-top: -160px; /* Ajusta esta distancia según lo que necesites */
-    }
-  
-    .logo-login {
-      width: 70px; /* Ajusta el tamaño para dispositivos pequeños */
-      height: auto;
-    }
-  
-    .divlogo {
-      text-align: center;
-      height: 150px;
-    }
-  
-    .derecho {
-      justify-content: flex-start; /* Mueve el contenido hacia la parte superior */
-      padding-top: 40px; /* Ajusta este valor según sea necesario */
-    }
-  }
-  
-  /* Estilos para el botón de login */
-  .loginbtn {
-    background-color: #D8D83D;
-    color: #1E3032;
-  }
-  
-  /* Estilos para el logo de login */
+
   .logo-login {
-    width: 200px; /* Ajusta el tamaño del logo */
-    height: auto; /* Mantén las proporciones */
-    margin: 0; /* Centra el logo */
-    padding: 0;
+    width: 200px;
+  }
+
+  .divlogo {
+    text-align: center;
+    height: 150px;
+  }
+
+  .derecho {
+    justify-content: flex-start;
+    padding-top: 40px;
+    background-color: #F5F5F5;
+  }
+}
+
+/* Tablets y pantallas medianas (768px - 991px) */
+@media (min-width: 768px) and (max-width: 991px) {
+  .contenedorLados {
+    background-color: #F5F5F5;
   }
   
-  /* Estilos adicionales para pantallas grandes */
-  @media (min-width: 769px) {
-    .derecho {
-      justify-content: center; /* Centra el contenido verticalmente */
-      align-items: center; /* Centra el contenido horizontalmente */
-    }
-  
-    .divlogo {
-      text-align: center;
-      height: 150px;
-    }
-  }
-  
-  /* Estilos para el contenedor izquierdo */
   .izquierdo {
-    position: relative; /* Contexto para posicionar el <h1> */
+    display: none !important;
+  }
+
+  .derecho {
+    width: 100% !important;
+    margin-left: 0 !important;
+    margin-top: 0 !important;
+    padding: 100px !important;
+    background-color: #F5F5F5 !important;
+    transform: translateY(-10%); /* Mueve todo el contenedor hacia arriba */
+    position: relative; /* Necesario para transform */
+  }
+
+  .logo-login {
+    width: 350px !important;
+    margin-top: 1px;
+    transform: translateY(-30%); /* Mueve todo el contenedor hacia arriba */
+    position: relative; /* Necesario para transform */
+  }
+
+  .divlogo {
+    height: 120px !important;
+  }
+
+}
+
+/* Pantallas grandes (desktop) */
+@media (min-width: 992px) {
+  .divlogo {
+    text-align: center;
+    height: 150px;
+  }
+
+  .derecho {
+    margin-top: 30px;
+    width: 35%;
+    margin-left: 100px;
+    justify-content: center;
+    align-items: center;
+    padding-top: 10px;
+    border-radius: 15px;
+  }
+}
+
+/* Para tablets 7" en portrait (ej: 600x1024px) */
+@media (min-width: 600px) and (max-width: 767px) and (orientation: portrait) {
+  .contenedorLados {
+    background-color: #F5F5F5;
   }
   
-  .izquierdo h1 {
-    position: absolute;
-    top: 20%; /* Ajusta hacia arriba reduciendo el porcentaje (por ejemplo, de 50% a 40%) */
-    left: 50%; /* Mantiene centrado horizontalmente */
-    transform: translate(-50%, -50%); /* Ajusta para que el centro del texto coincida con el punto calculado */
-    color: #D8D83D; /* Asegúrate de que sea visible sobre la imagen */
-    z-index: 2; /* Para asegurarte de que quede encima de la imagen */
-    font-size: 2.5rem; /* Ajusta el tamaño según tus necesidades */
-    text-align: center; /* Asegura que el texto esté centrado si es multilinea */
-    text-shadow: 5px 5px 4px rgba(0, 0, 0, 1); /* Agrega un sombreado para resaltar el texto */
-    font-family: 'Lobster', cursive; /* Fuente personalizada */
+  .izquierdo {
+    display: none !important;
   }
-  
-  .izquierdo img {
-    object-fit: cover;
-    object-position: center;
-    width: 100%;
-    height: 100%;
+
+  .derecho {
+    width: 100% !important;
+    margin-left: 0 !important;
+    margin-top: 0 !important;
+    padding: 100px !important;
+    background-color: #F5F5F5 !important;
+    transform: translateY(-10%); /* Mueve todo el contenedor hacia arriba */
+    position: relative; /* Necesario para transform */
   }
-  
+
+  .logo-login {
+    width: 350px !important;
+    margin-top: 1px;
+    transform: translateY(-30%); /* Mueve todo el contenedor hacia arriba */
+    position: relative; /* Necesario para transform */
+  }
+
+  .divlogo {
+    height: 120px !important;
+  }
+
+  /* Estilos para el botón de login */
+.loginbtn {
+  background-color: #FFD54F;
+  color: #3E2723;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  width: 150px;
+}
+
+.loginbtn:hover {
+  background-color: #FBC02D;
+}
+}

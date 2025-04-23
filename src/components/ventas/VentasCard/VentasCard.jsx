@@ -1,11 +1,6 @@
 import React from "react";
 import { Card, Button, Badge } from "react-bootstrap";
-import { 
-  FaCalendarAlt, 
-  FaUser, 
-  FaInfoCircle,
-  FaTrash
-} from "react-icons/fa";
+import { FaCalendarAlt, FaUser, FaInfoCircle, FaTrash } from "react-icons/fa";
 import "./VentasCard.css"; // Importa el CSS
 import { formatDateToDisplay } from "../../../utils/dateUtils";
 

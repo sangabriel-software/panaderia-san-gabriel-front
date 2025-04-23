@@ -30,7 +30,7 @@ export const useGetSucursales = () => {
       fetchSucursales();
     }, []);
   
-    return { sucursales, loadingSucursales, showErrorSucursales, showInfoSucursales };
+    return { sucursales, loadingSucursales, showErrorSucursales, showInfoSucursales, setSucursales };
   };
   
   export default useGetSucursales;

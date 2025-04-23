@@ -12,6 +12,11 @@ const getEndpoints = {
     CONSULTAR_VENTAS_USUARIO: "/consultar-venta-por-usuario",
     CONSULTAR_ORDEN_POR_CRITERIOS: "consultar-detalle-por-criterios",
     CONSULTAR_DETALLE_VENTA: "consultar-detalle-venta",
+    CONSULTAR_RECETAS: "consultar-recetas",
+    STOCK_DEL_DIA: "consultar-stock-sucursal",
+    STOCK_DE_PRODUCTOS_GENERALES: "consultar-stock-productos",
+    CONSULTAR_ORDENES_ESPECIALES: "consultar-ordenes-especiales",
+    CONSULTAR_ORDENES_ESPECIALES_POR_ID: "consultar-orden-especial-id",
 };
 
 const postEndpoints = {
@@ -25,14 +30,24 @@ const postEndpoints = {
     INGRESAR_CATEGORIA: "/ingresarcategoria",
     INGRESAR_ORDEN_PRODUCCION: "/ingresar-orden",
     INGRESAR_VENTA: "/ingresar-venta",
+    INGRESAR_SUCURSAL: "/ingresarSucursal",
+    INGRESAR_RECETA: "/ingresar-receta",
+    INGRESAR_STOCK: "ingresar-stock-productos",
+    INGRESAR_ORDEN_ESPECIAL: "/ingresar-orden-especial",
 };
 
 const putEndpoints = {
+
     ACTUALIZAR_ROL: "/actualizarRol",
     DESBLOQUEAR_USAURIO: "/desbloquearUsuario",
     BLOQUEAR_USUARIO: "/bloquearUsuario",
+    ACTUALIZAR_DATOS_USUARIO: "/actualizarUsuario",
     ACTUALIZAR_PRODUCTO: "/actualizarProducto",
-    ACTUALIZAR_PRECIO: "/actualizarPrecio"
+    ACTUALIZAR_PRECIO: "/actualizarPrecio",
+    ACTUALIZAR_SUCURSALES: "/actualizar-sucursal",
+    ACTUALIZAR_RECETA: "/actualizar-receta",
+    CAMBIAR_PASS: "/actualizar-pass",
+    ACTUALIZAR_ORDEN_ESPECIAL: "/actualizar-orden-especial",
 };
 
 const deleteEndpoints = {
@@ -42,8 +57,10 @@ const deleteEndpoints = {
     DESACTIVAR_PRODUCTOS: "desactivarProducto",
     ELIMINAR_ORDEN_PRODUCCION: "/eliminar-ordenes-produccion",
     ELMINAR_VENTA: "/eliminar-venta",
+    ELMINAR_SUCURSAL: "/eliminarSucursal",
+    ELIMINAR_RECETA: "elminar-receta",
+    ELIMINAR_ORDEN_ESPECIAL: "eliminar-orden-especial",
 };
-
 
 export { getEndpoints, postEndpoints, putEndpoints, deleteEndpoints};
 export default getEndpoints; // Exportación por defecto
