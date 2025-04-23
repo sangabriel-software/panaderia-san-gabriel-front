@@ -4,13 +4,13 @@ import { useMediaQuery } from 'react-responsive';
 import { useNavigate } from 'react-router-dom';
 import './OrdenesEspecialesList.styles.css';
 import Title from "../../../components/Title/Title";
-import { FiPlusCircle, FiEye, FiTrash2, FiUser, FiPhone, FiCalendar, FiShoppingBag, FiX } from 'react-icons/fi';
+import { FiPlusCircle, FiEye, FiTrash2, FiUser, FiPhone, FiCalendar, FiShoppingBag, FiX, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { eliminarOrdenEspecialService } from "../../../services/ordenesEspeciales/ordenesEspeciales.service";
 import Alert from "../../../components/Alerts/Alert";
 import ErrorPopup from "../../../components/Popup/ErrorPopUp";
 import { Spinner, Form } from "react-bootstrap";
 import { BsExclamationTriangleFill, BsInfoCircleFill } from 'react-icons/bs';
-import { formatDateToDisplay, parseDateFromInput } from "../../../utils/dateUtils";
+import { formatDateToDisplay } from "../../../utils/dateUtils";
 
 const OrdenesEspecialesList = () => {
   const { ordenesEspeciales, loadingOrdenEspecial, showErrorOrdenEspecial, setOrdenesEspeciales } = useGetOrdenEHeader();
@@ -24,6 +24,10 @@ const OrdenesEspecialesList = () => {
   // Filtros
   const [sucursalFilter, setSucursalFilter] = useState("");
   const [fechaFilter, setFechaFilter] = useState("");
+  
+  // Paginación
+  const [currentPage, setCurrentPage] = useState(1);
+  const recordsPerPage = 5;
   
   const navigate = useNavigate();
   
@@ -52,6 +56,14 @@ const OrdenesEspecialesList = () => {
     });
   }, [ordenesEspeciales, sucursalFilter, fechaFilter]);
 
+  // Lógica de paginación
+  const indexOfLastRecord = currentPage * recordsPerPage;
+  const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
+  const currentRecords = filteredOrdenes.slice(indexOfFirstRecord, indexOfLastRecord);
+  const totalPages = Math.ceil(filteredOrdenes.length / recordsPerPage);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
   const handleDeleteClick = (order) => {
     setSelectedOrder(order);
     setOpenDeleteDialog(true);
@@ -63,6 +75,10 @@ const OrdenesEspecialesList = () => {
       await eliminarOrdenEspecialService(selectedOrder.idOrdenEspecial);
       setOrdenesEspeciales(ordenesEspeciales.filter(o => o.idOrdenEspecial !== selectedOrder.idOrdenEspecial));
       setIsPopupOpen(true);
+      // Resetear a la primera página si quedan pocos registros
+      if (currentRecords.length === 1 && currentPage > 1) {
+        setCurrentPage(currentPage - 1);
+      }
     } catch (error) {
       setErrorPopupMessage(error.message || "Error al eliminar la orden especial");
       setIsPopupErrorOpen(true);
@@ -85,6 +101,7 @@ const OrdenesEspecialesList = () => {
   const clearFilters = () => {
     setSucursalFilter("");
     setFechaFilter("");
+    setCurrentPage(1); // Resetear a la primera página al limpiar filtros
   };
 
   if (loadingOrdenEspecial) {
@@ -129,7 +146,10 @@ const OrdenesEspecialesList = () => {
             <Form.Label>Sucursal:</Form.Label>
             <Form.Select
               value={sucursalFilter}
-              onChange={(e) => setSucursalFilter(e.target.value)}
+              onChange={(e) => {
+                setSucursalFilter(e.target.value);
+                setCurrentPage(1); // Resetear a la primera página al cambiar filtro
+              }}
               className="oel-filter-select"
             >
               <option value="">Todas las sucursales</option>
@@ -146,7 +166,10 @@ const OrdenesEspecialesList = () => {
             <Form.Control
               type="date"
               value={fechaFilter}
-              onChange={(e) => setFechaFilter(e.target.value)}
+              onChange={(e) => {
+                setFechaFilter(e.target.value);
+                setCurrentPage(1); // Resetear a la primera página al cambiar filtro
+              }}
               className="oel-filter-input"
             />
           </div>
@@ -179,170 +202,251 @@ const OrdenesEspecialesList = () => {
       )}
 
       {/* Versión Desktop */}
-      {!isMobile && !isTablet && filteredOrdenes.length > 0 && (
-        <div className="oel-table-container">
-          <table className="oel-table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Cliente</th>
-                <th>Teléfono</th>
-                <th>Sucursal</th>
-                <th>Fecha Entrega</th>
-                <th>Estado</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredOrdenes.map((orden) => (
-                <tr key={orden.idOrdenEspecial} className="oel-table-row">
-                  <td data-label="ID">{orden.idOrdenEspecial}</td>
-                  <td data-label="Cliente">{orden.nombreCliente}</td>
-                  <td data-label="Teléfono">{orden.telefonoCliente}</td>
-                  <td data-label="Sucursal">{orden.sucursalEntrega}</td>
-                  <td data-label="Fecha Entrega">{formatDateToDisplay(orden.fechaEntrega)}</td>
-                  <td data-label="Estado">
-                    <span className={`oel-status-badge ${orden.estado === 'A' ? 'oel-active' : 'oel-inactive'}`}>
-                      {orden.estado === 'A' ? 'Activo' : 'Inactivo'}
-                    </span>
-                  </td>
-                  <td data-label="Acciones">
-                    <div className="oel-actions">
-                      <button className="oel-action-button oel-view" title="Ver detalles">
-                        <FiEye className="oel-icon" />
-                      </button>
-                      <button 
-                        className="oel-action-button oel-delete"
-                        onClick={() => handleDeleteClick(orden)}
-                        title="Eliminar orden"
-                        disabled={isDeleting}
-                      >
-                        {isDeleting && selectedOrder?.idOrdenEspecial === orden.idOrdenEspecial ? (
-                          <Spinner animation="border" size="sm" />
-                        ) : (
-                          <FiTrash2 className="oel-icon" />
-                        )}
-                      </button>
-                    </div>
-                  </td>
+      {!isMobile && !isTablet && currentRecords.length > 0 && (
+        <>
+          <div className="oel-table-container">
+            <table className="oel-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Cliente</th>
+                  <th>Teléfono</th>
+                  <th>Sucursal</th>
+                  <th>Fecha Entrega</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      {/* Versión Tablet */}
-      {isTablet && filteredOrdenes.length > 0 && (
-        <div className="oel-grid-container">
-          {filteredOrdenes.map((orden) => (
-            <div key={orden.idOrdenEspecial} className="oel-card">
-              <div className="oel-card-header">
-                <div className="oel-client-info">
-                  <FiUser className="oel-icon" />
-                  <h3 className="oel-client-name">{orden.nombreCliente}</h3>
-                </div>
-                <span className={`oel-status-badge ${orden.estado === 'A' ? 'oel-active' : 'oel-inactive'}`}>
-                  {orden.estado === 'A' ? 'Activo' : 'Inactivo'}
-                </span>
-              </div>
-              <div className="oel-card-details">
-                <div className="oel-detail">
-                  <FiPhone className="oel-icon" />
-                  <span>{orden.telefonoCliente}</span>
-                </div>
-                <div className="oel-detail">
-                  <FiShoppingBag className="oel-icon" />
-                  <span>{orden.sucursalEntrega}</span>
-                </div>
-                <div className="oel-detail">
-                  <FiCalendar className="oel-icon" />
-                  <span>{formatDateToDisplay(orden.fechaEntrega)}</span>
-                </div>
-              </div>
-              <div className="oel-card-actions">
-                <button className="oel-card-action-button oel-view" title="Ver detalles">
-                  <FiEye className="oel-icon" /> Ver
-                </button>
-                <button 
-                  className="oel-card-action-button oel-delete"
-                  onClick={() => handleDeleteClick(orden)}
-                  title="Eliminar orden"
-                  disabled={isDeleting}
-                >
-                  {isDeleting && selectedOrder?.idOrdenEspecial === orden.idOrdenEspecial ? (
-                    <Spinner animation="border" size="sm" />
-                  ) : (
-                    <>
-                      <FiTrash2 className="oel-icon" /> Eliminar
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Versión Mobile */}
-      {isMobile && filteredOrdenes.length > 0 && (
-        <div className="oel-mobile-container">
-          {filteredOrdenes.map((orden) => (
-            <div key={orden.idOrdenEspecial} className="oel-mobile-card">
-              <div className="oel-mobile-header">
-                <div className="oel-client-info">
-                  <FiUser className="oel-icon oel-profile-icon" />
-                  <div>
-                    <h4 className="oel-client-name">{orden.nombreCliente}</h4>
-                    <div className="oel-client-meta">
+              </thead>
+              <tbody>
+                {currentRecords.map((orden) => (
+                  <tr key={orden.idOrdenEspecial} className="oel-table-row">
+                    <td data-label="ID">{orden.idOrdenEspecial}</td>
+                    <td data-label="Cliente">{orden.nombreCliente}</td>
+                    <td data-label="Teléfono">{orden.telefonoCliente}</td>
+                    <td data-label="Sucursal">{orden.sucursalEntrega}</td>
+                    <td data-label="Fecha Entrega">{formatDateToDisplay(orden.fechaEntrega)}</td>
+                    <td data-label="Estado">
                       <span className={`oel-status-badge ${orden.estado === 'A' ? 'oel-active' : 'oel-inactive'}`}>
                         {orden.estado === 'A' ? 'Activo' : 'Inactivo'}
                       </span>
-                      <span className="oel-order-id">#{orden.idOrdenEspecial}</span>
+                    </td>
+                    <td data-label="Acciones">
+                      <div className="oel-actions">
+                        <button className="oel-action-button oel-view" title="Ver detalles">
+                          <FiEye className="oel-icon" />
+                        </button>
+                        <button 
+                          className="oel-action-button oel-delete"
+                          onClick={() => handleDeleteClick(orden)}
+                          title="Eliminar orden"
+                          disabled={isDeleting}
+                        >
+                          {isDeleting && selectedOrder?.idOrdenEspecial === orden.idOrdenEspecial ? (
+                            <Spinner animation="border" size="sm" />
+                          ) : (
+                            <FiTrash2 className="oel-icon" />
+                          )}
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          
+          {/* Paginación Desktop */}
+          <div className="oel-pagination">
+            <button
+              onClick={() => paginate(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="oel-pagination-button"
+            >
+              <FiChevronLeft className="oel-icon" />
+            </button>
+            
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map(number => (
+              <button
+                key={number}
+                onClick={() => paginate(number)}
+                className={`oel-pagination-button ${currentPage === number ? 'active' : ''}`}
+              >
+                {number}
+              </button>
+            ))}
+            
+            <button
+              onClick={() => paginate(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="oel-pagination-button"
+            >
+              <FiChevronRight className="oel-icon" />
+            </button>
+          </div>
+        </>
+      )}
+
+      {/* Versión Tablet */}
+      {isTablet && currentRecords.length > 0 && (
+        <>
+          <div className="oel-grid-container">
+            {currentRecords.map((orden) => (
+              <div key={orden.idOrdenEspecial} className="oel-card">
+                <div className="oel-card-header">
+                  <div className="oel-client-info">
+                    <FiUser className="oel-icon" />
+                    <h3 className="oel-client-name">{orden.nombreCliente}</h3>
+                  </div>
+                  <span className={`oel-status-badge ${orden.estado === 'A' ? 'oel-active' : 'oel-inactive'}`}>
+                    {orden.estado === 'A' ? 'Activo' : 'Inactivo'}
+                  </span>
+                </div>
+                <div className="oel-card-details">
+                  <div className="oel-detail">
+                    <FiPhone className="oel-icon" />
+                    <span>{orden.telefonoCliente}</span>
+                  </div>
+                  <div className="oel-detail">
+                    <FiShoppingBag className="oel-icon" />
+                    <span>{orden.sucursalEntrega}</span>
+                  </div>
+                  <div className="oel-detail">
+                    <FiCalendar className="oel-icon" />
+                    <span>{formatDateToDisplay(orden.fechaEntrega)}</span>
+                  </div>
+                </div>
+                <div className="oel-card-actions">
+                  <button className="oel-card-action-button oel-view" title="Ver detalles">
+                    <FiEye className="oel-icon" /> Ver
+                  </button>
+                  <button 
+                    className="oel-card-action-button oel-delete"
+                    onClick={() => handleDeleteClick(orden)}
+                    title="Eliminar orden"
+                    disabled={isDeleting}
+                  >
+                    {isDeleting && selectedOrder?.idOrdenEspecial === orden.idOrdenEspecial ? (
+                      <Spinner animation="border" size="sm" />
+                    ) : (
+                      <>
+                        <FiTrash2 className="oel-icon" /> Eliminar
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          {/* Paginación Tablet */}
+          <div className="oel-pagination">
+            <button
+              onClick={() => paginate(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="oel-pagination-button"
+            >
+              <FiChevronLeft className="oel-icon" />
+            </button>
+            
+            <span className="oel-pagination-info">
+              Página {currentPage} de {totalPages}
+            </span>
+            
+            <button
+              onClick={() => paginate(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="oel-pagination-button"
+            >
+              <FiChevronRight className="oel-icon" />
+            </button>
+          </div>
+        </>
+      )}
+
+      {/* Versión Mobile */}
+      {isMobile && currentRecords.length > 0 && (
+        <>
+          <div className="oel-mobile-container">
+            {currentRecords.map((orden) => (
+              <div key={orden.idOrdenEspecial} className="oel-mobile-card">
+                <div className="oel-mobile-header">
+                  <div className="oel-client-info">
+                    <FiUser className="oel-icon oel-profile-icon" />
+                    <div>
+                      <h4 className="oel-client-name">{orden.nombreCliente}</h4>
+                      <div className="oel-client-meta">
+                        <span className={`oel-status-badge ${orden.estado === 'A' ? 'oel-active' : 'oel-inactive'}`}>
+                          {orden.estado === 'A' ? 'Activo' : 'Inactivo'}
+                        </span>
+                        <span className="oel-order-id">#{orden.idOrdenEspecial}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-              
-              <div className="oel-mobile-details">
-                <div className="oel-detail-row">
-                  <FiPhone className="oel-icon" />
-                  <span>{orden.telefonoCliente}</span>
+                
+                <div className="oel-mobile-details">
+                  <div className="oel-detail-row">
+                    <FiPhone className="oel-icon" />
+                    <span>{orden.telefonoCliente}</span>
+                  </div>
+                  <div className="oel-detail-row">
+                    <FiShoppingBag className="oel-icon" />
+                    <span>{orden.sucursalEntrega}</span>
+                  </div>
+                  <div className="oel-detail-row">
+                    <FiCalendar className="oel-icon" />
+                    <span>{formatDateToDisplay(orden.fechaEntrega)}</span>
+                  </div>
                 </div>
-                <div className="oel-detail-row">
-                  <FiShoppingBag className="oel-icon" />
-                  <span>{orden.sucursalEntrega}</span>
-                </div>
-                <div className="oel-detail-row">
-                  <FiCalendar className="oel-icon" />
-                  <span>{formatDateToDisplay(orden.fechaEntrega)}</span>
+                
+                <div className="oel-mobile-actions">
+                  <button className="oel-mobile-action-button oel-view" title="Ver detalles">
+                    <FiEye className="oel-icon" />
+                    <span>Ver</span>
+                  </button>
+                  <button 
+                    className="oel-mobile-action-button oel-delete"
+                    onClick={() => handleDeleteClick(orden)}
+                    title="Eliminar orden"
+                    disabled={isDeleting}
+                  >
+                    {isDeleting && selectedOrder?.idOrdenEspecial === orden.idOrdenEspecial ? (
+                      <Spinner animation="border" size="sm" />
+                    ) : (
+                      <>
+                        <FiTrash2 className="oel-icon" />
+                        <span>Eliminar</span>
+                      </>
+                    )}
+                  </button>
                 </div>
               </div>
-              
-              <div className="oel-mobile-actions">
-                <button className="oel-mobile-action-button oel-view" title="Ver detalles">
-                  <FiEye className="oel-icon" />
-                  <span>Ver</span>
-                </button>
-                <button 
-                  className="oel-mobile-action-button oel-delete"
-                  onClick={() => handleDeleteClick(orden)}
-                  title="Eliminar orden"
-                  disabled={isDeleting}
-                >
-                  {isDeleting && selectedOrder?.idOrdenEspecial === orden.idOrdenEspecial ? (
-                    <Spinner animation="border" size="sm" />
-                  ) : (
-                    <>
-                      <FiTrash2 className="oel-icon" />
-                      <span>Eliminar</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+          
+          {/* Paginación Mobile */}
+          <div className="oel-pagination-mobile">
+            <button
+              onClick={() => paginate(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="oel-pagination-button"
+            >
+              <FiChevronLeft className="oel-icon" /> Anterior
+            </button>
+            
+            <span className="oel-pagination-info">
+              {currentPage}/{totalPages}
+            </span>
+            
+            <button
+              onClick={() => paginate(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="oel-pagination-button"
+            >
+              Siguiente <FiChevronRight className="oel-icon" />
+            </button>
+          </div>
+        </>
       )}
 
       {/* Modal de confirmación */}
