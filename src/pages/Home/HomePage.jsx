@@ -125,18 +125,18 @@ const HomePage = () => {
       action: () => navigate("/ventas/ingresar-venta"),
     },
     {
+      title: "Orden Especial",
+      icon: <FiTrendingUp size={20} />,
+      color: "#C7CEEA", // Azul lila pastel
+      hoverColor: "#B2BCE5",
+      action: () => navigate("/pedido-especial/ingresar-orden-especial"),
+    },
+    {
       title: "Agregar Stock",
       icon: <FiPlus size={20} />,
       color: "#FFDAC1", // Melocotón pastel
       hoverColor: "#FFC7A7",
       action: () => navigate("/stock-productos"),
-    },
-    {
-      title: "Ver Reportes",
-      icon: <FiTrendingUp size={20} />,
-      color: "#C7CEEA", // Azul lila pastel
-      hoverColor: "#B2BCE5",
-      action: () => navigate("/reports"),
     },
     {
       title: "Ingresar Orden",
