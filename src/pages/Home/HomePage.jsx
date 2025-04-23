@@ -353,7 +353,7 @@ const HomePage = () => {
         size="lg"
         className="homepage-modal"
       >
-        <Modal.Header className="text-white bg-primary">
+        <Modal.Header className="text-white bg-info">
           <Modal.Title>Detalles del Pedido Especial</Modal.Title>
           <button
             type="button"
@@ -457,17 +457,17 @@ const HomePage = () => {
         </Modal.Body>
         <Modal.Footer>
           <Button
-            variant="outline-secondary"
+            variant="danger"
             onClick={() => setShowModal(false)}
           >
             Cerrar
           </Button>
-          <Button
+          {/* <Button
             variant="primary"
             onClick={() => navigate(`/ordenes-produccion/${selectedOrder?.id}`)}
           >
             Ver orden completa
-          </Button>
+          </Button> */}
         </Modal.Footer>
       </Modal>
     </div>

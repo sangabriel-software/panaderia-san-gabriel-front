@@ -7,7 +7,7 @@ import * as DarkReader from "darkreader";
 import "./Sidebar.css";
 import { getUserData, getUserPermissions } from "../../utils/Auth/decodedata";
 import { getColorFromName } from "./Sidebar.uitils";
-import { FiBox, FiCalendar, FiHome, FiMapPin, FiPieChart, FiSettings, FiShoppingBag, FiShoppingCart, FiUsers } from "react-icons/fi";
+import { FiBox, FiCalendar, FiHome, FiMapPin, FiPieChart, FiSettings, FiShoppingBag, FiShoppingCart, FiTruck, FiUsers } from "react-icons/fi";
 
 function Sidebar({ show, onClose }) {
   const [usersOpen, setUsersOpen] = useState(false);
@@ -246,6 +246,17 @@ function Sidebar({ show, onClose }) {
             onClick={handleNavLinkClick}
           >
             <FiMapPin size={25} className="me-2" /> Sucursales
+          </Nav.Link>
+        )}
+
+        {isRouteAllowed("/traslados-productos") && (
+          <Nav.Link
+            as={NavLink}
+            to="/traslados-productos"
+            className="text-light"
+            onClick={handleNavLinkClick}
+          >
+            <FiTruck size={25} className="me-2" /> Traslados
           </Nav.Link>
         )}
 

@@ -30,6 +30,8 @@ const OrdenEspecialDetail = () => {
     setDetalleOrdenEspecial
   } = useGetOrdenEDetalle(idOrdenEspecial);
 
+  console.log(detalleOrdenEspecial)
+
   // Hooks para productos y sucursales
   const { productos, loadigProducts, showErrorProductos } = useGetProductosYPrecios();
   const { sucursales, loadingSucursales, showErrorSucursales } = useGetSucursales();
@@ -104,7 +106,7 @@ const OrdenEspecialDetail = () => {
     setIsLoading(true);
     
     try {
-      // Validaciones
+      // Validaciones (se mantienen igual)
       if (!detalleOrdenEspecial?.ordenEncabezado?.nombreCliente?.trim()) {
         throw new Error("El nombre del cliente es requerido");
       }
@@ -121,15 +123,23 @@ const OrdenEspecialDetail = () => {
         throw new Error("La fecha de entrega es requerida");
       }
       
-      // Preparar productos seleccionados
+      // Preparar productos seleccionados - MODIFICADO para incluir idDetalleOrdenEspecial
       const productosSeleccionados = Object.entries(cantidadValues)
         .filter(([_, cantidad]) => cantidad > 0)
-        .map(([idProducto, cantidad]) => ({
-          idProducto: parseInt(idProducto),
-          cantidadUnidades: cantidad,
-          nombreProducto: productos.find(p => p.idProducto === parseInt(idProducto))?.nombreProducto || "",
-          precioUnitario: productos.find(p => p.idProducto === parseInt(idProducto))?.precioVenta || 0
-        }));
+        .map(([idProducto, cantidad]) => {
+          // Buscar el producto en el detalle original para obtener su idDetalleOrdenEspecial
+          const productoOriginal = detalleOrdenEspecial.ordenDetalle.find(
+            p => p.idProducto === parseInt(idProducto)
+          );
+          
+          return {
+            idDetalleOrdenEspecial: productoOriginal?.idDetalleOrdenEspecial || null, // Incluir el ID existente o null para nuevos
+            idProducto: parseInt(idProducto),
+            cantidadUnidades: cantidad,
+            nombreProducto: productos.find(p => p.idProducto === parseInt(idProducto))?.nombreProducto || "",
+            precioUnitario: productos.find(p => p.idProducto === parseInt(idProducto))?.precioVenta || 0
+          };
+        });
       
       if (productosSeleccionados.length === 0) {
         throw new Error("Debe seleccionar al menos un producto");
@@ -149,6 +159,8 @@ const OrdenEspecialDetail = () => {
         ordenDetalle: productosSeleccionados
       };
       
+      console.log("Payload enviado:", payload); // Para depuración
+  
       // Enviar a la API
       await actualizarOrdenEspecialService(payload);
       
@@ -160,8 +172,8 @@ const OrdenEspecialDetail = () => {
       
       setIsPopupOpen(true);
       setIsEditing(false);
-      setCategoriaActiva("Todas"); // Resetear categoría después de guardar
-      setSearchTerm(""); // Limpiar búsqueda después de guardar
+      setCategoriaActiva("Todas");
+      setSearchTerm("");
     } catch (error) {
       setErrorPopupMessage(error.message);
       setIsPopupErrorOpen(true);
