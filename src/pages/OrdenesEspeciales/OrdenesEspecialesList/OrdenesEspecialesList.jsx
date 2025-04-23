@@ -1,32 +1,76 @@
 import useGetOrdenEHeader from "../../../hooks/orenesEspeciales/useGetOrdenEHeader";
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useMediaQuery } from 'react-responsive';
 import { useNavigate } from 'react-router-dom';
 import './OrdenesEspecialesList.styles.css';
 import Title from "../../../components/Title/Title";
 import { FiPlusCircle, FiEye, FiTrash2, FiUser, FiPhone, FiCalendar, FiShoppingBag, FiX } from 'react-icons/fi';
-import { formatDateToDisplay } from "../../../utils/dateUtils";
+import { eliminarOrdenEspecialService } from "../../../services/ordenesEspeciales/ordenesEspeciales.service";
+import Alert from "../../../components/Alerts/Alert";
+import ErrorPopup from "../../../components/Popup/ErrorPopUp";
+import { Spinner, Form } from "react-bootstrap";
+import { BsExclamationTriangleFill, BsInfoCircleFill } from 'react-icons/bs';
+import { formatDateToDisplay, parseDateFromInput } from "../../../utils/dateUtils";
 
 const OrdenesEspecialesList = () => {
   const { ordenesEspeciales, loadingOrdenEspecial, showErrorOrdenEspecial, setOrdenesEspeciales } = useGetOrdenEHeader();
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [isPopupErrorOpen, setIsPopupErrorOpen] = useState(false);
+  const [errorPopupMessage, setErrorPopupMessage] = useState("");
+  
+  // Filtros
+  const [sucursalFilter, setSucursalFilter] = useState("");
+  const [fechaFilter, setFechaFilter] = useState("");
+  
   const navigate = useNavigate();
   
   // Definición de breakpoints
   const isMobile = useMediaQuery({ maxWidth: 767 });
   const isTablet = useMediaQuery({ minWidth: 768, maxWidth: 991 });
 
+  // Obtener lista única de sucursales para el filtro
+  const sucursalesUnicas = useMemo(() => {
+    const sucursales = ordenesEspeciales.map(o => o.sucursalEntrega);
+    return [...new Set(sucursales)].sort();
+  }, [ordenesEspeciales]);
+
+  // Filtrar órdenes
+  const filteredOrdenes = useMemo(() => {
+    return ordenesEspeciales.filter(orden => {
+      // Filtro por sucursal
+      const matchesSucursal = sucursalFilter === "" || 
+        orden.sucursalEntrega.toLowerCase().includes(sucursalFilter.toLowerCase());
+      
+      // Filtro por fecha
+      const matchesFecha = fechaFilter === "" || 
+        orden.fechaEntrega === fechaFilter;
+      
+      return matchesSucursal && matchesFecha;
+    });
+  }, [ordenesEspeciales, sucursalFilter, fechaFilter]);
+
   const handleDeleteClick = (order) => {
     setSelectedOrder(order);
     setOpenDeleteDialog(true);
   };
 
-  const handleDeleteConfirm = () => {
-    console.log('Eliminando orden:', selectedOrder.idOrdenEspecial);
-    setOrdenesEspeciales(ordenesEspeciales.filter(o => o.idOrdenEspecial !== selectedOrder.idOrdenEspecial));
-    setOpenDeleteDialog(false);
-    setSelectedOrder(null);
+  const handleDeleteConfirm = async () => {
+    setIsDeleting(true);
+    try {
+      await eliminarOrdenEspecialService(selectedOrder.idOrdenEspecial);
+      setOrdenesEspeciales(ordenesEspeciales.filter(o => o.idOrdenEspecial !== selectedOrder.idOrdenEspecial));
+      setIsPopupOpen(true);
+    } catch (error) {
+      setErrorPopupMessage(error.message || "Error al eliminar la orden especial");
+      setIsPopupErrorOpen(true);
+    } finally {
+      setIsDeleting(false);
+      setOpenDeleteDialog(false);
+      setSelectedOrder(null);
+    }
   };
 
   const handleDeleteCancel = () => {
@@ -36,6 +80,11 @@ const OrdenesEspecialesList = () => {
 
   const handleNewOrder = () => {
     navigate('/pedido-especial/ingresar-orden-especial');
+  };
+
+  const clearFilters = () => {
+    setSucursalFilter("");
+    setFechaFilter("");
   };
 
   if (loadingOrdenEspecial) {
@@ -49,7 +98,11 @@ const OrdenesEspecialesList = () => {
   if (showErrorOrdenEspecial) {
     return (
       <div className="oel-error-message">
-        Error al cargar las órdenes especiales
+        <Alert
+          type="danger"
+          message="Error al cargar las órdenes especiales"
+          icon={<BsExclamationTriangleFill />}
+        />
       </div>
     );
   }
@@ -69,8 +122,64 @@ const OrdenesEspecialesList = () => {
         </button>
       </div>
 
+      {/* Filtros */}
+      <div className="oel-filters-container">
+        <div className="oel-filters-row">
+          <div className="oel-filter-group">
+            <Form.Label>Sucursal:</Form.Label>
+            <Form.Select
+              value={sucursalFilter}
+              onChange={(e) => setSucursalFilter(e.target.value)}
+              className="oel-filter-select"
+            >
+              <option value="">Todas las sucursales</option>
+              {sucursalesUnicas.map((sucursal) => (
+                <option key={sucursal} value={sucursal}>
+                  {sucursal}
+                </option>
+              ))}
+            </Form.Select>
+          </div>
+          
+          <div className="oel-filter-group">
+            <Form.Label>Fecha de Entrega:</Form.Label>
+            <Form.Control
+              type="date"
+              value={fechaFilter}
+              onChange={(e) => setFechaFilter(e.target.value)}
+              className="oel-filter-input"
+            />
+          </div>
+          
+          <button 
+            className="oel-clear-filters"
+            onClick={clearFilters}
+            disabled={!sucursalFilter && !fechaFilter}
+          >
+            Limpiar filtros
+          </button>
+        </div>
+      </div>
+
+      {/* Mostrar alerta si no hay órdenes */}
+      {filteredOrdenes.length === 0 && !loadingOrdenEspecial && !showErrorOrdenEspecial && (
+        <div className="row justify-content-center my-4">
+          <div className="col-md-8">
+            <Alert
+              type="info"
+              message={
+                sucursalFilter || fechaFilter 
+                  ? "No hay órdenes que coincidan con los filtros aplicados"
+                  : "No hay órdenes especiales registradas. Haz clic en 'Ingresar Orden Especial' para crear una nueva."
+              }
+              icon={<BsInfoCircleFill />}
+            />
+          </div>
+        </div>
+      )}
+
       {/* Versión Desktop */}
-      {!isMobile && !isTablet && (
+      {!isMobile && !isTablet && filteredOrdenes.length > 0 && (
         <div className="oel-table-container">
           <table className="oel-table">
             <thead>
@@ -85,7 +194,7 @@ const OrdenesEspecialesList = () => {
               </tr>
             </thead>
             <tbody>
-              {ordenesEspeciales.map((orden) => (
+              {filteredOrdenes.map((orden) => (
                 <tr key={orden.idOrdenEspecial} className="oel-table-row">
                   <td data-label="ID">{orden.idOrdenEspecial}</td>
                   <td data-label="Cliente">{orden.nombreCliente}</td>
@@ -106,8 +215,13 @@ const OrdenesEspecialesList = () => {
                         className="oel-action-button oel-delete"
                         onClick={() => handleDeleteClick(orden)}
                         title="Eliminar orden"
+                        disabled={isDeleting}
                       >
-                        <FiTrash2 className="oel-icon" />
+                        {isDeleting && selectedOrder?.idOrdenEspecial === orden.idOrdenEspecial ? (
+                          <Spinner animation="border" size="sm" />
+                        ) : (
+                          <FiTrash2 className="oel-icon" />
+                        )}
                       </button>
                     </div>
                   </td>
@@ -119,9 +233,9 @@ const OrdenesEspecialesList = () => {
       )}
 
       {/* Versión Tablet */}
-      {isTablet && (
+      {isTablet && filteredOrdenes.length > 0 && (
         <div className="oel-grid-container">
-          {ordenesEspeciales.map((orden) => (
+          {filteredOrdenes.map((orden) => (
             <div key={orden.idOrdenEspecial} className="oel-card">
               <div className="oel-card-header">
                 <div className="oel-client-info">
@@ -154,8 +268,15 @@ const OrdenesEspecialesList = () => {
                   className="oel-card-action-button oel-delete"
                   onClick={() => handleDeleteClick(orden)}
                   title="Eliminar orden"
+                  disabled={isDeleting}
                 >
-                  <FiTrash2 className="oel-icon" /> Eliminar
+                  {isDeleting && selectedOrder?.idOrdenEspecial === orden.idOrdenEspecial ? (
+                    <Spinner animation="border" size="sm" />
+                  ) : (
+                    <>
+                      <FiTrash2 className="oel-icon" /> Eliminar
+                    </>
+                  )}
                 </button>
               </div>
             </div>
@@ -164,9 +285,9 @@ const OrdenesEspecialesList = () => {
       )}
 
       {/* Versión Mobile */}
-      {isMobile && (
+      {isMobile && filteredOrdenes.length > 0 && (
         <div className="oel-mobile-container">
-          {ordenesEspeciales.map((orden) => (
+          {filteredOrdenes.map((orden) => (
             <div key={orden.idOrdenEspecial} className="oel-mobile-card">
               <div className="oel-mobile-header">
                 <div className="oel-client-info">
@@ -207,9 +328,16 @@ const OrdenesEspecialesList = () => {
                   className="oel-mobile-action-button oel-delete"
                   onClick={() => handleDeleteClick(orden)}
                   title="Eliminar orden"
+                  disabled={isDeleting}
                 >
-                  <FiTrash2 className="oel-icon" />
-                  <span>Eliminar</span>
+                  {isDeleting && selectedOrder?.idOrdenEspecial === orden.idOrdenEspecial ? (
+                    <Spinner animation="border" size="sm" />
+                  ) : (
+                    <>
+                      <FiTrash2 className="oel-icon" />
+                      <span>Eliminar</span>
+                    </>
+                  )}
                 </button>
               </div>
             </div>
@@ -226,30 +354,45 @@ const OrdenesEspecialesList = () => {
               <button 
                 className="oel-modal-close"
                 onClick={handleDeleteCancel}
+                disabled={isDeleting}
               >
                 <FiX className="oel-icon" />
               </button>
             </div>
             <div className="oel-modal-body">
-              <p>¿Estás seguro que deseas eliminar la orden especial #{selectedOrder?.idOrdenEspecial} de {selectedOrder?.nombreCliente}?</p>
+              <p>¿Estás seguro que deseas eliminar la orden especial #{selectedOrder?.idOrdenEspecial} a nombre de {selectedOrder?.nombreCliente}?</p>
             </div>
             <div className="oel-modal-footer">
               <button 
                 className="oel-modal-button oel-cancel"
                 onClick={handleDeleteCancel}
+                disabled={isDeleting}
               >
                 Cancelar
               </button>
               <button 
                 className="oel-modal-button oel-confirm"
                 onClick={handleDeleteConfirm}
+                disabled={isDeleting}
               >
-                Eliminar
+                {isDeleting ? (
+                  <Spinner animation="border" size="sm" />
+                ) : (
+                  "Eliminar"
+                )}
               </button>
             </div>
           </div>
         </div>
       )}
+
+      {/* Popup errores */}
+      <ErrorPopup
+        isOpen={isPopupErrorOpen}
+        onClose={() => setIsPopupErrorOpen(false)}
+        title="¡Error!"
+        message={errorPopupMessage}
+      />
     </div>
   );
 };

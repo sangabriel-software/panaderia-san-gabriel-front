@@ -424,3 +424,62 @@
       justify-content: center;
     }
   }
+
+  /* Estilos para los filtros */
+.oel-filters-container {
+  background-color: #f8f9fa;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.oel-filters-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: flex-end;
+}
+
+.oel-filter-group {
+  flex: 1;
+  min-width: 200px;
+}
+
+.oel-filter-select,
+.oel-filter-input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  background-color: white;
+}
+
+.oel-clear-filters {
+  background-color: #f0f0f0;
+  border: 1px solid #ddd;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.oel-clear-filters:hover {
+  background-color: #e0e0e0;
+}
+
+.oel-clear-filters:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Responsive */
+@media (max-width: 767px) {
+  .oel-filter-group {
+    min-width: 100%;
+  }
+  
+  .oel-clear-filters {
+    width: 100%;
+  }
+}

@@ -57,9 +57,9 @@ const deleteEndpoints = {
     ELIMINAR_ORDEN_PRODUCCION: "/eliminar-ordenes-produccion",
     ELMINAR_VENTA: "/eliminar-venta",
     ELMINAR_SUCURSAL: "/eliminarSucursal",
-    ELIMINAR_RECETA: "elminar-receta"
+    ELIMINAR_RECETA: "elminar-receta",
+    ELIMINAR_ORDEN_ESPECIAL: "eliminar-orden-especial",
 };
-
 
 export { getEndpoints, postEndpoints, putEndpoints, deleteEndpoints};
 export default getEndpoints; // Exportación por defecto

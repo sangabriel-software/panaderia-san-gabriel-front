@@ -29,15 +29,16 @@ export const consultarOrdenEspecialByIdService = async (idOrdenEspecial) => {
   }
 };
 
-/*export const eliminarOrdenProduccionService = async (idOrdenProduccion) => {
+export const eliminarOrdenEspecialService = async (idOrdenEspecial) => {
   try {
-    const response = await api.delete(`${deleteEndpoints.ELIMINAR_ORDEN_PRODUCCION}/${idOrdenProduccion}`); 
+    const response = await api.delete(`${deleteEndpoints.ELIMINAR_ORDEN_ESPECIAL}/${idOrdenEspecial}`); 
       return response.data;
   } catch (error) {
     throw error;
   }
 }
 
+/*
 export const consultarDetalleOrdenPorCriterio = async (ordenTurno, fechaAprducir, idSucursal) => {
   try {
     const response = await api.get(`${getEndpoints.CONSULTAR_ORDEN_POR_CRITERIOS}?ordenTurno=${ordenTurno}&fechaAproducir=${fechaAprducir}&idSucursal=${idSucursal}`);

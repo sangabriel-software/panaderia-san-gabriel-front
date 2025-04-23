@@ -6,7 +6,6 @@ import "./styles/App.css";
 import "./styles/globalStyles.css";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import IngresarOrdenEspecialPage from "./pages/OrdenesEspeciales/ingresar-orden-especial/IngresarIOrdenEspecial";
 
 const AccessDeniedPage = lazy( ()=> import("./components/AccesoDenegado/AccessDeniedPage"));
 // Lazy-loaded components
@@ -36,6 +35,7 @@ const StockDiarioPage = lazy(() => import("./pages/StockProductos/StockDiarioPag
 const IngresarStockGeneralPage = lazy(() => import("./pages/StockProductos/IngresarStock/IngresarStockPage"));
 const StockGeneralPage = lazy(() => import("./pages/StockProductos/StockGeneralPage/StockGeneralPage"));
 const OrdenesEspecialesList = lazy(() => import("./pages/OrdenesEspeciales/OrdenesEspecialesList/OrdenesEspecialesList"));
+const IngresarOrdenEspecialPage = lazy(() => import("./pages/OrdenesEspeciales/ingresar-orden-especial/IngresarIOrdenEspecial"));
 const HomePage = lazy(() => import("./pages/Home/HomePage"));
 
 function App() {
