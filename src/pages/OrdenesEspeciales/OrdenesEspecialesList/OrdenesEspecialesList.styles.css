@@ -520,9 +520,9 @@
 }
 
 .oel-pagination-button.active {
-  background-color: #6a01ac;
+  background-color: #4361EE;
   color: white;
-  border-color: #6a01ac;
+  border-color: #4361EE;
 }
 
 .oel-pagination-button:disabled {
