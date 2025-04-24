@@ -48,6 +48,11 @@ const OrdenEspecialDetail = () => {
   const [isPopupErrorOpen, setIsPopupErrorOpen] = useState(false);
   const [errorPopupMessage, setErrorPopupMessage] = useState("");
 
+  // Obtener IDs de productos que existen en la orden (aunque tengan cantidad 0)
+  const productosEnOrdenIds = useMemo(() => {
+    return detalleOrdenEspecial?.ordenDetalle?.map(p => p.idProducto) || [];
+  }, [detalleOrdenEspecial]);
+
   // Efecto para inicializar las cantidades de productos cuando se cargan los datos
   useEffect(() => {
     if (detalleOrdenEspecial?.ordenDetalle && productos) {
@@ -59,30 +64,46 @@ const OrdenEspecialDetail = () => {
     }
   }, [detalleOrdenEspecial, productos]);
 
-  // Obtener categorías únicas de productos
+  // Obtener categorías únicas de productos que existen en la orden
   const categorias = useMemo(() => {
-    return [...new Set(productos?.map((item) => item.nombreCategoria) || [])];
-  }, [productos]);
+    if (!productos || !detalleOrdenEspecial?.ordenDetalle) return ["Todas"];
+    
+    const productosEnOrden = productos.filter(p => 
+      productosEnOrdenIds.includes(p.idProducto)
+    );
+    
+    return [
+      "Todas",
+      ...new Set(productosEnOrden.map(p => p.nombreCategoria))
+    ];
+  }, [productos, detalleOrdenEspecial, productosEnOrdenIds]);
 
-  // Filtrar productos según categoría y término de búsqueda
+  // Filtrar productos
   const productosFiltrados = useMemo(() => {
-    let filtered = categoriaActiva === "Todas" 
-      ? productos
-      : productos?.filter((item) => item.nombreCategoria === categoriaActiva);
+    if (!productos || !detalleOrdenEspecial?.ordenDetalle) return [];
+    
+    // Primero filtramos solo productos que están en la orden
+    let filtered = productos.filter(p => productosEnOrdenIds.includes(p.idProducto));
 
+    // Aplicar filtro de categoría
+    if (categoriaActiva !== "Todas") {
+      filtered = filtered.filter(p => p.nombreCategoria === categoriaActiva);
+    }
+
+    // Aplicar filtro de búsqueda
     if (searchTerm) {
-      filtered = filtered?.filter((producto) =>
-        producto.nombreProducto.toLowerCase().includes(searchTerm.toLowerCase())
+      filtered = filtered.filter(p =>
+        p.nombreProducto.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
-    // Solo aplicar filtro de cantidad > 0 cuando NO estemos en modo edición
+    // En modo visualización, solo mostramos productos con cantidad > 0
+    if (!isEditing) {
+      filtered = filtered.filter(p => (cantidadValues[p.idProducto] || 0) > 0);
+    }
 
-      filtered = filtered?.filter((producto) => (cantidadValues[producto.idProducto] || 0) > 0);
-    
-
-    return filtered || [];
-  }, [productos, categoriaActiva, searchTerm, cantidadValues, isEditing]);
+    return filtered;
+  }, [productos, detalleOrdenEspecial, categoriaActiva, searchTerm, cantidadValues, isEditing, productosEnOrdenIds]);
 
   // Limpiar búsqueda
   const clearSearch = () => {
@@ -135,7 +156,7 @@ const OrdenEspecialDetail = () => {
         throw new Error("La fecha de entrega es requerida");
       }
       
-      // Preparar productos seleccionados
+      // Preparar productos seleccionados (solo los con cantidad > 0)
       const productosSeleccionados = Object.entries(cantidadValues)
         .filter(([_, cantidad]) => cantidad > 0)
         .map(([idProducto, cantidad]) => {
