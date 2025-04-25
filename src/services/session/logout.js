@@ -6,7 +6,8 @@ const useLogout = () => {
     // Mostrar notificación de proceso
     toast.loading("Cerrando sesión...", {
       toastId: 'logout-process',
-      autoClose: false
+      autoClose: false,
+      autoClose: 2000,
     });
 
     // Esperar un momento para que el usuario vea el mensaje

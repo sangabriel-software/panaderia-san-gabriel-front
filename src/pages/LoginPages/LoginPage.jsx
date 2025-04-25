@@ -20,7 +20,7 @@ function LoginPage() {
     const queryParams = new URLSearchParams(location.search);
     if (queryParams.get('logout') === 'success') {
       toast.success("Sesión cerrada correctamente", {
-        autoClose: 3000,
+        autoClose: 2000,
         toastId: 'logout-success'
       });
       
