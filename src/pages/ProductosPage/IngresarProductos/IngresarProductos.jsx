@@ -41,16 +41,19 @@ function IngresarProductos() {
   // Determinar si la categoría seleccionada es Panaderia
   const [isPanaderia, setIsPanaderia] = useState(false);
 
+  const [isConfig, setIsConfig] = useState(false);
+
   useEffect(() => {
     if (selectedCategory) {
       const categoriaSeleccionada = categorias?.find(
         (cat) => cat.idCategoria == selectedCategory
       );
-      const esPanaderia = categoriaSeleccionada?.nombreCategoria === "Panaderia";
-      setIsPanaderia(esPanaderia);
+      
+      const esconfigurable = categoriaSeleccionada?.nombreCategoria === "Panaderia" || categoriaSeleccionada?.nombreCategoria === "Especiales";
+      setIsConfig(esconfigurable);
       
       // Resetear valores específicos de Panaderia cuando se cambia de categoría
-      if (!esPanaderia) {
+      if (!esconfigurable) {
         setValue('controlStock', 0);
         setValue('stockDiario', 0);
         setValue('tipoProduccion', 'bandejas');
@@ -227,7 +230,7 @@ function IngresarProductos() {
           </Row>
 
           {/* Sección específica para Panaderia */}
-          {isPanaderia && (
+          {isConfig && (
             <>
               <div className="mb-3">
                 <h6 className="label-title">Configuración para Producción y Stock</h6>
