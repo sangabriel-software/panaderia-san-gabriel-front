@@ -5,6 +5,8 @@ import ErrorPopup from "../../../../components/Popup/ErrorPopUp";
 import WarningPopup from "../../../../components/Popup/WarningPopUp";
 import "./CreateRolForm.css";
 import { BsArrowLeft } from "react-icons/bs";
+import { Container } from "react-bootstrap";
+import DotsMove from "../../../../components/Spinners/DotsMove";
 
 function CreateRolForm() {
   const {
@@ -28,7 +30,17 @@ function CreateRolForm() {
     navigate,
   } = useCreateRolFormLogic();
 
-  if (loading) return <p>Cargando permisos...</p>;
+  if(loading){
+    return (
+      <Container
+        className="d-flex justify-content-center align-items-center"
+        style={{ minHeight: "70vh" }}
+      >
+        <DotsMove />
+      </Container>
+    );
+  }
+
   if (showError) return <p>Error al cargar permisos.</p>;
 
   return (
