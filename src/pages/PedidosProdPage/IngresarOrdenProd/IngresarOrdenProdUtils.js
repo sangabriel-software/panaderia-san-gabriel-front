@@ -48,7 +48,7 @@ export const filterProductsByName = (products, searchTerm, usuario) => {
 
 export const getFilteredProductsByCategory = (productos, searchTerm) => {
   // Filtrar solo productos de panadería (idCategoria = 1)
-  const panaderiaProducts = productos.filter((p) => p.idCategoria === 1);
+  const panaderiaProducts = productos.filter((p) => p.idCategoria === 1 || p.idCategoria === 2);
 
   // Si hay término de búsqueda, filtrar por nombre dentro de los productos de panadería
   if (searchTerm) {
