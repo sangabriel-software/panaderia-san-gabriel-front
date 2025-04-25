@@ -388,7 +388,6 @@ export const handleUpdateProduct = async (data, selectedProduct, setProductos, s
       setHasChanges(false);
     }
   } catch (error) {
-    console.log(error)
     setShowModifyModal(false);
     setErrorPopupMessage(
       "No se pudo actualizar el producto. Inténtalo de nuevo."
