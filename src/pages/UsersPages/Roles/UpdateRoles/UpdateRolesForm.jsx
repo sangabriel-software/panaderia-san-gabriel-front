@@ -12,6 +12,8 @@ import { AsignarPermisosARol, eliminarPermisosARol, } from "../../../../services
 import { actualizarRol } from "../../../../services/userServices/rolesservices/roles.service";
 import UpdatePopUp from "../../../../components/Popup/UpdatePupup";
 import Alert from "../../../../components/Alerts/Alert";
+import { Container } from "react-bootstrap";
+import DotsMove from "../../../../components/Spinners/DotsMove";
 
 function UpdateRolesForm() {
   const { register, handleSubmit, setError, clearErrors, reset, formState: { errors }, } = useForm();
@@ -75,7 +77,18 @@ function UpdateRolesForm() {
     }
   };
 
-  if (loading || loadingPR) return <p>Cargando permisos...</p>;
+  if (loading || loadingPR){
+    return (
+      <Container
+        className="d-flex justify-content-center align-items-center"
+        style={{ minHeight: "70vh" }}
+      >
+        <DotsMove />
+      </Container>
+    );
+  }
+
+
   if (showError || showErrorPR) return <p>Error al cargar permisos.</p>;
 
   return (
