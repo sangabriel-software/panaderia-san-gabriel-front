@@ -20,6 +20,8 @@ const DesktopVentaDetalle = ({ venta, onDownloadXLS, onDownloadPDF }) => {
   const detallesVenta = venta?.detalleVenta;
   const detalleIngresos = venta?.detalleIngresos;
 
+  console.log(encabezadoVenta)
+
   return (
     <Container
       fluid
@@ -71,7 +73,7 @@ const DesktopHeader = ({ encabezadoVenta, onDownloadXLS, onDownloadPDF }) => {
               <div className="d-flex align-items-center gap-2 mb-2">
                 <BsPerson size={16} style={{ color: "#4ECDC4" }} />
                 <span className="text-secondary">Vendido por:</span>
-                <span className="fw-bold text-dark">{`@${encabezadoVenta?.usuario}`}</span>
+                <span className="fw-bold text-dark">{`${encabezadoVenta?.nombreUsuario}`}</span>
               </div>
               <div className="d-flex align-items-center gap-2">
                 <BsShop size={16} style={{ color: "#4ECDC4" }} />

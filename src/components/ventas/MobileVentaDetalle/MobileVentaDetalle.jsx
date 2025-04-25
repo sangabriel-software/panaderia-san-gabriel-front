@@ -106,7 +106,7 @@ const MobileVentaDetalle = ({ venta, onDownloadXLS, onDownloadPDF }) => {
                 <BsPerson size={16} style={{ color: "#4ECDC4" }} /> {/* Ícono de usuario */}
                 Usuario:
               </span>
-              <span className="fw-medium text-dark fw-bold">{`@${encabezadoVenta?.usuario}`}</span>
+              <span className="fw-medium text-dark fw-bold">{`${encabezadoVenta?.nombreUsuario}`}</span>
             </div>
             <div className="d-flex justify-content-between align-items-center py-2 border-bottom">
               <span className="text-secondary d-flex align-items-center gap-2">
