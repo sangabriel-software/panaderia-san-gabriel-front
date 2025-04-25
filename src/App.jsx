@@ -7,7 +7,9 @@ import "./styles/globalStyles.css";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const AccessDeniedPage = lazy( ()=> import("./components/AccesoDenegado/AccessDeniedPage"));
+const LoadingSpinner = lazy(() => import("./components/LoadingSpinner/LoadingSpinner"));
+const AccessDeniedPage = lazy(() => import("./components/AccesoDenegado/AccessDeniedPage"));
+
 // Lazy-loaded components
 const MainLayout = lazy(() => import("./layouts/MainLayout"));
 const LoginPage = lazy(() => import("./pages/LoginPages/LoginPage"));
@@ -41,7 +43,8 @@ const HomePage = lazy(() => import("./pages/Home/HomePage"));
 
 function App() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+
+    <Suspense fallback={<LoadingSpinner />}>
       <ToastContainer /> {/* Contenedor para las notificaciones */}
       <Routes>
         <Route path="/login" element={<LoginPage />} />
