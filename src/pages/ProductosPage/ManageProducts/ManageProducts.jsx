@@ -178,7 +178,7 @@ const ManageProducts = () => {
                       onChange={(e) => {
                         const newValue = e.target.value;
                         setValue("idCategoria", newValue);
-                        const isNowPanaderia = newValue == 1;
+                        const isNowPanaderia = newValue == 1 || newValue == 2;
                         setIsPanaderia(isNowPanaderia);
                         
                         // Cambio clave aquí: establecer "bandejas" como valor por defecto si es Panaderia
