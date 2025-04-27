@@ -147,6 +147,24 @@ const crearEncabezadoVenta = (idOrdenProduccion, usuario, turnoValue, sucursalVa
   };
 };
 
+const obtenerUnidadesFrances = (cantidadIngresada) => {
+  // Convertir a string por si viene como número
+  const valorStr = cantidadIngresada.toString();
+  
+  // Separar parte entera y decimal
+  const partes = valorStr.split('.');
+  
+  const filaFrances = partes[0] ? parseInt(partes[0], 10) : 0;
+  const unidadFrances = partes[1] ? parseInt(partes[1], 10) : 0;
+
+  const francesUnidad = filaFrances * 6;
+
+  const totalUnidadesFrances = francesUnidad + unidadFrances;
+  
+  return totalUnidadesFrances;
+};
+
+
 // Función para obtener las cantidades ingresadas
 const obtenerCantidadesIngresadas = (productos, trayQuantities) => {
   return productos.map((producto) => {
@@ -169,6 +187,10 @@ const crearDetalleVenta = (productos, trayQuantities, orden, fechaActual) => {
     .map((producto) => {
       const cantidadIngresada = producto.cantidadIngresada; // Usar la cantidad obtenida
 
+
+        const unidadesFrancesNoVendidas = producto.idProducto === 1 ? obtenerUnidadesFrances(cantidadIngresada) : 0;
+      
+
       // Solo para la categoría 1 (Panaderia) y si hay idOrdenProduccion
       if (producto.idCategoria === 1 && idOrdenProduccion && producto.controlarStock === 0 && producto.controlarStockDiario === 1) {
         // Verificar si el producto está en la orden
@@ -181,7 +203,7 @@ const crearDetalleVenta = (productos, trayQuantities, orden, fechaActual) => {
             controlarStock: producto.controlarStock,
             controlarStockDiario: producto.controlarStockDiario,
             idCategoria: producto.idCategoria,
-            unidadesNoVendidas: cantidadIngresada, 
+            unidadesNoVendidas: producto.idProducto === 1 ? unidadesFrancesNoVendidas : cantidadIngresada, 
             fechaCreacion: fechaActual,
           };
         } else {
@@ -237,15 +259,15 @@ export const handleGuardarVenta = async (setIsLoading, orden, sucursalValue, usu
     detalleIngreso,
   };
 
-  //console.log(payload);
+  console.log(payload);
 
   try {
-    const resIngrearVenta = await ingresarVentaService(payload);
-    if(resIngrearVenta.status === 200){
+    //const resIngrearVenta = await ingresarVentaService(payload);
+    /*if(resIngrearVenta.status === 200){
       setTrayQuantities([])
       reset();
       setIsPopupSuccessOpen(true);
-    }
+    }*/
   } catch (error) {
     if (error.status === 422) {
       setErrorPopupMessage("Has ingresado más unidades restantes que las producidas en algún producto");

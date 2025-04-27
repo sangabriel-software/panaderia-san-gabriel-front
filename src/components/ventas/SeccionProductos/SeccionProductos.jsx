@@ -31,16 +31,26 @@ const SeccionProductos = ({ searchTerm, setSearchTerm, categorias, activeCategor
     setFocusedInput(idProducto);
   };
 
-  const handleBlur = (idProducto, value) => {
-    if (value === "" || isNaN(value)) {
-      setTrayQuantities({
-        ...trayQuantities,
-        [idProducto]: {
-          cantidad: 0,
-          precioPorUnidad: productsToShow.find((p) => p.idProducto === idProducto).precioPorUnidad,
-        },
-      });
+  const handleBlur = (idProducto, value, productoNombre) => {
+    let parsedValue;
+    
+    if (productoNombre === "Frances") {
+      // Para Frances, permitir decimales
+      parsedValue = parseFloat(value) || 0;
+      parsedValue = Math.max(0, parsedValue);
+    } else {
+      // Para otros productos, solo enteros
+      parsedValue = parseInt(value, 10) || 0;
+      parsedValue = Math.max(0, parsedValue);
     }
+
+    setTrayQuantities({
+      ...trayQuantities,
+      [idProducto]: {
+        cantidad: parsedValue,
+        precioPorUnidad: productsToShow.find((p) => p.idProducto === idProducto).precioPorUnidad,
+      },
+    });
     setFocusedInput(null);
   };
 
@@ -50,17 +60,40 @@ const SeccionProductos = ({ searchTerm, setSearchTerm, categorias, activeCategor
     if (focusedInput === producto.idProducto) {
       return cantidad === 0 ? "" : cantidad.toString();
     } else {
-      return cantidad.toString();
+      return producto.nombreProducto === "Frances" 
+        ? cantidad.toString() 
+        : Math.floor(cantidad).toString();
     }
   };
 
-  // Función para determinar el texto del header según la categoría activa
-  // const getHeaderText = () => {
-  //   return activeCategory === "Panaderia" || 
-  //          productsToShow.some(p => p.idCategoria === 1) 
-  //     ? "Unidades no vendidas" 
-  //     : "Unidades vendidas";
-  // };
+  const handleInputChange = (e, producto) => {
+    const value = e.target.value;
+    const isFrances = producto.nombreProducto === "Frances";
+    
+    if (isFrances) {
+      // Permitir decimales para Frances
+      if (value === "" || /^\d*\.?\d*$/.test(value)) {
+        setTrayQuantities({
+          ...trayQuantities,
+          [producto.idProducto]: {
+            cantidad: value === "" ? "" : value,
+            precioPorUnidad: producto.precioPorUnidad,
+          },
+        });
+      }
+    } else {
+      // Solo enteros para otros productos
+      if (value === "" || /^\d*$/.test(value)) {
+        setTrayQuantities({
+          ...trayQuantities,
+          [producto.idProducto]: {
+            cantidad: value === "" ? "" : parseInt(value, 10),
+            precioPorUnidad: producto.precioPorUnidad,
+          },
+        });
+      }
+    }
+  };
 
   return (
     <div className="ventas-products-section mt-4">
@@ -123,26 +156,28 @@ const SeccionProductos = ({ searchTerm, setSearchTerm, categorias, activeCategor
                     </div>
                   </td>
                   <td className="text-center align-middle">
-                    <Form.Control
-                      type="number"
-                      min="0"
-                      value={getInputValue(producto)}
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        const cantidadNoVendida = Math.max(0, parseInt(value, 10) || 0);
-
-                        setTrayQuantities({
-                          ...trayQuantities,
-                          [producto.idProducto]: {
-                            cantidad: cantidadNoVendida,
-                            precioPorUnidad: producto.precioPorUnidad,
-                          },
-                        });
-                      }}
-                      onFocus={() => handleFocus(producto.idProducto)}
-                      onBlur={(e) => handleBlur(producto.idProducto, e.target.value)}
-                      className="ventas-quantity-input"
-                    />
+                    {producto.nombreProducto === "Frances" ? (
+                      <Form.Control
+                        type="text"
+                        value={getInputValue(producto)}
+                        onChange={(e) => handleInputChange(e, producto)}
+                        onFocus={() => handleFocus(producto.idProducto)}
+                        onBlur={(e) => handleBlur(producto.idProducto, e.target.value, producto.nombreProducto)}
+                        className="ventas-quantity-input"
+                        inputMode="decimal"
+                      />
+                    ) : (
+                      <Form.Control
+                        type="number"
+                        min="0"
+                        step="1"
+                        value={getInputValue(producto)}
+                        onChange={(e) => handleInputChange(e, producto)}
+                        onFocus={() => handleFocus(producto.idProducto)}
+                        onBlur={(e) => handleBlur(producto.idProducto, e.target.value, producto.nombreProducto)}
+                        className="ventas-quantity-input"
+                      />
+                    )}
                   </td>
                 </tr>
               ))

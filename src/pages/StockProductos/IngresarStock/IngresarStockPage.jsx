@@ -50,6 +50,9 @@ const IngresarStockGeneralPage = () => {
     return filtered;
   }, [prodPorHarina, categoriaActiva, searchTerm]);
 
+  const clearSearch = () => {
+    setSearchTerm("");
+  };
 
   /* Guardar Stock */
   const handleSubmit = async () => {

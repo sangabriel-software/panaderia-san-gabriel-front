@@ -8,7 +8,7 @@ import { handleViewDetalle } from "../../pages/PedidosProdPage/DetallesOrdenesPr
 import "./OrderTable.css";
 import { BsFileEarmarkPdf } from "react-icons/bs";
 
-const ITEMS_PER_PAGE = 5;
+const ITEMS_PER_PAGE = 10;
 
 const getColorByName = (name) => {
   const COLORS = ["success", "primary", "info"];
