@@ -1,12 +1,13 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Table, Button, Badge, Container, Spinner } from "react-bootstrap";
 import { formatDateToDisplay } from "../../utils/dateUtils";
-import { FaTrashAlt,} from "react-icons/fa";
+import { FaTrashAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import PaginationComponent from "../PaginationComponent/PaginationComponent";
 import { handleViewDetalle } from "../../pages/PedidosProdPage/DetallesOrdenesProd/DetallesOrdenesProdUtils";
 import "./OrderTable.css";
 import { BsFileEarmarkPdf } from "react-icons/bs";
+import dayjs from "dayjs";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -31,6 +32,20 @@ const OrderTable = ({ orders, onDelete, onViewPdf, loadingViewPdf }) => {
     handleViewDetalle(idOrdenProduccion, navigate);
   };
 
+// Función que verifica si la fecha es hoy o ya pasó usando Day.js
+const isToday = (dateString) => {
+  if (!dateString) return false;
+  return dayjs(dateString).isSame(dayjs(), 'day');
+};
+
+const isTodayOrPast = (dateString) => {
+  if (!dateString) return false;
+  const date = dayjs(dateString);
+  const today = dayjs().startOf('day');
+  return date.isSame(today, 'day') || date.isBefore(today, 'day');
+};
+
+
   useEffect(() => {
     containerRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [currentPage]);
@@ -50,92 +65,82 @@ const OrderTable = ({ orders, onDelete, onViewPdf, loadingViewPdf }) => {
           </tr>
         </thead>
         <tbody>
-          {paginatedOrders.map((order, index) => (
-            <tr
-              key={order.idOrdenProduccion}
-              className="table-row"
-              onDoubleClick={() => handleRowClick(order.idOrdenProduccion)}
-              style={{ cursor: "pointer" }}
-            >
-              <td
-                className="text-center serial-number"
-                title="Doble clic para ver detalles"
+          {paginatedOrders.map((order, index) => {
+            const isCurrentDay = isTodayOrPast(order.fechaAProducir);
+            const isTodayd = isToday(order.fechaAProducir);
+            
+            return (
+              <tr
+                key={order.idOrdenProduccion}
+                className="table-row"
+                onDoubleClick={() => handleRowClick(order.idOrdenProduccion)}
+                style={{ cursor: "pointer" }}
               >
-                #{startIndex + index + 1}
-              </td>
-              <td
-                className="text-center order-number"
-                title="Doble clic para ver detalles"
-              >
-                ORD-{order.idOrdenProduccion}
-              </td>
-              <td
-                className="text-center"
-                title="Doble clic para ver detalles"
-              >
-                <Badge pill className="branch-badge text-light" bg={getColorByName(order.nombreSucursal)}>
-                  {order.nombreSucursal}
-                </Badge>
-              </td>
-              <td
-                className="text-center shift-cell"
-                title="Doble clic para ver detalles"
-              >
-                {order.ordenTurno}
-              </td>
-              <td
-                className="text-center"
-                title="Doble clic para ver detalles"
-              >
-                <Badge className={`status-badge ${order.estadoOrden === "P" ? "status-pending" : "status-completed"}`}>
-                  {order.estadoOrden === "P" ? "Pendiente" : "Completado"}
-                </Badge>
-              </td>
-              <td
-                className="text-center production-date"
-                title="Doble clic para ver detalles"
-              >
-                {formatDateToDisplay(order.fechaAProducir)}
-              </td>
-              <td className="text-center actions-cell" onDoubleClick={(e) => e.stopPropagation()}>
-                <div className="d-flex justify-content-center gap-2">
-                  <Button
-                    variant="link"
-                    className="action-btn pdf-btn"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onViewPdf(order.idOrdenProduccion);
-                    }}
-                    onDoubleClick={(e) => e.stopPropagation()}
-                    disabled={loadingViewPdf === order.idOrdenProduccion} // Deshabilita el botón mientras se carga
+                <td className="text-center serial-number" title="Doble clic para ver detalles">
+                  #{startIndex + index + 1}
+                </td>
+                <td className="text-center order-number" title="Doble clic para ver detalles">
+                  ORD-{order.idOrdenProduccion}
+                </td>
+                <td className="text-center" title="Doble clic para ver detalles">
+                  <Badge 
+                    pill 
+                    className="branch-badge text-light" 
+                    bg={getColorByName(order.nombreSucursal)}
                   >
-                    {loadingViewPdf === order.idOrdenProduccion ? (
-                      <Spinner
-                        as="span"
-                        animation="border"
-                        size="sm"
-                        role="status"
-                        aria-hidden="true"
-                      />
-                    ) : (
-                      <BsFileEarmarkPdf className="action-icon text-primary" />
-                    )}
-                  </Button>
-                  <Button
-                    variant="link"
-                    className="action-btn delete-btn"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onDelete(order.idOrdenProduccion);
-                    }}
-                    onDoubleClick={(e) => e.stopPropagation()}
-                  >
-                    <FaTrashAlt className="action-icon" />
-                  </Button>
-                </div>
-              </td>
-            </tr>
-          ))}
+                    {order.nombreSucursal}
+                  </Badge>
+                </td>
+                <td className="text-center shift-cell" title="Doble clic para ver detalles">
+                  {order.ordenTurno}
+                </td>
+                <td className="text-center" title="Doble clic para ver detalles">
+                  <Badge className={`status-badge ${order.estadoOrden === "P" ? "status-pending" : "status-completed"}`}>
+                    {order.estadoOrden === "P" ? "Pendiente" : "Completado"}
+                  </Badge>
+                </td>
+                <td className="text-center production-date" title="Doble clic para ver detalles">
+                  {formatDateToDisplay(order.fechaAProducir)}
+                  {isTodayd && (
+                    <Badge bg="warning" text="dark" className="ms-2">
+                      Hoy
+                    </Badge>
+                  )}
+                </td>
+                <td className="text-center actions-cell" onDoubleClick={(e) => e.stopPropagation()}>
+                  <div className="d-flex justify-content-center gap-2">
+                    <Button
+                      variant="link"
+                      className="action-btn pdf-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onViewPdf(order.idOrdenProduccion);
+                      }}
+                      disabled={loadingViewPdf === order.idOrdenProduccion}
+                    >
+                      {loadingViewPdf === order.idOrdenProduccion ? (
+                        <Spinner as="span" animation="border" size="sm" />
+                      ) : (
+                        <BsFileEarmarkPdf className="action-icon text-primary" />
+                      )}
+                    </Button>
+                    <Button
+                      variant="link"
+                      className="action-btn delete-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDelete(order.idOrdenProduccion);
+                      }}
+                      disabled={isCurrentDay}
+                      title={isCurrentDay ? "No se pueden eliminar órdenes del día actual" : "Eliminar orden"}
+                    >
+                      <FaTrashAlt className={`action-icon ${isCurrentDay ? "text-muted" : "text-danger"}`} />
+                    </Button>
+                  </div>
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </Table>
 
