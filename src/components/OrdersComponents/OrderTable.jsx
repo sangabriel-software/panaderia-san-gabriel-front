@@ -102,7 +102,7 @@ const isTodayOrPast = (dateString) => {
                 <td className="text-center production-date" title="Doble clic para ver detalles">
                   {formatDateToDisplay(order.fechaAProducir)}
                   {isTodayd && (
-                    <Badge bg="warning" text="dark" className="ms-2">
+                    <Badge bg="success" text="light" className="ms-2">
                       Hoy
                     </Badge>
                   )}
