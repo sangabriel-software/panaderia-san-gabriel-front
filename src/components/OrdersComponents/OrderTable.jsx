@@ -33,17 +33,17 @@ const OrderTable = ({ orders, onDelete, onViewPdf, loadingViewPdf }) => {
   };
 
 // Función que verifica si la fecha es hoy o ya pasó usando Day.js
-const isToday = (dateString) => {
-  if (!dateString) return false;
-  return dayjs(dateString).isSame(dayjs(), 'day');
-};
+    const isToday = (dateString) => {
+      if (!dateString) return false;
+      return dayjs(dateString).isSame(dayjs(), 'day');
+    };
 
-const isTodayOrPast = (dateString) => {
-  if (!dateString) return false;
-  const date = dayjs(dateString);
-  const today = dayjs().startOf('day');
-  return date.isSame(today, 'day') || date.isBefore(today, 'day');
-};
+    const isTodayOrPast = (dateString) => {
+      if (!dateString) return false;
+      const date = dayjs(dateString);
+      const today = dayjs().startOf('day');
+      return date.isSame(today, 'day') || date.isBefore(today, 'day');
+    };
 
 
   useEffect(() => {
