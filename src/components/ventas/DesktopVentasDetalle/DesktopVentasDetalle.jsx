@@ -229,18 +229,18 @@ const Balance = ({ detalleIngresos }) => {
         <Row>
           <Col md={12}>
             <div className="d-flex flex-column gap-1">
-              <div className="d-flex align-items-center gap-3">
-                <BsCash size={16} style={{ color: "#4ECDC4" }} />
-                <span className="text-secondary ">Monto Esperado:</span>
-                <span className="fw-bold text-dark">
-                  {formatCurrency(detalleIngresos?.montoEsperado)}
-                </span>
-              </div>
-              <div className="d-flex align-items-center gap-3">
+            <div className="d-flex align-items-center gap-3">
                 <BsWallet size={16} style={{ color: "#4ECDC4" }} />
                 <span className="text-secondary">Monto Ingresado:</span>
                 <span className="fw-bold text-dark">
                   {formatCurrency(detalleIngresos?.montoTotalIngresado)}
+                </span>
+              </div>
+              <div className="d-flex align-items-center gap-3">
+                <BsCash size={16} style={{ color: "#4ECDC4" }} />
+                <span className="text-secondary ">{`Monto Esperado:`}</span>
+                <span className="fw-bold text-dark">
+                  {formatCurrency(detalleIngresos?.montoEsperado)}
                 </span>
               </div>
               <div className="d-flex align-items-center gap-2">
