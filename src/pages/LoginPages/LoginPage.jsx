@@ -1,6 +1,7 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
 import logo from "../../assets/logo.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
@@ -9,9 +10,25 @@ import "./LoginPage.css";
 
 function LoginPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { register, handleSubmit, formState: { errors } } = useForm();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  // Efecto para mostrar mensaje de cierre de sesión exitoso
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    if (queryParams.get('logout') === 'success') {
+      toast.success("Sesión cerrada correctamente", {
+        autoClose: 2000,
+        toastId: 'logout-success'
+      });
+      
+      // Limpiar la URL
+      const cleanUrl = window.location.pathname;
+      window.history.replaceState({}, document.title, cleanUrl);
+    }
+  }, [location]);
 
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
 

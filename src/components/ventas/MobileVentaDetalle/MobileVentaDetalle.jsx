@@ -104,9 +104,9 @@ const MobileVentaDetalle = ({ venta, onDownloadXLS, onDownloadPDF }) => {
             <div className="d-flex justify-content-between align-items-center py-2 border-bottom">
               <span className="text-secondary d-flex align-items-center gap-2">
                 <BsPerson size={16} style={{ color: "#4ECDC4" }} /> {/* Ícono de usuario */}
-                Usuario:
+                Vendido por:
               </span>
-              <span className="fw-medium text-dark fw-bold">{`@${encabezadoVenta?.usuario}`}</span>
+              <span className="fw-medium text-dark fw-bold">{`${encabezadoVenta?.nombreUsuario}`}</span>
             </div>
             <div className="d-flex justify-content-between align-items-center py-2 border-bottom">
               <span className="text-secondary d-flex align-items-center gap-2">
@@ -154,20 +154,20 @@ const MobileVentaDetalle = ({ venta, onDownloadXLS, onDownloadPDF }) => {
             style={{ backgroundColor: "#FFF3B0" }} // Fondo amarillo pastel
           >
             <Card.Body className="py-3">
+            <div className="d-flex justify-content-between align-items-center mb-2">
+                <span className="text-secondary d-flex align-items-center gap-2">
+                  <BsWallet size={16} style={{ color: "#4ECDC4" }} /> M. Ingresado:
+                </span>
+                <span className="fw-bold text-dark" style={{ fontSize: isSmallScreen ? "0.875rem" : "1rem" }}>
+                  {formatCurrency(detalleIngresos?.montoTotalIngresado)}
+                </span>
+              </div>
               <div className="d-flex justify-content-between align-items-center mb-2">
                 <span className="text-secondary d-flex align-items-center gap-2">
                   <BsCash size={16} style={{ color: "#4ECDC4" }} /> M. Esperado:
                 </span>
                 <span className="fw-bold text-dark" style={{ fontSize: isSmallScreen ? "0.875rem" : "1rem" }}>
                   {formatCurrency(detalleIngresos?.montoEsperado)}
-                </span>
-              </div>
-              <div className="d-flex justify-content-between align-items-center mb-2">
-                <span className="text-secondary d-flex align-items-center gap-2">
-                  <BsWallet size={16} style={{ color: "#4ECDC4" }} /> M. Ingresado:
-                </span>
-                <span className="fw-bold text-dark" style={{ fontSize: isSmallScreen ? "0.875rem" : "1rem" }}>
-                  {formatCurrency(detalleIngresos?.montoTotalIngresado)}
                 </span>
               </div>
               <div className="d-flex justify-content-between align-items-center">

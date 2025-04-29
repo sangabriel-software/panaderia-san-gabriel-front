@@ -133,7 +133,7 @@ export const resetFormToInitialValues = (selectedProduct, reset, setValue, setIs
 export const useProductFormSetup = (selectedProduct, setValue, reset, setIsPanaderia, setTipoProduccion, setInitialProductValues) => {
   useEffect(() => {
     if (selectedProduct) {
-      const esPanaderia = selectedProduct.idCategoria == 1;
+      const esPanaderia = selectedProduct.idCategoria == 1 || selectedProduct.idCategoria == 2;
       setIsPanaderia(esPanaderia);
 
       // Configurar valores iniciales del formulario
@@ -237,8 +237,8 @@ export const handleModify = (producto, setSelectedProduct, setShowModifyModal, r
 
   // Usamos timeout para asegurar que el modal esté montado antes de setear valores
   setTimeout(() => {
-    const esPanaderia = producto.idCategoria == 1;
-
+    const esPanaderia = producto.idCategoria == 1 || producto.idCategoria == 2;
+;
     reset({
       nombreProducto: producto.nombreProducto,
       idCategoria: producto.idCategoria,
@@ -369,13 +369,8 @@ export const handleUpdateProduct = async (data, selectedProduct, setProductos, s
     if (resProdActualizado.status === 200) {
       // Actualiza el precio del producto en el servidor
 
-      const preciosUpdatePayload = crearPayloadPrecioProducto(
-        data,
-        selectedProduct.idProducto
-      );
-      const resPrecioActualizado = await actualizarPrecioProductoSevice(
-        preciosUpdatePayload
-      );
+      const preciosUpdatePayload = crearPayloadPrecioProducto(data, selectedProduct.idProducto);
+      const resPrecioActualizado = await actualizarPrecioProductoSevice(preciosUpdatePayload);
 
       // Actualiza el estado local con el producto modificado
       setProductos((prevProductos) =>

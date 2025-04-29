@@ -9,6 +9,8 @@ import ErrorPopup from "../../../../components/Popup/ErrorPopUp";
 import { handleConfirmDelete, handleDelele, handleEditRole } from "./ManageRolesUtils";
 import "./ManageRoles.css";
 import { FaShieldAlt } from "react-icons/fa";
+import { Container } from "react-bootstrap";
+import DotsMove from "../../../../components/Spinners/DotsMove";
 
 function ManageRoles() {
   const { roles, loading, showError, showInfo, setRoles } = useRoles(); 
@@ -22,7 +24,14 @@ function ManageRoles() {
 
 
   if (loading) {
-    return <div className="loading">Cargando roles...</div>;
+    return (
+      <Container
+        className="d-flex justify-content-center align-items-center"
+        style={{ minHeight: "70vh" }}
+      >
+        <DotsMove />
+      </Container>
+    );
   }
 
   return (

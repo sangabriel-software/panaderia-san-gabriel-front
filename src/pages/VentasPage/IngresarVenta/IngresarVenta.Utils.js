@@ -2,6 +2,7 @@ import dayjs from "dayjs";
 import { consultarDetalleOrdenPorCriterio } from "../../../services/ordenesproduccion/ordenesProduccion.service";
 import { consultarProductosService } from "../../../services/productos/productos.service";
 import { ingresarVentaService } from "../../../services/ventas/ventas.service";
+import { currentDate, getCurrentDateTimeWithSeconds } from "../../../utils/dateUtils";
 
 // Función para obtener las iniciales de un nombre
 export const getInitials = (name) => {
@@ -144,8 +145,27 @@ const crearEncabezadoVenta = (idOrdenProduccion, usuario, turnoValue, sucursalVa
     ventaTurno: turnoValue,
     fechaVenta: fechaActual,
     fechaCreacion: fechaActual,
-  };
+    fechaYHoraVenta: getCurrentDateTimeWithSeconds(),
+    };
 };
+
+const obtenerUnidadesFrances = (cantidadIngresada) => {
+  // Convertir a string por si viene como número
+  const valorStr = cantidadIngresada.toString();
+  
+  // Separar parte entera y decimal
+  const partes = valorStr.split('.');
+  
+  const filaFrances = partes[0] ? parseInt(partes[0], 10) : 0;
+  const unidadFrances = partes[1] ? parseInt(partes[1], 10) : 0;
+
+  const francesUnidad = filaFrances * 6;
+
+  const totalUnidadesFrances = francesUnidad + unidadFrances;
+  
+  return totalUnidadesFrances;
+};
+
 
 // Función para obtener las cantidades ingresadas
 const obtenerCantidadesIngresadas = (productos, trayQuantities) => {
@@ -169,6 +189,10 @@ const crearDetalleVenta = (productos, trayQuantities, orden, fechaActual) => {
     .map((producto) => {
       const cantidadIngresada = producto.cantidadIngresada; // Usar la cantidad obtenida
 
+
+        const unidadesFrancesNoVendidas = obtenerUnidadesFrances(cantidadIngresada);
+      
+
       // Solo para la categoría 1 (Panaderia) y si hay idOrdenProduccion
       if (producto.idCategoria === 1 && idOrdenProduccion && producto.controlarStock === 0 && producto.controlarStockDiario === 1) {
         // Verificar si el producto está en la orden
@@ -181,7 +205,7 @@ const crearDetalleVenta = (productos, trayQuantities, orden, fechaActual) => {
             controlarStock: producto.controlarStock,
             controlarStockDiario: producto.controlarStockDiario,
             idCategoria: producto.idCategoria,
-            unidadesNoVendidas: cantidadIngresada, 
+            unidadesNoVendidas: producto.idProducto === 1 ? unidadesFrancesNoVendidas : cantidadIngresada, 
             fechaCreacion: fechaActual,
           };
         } else {
@@ -236,8 +260,6 @@ export const handleGuardarVenta = async (setIsLoading, orden, sucursalValue, usu
     detalleVenta,
     detalleIngreso,
   };
-
-  //console.log(payload);
 
   try {
     const resIngrearVenta = await ingresarVentaService(payload);

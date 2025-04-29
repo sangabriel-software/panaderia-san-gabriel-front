@@ -1,21 +1,24 @@
-import { useNavigate } from "react-router-dom";
 import { removeLocalStorage } from "../../utils/Auth/localstorage";
 import { toast } from "react-toastify";
 
 const useLogout = () => {
-  const navigate = useNavigate();
-
   const handleLogout = () => {
-    removeLocalStorage("userData");
-    removeLocalStorage("token");
-
-    // Mostrar notificación de cierre de sesión
-    toast.success("Se ha cerrado la sesión", {
-      autoClose: 3000,
+    // Mostrar notificación de proceso
+    toast.loading("Cerrando sesión...", {
+      toastId: 'logout-process',
+      autoClose: false,
+      autoClose: 2000,
     });
 
-    // Redirigir al usuario a la página de inicio de sesión
-    navigate("/");
+    // Esperar un momento para que el usuario vea el mensaje
+    setTimeout(() => {
+      // Limpiar datos
+      removeLocalStorage("userData");
+      removeLocalStorage("token");
+      
+      // Redirigir con parámetro
+      window.location.href = "/login?logout=success";
+    }, 1000);
   };
 
   return { handleLogout };

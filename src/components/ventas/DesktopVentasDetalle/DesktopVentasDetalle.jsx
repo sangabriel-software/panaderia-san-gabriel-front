@@ -20,6 +20,8 @@ const DesktopVentaDetalle = ({ venta, onDownloadXLS, onDownloadPDF }) => {
   const detallesVenta = venta?.detalleVenta;
   const detalleIngresos = venta?.detalleIngresos;
 
+  console.log(encabezadoVenta)
+
   return (
     <Container
       fluid
@@ -71,7 +73,7 @@ const DesktopHeader = ({ encabezadoVenta, onDownloadXLS, onDownloadPDF }) => {
               <div className="d-flex align-items-center gap-2 mb-2">
                 <BsPerson size={16} style={{ color: "#4ECDC4" }} />
                 <span className="text-secondary">Vendido por:</span>
-                <span className="fw-bold text-dark">{`@${encabezadoVenta?.usuario}`}</span>
+                <span className="fw-bold text-dark">{`${encabezadoVenta?.nombreUsuario}`}</span>
               </div>
               <div className="d-flex align-items-center gap-2">
                 <BsShop size={16} style={{ color: "#4ECDC4" }} />
@@ -227,18 +229,18 @@ const Balance = ({ detalleIngresos }) => {
         <Row>
           <Col md={12}>
             <div className="d-flex flex-column gap-1">
-              <div className="d-flex align-items-center gap-3">
-                <BsCash size={16} style={{ color: "#4ECDC4" }} />
-                <span className="text-secondary ">Monto Esperado:</span>
-                <span className="fw-bold text-dark">
-                  {formatCurrency(detalleIngresos?.montoEsperado)}
-                </span>
-              </div>
-              <div className="d-flex align-items-center gap-3">
+            <div className="d-flex align-items-center gap-3">
                 <BsWallet size={16} style={{ color: "#4ECDC4" }} />
                 <span className="text-secondary">Monto Ingresado:</span>
                 <span className="fw-bold text-dark">
                   {formatCurrency(detalleIngresos?.montoTotalIngresado)}
+                </span>
+              </div>
+              <div className="d-flex align-items-center gap-3">
+                <BsCash size={16} style={{ color: "#4ECDC4" }} />
+                <span className="text-secondary ">{`Monto Esperado:`}</span>
+                <span className="fw-bold text-dark">
+                  {formatCurrency(detalleIngresos?.montoEsperado)}
                 </span>
               </div>
               <div className="d-flex align-items-center gap-2">

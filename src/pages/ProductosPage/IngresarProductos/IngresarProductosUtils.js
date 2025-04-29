@@ -10,7 +10,7 @@ export const crearPayloadProducto = (data) => {
   const badejasUnidades = (idCategoria === 1) ? unidadesPorBandeja : null;   // Determinar bandejasUnidades basado en la categoría
   //determinar tipo produccion
   let tipoProduccion
-  if(idCategoria === 1){
+  if(idCategoria === 1 || idCategoria === 2){
     tipoProduccion = data.tipoProduccion;
   }else{
     tipoProduccion = "Otros";

@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 import "./UsersCard.css";
-import { FaBan, FaEllipsisH, FaTrash } from "react-icons/fa";
+import { FaBan, FaEllipsisH, FaTrash, FaEdit } from "react-icons/fa";
 
 const UsersCard = ({
   id,
@@ -221,9 +221,18 @@ const UsersCard = ({
           >
             <button
               className="btn btn-light w-100 text-start mb-1"
+              onClick={(e) => handleOptionClick("modify", e)}
+              style={{ color: "#0d6efd" }}
+              disabled={role === "Admin" || !role}
+            >
+              <FaEdit className="me-2" />
+              Modificar
+            </button>
+            <button
+              className="btn btn-light w-100 text-start mb-1"
               onClick={(e) => handleOptionClick("delete", e)}
               style={{ color: "#dc3545" }}
-              disabled={role === "Admin" || !role} // Deshabilitar si el rol es "Admin" o no está definido
+              disabled={role === "Admin" || !role}
             >
               <FaTrash className="me-2" />
               Eliminar
@@ -231,7 +240,7 @@ const UsersCard = ({
             <button
               className="btn btn-light w-100 text-start fw-b"
               onClick={(e) => handleOptionClick("block", e)}
-              disabled={role === "Admin" || !role} // Deshabilitar si el rol es "Admin" o no está definido
+              disabled={role === "Admin" || !role}
               style={{
                 color:
                   status === "Activo" || status === "A" ? "#FF9800" : "#0d6efd",

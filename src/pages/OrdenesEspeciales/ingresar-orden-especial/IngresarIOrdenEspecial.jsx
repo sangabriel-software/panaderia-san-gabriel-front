@@ -208,12 +208,10 @@ const IngresarOrdenEspecialPage = () => {
           <Col md={6} className="mb-3">
             <Form.Group>
               <Form.Label>Fecha de Entrega *</Form.Label>
-              <DatePicker
-                selected={fechaEntrega}
-                onChange={(date) => setFechaEntrega(date)}
-                minDate={new Date()}
-                className="form-control"
-                dateFormat="dd/MM/yyyy"
+              <Form.Control
+                type="date"
+                value={fechaEntrega ? dayjs(fechaEntrega).format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD')}
+                onChange={(e) => setFechaEntrega(new Date(e.target.value))}
               />
             </Form.Group>
           </Col>

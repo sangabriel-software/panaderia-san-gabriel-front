@@ -48,7 +48,7 @@ const IngresarOrdenProd = () => {
   const handleShowOrderSummary = () => setShowOrderSummary(true);
   const handleCloseOrderSummary = () => setShowOrderSummary(false);
 
-  const filteredProducts = productos.filter((producto) => producto.idCategoria === 1);
+  const filteredProducts = productos.filter((producto) => producto.idCategoria === 1 || producto.idCategoria === 2);
   const productsToShow = getFilteredProductsByCategory(productos, searchTerm, activeCategory, usuario)
     .filter(producto => {
       if (productionTypeFilter === "todos") return true;
@@ -155,11 +155,7 @@ const IngresarOrdenProd = () => {
                             required: "Seleccione una fecha",
                           })}
                           className="form-control modern-datepicker"
-                          min={
-                            usuario.idRol === 1 && usuario.rol === "Admin"
-                              ? tomorrow
-                              : today
-                          }
+                          min={tomorrow}
                         />
                       </InputGroup>
                       {errors.fechaAProducir && (

@@ -20,7 +20,7 @@ import { getUserData } from "../../../utils/Auth/decodedata";
 
 const OrdenEspecialDetail = () => {
   const { idOrdenEspecial } = useParams();
-   const userData = getUserData();
+  const userData = getUserData();
   const navigate = useNavigate();
   
   // Custom hook para cargar los datos de la orden
@@ -31,7 +31,6 @@ const OrdenEspecialDetail = () => {
     errorMessage: errorDetalleMessage,
     setDetalleOrdenEspecial
   } = useGetOrdenEDetalle(idOrdenEspecial);
-
 
   // Hooks para productos y sucursales
   const { productos, loadigProducts, showErrorProductos } = useGetProductosYPrecios();
@@ -49,6 +48,11 @@ const OrdenEspecialDetail = () => {
   const [isPopupErrorOpen, setIsPopupErrorOpen] = useState(false);
   const [errorPopupMessage, setErrorPopupMessage] = useState("");
 
+  // Obtener IDs de productos que existen en la orden (aunque tengan cantidad 0)
+  const productosEnOrdenIds = useMemo(() => {
+    return detalleOrdenEspecial?.ordenDetalle?.map(p => p.idProducto) || [];
+  }, [detalleOrdenEspecial]);
+
   // Efecto para inicializar las cantidades de productos cuando se cargan los datos
   useEffect(() => {
     if (detalleOrdenEspecial?.ordenDetalle && productos) {
@@ -60,27 +64,46 @@ const OrdenEspecialDetail = () => {
     }
   }, [detalleOrdenEspecial, productos]);
 
-  // Obtener categorías únicas de productos
+  // Obtener categorías únicas de productos que existen en la orden
   const categorias = useMemo(() => {
-    return [...new Set(productos?.map((item) => item.nombreCategoria) || [])];
-  }, [productos]);
+    if (!productos || !detalleOrdenEspecial?.ordenDetalle) return ["Todas"];
+    
+    const productosEnOrden = productos.filter(p => 
+      productosEnOrdenIds.includes(p.idProducto)
+    );
+    
+    return [
+      "Todas",
+      ...new Set(productosEnOrden.map(p => p.nombreCategoria))
+    ];
+  }, [productos, detalleOrdenEspecial, productosEnOrdenIds]);
 
-  // Filtrar productos según categoría y término de búsqueda
+  // Filtrar productos
   const productosFiltrados = useMemo(() => {
-    let filtered = categoriaActiva === "Todas" 
-      ? productos
-      : productos?.filter((item) => item.nombreCategoria === categoriaActiva);
+    if (!productos || !detalleOrdenEspecial?.ordenDetalle) return [];
+    
+    // Primero filtramos solo productos que están en la orden
+    let filtered = productos.filter(p => productosEnOrdenIds.includes(p.idProducto));
 
+    // Aplicar filtro de categoría
+    if (categoriaActiva !== "Todas") {
+      filtered = filtered.filter(p => p.nombreCategoria === categoriaActiva);
+    }
+
+    // Aplicar filtro de búsqueda
     if (searchTerm) {
-      filtered = filtered?.filter((producto) =>
-        producto.nombreProducto.toLowerCase().includes(searchTerm.toLowerCase())
+      filtered = filtered.filter(p =>
+        p.nombreProducto.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
-    filtered = filtered?.filter((producto) => (cantidadValues[producto.idProducto] || 0) > 0);
+    // En modo visualización, solo mostramos productos con cantidad > 0
+    if (!isEditing) {
+      filtered = filtered.filter(p => (cantidadValues[p.idProducto] || 0) > 0);
+    }
 
-    return filtered || [];
-  }, [productos, categoriaActiva, searchTerm]);
+    return filtered;
+  }, [productos, detalleOrdenEspecial, categoriaActiva, searchTerm, cantidadValues, isEditing, productosEnOrdenIds]);
 
   // Limpiar búsqueda
   const clearSearch = () => {
@@ -98,8 +121,17 @@ const OrdenEspecialDetail = () => {
   // Función para cancelar la edición y resetear los filtros
   const handleCancelEdit = () => {
     setIsEditing(false);
-    setCategoriaActiva("Todas"); // Resetear categoría a "Todas"
-    setSearchTerm(""); // Limpiar búsqueda
+    setCategoriaActiva("Todas");
+    setSearchTerm("");
+    
+    // Restaurar las cantidades originales al cancelar
+    if (detalleOrdenEspecial?.ordenDetalle) {
+      const cantidades = {};
+      detalleOrdenEspecial.ordenDetalle.forEach(producto => {
+        cantidades[producto.idProducto] = producto.cantidadUnidades;
+      });
+      setCantidadValues(cantidades);
+    }
   };
 
   // Enviar datos actualizados al servidor
@@ -107,7 +139,7 @@ const OrdenEspecialDetail = () => {
     setIsLoading(true);
     
     try {
-      // Validaciones (se mantienen igual)
+      // Validaciones
       if (!detalleOrdenEspecial?.ordenEncabezado?.nombreCliente?.trim()) {
         throw new Error("El nombre del cliente es requerido");
       }
@@ -124,17 +156,16 @@ const OrdenEspecialDetail = () => {
         throw new Error("La fecha de entrega es requerida");
       }
       
-      // Preparar productos seleccionados - MODIFICADO para incluir idDetalleOrdenEspecial
+      // Preparar productos seleccionados (solo los con cantidad > 0)
       const productosSeleccionados = Object.entries(cantidadValues)
         .filter(([_, cantidad]) => cantidad > 0)
         .map(([idProducto, cantidad]) => {
-          // Buscar el producto en el detalle original para obtener su idDetalleOrdenEspecial
           const productoOriginal = detalleOrdenEspecial.ordenDetalle.find(
             p => p.idProducto === parseInt(idProducto)
           );
           
           return {
-            idDetalleOrdenEspecial: productoOriginal?.idDetalleOrdenEspecial || null, // Incluir el ID existente o null para nuevos
+            idDetalleOrdenEspecial: productoOriginal?.idDetalleOrdenEspecial || null,
             idProducto: parseInt(idProducto),
             cantidadUnidades: cantidad,
             nombreProducto: productos.find(p => p.idProducto === parseInt(idProducto))?.nombreProducto || "",
@@ -160,8 +191,6 @@ const OrdenEspecialDetail = () => {
         ordenDetalle: productosSeleccionados
       };
       
-      console.log("Payload enviado:", payload); // Para depuración
-  
       // Enviar a la API
       await actualizarOrdenEspecialService(payload);
       
@@ -269,32 +298,32 @@ const OrdenEspecialDetail = () => {
 
       {/* Información del cliente */}
       <div className="card card-info-cliente p-4 mb-4 shadow-sm">
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <h5>Información del Cliente</h5>
-        {!isEditing ? (
-          <Button
-            variant="primary"
-            onClick={() => setIsEditing(true)}
-            disabled={dayjs(detalleOrdenEspecial.ordenEncabezado.fechaEntrega).isBefore(dayjs(), 'day')}
-          >
-            <FiEdit className="me-2" /> Modificar
-          </Button>
-        ) : (
-          <div>
-            <Button variant="success" onClick={handleSubmit} disabled={isLoading} className="me-2">
-              {isLoading ? (
-                <Spinner animation="border" size="sm" className="me-2" />
-              ) : (
-                <FiSave className="me-2" />
-              )}
-              Guardar Cambios
+        <div className="d-flex justify-content-between align-items-center mb-4">
+          <h5>Información del Cliente</h5>
+          {!isEditing ? (
+            <Button
+              variant="primary"
+              onClick={() => setIsEditing(true)}
+              disabled={dayjs(detalleOrdenEspecial.ordenEncabezado.fechaEntrega).isBefore(dayjs(), 'day')}
+            >
+              <FiEdit className="me-2" /> Modificar
             </Button>
-            <Button variant="secondary" onClick={handleCancelEdit}>
-              <FiX className="me-2" /> Cancelar
-            </Button>
-          </div>
-        )}
-      </div>
+          ) : (
+            <div>
+              <Button variant="success" onClick={handleSubmit} disabled={isLoading} className="me-2">
+                {isLoading ? (
+                  <Spinner animation="border" size="sm" className="me-2" />
+                ) : (
+                  <FiSave className="me-2" />
+                )}
+                Guardar Cambios
+              </Button>
+              <Button variant="secondary" onClick={handleCancelEdit}>
+                <FiX className="me-2" /> Cancelar
+              </Button>
+            </div>
+          )}
+        </div>
         
         <Row>
           <Col md={6} className="mb-3">
@@ -366,7 +395,7 @@ const OrdenEspecialDetail = () => {
                 <Dropdown.Menu className="w-100 dropdown-menu-custom">
                   {sucursales?.map((sucursal) => (
                     <Dropdown.Item 
-                    className="dropdown-item-custom"
+                      className="dropdown-item-custom"
                       key={sucursal.idSucursal}
                       onClick={() => setDetalleOrdenEspecial({
                         ...detalleOrdenEspecial,
@@ -493,7 +522,9 @@ const OrdenEspecialDetail = () => {
             ) : (
               <tr>
                 <td colSpan="2" className="text-center py-4">
-                  No hay productos disponibles en esta categoría
+                  {isEditing 
+                    ? "No hay productos disponibles con los filtros actuales" 
+                    : "No hay productos en esta orden"}
                 </td>
               </tr>
             )}

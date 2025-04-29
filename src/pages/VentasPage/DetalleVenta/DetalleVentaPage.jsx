@@ -8,6 +8,7 @@ import { Container } from "react-bootstrap";
 import { BsArrowLeft } from "react-icons/bs";
 import Title from "../../../components/Title/Title";
 import { useMediaQuery } from "react-responsive"; // Importar react-responsive
+import DotsMove from "../../../components/Spinners/DotsMove";
 
 const DetalleVentaPage = () => {
   const { idVenta } = useParams();
@@ -21,7 +22,14 @@ const DetalleVentaPage = () => {
 
   // Manejo de estados de carga y errores
   if (loadingDetalleVenta) {
-    return <div>Cargando detalles de la venta...</div>;
+    return (
+      <Container
+        className="d-flex justify-content-center align-items-center"
+        style={{ minHeight: "70vh" }}
+      >
+        <DotsMove />
+      </Container>
+    );
   }
 
   if (showErrorDetalleVenta) {
