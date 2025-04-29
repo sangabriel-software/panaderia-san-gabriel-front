@@ -2,6 +2,7 @@ import dayjs from "dayjs";
 import { consultarDetalleOrdenPorCriterio } from "../../../services/ordenesproduccion/ordenesProduccion.service";
 import { consultarProductosService } from "../../../services/productos/productos.service";
 import { ingresarVentaService } from "../../../services/ventas/ventas.service";
+import { currentDate, getCurrentDateTimeWithSeconds } from "../../../utils/dateUtils";
 
 // Función para obtener las iniciales de un nombre
 export const getInitials = (name) => {
@@ -144,7 +145,8 @@ const crearEncabezadoVenta = (idOrdenProduccion, usuario, turnoValue, sucursalVa
     ventaTurno: turnoValue,
     fechaVenta: fechaActual,
     fechaCreacion: fechaActual,
-  };
+    fechaYHoraVenta: getCurrentDateTimeWithSeconds(),
+    };
 };
 
 const obtenerUnidadesFrances = (cantidadIngresada) => {
