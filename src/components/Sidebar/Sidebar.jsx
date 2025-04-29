@@ -172,10 +172,10 @@ function Sidebar({ show, onClose }) {
             </Collapse>
             <Collapse in={inventarioOpen}>
               <div>
-              {isRouteAllowed("/descontar-stock") && (
+              {isRouteAllowed("/descuento-stock") && (
                   <Nav.Link
                     as={NavLink}
-                    to="/descontar-stock"
+                    to="/descuento-stock"
                     className="text-light ps-4 submenu-item"
                     onClick={handleNavLinkClick}
                   >
