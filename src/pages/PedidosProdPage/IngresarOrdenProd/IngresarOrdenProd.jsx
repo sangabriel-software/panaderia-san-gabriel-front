@@ -155,11 +155,7 @@ const IngresarOrdenProd = () => {
                             required: "Seleccione una fecha",
                           })}
                           className="form-control modern-datepicker"
-                          min={
-                            usuario.idRol === 1 && usuario.rol === "Admin"
-                              ? tomorrow
-                              : today
-                          }
+                          min={tomorrow}
                         />
                       </InputGroup>
                       {errors.fechaAProducir && (
