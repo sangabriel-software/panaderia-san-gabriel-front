@@ -1,0 +1,104 @@
+.gestionar-descuentos-container {
+    padding: 2rem 1rem;
+    max-width: 1200px;
+}
+
+.gestionar-descuentos-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.gestionar-descuentos-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #2c3e50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.gestionar-descuentos-subtitle {
+    font-size: 1.1rem;
+    color: #7f8c8d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.gestionar-descuentos-row {
+    margin: 0 -0.5rem;
+}
+
+.gestionar-descuentos-col {
+    padding: 0.5rem;
+}
+
+.gestionar-descuentos-card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    height: 100%;
+    cursor: pointer;
+    background-color: #fff;
+    overflow: hidden;
+}
+
+.gestionar-descuentos-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+.gestionar-descuentos-card-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.gestionar-descuentos-icon {
+    font-size: 1.5rem;
+    color: #e74c3c;
+    margin-right: 1rem;
+}
+
+.gestionar-descuentos-sucursal-name {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin: 0;
+}
+
+.gestionar-descuentos-location {
+    color: #7f8c8d;
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.gestionar-descuentos-action {
+    display: flex;
+    align-items: center;
+    color: #e74c3c;
+    font-weight: 600;
+    padding: 0.8rem 1rem;
+    background-color: rgba(231, 76, 60, 0.1);
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.gestionar-descuentos-card:hover .gestionar-descuentos-action {
+    background-color: rgba(231, 76, 60, 0.2);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .gestionar-descuentos-title {
+        font-size: 1.8rem;
+    }
+    
+    .gestionar-descuentos-subtitle {
+        font-size: 1rem;
+    }
+}

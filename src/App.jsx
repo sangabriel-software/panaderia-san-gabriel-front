@@ -40,6 +40,7 @@ const OrdenesEspecialesList = lazy(() => import("./pages/OrdenesEspeciales/Orden
 const IngresarOrdenEspecialPage = lazy(() => import("./pages/OrdenesEspeciales/ingresar-orden-especial/IngresarIOrdenEspecial"));
 const OrdenEspecialDetail = lazy(() => import("./pages/OrdenesEspeciales/DetalleOrdenEspecial/OrdenEspecialDetalle"));
 const HomePage = lazy(() => import("./pages/Home/HomePage"));
+const GestionarDecuentos = lazy(() => import("./pages/StockProductos/DescontarStock/GestionDescuentos/GestionarDecuentos"));
 
 function App() {
   return (
@@ -104,6 +105,10 @@ function App() {
               <Route index element={<OrdenesEspecialesList/>} />
               <Route path="ingresar-orden-especial" element={<IngresarOrdenEspecialPage/>} />
               <Route path="detalle-orden-especial/:idOrdenEspecial" element={<OrdenEspecialDetail/>} />
+            </Route>
+
+            <Route path="/descuento-stock">
+            <Route index element={<GestionarDecuentos/>} />
             </Route>
 
           </Route>
