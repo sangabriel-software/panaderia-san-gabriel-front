@@ -41,6 +41,7 @@ const IngresarOrdenEspecialPage = lazy(() => import("./pages/OrdenesEspeciales/i
 const OrdenEspecialDetail = lazy(() => import("./pages/OrdenesEspeciales/DetalleOrdenEspecial/OrdenEspecialDetalle"));
 const HomePage = lazy(() => import("./pages/Home/HomePage"));
 const GestionarDecuentos = lazy(() => import("./pages/StockProductos/DescontarStock/GestionDescuentos/GestionarDecuentos"));
+const StockDescuentosList = lazy(() => import("./pages/StockProductos/DescontarStock/StockDescuentosList/StockDescuentosList"));  
 
 function App() {
   return (
@@ -110,6 +111,7 @@ function App() {
 
             <Route path="/descuento-stock">
             <Route index element={<GestionarDecuentos/>} />
+            <Route path="stock-descuentos-lista/:idSucursal" element={<StockDescuentosList/>} />
             </Route>
 
           </Route>

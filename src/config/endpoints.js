@@ -17,6 +17,7 @@ const getEndpoints = {
     STOCK_DE_PRODUCTOS_GENERALES: "consultar-stock-productos",
     CONSULTAR_ORDENES_ESPECIALES: "consultar-ordenes-especiales",
     CONSULTAR_ORDENES_ESPECIALES_POR_ID: "consultar-orden-especial-id",
+    DESCUENTO_DE_STOCK: "consultar-descuento-stock-por-sucursal",
 };
 
 const postEndpoints = {
