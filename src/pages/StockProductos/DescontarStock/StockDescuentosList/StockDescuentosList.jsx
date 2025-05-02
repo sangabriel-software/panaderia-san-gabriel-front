@@ -1,5 +1,4 @@
 import { useParams, useNavigate } from "react-router";
-import useGetStockDescontado from "../../../../hooks/DescuentoDeStock/useGetStockDescontado";
 import { useState, useMemo } from "react";
 import { useMediaQuery } from "react-responsive";
 import { 
@@ -15,6 +14,7 @@ import {
   FiUser
 } from "react-icons/fi";
 import './StockDescuentosList.styles.css';
+import useGetStockDescontado from "../../../../hooks/DescuentoDeStock/useGetStockDescontado";
 
 const StockDescuentosList = () => {
     const { idSucursal } = useParams();
