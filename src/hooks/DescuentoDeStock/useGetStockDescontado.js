@@ -25,7 +25,7 @@ const useGetStockDescontado = (idSucursal) => {
         setLoadingStockDescontado(false);
       }
     };
-    
+
     fetchStockDescontado();
   }, []);
 
