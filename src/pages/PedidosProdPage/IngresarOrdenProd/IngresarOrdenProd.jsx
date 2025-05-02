@@ -29,7 +29,7 @@ const IngresarOrdenProd = () => {
     defaultValues: {
       sucursal: "",
       turno: "AM",
-      fechaAProducir: usuario.idRol === 1 && usuario.rol === "Admin" ? tomorrow : today,
+      fechaAProducir: tomorrow,
       nombrePanadero: "",
     },
   });

@@ -7,12 +7,11 @@ import * as DarkReader from "darkreader";
 import "./Sidebar.css";
 import { getUserData, getUserPermissions } from "../../utils/Auth/decodedata";
 import { getColorFromName } from "./Sidebar.uitils";
-import { FiAlertCircle, FiBox, FiCalendar, FiClipboard, FiHome, FiMapPin, FiPackage, FiPieChart, FiSettings, FiShoppingBag, FiShoppingCart, FiTruck, FiUsers } from "react-icons/fi";
+import { FiBox, FiCalendar, FiHome, FiMapPin, FiPieChart, FiSettings, FiShoppingBag, FiShoppingCart, FiTruck, FiUsers } from "react-icons/fi";
 
 function Sidebar({ show, onClose }) {
   const [usersOpen, setUsersOpen] = useState(false);
   const [configOpen, setConfigOpen] = useState(false);
-  const [inventarioOpen, setInvetarioOpen] = useState(false);
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
   const [isChangingTheme, setIsChangingTheme] = useState(false);
   const permisosUsuario = getUserPermissions();
@@ -141,52 +140,7 @@ function Sidebar({ show, onClose }) {
           </Nav.Link>
         )}
 
-          {/* Inventadio Dropdown */}
-          <>
-            <Nav.Link
-              className="text-light d-flex justify-content-between align-items-center"
-              onClick={() => setInvetarioOpen(!inventarioOpen)}
-              style={{ cursor: "pointer" }}
-            >
-              <span>
-                <FiBox size={25} className="me-2" /> Inventario
-              </span>
-              <FaChevronRight
-                className={`dropdown-arrow ${inventarioOpen ? "open" : ""}`}
-              />
-            </Nav.Link>
-
-            <Collapse in={inventarioOpen}>
-              <div>
-              {isRouteAllowed("/stock-productos") && (
-                  <Nav.Link
-                    as={NavLink}
-                    to="/stock-productos"
-                    className="text-light ps-4 submenu-item"
-                    onClick={handleNavLinkClick}
-                  >
-                    <FiClipboard className="me-2" /> Control de stock
-                  </Nav.Link>
-                )}
-              </div>
-            </Collapse>
-            <Collapse in={inventarioOpen}>
-              <div>
-              {isRouteAllowed("/descuento-stock") && (
-                  <Nav.Link
-                    as={NavLink}
-                    to="/descuento-stock"
-                    className="text-light ps-4 submenu-item"
-                    onClick={handleNavLinkClick}
-                  >
-                    <FiAlertCircle className="me-2" /> Descontar Stock
-                  </Nav.Link>
-                )}
-              </div>
-            </Collapse>
-          </>
-
-        {/* {isRouteAllowed("/stock-productos") && (
+        {isRouteAllowed("/stock-productos") && (
           <Nav.Link
             as={NavLink}
             to="/stock-productos"
@@ -195,7 +149,7 @@ function Sidebar({ show, onClose }) {
           >
             <FiBox size={25} className="me-2" /> Inventario
           </Nav.Link>
-        )} */}
+        )}
 
         {isRouteAllowed("/ordenes-produccion") && (
           <Nav.Link
