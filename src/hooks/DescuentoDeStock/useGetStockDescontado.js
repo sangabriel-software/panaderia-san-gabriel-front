@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { decryptId } from "../../utils/CryptoParams";
-import { consultarGestionDeDescuentoStockService } from "../../services/DescuentoDeStock/descuentoDeStock.service";
+import { consultarGestionDeDescuentoStockService } from "../../services/descuentoDeStock/descuentoDeStock.service";
 
 /* Consulta a BD los permisoso */
 const useGetStockDescontado = (idSucursal) => {
