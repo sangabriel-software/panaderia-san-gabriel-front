@@ -1,4 +1,5 @@
 import { useParams, useNavigate } from "react-router";
+import useGetStockDescontado from "../../../../hooks/DescuentoDeStock/useGetStockDescontado";
 import { useState, useMemo } from "react";
 import { useMediaQuery } from "react-responsive";
 import { 
@@ -11,10 +12,10 @@ import {
   FiEye,
   FiXCircle,
   FiFilter,
-  FiUser
+  FiUser,
+  FiPlus
 } from "react-icons/fi";
 import './StockDescuentosList.styles.css';
-import useGetStockDescontado from "../../../../hooks/DescuentoDeStock/useGetStockDescontado";
 
 const StockDescuentosList = () => {
     const { idSucursal } = useParams();
@@ -87,6 +88,10 @@ const StockDescuentosList = () => {
         setShowFiltros(!showFiltros);
     };
 
+    const handleAddDiscount = () => {
+        navigate(`/sucursales/${idSucursal}/descuento-productos`);
+    };
+
     if (loadingStockDescontado) {
         return (
             <div className="sdl-loading-screen">
@@ -125,6 +130,12 @@ const StockDescuentosList = () => {
                         Mostrar todos
                     </button>
                 )}
+                <button 
+                    className="sdl-add-discount-btn sdl-empty-btn"
+                    onClick={handleAddDiscount}
+                >
+                    <FiPlus /> Descontar producto
+                </button>
             </div>
         );
     }
@@ -137,13 +148,21 @@ const StockDescuentosList = () => {
                         <h1>Descuentos aplicados</h1>
                         <p>Registro histórico de modificaciones al stock</p>
                     </div>
-                    <button 
-                        className="sdl-filter-toggle"
-                        onClick={toggleFiltros}
-                    >
-                        <FiFilter />
-                        {isMobile ? "" : "Filtrar"}
-                    </button>
+                    <div className="sdl-header-actions">
+                        <button 
+                            className="sdl-filter-toggle"
+                            onClick={toggleFiltros}
+                        >
+                            <FiFilter />
+                            {isMobile ? "" : "Filtrar"}
+                        </button>
+                        <button 
+                            className="sdl-add-discount-btn"
+                            onClick={handleAddDiscount}
+                        >
+                            {isMobile ? <FiPlus /> : "Descontar producto"}
+                        </button>
+                    </div>
                 </div>
                 
                 {showFiltros && (

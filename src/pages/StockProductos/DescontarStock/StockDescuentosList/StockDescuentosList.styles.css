@@ -52,6 +52,37 @@
     margin: 0;
 }
 
+/* Header Actions */
+.sdl-header-actions {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+/* Botón de agregar descuento */
+.sdl-add-discount-btn {
+    background: var(--sdl-primary);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: var(--sdl-radius);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.sdl-add-discount-btn:hover {
+    background: var(--sdl-primary-dark);
+}
+
+.sdl-empty-screen .sdl-add-discount-btn {
+    margin-top: 1.5rem;
+}
+
 /* Filtros */
 .sdl-filter-toggle {
     background: var(--sdl-primary-light);
@@ -485,55 +516,6 @@
     background: #e0e7ff;
 }
 
-/* Responsive */
-@media (max-width: 767px) {
-    .sdl-container {
-        padding: 0.75rem;
-    }
-    
-    .sdl-header {
-        margin-bottom: 1.5rem;
-        padding: 0;
-    }
-    
-    .sdl-header h1 {
-        font-size: 1.3rem;
-    }
-    
-    .sdl-item {
-        padding: 0.75rem;
-        gap: 0.75rem;
-    }
-    
-    .sdl-item-icon {
-        width: 36px;
-        height: 36px;
-    }
-    
-    .sdl-item-details {
-        flex-direction: column;
-        gap: 0.25rem;
-    }
-    
-    .sdl-fecha, .sdl-id {
-        font-size: 0.8rem;
-    }
-    
-    .sdl-action-btn {
-        width: 28px;
-        height: 28px;
-    }
-    
-    .sdl-filtros-container {
-        padding: 0.75rem;
-    }
-    
-    .sdl-filtro-btn {
-        padding: 0.5rem 0.75rem;
-        font-size: 0.8rem;
-    }
-}
-
 /* Estilos para el usuario */
 .sdl-item-user {
     display: flex;
@@ -569,4 +551,66 @@
 
 .sdl-modal-user svg {
     flex-shrink: 0;
+}
+
+/* Responsive */
+@media (max-width: 767px) {
+    .sdl-container {
+        padding: 0.75rem;
+    }
+    
+    .sdl-header {
+        margin-bottom: 1.5rem;
+        padding: 0;
+    }
+    
+    .sdl-header h1 {
+        font-size: 1.3rem;
+    }
+    
+    .sdl-header-actions {
+        gap: 0.5rem;
+    }
+    
+    .sdl-add-discount-btn span {
+        display: none;
+    }
+    
+    .sdl-add-discount-btn:after {
+        content: "+";
+        font-size: 1rem;
+    }
+    
+    .sdl-item {
+        padding: 0.75rem;
+        gap: 0.75rem;
+    }
+    
+    .sdl-item-icon {
+        width: 36px;
+        height: 36px;
+    }
+    
+    .sdl-item-details {
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+    
+    .sdl-fecha, .sdl-id {
+        font-size: 0.8rem;
+    }
+    
+    .sdl-action-btn {
+        width: 28px;
+        height: 28px;
+    }
+    
+    .sdl-filtros-container {
+        padding: 0.75rem;
+    }
+    
+    .sdl-filtro-btn {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.8rem;
+    }
 }
