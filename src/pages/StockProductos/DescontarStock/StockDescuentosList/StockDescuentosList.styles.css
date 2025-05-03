@@ -29,13 +29,9 @@
 /* Header */
 .sdl-header {
     margin-bottom: 2rem;
-    padding: 0 var(--sdl-spacing);
 }
 
 .sdl-header-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     margin-bottom: 1rem;
 }
 
@@ -52,13 +48,6 @@
     margin: 0;
 }
 
-/* Header Actions */
-.sdl-header-actions {
-    display: flex;
-    gap: 0.75rem;
-    align-items: center;
-}
-
 /* Botón de agregar descuento */
 .sdl-add-discount-btn {
     background: var(--sdl-primary);
@@ -73,6 +62,7 @@
     font-weight: 500;
     transition: all 0.2s ease;
     white-space: nowrap;
+    justify-content: center;
 }
 
 .sdl-add-discount-btn:hover {
@@ -140,6 +130,8 @@
     cursor: pointer;
     font-size: 0.85rem;
     transition: all 0.2s ease;
+    flex: 1;
+    text-align: center;
 }
 
 .sdl-filtro-btn:hover {
@@ -557,28 +549,19 @@
 @media (max-width: 767px) {
     .sdl-container {
         padding: 0.75rem;
+        max-width: 100%;
     }
     
     .sdl-header {
         margin-bottom: 1.5rem;
-        padding: 0;
     }
     
     .sdl-header h1 {
         font-size: 1.3rem;
     }
     
-    .sdl-header-actions {
-        gap: 0.5rem;
-    }
-    
-    .sdl-add-discount-btn span {
-        display: none;
-    }
-    
-    .sdl-add-discount-btn:after {
-        content: "+";
-        font-size: 1rem;
+    .sdl-header p {
+        font-size: 0.85rem;
     }
     
     .sdl-item {
@@ -610,7 +593,53 @@
     }
     
     .sdl-filtro-btn {
-        padding: 0.5rem 0.75rem;
+        padding: 0.5rem 0.5rem;
         font-size: 0.8rem;
+    }
+    
+    .sdl-filtro-options {
+        gap: 0.25rem;
+    }
+    
+    .sdl-add-discount-btn {
+        padding: 0.75rem;
+    }
+    
+    .sdl-header-actions {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}
+
+/* Tablet 7" (600px - 768px) */
+@media (min-width: 600px) and (max-width: 991px) {
+    .sdl-container {
+        max-width: 100%;
+        padding: 1.5rem;
+    }
+    
+    .sdl-header h1 {
+        font-size: 1.8rem;
+    }
+    
+    .sdl-header p {
+        font-size: 1rem;
+    }
+    
+    .sdl-item {
+        padding: 1.25rem;
+    }
+    
+    .sdl-item-content {
+        min-width: 60%;
+    }
+    
+    .sdl-filtro-btn {
+        padding: 0.5rem 0.8rem;
+        font-size: 0.9rem;
+    }
+    
+    .sdl-add-discount-btn {
+        font-size: 1rem;
     }
 }

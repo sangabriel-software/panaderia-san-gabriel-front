@@ -3,20 +3,20 @@ import useGetStockDescontado from "../../../../hooks/DescuentoDeStock/useGetStoc
 import { useState, useMemo } from "react";
 import { useMediaQuery } from "react-responsive";
 import { 
-  FiCalendar, 
   FiTag, 
   FiCheck, 
   FiX, 
-  FiChevronRight,
   FiTrash2,
   FiEye,
   FiXCircle,
   FiFilter,
   FiUser,
-  FiPlus
+  FiPlus,
+  FiMinus,
+  FiChevronRight
 } from "react-icons/fi";
-import './StockDescuentosList.styles.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import './StockDescuentosList.styles.css';
 
 const StockDescuentosList = () => {
     const { idSucursal } = useParams();
@@ -36,6 +36,7 @@ const StockDescuentosList = () => {
     const [showFiltros, setShowFiltros] = useState(false);
     
     const isMobile = useMediaQuery({ maxWidth: 767 });
+    const isTablet = useMediaQuery({ minWidth: 768, maxWidth: 991 });
 
     // Filtrar descuentos por tipo
     const descuentosFiltrados = useMemo(() => {
@@ -97,7 +98,7 @@ const StockDescuentosList = () => {
         return (
             <div className="sdl-loading-screen">
                 <div className="sdl-loading-spinner"></div>
-                <p>Cargando historial de producto descontado...</p>
+                <p>Cargando descuentos...</p>
             </div>
         );
     }
@@ -106,7 +107,7 @@ const StockDescuentosList = () => {
         return (
             <div className="sdl-error-screen">
                 <div className="sdl-error-icon">!</div>
-                <p>Error al cargar el historial de producto descontado</p>
+                <p>Error al cargar los descuentos</p>
             </div>
         );
     }
@@ -132,10 +133,10 @@ const StockDescuentosList = () => {
                     </button>
                 )}
                 <button 
-                    className="btn btn-primary mt-3"
+                    className="sdl-add-discount-btn sdl-empty-btn"
                     onClick={handleAddDiscount}
                 >
-                    <FiPlus /> Descontar producto
+                    <FiMinus /> Descontar producto
                 </button>
             </div>
         );
@@ -144,51 +145,60 @@ const StockDescuentosList = () => {
     return (
         <div className="sdl-container">
             <header className="sdl-header">
-                <div className="sdl-header-top">
-                    <div>
+                <div className="sdl-header-top row">
+                    <div className="col-12 col-md-6">
                         <h1>Descuentos aplicados</h1>
-                        <p>Registro histórico de modificaciones al stock</p>
+                        <p className="d-none d-md-block">Registro histórico de modificaciones al stock</p>
                     </div>
-                    <div className="sdl-header-actions">
-                        <button 
-                            className="sdl-filter-toggle"
-                            onClick={toggleFiltros}
-                        >
-                            <FiFilter />
-                            {isMobile ? "" : "Filtrar"}
-                        </button>
-                        <button 
-                            className="btn btn-primary d-none d-md-inline-flex align-items-center"
-                            onClick={handleAddDiscount}
-                        >
-                            <FiPlus className="me-2" /> Descontar producto
-                        </button>
+                    <div className="col-12 col-md-6">
+                        <div className="d-flex flex-column flex-md-row justify-content-md-end gap-2">
+                            <button 
+                                className="sdl-filter-toggle"
+                                onClick={toggleFiltros}
+                            >
+                                <FiFilter />
+                                Filtrar
+                            </button>
+                            
+                            <button 
+                                className="sdl-add-discount-btn"
+                                onClick={handleAddDiscount}
+                            >
+                                <FiMinus /> Descontar producto
+                            </button>
+                        </div>
                     </div>
                 </div>
                 
+                <p className="d-md-none mt-2">Registro histórico de modificaciones al stock</p>
+                
                 {showFiltros && (
-                    <div className="sdl-filtros-container">
-                        <div className="sdl-filtro-group">
-                            <label>Tipo de descuento:</label>
-                            <div className="sdl-filtro-options">
-                                <button
-                                    className={`sdl-filtro-btn ${filtroTipo === "TODOS" ? "active" : ""}`}
-                                    onClick={() => setFiltroTipo("TODOS")}
-                                >
-                                    Todos
-                                </button>
-                                <button
-                                    className={`sdl-filtro-btn ${filtroTipo === "MAYOREO" ? "active" : ""}`}
-                                    onClick={() => setFiltroTipo("MAYOREO")}
-                                >
-                                    Mayoreo
-                                </button>
-                                <button
-                                    className={`sdl-filtro-btn ${filtroTipo === "MAL ESTADO" ? "active" : ""}`}
-                                    onClick={() => setFiltroTipo("MAL ESTADO")}
-                                >
-                                    Mal estado
-                                </button>
+                    <div className="sdl-filtros-container mt-2">
+                        <div className="row">
+                            <div className="col-12">
+                                <div className="sdl-filtro-group">
+                                    <label>Tipo de descuento:</label>
+                                    <div className="sdl-filtro-options">
+                                        <button
+                                            className={`sdl-filtro-btn ${filtroTipo === "TODOS" ? "active" : ""}`}
+                                            onClick={() => setFiltroTipo("TODOS")}
+                                        >
+                                            Todos
+                                        </button>
+                                        <button
+                                            className={`sdl-filtro-btn ${filtroTipo === "MAYOREO" ? "active" : ""}`}
+                                            onClick={() => setFiltroTipo("MAYOREO")}
+                                        >
+                                            Mayoreo
+                                        </button>
+                                        <button
+                                            className={`sdl-filtro-btn ${filtroTipo === "MAL ESTADO" ? "active" : ""}`}
+                                            onClick={() => setFiltroTipo("MAL ESTADO")}
+                                        >
+                                            Mal estado
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -244,17 +254,6 @@ const StockDescuentosList = () => {
                 ))}
             </div>
 
-            {/* Botón flotante para móviles */}
-            <div className="d-block d-md-none fixed-bottom p-3">
-                <button 
-                    className="btn btn-primary w-100 py-3 rounded-pill shadow-lg d-flex align-items-center justify-content-center"
-                    onClick={handleAddDiscount}
-                >
-                    <FiPlus className="me-2" /> Descontar producto
-                </button>
-            </div>
-
-            {/* Modal de confirmación de eliminación */}
             {showDeleteModal && (
                 <div className="sdl-modal-overlay">
                     <div className="sdl-modal">
@@ -301,7 +300,6 @@ const StockDescuentosList = () => {
                 </div>
             )}
 
-            {/* Mensaje de error */}
             {errorMessage && (
                 <div className="sdl-error-message">
                     <div className="sdl-error-content">
