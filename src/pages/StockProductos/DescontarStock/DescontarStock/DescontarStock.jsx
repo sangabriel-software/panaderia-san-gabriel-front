@@ -378,7 +378,9 @@ const DescontarStock = () => {
       </div>
 
       {/* Selector de tipo de descuento */}
-      <div className="mb-4">
+      <div className="ros">
+        <div className="col-md-3">
+        <div className="mb-4">
         <h6 className="mb-3">Tipo de descuento:</h6>
         <Form.Select
           value={tipoDescuento}
@@ -390,6 +392,9 @@ const DescontarStock = () => {
         </Form.Select>
       </div>
 
+        </div>
+      </div>
+
       {/* Tabla de productos */}
       <div className="table-responsive excel-table-container mb-4">
         <Table striped bordered hover className="excel-table">
@@ -398,7 +403,7 @@ const DescontarStock = () => {
               <th className="dark-header text-center" style={{ width: "50%" }}>
                 Producto
               </th>
-              <th className="dark-header text-center" style={{ width: "20%" }}>
+              <th className="dark-header text-center" style={{ width: "20%"}}>
                 Stock Actual
               </th>
               <th className="dark-header text-center" style={{ width: "30%" }}>
@@ -429,7 +434,7 @@ const DescontarStock = () => {
                         </span>
                       </div>
                     </td>
-                    <td className="text-center align-middle">
+                    <td className="text-center align-middle" style={{ fontWeight: "bold"}}>
                       {esFrances ? 
                         `${Math.floor(producto.cantidadMostrada)}.${Math.round((producto.cantidadMostrada % 1) * 6)}` : 
                         producto.cantidadExistente}
