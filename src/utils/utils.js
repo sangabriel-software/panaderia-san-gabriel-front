@@ -29,3 +29,9 @@ export const getUniqueColor = (text) => {
       assignedColors[text] = color;
       return color;
 };
+
+// Función para obtener las iniciales de un nombre
+export const getInitials = (name) => {
+  const words = name.split(" ");
+  return words.map((word) => word[0]).join("").toUpperCase();
+};

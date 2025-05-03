@@ -5,15 +5,12 @@ import { useNavigate } from "react-router-dom";
 import useGetSucursales from "../../../../hooks/sucursales/useGetSucursales";
 import DotsMove from "../../../../components/Spinners/DotsMove";
 import "./GestionarDecuentos.styles.css";
+import { handleNavigateToDescuentos } from "./GestionarDescuento.utils";
 
 const GestionarDescuentos = () => {
     const { sucursales, loadingSucursales } = useGetSucursales();
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState("");
-
-    const handleNavigateToDescuentos = (idSucursal) => {
-        navigate(`/descontar-productos/${idSucursal}`);
-    };
 
     const filteredSucursales = sucursales.filter(sucursal =>
         sucursal.nombreSucursal.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -73,7 +70,7 @@ const GestionarDescuentos = () => {
                         >
                             <Card 
                                 className="gestionar-descuentos-card"
-                                onClick={() => handleNavigateToDescuentos(sucursal.idSucursal)}
+                                onClick={() => handleNavigateToDescuentos(navigate, sucursal.idSucursal)}
                             >
                                 <Card.Body>
                                     <div className="gestionar-descuentos-card-header">
