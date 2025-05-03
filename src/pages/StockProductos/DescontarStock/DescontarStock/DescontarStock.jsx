@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Container, Table, Button, Form, Spinner, Dropdown } from "react-bootstrap";
 import { BsArrowLeft, BsExclamationTriangleFill, BsFillInfoCircleFill } from "react-icons/bs";
 import { useNavigate, useParams } from "react-router-dom";
@@ -12,7 +12,7 @@ import Title from "../../../../components/Title/Title";
 import useGetSucursales from "../../../../hooks/sucursales/useGetSucursales";
 import { decryptId } from "../../../../utils/CryptoParams";
 import "./DescontarStock.style.css";
-import { descontarStockService } from "../../../../services/descuentoDeStock/descuentoDeStock.service";
+import { descontarStockService } from "../../../../services/DescuentoDeStock/descuentoDeStock.service";
 import { getUserData } from "../../../../utils/Auth/decodedata";
 import useGetStockGeneral from "../../../../hooks/stock/useGetStockGeneral";
 import useGetStockDelDia from "../../../../hooks/stock/useGetStockDelDia";
@@ -20,20 +20,29 @@ import useGetStockDelDia from "../../../../hooks/stock/useGetStockDelDia";
 const DescontarStock = () => {
   const { idSucursal } = useParams();
   const navigate = useNavigate();
-  const { stockGeneral, loadingStockGeneral } = useGetStockGeneral(idSucursal);
-  const { stockDelDia, loadingStockDiario } = useGetStockDelDia(idSucursal);
+  const { stockGeneral: initialStockGeneral, loadingStockGeneral, setStockGeneral } = useGetStockGeneral(idSucursal);
+  const { stockDelDia: initialStockDelDia, loadingStockDiario, setStockDelDia } = useGetStockDelDia(idSucursal);
   const { sucursales, loadingSucursales } = useGetSucursales();
   const [stockValues, setStockValues] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [categoriaActiva, setCategoriaActiva] = useState("Todas");
   const [searchTerm, setSearchTerm] = useState("");
-  const [tipoDescuento, setTipoDescuento] = useState("MAL ESTADO");
+  const [tipoDescuento, setTipoDescuento] = useState("MAYOREO");
+  const [localStock, setLocalStock] = useState({ general: [], dia: [] });
   const userData = getUserData();
 
   /* Popups */
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [isPopupErrorOpen, setIsPopupErrorOpen] = useState(false);
   const [errorPopupMessage, setErrorPopupMessage] = useState("");
+
+  // Actualizar el estado local cuando cambian los datos iniciales
+  useEffect(() => {
+    setLocalStock({
+      general: initialStockGeneral || [],
+      dia: initialStockDelDia || []
+    });
+  }, [initialStockGeneral, initialStockDelDia]);
 
   const decryptedIdSucursal = decryptId(decodeURIComponent(idSucursal));
   const sucursal = sucursales?.find(item => 
@@ -63,11 +72,11 @@ const DescontarStock = () => {
   // Combinación de stocks similar a StockUnificado con filtro de stock > 0
   const combinedStock = useMemo(() => {
     // Si ambos están vacíos, retornar array vacío
-    if ((!stockDelDia || stockDelDia.length === 0) && (!stockGeneral || stockGeneral.length === 0)) return [];
+    if ((!localStock.dia || localStock.dia.length === 0) && (!localStock.general || localStock.general.length === 0)) return [];
     
     // Obtener productos del día (filtrados y marcados)
-    const productosDia = Array.isArray(stockDelDia) 
-      ? stockDelDia
+    const productosDia = Array.isArray(localStock.dia) 
+      ? localStock.dia
           .filter(item => item?.idStockDiario !== 0 && item.cantidadExistente > 0)
           .map(item => ({ 
             ...item, 
@@ -77,8 +86,8 @@ const DescontarStock = () => {
       : [];
     
     // Obtener productos generales (filtrados y marcados)
-    const productosGenerales = Array.isArray(stockGeneral) 
-      ? stockGeneral
+    const productosGenerales = Array.isArray(localStock.general) 
+      ? localStock.general
           .filter(genItem => 
             genItem.cantidadExistente > 0 && 
             !productosDia.some(diaItem => diaItem.idProducto === genItem.idProducto)
@@ -92,7 +101,7 @@ const DescontarStock = () => {
     
     // Combinar dando prioridad a los productos del día
     return [...productosDia, ...productosGenerales];
-  }, [stockGeneral, stockDelDia]);
+  }, [localStock]);
 
   // Obtención de categorías
   const categorias = useMemo(() => {
@@ -154,6 +163,31 @@ const DescontarStock = () => {
     }));
   };
 
+  // Función para actualizar el stock local después de un descuento
+  const actualizarStockLocal = (productosDescontados) => {
+    setLocalStock(prev => {
+      const newStock = { ...prev };
+      
+      productosDescontados.forEach(({ idProducto, stockADescontar, esStockDiario }) => {
+        if (esStockDiario) {
+          newStock.dia = newStock.dia.map(item => 
+            item.idProducto === idProducto 
+              ? { ...item, cantidadExistente: item.cantidadExistente - stockADescontar }
+              : item
+          );
+        } else {
+          newStock.general = newStock.general.map(item => 
+            item.idProducto === idProducto 
+              ? { ...item, cantidadExistente: item.cantidadExistente - stockADescontar }
+              : item
+          );
+        }
+      });
+      
+      return newStock;
+    });
+  };
+
   /* Descontar Stock */
   const handleSubmit = async () => {
     try {
@@ -211,15 +245,22 @@ const DescontarStock = () => {
         }))
       };
 
-      console.log("Payload a enviar:", payload);
-
       // Llamada al servicio para descontar stock
       const response = await descontarStockService(payload);
 
       // Verificar si la respuesta fue exitosa
       if (response) {
+        // Actualizar el stock local antes de mostrar el popup
+        actualizarStockLocal(productosCompletos.map(p => ({
+          idProducto: p.idProducto,
+          stockADescontar: p.stockADescontar,
+          esStockDiario: p.esStockDiario
+        })));
+
         setIsPopupOpen(true);
         setStockValues({});
+        
+        // Refrescar datos del servidor en segundo plano
       } else {
         throw new Error("No se recibió respuesta del servidor");
       }
@@ -344,11 +385,8 @@ const DescontarStock = () => {
           onChange={(e) => setTipoDescuento(e.target.value)}
           className="mb-3"
         >
-          <option value="MAYOREO">Mayoreo</option>
-          <option value="MAL ESTADO">Mal estado</option>
-          <option value="DONACION">Donación</option>
-          <option value="PERDIDA">Pérdida</option>
-          <option value="OTRO">Otro</option>
+          <option value="MAYOREO">Venta por mayoreo</option>
+          <option value="MAL ESTADO">Perdida</option>
         </Form.Select>
       </div>
 
