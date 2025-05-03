@@ -2,14 +2,14 @@ import api from "../../config/api";
 import { deleteEndpoints, getEndpoints, postEndpoints, putEndpoints, } from "../../config/endpoints";
 
 
-// export const ingresarStockProductos = async (dataStock) => {
-//   try {
-//       const response = await api.post(`${postEndpoints.INGRESAR_STOCK}`, dataStock); 
-//       return response.data;
-//   } catch (error) {
-//     throw error;
-//   }
-// }
+export const descontarStockService = async (dataStock) => {
+  try {
+      const response = await api.post(`${postEndpoints.DESCONTAR_STOCK}`, dataStock); 
+      return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
 
 export const consultarGestionDeDescuentoStockService = async (idSucursal) => {
   try {

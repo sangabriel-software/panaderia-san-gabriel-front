@@ -81,7 +81,7 @@ const StockDescuentosList = () => {
     };
 
     const handleViewDetails = (idDescuento) => {
-        navigate(`/descuento-detalle/${idDescuento}`);
+        navigate(`/descuento-stock/descuento-detalle/${encodeURIComponent(idDescuento)}`);
     };
 
     const toggleFiltros = () => {
@@ -89,14 +89,14 @@ const StockDescuentosList = () => {
     };
 
     const handleAddDiscount = () => {
-        navigate(`/sucursales/${idSucursal}/descuento-productos`);
+        navigate(`/descuento-stock/descontar-stock/${encodeURIComponent(idSucursal)}`);
     };
 
     if (loadingStockDescontado) {
         return (
             <div className="sdl-loading-screen">
                 <div className="sdl-loading-spinner"></div>
-                <p>Cargando descuentos...</p>
+                <p>Cargando gestiones de descuento de stock...</p>
             </div>
         );
     }
@@ -105,7 +105,7 @@ const StockDescuentosList = () => {
         return (
             <div className="sdl-error-screen">
                 <div className="sdl-error-icon">!</div>
-                <p>Error al cargar los descuentos</p>
+                <p>Error al cargar las gestiones de descuento de stock</p>
             </div>
         );
     }

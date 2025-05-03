@@ -112,9 +112,9 @@ function App() {
             </Route>
 
             <Route path="/descuento-stock">
-            <Route index element={<GestionarDecuentos/>} />
-            <Route path="stock-descuentos-lista/:idSucursal" element={<StockDescuentosList/>} />
-            <Route path="descontar-stock/:idSucursal" element={<DescontarStock/>} />
+              <Route index element={<GestionarDecuentos/>} />
+              <Route path="stock-descuentos-lista/:idSucursal" element={<StockDescuentosList/>} />
+              <Route path="descontar-stock/:idSucursal" element={<DescontarStock/>} />
             </Route>
 
           </Route>

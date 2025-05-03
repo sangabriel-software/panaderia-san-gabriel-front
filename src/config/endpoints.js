@@ -35,6 +35,7 @@ const postEndpoints = {
     INGRESAR_RECETA: "/ingresar-receta",
     INGRESAR_STOCK: "ingresar-stock-productos",
     INGRESAR_ORDEN_ESPECIAL: "/ingresar-orden-especial",
+    DESCONTAR_STOCK: "descontar-stock",
 };
 
 const putEndpoints = {
