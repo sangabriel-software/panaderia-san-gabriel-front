@@ -314,35 +314,40 @@ const StockUnificado = () => {
             </thead>
             <tbody>
               {filteredProducts.length > 0 ? (
-                filteredProducts.map((producto) => (
-                  <tr key={`${producto.idProducto}-${producto.esStockDiario ? 'dia' : 'gen'}`}>
-                    <td className="product-cell">
-                      <div className="product-info">
-                        <div
-                          className="product-badge-general"
-                          style={{
-                            backgroundColor: getUniqueColor(
-                              producto.nombreProducto
-                            ),
-                          }}
-                        >
-                          {getInitials(producto.nombreProducto)}
+                filteredProducts.map((producto) => {
+                  const esFrances = producto.nombreProducto === "Frances";
+                  const cantidadMostrada = esFrances 
+                    ? `${Math.floor(producto.cantidadExistente / 6)}.${producto.cantidadExistente % 6}`
+                    : producto.cantidadExistente;
+                  
+                  return (
+                    <tr key={`${producto.idProducto}-${producto.esStockDiario ? 'dia' : 'gen'}`}>
+                      <td className="product-cell">
+                        <div className="product-info">
+                          <div
+                            className="product-badge-general"
+                            style={{
+                              backgroundColor: getUniqueColor(
+                                producto.nombreProducto
+                              ),
+                            }}
+                          >
+                            {getInitials(producto.nombreProducto)}
+                          </div>
+                          <span className="product-name">
+                            {producto.nombreProducto}
+                          </span>
                         </div>
-                        <span className="product-name">
-                          {producto.nombreProducto}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="quantity-cell-general text-center align-middle fw-bold">
-                      {producto.nombreProducto === "Frances"
-                        ? producto.cantidadExistente / 6
-                        : producto.cantidadExistente}
-                    </td>
-                    <td className="text-center align-middle">
-                      {producto.nombreProducto === "Frances" ? "Filas" : "Unidades"}
-                    </td>
-                  </tr>
-                ))
+                      </td>
+                      <td className="quantity-cell-general text-center align-middle fw-bold">
+                        {cantidadMostrada}
+                      </td>
+                      <td className="text-center align-middle">
+                        {esFrances ? "Filas" : "Unidades"}
+                      </td>
+                    </tr>
+                  );
+                })
               ) : (
                 <tr>
                   <td colSpan="3" className="text-center py-4 align-middle">
