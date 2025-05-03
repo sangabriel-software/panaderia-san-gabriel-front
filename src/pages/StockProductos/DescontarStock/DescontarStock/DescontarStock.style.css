@@ -286,7 +286,7 @@
   
   @media (max-width: 575px) {
     .excel-table {
-      font-size: 0.85rem;
+      font-size: 0.95rem;
     }
     
     .excel-table th, 
@@ -306,7 +306,7 @@
     .quantity-input {
       width: 70px;
       padding: 3px 5px;
-      font-size: 0.75rem;
+      font-size: 0.90rem;
       text-align: center;
     }
     
