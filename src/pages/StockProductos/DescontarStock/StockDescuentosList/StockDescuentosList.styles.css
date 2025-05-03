@@ -1,4 +1,3 @@
-/* Variables */
 :root {
     --sdl-primary: #3b82f6;
     --sdl-primary-light: #eff6ff;
@@ -10,13 +9,16 @@
     --sdl-success: #10b981;
     --sdl-error: #ef4444;
     --sdl-warning: #f59e0b;
+    --sdl-mayoreo: #8b5cf6;
+    --sdl-mal-estado: #f97316;
+    --sdl-otros: #64748b;
     --sdl-radius: 8px;
     --sdl-spacing: 1rem;
     --sdl-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     --sdl-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --sdl-card-bg: #f8fafc;
 }
 
-/* Reset y estilos base */
 .sdl-container {
     max-width: 800px;
     margin: 0 auto;
@@ -26,7 +28,6 @@
     position: relative;
 }
 
-/* Header */
 .sdl-header {
     margin-bottom: 2rem;
 }
@@ -48,7 +49,6 @@
     margin: 0;
 }
 
-/* Botón de agregar descuento */
 .sdl-add-discount-btn {
     background: var(--sdl-primary);
     color: white;
@@ -73,7 +73,6 @@
     margin-top: 1.5rem;
 }
 
-/* Filtros */
 .sdl-filter-toggle {
     background: var(--sdl-primary-light);
     color: var(--sdl-primary);
@@ -144,14 +143,12 @@
     border-color: var(--sdl-primary);
 }
 
-/* Lista de items */
 .sdl-list {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
 }
 
-/* Item individual */
 .sdl-item {
     display: flex;
     align-items: center;
@@ -166,9 +163,10 @@
 }
 
 .sdl-item:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--sdl-shadow-md);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
     border-color: var(--sdl-primary-light);
+    background-color: var(--sdl-card-bg);
 }
 
 .sdl-item-icon {
@@ -195,13 +193,31 @@
     margin-bottom: 0.25rem;
 }
 
-.sdl-tipo {
-    font-weight: 500;
-    text-transform: capitalize;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    padding-right: 0.5rem;
+.sdl-tipo-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: white;
+    display: inline-flex;
+    align-items: center;
+}
+
+.sdl-tipo-badge.mayoreo {
+    background-color: var(--sdl-mayoreo);
+    box-shadow: 0 2px 4px rgba(139, 92, 246, 0.2);
+}
+
+.sdl-tipo-badge.mal-estado {
+    background-color: var(--sdl-mal-estado);
+    box-shadow: 0 2px 4px rgba(249, 115, 22, 0.2);
+}
+
+.sdl-tipo-badge.todos {
+    background-color: var(--sdl-otros);
+    box-shadow: 0 2px 4px rgba(100, 116, 139, 0.2);
 }
 
 .sdl-estado {
@@ -224,6 +240,50 @@
     color: var(--sdl-error);
 }
 
+.sdl-item-user-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin: 0.75rem 0;
+}
+
+.sdl-user-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: var(--sdl-primary-light);
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--sdl-radius);
+    width: fit-content;
+}
+
+.sdl-user-icon {
+    color: var(--sdl-primary);
+    font-size: 0.9rem;
+}
+
+.sdl-username {
+    font-weight: 500;
+    color: var(--sdl-text);
+    font-size: 0.85rem;
+}
+
+.sdl-time-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--sdl-text-light);
+    font-size: 0.8rem;
+}
+
+.sdl-time-icon {
+    font-size: 0.8rem;
+}
+
+.sdl-time-text {
+    font-style: italic;
+}
+
 .sdl-item-details {
     display: flex;
     gap: 0.75rem;
@@ -231,13 +291,13 @@
     color: var(--sdl-text-light);
 }
 
-.sdl-fecha {
-    white-space: nowrap;
-}
-
 .sdl-id {
-    color: var(--sdl-primary);
-    font-weight: 500;
+    color: var(--sdl-text-light);
+    font-size: 0.8rem;
+    background-color: var(--sdl-card-bg);
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--sdl-radius);
+    display: inline-block;
 }
 
 .sdl-item-actions {
@@ -275,7 +335,6 @@
     margin-left: 0.25rem;
 }
 
-/* Modales */
 .sdl-modal-overlay {
     position: fixed;
     top: 0;
@@ -382,7 +441,6 @@
     background-color: #dc2626;
 }
 
-/* Spinner */
 .sdl-spinner-small {
     display: inline-block;
     width: 16px;
@@ -397,7 +455,6 @@
     to { transform: rotate(360deg); }
 }
 
-/* Mensaje de error */
 .sdl-error-message {
     position: fixed;
     bottom: 1rem;
@@ -442,7 +499,6 @@
     padding: 0.25rem;
 }
 
-/* Estados de carga y error */
 .sdl-loading-screen,
 .sdl-error-screen,
 .sdl-empty-screen {
@@ -508,27 +564,6 @@
     background: #e0e7ff;
 }
 
-/* Estilos para el usuario */
-.sdl-item-user {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin: 0.5rem 0;
-    font-size: 0.85rem;
-    color: var(--sdl-text-light);
-}
-
-.sdl-user-icon {
-    font-size: 0.9rem;
-    color: var(--sdl-primary);
-}
-
-.sdl-username {
-    font-weight: 500;
-    color: var(--sdl-text);
-}
-
-/* Estilo para el usuario en el modal */
 .sdl-modal-user {
     display: flex;
     align-items: center;
@@ -545,7 +580,6 @@
     flex-shrink: 0;
 }
 
-/* Responsive */
 @media (max-width: 767px) {
     .sdl-container {
         padding: 0.75rem;
@@ -605,13 +639,20 @@
         padding: 0.75rem;
     }
     
-    .sdl-header-actions {
-        flex-direction: column;
-        gap: 0.5rem;
+    .sdl-tipo-badge {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.6rem;
+    }
+    
+    .sdl-user-badge {
+        padding: 0.4rem 0.6rem;
+    }
+    
+    .sdl-username {
+        font-size: 0.8rem;
     }
 }
 
-/* Tablet 7" (600px - 768px) */
 @media (min-width: 600px) and (max-width: 991px) {
     .sdl-container {
         max-width: 100%;

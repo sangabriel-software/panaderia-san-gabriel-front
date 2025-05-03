@@ -11,9 +11,9 @@ import {
   FiXCircle,
   FiFilter,
   FiUser,
-  FiPlus,
   FiMinus,
-  FiChevronRight
+  FiChevronRight,
+  FiClock
 } from "react-icons/fi";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './StockDescuentosList.styles.css';
@@ -38,7 +38,6 @@ const StockDescuentosList = () => {
     const isMobile = useMediaQuery({ maxWidth: 767 });
     const isTablet = useMediaQuery({ minWidth: 768, maxWidth: 991 });
 
-    // Filtrar descuentos por tipo
     const descuentosFiltrados = useMemo(() => {
         if (!stockDescontadoList) return [];
         
@@ -51,7 +50,6 @@ const StockDescuentosList = () => {
         );
     }, [stockDescontadoList, filtroTipo]);
 
-    // Formatear fecha para mostrar
     const formatFecha = (fecha) => {
         const date = new Date(fecha);
         return date.toLocaleDateString('es-ES', {
@@ -147,7 +145,7 @@ const StockDescuentosList = () => {
             <header className="sdl-header">
                 <div className="sdl-header-top row">
                     <div className="col-12 col-md-6">
-                        <h1>Descuentos aplicados</h1>
+                        <h1>Historial de Stock descontado</h1>
                         <p className="d-none d-md-block">Registro histórico de modificaciones al stock</p>
                     </div>
                     <div className="col-12 col-md-6">
@@ -214,20 +212,27 @@ const StockDescuentosList = () => {
                         
                         <div className="sdl-item-content">
                             <div className="sdl-item-header">
-                                <span className="sdl-tipo">{"Descuento por " + descuento.tipoDescuento}</span>
+                                <span className={`sdl-tipo-badge ${descuento.tipoDescuento.toLowerCase().replace(' ', '-')}`}>
+                                    {descuento.tipoDescuento}
+                                </span>
                                 <span className={`sdl-estado ${descuento.estado === 'A' ? 'active' : 'inactive'}`}>
                                     {descuento.estado === 'A' ? <FiCheck /> : <FiX />}
                                 </span>
                             </div>
                             
-                            <div className="sdl-item-user">
-                                <FiUser className="sdl-user-icon" />
-                                <span className="sdl-username">{descuento.nombreUsuario}</span>
+                            <div className="sdl-item-user-info">
+                                <div className="sdl-user-badge">
+                                    <FiUser className="sdl-user-icon" />
+                                    <span className="sdl-username">Usuario: {descuento.nombreUsuario}</span>
+                                </div>
+                                <div className="sdl-time-info">
+                                    <FiClock className="sdl-time-icon" />
+                                    <span className="sdl-time-text">{formatFecha(descuento.fechaDescuento)}</span>
+                                </div>
                             </div>
                             
                             <div className="sdl-item-details">
-                                <span className="sdl-fecha">{formatFecha(descuento.fechaDescuento)}</span>
-                                <span className="sdl-id">#{descuento.idDescuento}</span>
+                                <span className="sdl-id">ID: #{descuento.idDescuento}</span>
                             </div>
                         </div>
                         
