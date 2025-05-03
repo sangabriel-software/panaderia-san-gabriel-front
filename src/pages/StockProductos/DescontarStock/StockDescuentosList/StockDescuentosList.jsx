@@ -16,6 +16,7 @@ import {
   FiPlus
 } from "react-icons/fi";
 import './StockDescuentosList.styles.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const StockDescuentosList = () => {
     const { idSucursal } = useParams();
@@ -96,7 +97,7 @@ const StockDescuentosList = () => {
         return (
             <div className="sdl-loading-screen">
                 <div className="sdl-loading-spinner"></div>
-                <p>Cargando descuentos...</p>
+                <p>Cargando historial de producto descontado...</p>
             </div>
         );
     }
@@ -105,7 +106,7 @@ const StockDescuentosList = () => {
         return (
             <div className="sdl-error-screen">
                 <div className="sdl-error-icon">!</div>
-                <p>Error al cargar los descuentos</p>
+                <p>Error al cargar el historial de producto descontado</p>
             </div>
         );
     }
@@ -131,7 +132,7 @@ const StockDescuentosList = () => {
                     </button>
                 )}
                 <button 
-                    className="sdl-add-discount-btn sdl-empty-btn"
+                    className="btn btn-primary mt-3"
                     onClick={handleAddDiscount}
                 >
                     <FiPlus /> Descontar producto
@@ -157,10 +158,10 @@ const StockDescuentosList = () => {
                             {isMobile ? "" : "Filtrar"}
                         </button>
                         <button 
-                            className="sdl-add-discount-btn"
+                            className="btn btn-primary d-none d-md-inline-flex align-items-center"
                             onClick={handleAddDiscount}
                         >
-                            {isMobile ? <FiPlus /> : "Descontar producto"}
+                            <FiPlus className="me-2" /> Descontar producto
                         </button>
                     </div>
                 </div>
@@ -241,6 +242,16 @@ const StockDescuentosList = () => {
                         </div>
                     </div>
                 ))}
+            </div>
+
+            {/* Botón flotante para móviles */}
+            <div className="d-block d-md-none fixed-bottom p-3">
+                <button 
+                    className="btn btn-primary w-100 py-3 rounded-pill shadow-lg d-flex align-items-center justify-content-center"
+                    onClick={handleAddDiscount}
+                >
+                    <FiPlus className="me-2" /> Descontar producto
+                </button>
             </div>
 
             {/* Modal de confirmación de eliminación */}
