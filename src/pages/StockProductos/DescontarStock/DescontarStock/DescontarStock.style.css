@@ -312,6 +312,7 @@
     
     .product-name {
       font-size: 0.95rem;
+      font-weight: bold;
     }
     
     .search-input {
