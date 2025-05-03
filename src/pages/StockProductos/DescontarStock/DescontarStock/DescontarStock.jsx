@@ -12,7 +12,7 @@ import Title from "../../../../components/Title/Title";
 import useGetSucursales from "../../../../hooks/sucursales/useGetSucursales";
 import { decryptId } from "../../../../utils/CryptoParams";
 import "./DescontarStock.style.css";
-import { descontarStockService } from "../../../../services/DescuentoDeStock/descuentoDeStock.service";
+import { descontarStockService } from "../../../../services/descuentoDeStock/descuentoDeStock.service";
 import { getUserData } from "../../../../utils/Auth/decodedata";
 import useGetStockGeneral from "../../../../hooks/stock/useGetStockGeneral";
 import useGetStockDelDia from "../../../../hooks/stock/useGetStockDelDia";
