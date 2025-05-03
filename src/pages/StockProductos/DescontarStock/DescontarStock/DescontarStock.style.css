@@ -286,7 +286,7 @@
   
   @media (max-width: 575px) {
     .excel-table {
-      font-size: 0.75rem;
+      font-size: 0.85rem;
     }
     
     .excel-table th, 
@@ -311,7 +311,7 @@
     }
     
     .product-name {
-      font-size: 0.75rem;
+      font-size: 0.85rem;
     }
     
     .search-input {
