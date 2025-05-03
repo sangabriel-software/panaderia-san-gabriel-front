@@ -31,7 +31,7 @@ const GestionarStockPage = () => {
             
             <Row className="sucursales-grid">
                 {sucursales.map((sucursal) => (
-                    <Col key={sucursal.idSucursal} xs={12} sm={6} lg={4}>
+                    <Col key={sucursal.idSucursal} xs={12} sm={8} lg={4}>
                         <Card className="sucursal-card">
                             <div className="card-header">
                                 <FaBuilding className="sucursal-icon" />

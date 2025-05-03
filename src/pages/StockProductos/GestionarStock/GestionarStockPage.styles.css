@@ -15,6 +15,7 @@
 .gestionar-container {
     max-width: 1200px;
     min-height: 100vh;
+    padding: 2rem 1rem;
 }
 
 .loading-container {
@@ -69,6 +70,8 @@
     height: 100%;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     background: var(--card-bg);
+    display: flex;
+    flex-direction: column;
 }
 
 .sucursal-card:hover {
@@ -116,19 +119,22 @@
     display: flex;
     flex-direction: column;
     gap: 1rem;
+    flex-grow: 1;
+    justify-content: flex-end;
 }
 
 .option-btn {
     display: flex;
     align-items: center;
     gap: 1rem;
-    padding: 1rem; /* Aumentado el padding */
+    padding: 1rem;
     border-radius: 8px;
     font-weight: 500;
     text-align: left;
     transition: all 0.3s ease;
     border-width: 1px;
     border-style: solid;
+    width: 100%;
 }
 
 .option-btn:hover {
@@ -136,7 +142,7 @@
 }
 
 .option-icon {
-    font-size: 1.3rem; /* Icono más grande */
+    font-size: 1.3rem;
     flex-shrink: 0;
 }
 
@@ -147,7 +153,7 @@
 }
 
 .option-text span {
-    font-size: 1.05rem; /* Texto más grande */
+    font-size: 1.05rem;
 }
 
 .option-text small {
@@ -158,7 +164,7 @@
 
 /* Botón de Stock General específico */
 .stock-general-btn {
-    min-height: 70px; /* Altura mínima aumentada */
+    min-height: 70px;
     background-color: var(--primary-light);
     border-color: var(--primary);
 }
@@ -183,28 +189,18 @@
     color: white;
 }
 
-/* Responsive Design */
-@media (max-width: 992px) {
-    .gestionar-title {
-        font-size: 1.8rem;
-    }
-    
-    .gestionar-subtitle {
-        font-size: 1rem;
-    }
-}
-
-@media (max-width: 768px) {
+/* Responsive Design - Tablet (768px - 991px) */
+@media (min-width: 768px) and (max-width: 991px) {
     .gestionar-container {
-        padding: 1.5rem 1rem;
-    }
-    
-    .gestionar-header {
-        margin-bottom: 2rem;
+        padding: 1.5rem;
     }
     
     .sucursales-grid {
         gap: 1.25rem;
+    }
+    
+    .sucursal-card {
+        min-height: 300px;
     }
     
     .card-header {
@@ -218,9 +214,33 @@
     .option-btn {
         padding: 0.9rem;
     }
+    
+    .stock-general-btn {
+        min-height: 65px;
+    }
 }
 
-@media (max-width: 576px) {
+/* Responsive Design - Mobile (576px - 767px) */
+@media (min-width: 576px) and (max-width: 767px) {
+    .gestionar-container {
+        padding: 1.25rem;
+    }
+    
+    .gestionar-header {
+        margin-bottom: 2rem;
+    }
+    
+    .sucursales-grid {
+        gap: 1rem;
+    }
+    
+    .sucursal-card {
+        min-height: auto;
+    }
+}
+
+/* Responsive Design - Small Mobile (<576px) */
+@media (max-width: 575px) {
     .gestionar-title {
         font-size: 1.6rem;
         flex-direction: column;
@@ -253,6 +273,6 @@
     }
     
     .stock-general-btn {
-        min-height: 65px;
+        min-height: 60px;
     }
 }
