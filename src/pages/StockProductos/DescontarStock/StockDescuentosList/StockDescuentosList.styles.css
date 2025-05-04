@@ -220,6 +220,11 @@
     box-shadow: 0 2px 4px rgba(100, 116, 139, 0.2);
 }
 
+.sdl-tipo-badge.correccion {
+    background-color: var(--sdl-otros);
+    box-shadow: 0 2px 4px rgba(255, 215, 0, 0.2);
+}
+
 .sdl-estado {
     display: flex;
     align-items: center;
