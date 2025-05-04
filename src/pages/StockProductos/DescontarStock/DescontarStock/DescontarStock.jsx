@@ -311,7 +311,7 @@ const DescontarStock = () => {
             <button
               className="btn bt-return rounded-circle d-flex align-items-center justify-content-center shadow"
               style={{ width: "40px", height: "40px" }}
-              onClick={() => navigate("/stock-productos")}
+              onClick={() => navigate(`/descuento-stock/stock-descuentos-lista/${encodeURIComponent(idSucursal)}`)}
             >
               <BsArrowLeft size={20} />
             </button>
@@ -389,6 +389,7 @@ const DescontarStock = () => {
         >
           <option value="MAYOREO">Venta por mayoreo</option>
           <option value="MAL ESTADO">Perdida</option>
+          <option value="CORRECCION">Correccion de stock</option>
         </Form.Select>
       </div>
 
