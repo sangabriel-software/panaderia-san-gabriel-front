@@ -63,6 +63,7 @@ const deleteEndpoints = {
     ELMINAR_SUCURSAL: "/eliminarSucursal",
     ELIMINAR_RECETA: "elminar-receta",
     ELIMINAR_ORDEN_ESPECIAL: "eliminar-orden-especial",
+    CANCELAR_DESCUENTO_STOCK: "cancelar-descuento-stock",
 };
 
 export { getEndpoints, postEndpoints, putEndpoints, deleteEndpoints};

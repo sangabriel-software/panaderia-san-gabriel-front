@@ -29,3 +29,13 @@ export const consultarDetalleDescuentosService = async (idDescuento) => {
       throw error;
     }
 }
+
+export const cancelarDescuentoStockServices = async (idDescuento) => {
+    try {
+        const response = await api.delete(`${deleteEndpoints.CANCELAR_DESCUENTO_STOCK}/${idDescuento}`); 
+        return response.data;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+}
