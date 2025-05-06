@@ -1,12 +1,13 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Table, Button, Badge, Container, Spinner } from "react-bootstrap";
+import { Table, Button, Badge, Container, Spinner, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { FaTrashAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { formatDateToDisplay } from "../../../utils/dateUtils";
 import PaginationComponent from "../../PaginationComponent/PaginationComponent";
-import "./VentasTable.css"; // Importa el CSS personalizado
+import "./VentasTable.css";
 import { handleViewDetalleVenta } from "../../../pages/VentasPage/DetalleVenta/DetalleVenta.utils";
 import { BsFileEarmarkPdf } from "react-icons/bs";
+import dayjs from "dayjs";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -23,6 +24,11 @@ const VentasTable = ({ sales, onDelete, onViewPdf, loadingViewPdf }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const containerRef = useRef(null);
   const navigate = useNavigate();
+
+  // Función para verificar si una venta es de hoy
+  const esVentaDeHoy = (fechaVenta) => {
+    return dayjs(fechaVenta).isSame(dayjs(), 'day');
+  };
 
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const paginatedSales = sales.slice(startIndex, startIndex + ITEMS_PER_PAGE);
@@ -52,100 +58,120 @@ const VentasTable = ({ sales, onDelete, onViewPdf, loadingViewPdf }) => {
           </tr>
         </thead>
         <tbody>
-          {paginatedSales.map((sale, index) => (
-            <tr
-              key={sale.idVenta}
-              className="ventas-table-row"
-              onDoubleClick={() => handleRowClick(sale.idVenta)}
-              style={{ cursor: "pointer" }}
-            >
-              <td
-                className="text-center ventas-serial-number"
-                title="Doble clic para ver detalles"
+          {paginatedSales.map((sale, index) => {
+            const esHoy = esVentaDeHoy(sale.fechaVenta);
+            return (
+              <tr
+                key={sale.idVenta}
+                className="ventas-table-row"
+                onDoubleClick={() => handleRowClick(sale.idVenta)}
+                style={{ cursor: "pointer" }}
               >
-                #{startIndex + index + 1}
-              </td>
-              <td
-                className="text-center ventas-sale-number"
-                title="Doble clic para ver detalles"
-              >
-                VNT-{sale.idVenta}{" "}
-                {/* Aquí se muestra "VNT-" seguido del número de venta */}
-              </td>
-              <td className="text-center" title="Doble clic para ver detalles">
-                <Badge
-                  pill
-                  className="ventas-branch-badge text-light"
-                  bg={getColorByName(sale.nombreSucursal)}
+                <td
+                  className="text-center ventas-serial-number"
+                  title="Doble clic para ver detalles"
                 >
-                  {sale.nombreSucursal}
-                </Badge>
-              </td>
-              <td
-                className="text-center ventas-user-cell"
-                title="Doble clic para ver detalles"
-              >
-                {sale.nombreUsuario}
-              </td>
-              <td className="text-center" title="Doble clic para ver detalles">
-                <Badge
-                  className={`ventas-status-badge ${
-                    sale.estadoVenta === "C"
-                      ? "ventas-status-completed"
-                      : "ventas-status-pending"
-                  }`}
+                  #{startIndex + index + 1}
+                </td>
+                <td
+                  className="text-center ventas-sale-number"
+                  title="Doble clic para ver detalles"
                 >
-                  {`Q.${sale.totalVenta ? Number(sale.totalVenta).toFixed(2) : '0.00'}`}
-                </Badge>
-              </td>
-              <td
-                className="text-center ventas-sale-date"
-                title="Doble clic para ver detalles"
-              >
-                {formatDateToDisplay(sale.fechaVenta)}
-              </td>
-              <td
-                className="text-center ventas-actions-cell"
-                onDoubleClick={(e) => e.stopPropagation()}
-              >
-                <div className="d-flex justify-content-center gap-2">
-                  <Button
-                    variant="link"
-                    className="ventas-action-btn ventas-pdf-btn"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onViewPdf(sale.idVenta);
-                    }}
-                    onDoubleClick={(e) => e.stopPropagation()}
-                    disabled={loadingViewPdf === sale.idVenta} // Deshabilita el botón mientras se carga
+                  VNT-{sale.idVenta}
+                  {!esHoy && (
+                    <span className="ventas-old-badge">Anterior</span>
+                  )}
+                </td>
+                <td className="text-center" title="Doble clic para ver detalles">
+                  <Badge
+                    pill
+                    className="ventas-branch-badge text-light"
+                    bg={getColorByName(sale.nombreSucursal)}
                   >
-                    {loadingViewPdf === sale.idVenta ? (
-                      <Spinner
-                        as="span"
-                        animation="border"
-                        size="sm"
-                        role="status"
-                        aria-hidden="true"
-                      />
-                    ) : (
-                      <BsFileEarmarkPdf className="action-icon text-primary" />
-                    )}
-                  </Button>
-                  <Button
-                    variant="link"
-                    className="ventas-action-btn ventas-delete-btn"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onDelete(sale.idVenta);
-                    }}
-                    onDoubleClick={(e) => e.stopPropagation()}
+                    {sale.nombreSucursal}
+                  </Badge>
+                </td>
+                <td
+                  className="text-center ventas-user-cell"
+                  title="Doble clic para ver detalles"
+                >
+                  {sale.nombreUsuario}
+                </td>
+                <td className="text-center" title="Doble clic para ver detalles">
+                  <Badge
+                    className={`ventas-status-badge ${
+                      sale.estadoVenta === "C"
+                        ? "ventas-status-completed"
+                        : "ventas-status-pending"
+                    }`}
                   >
-                    <FaTrashAlt className="ventas-action-icon" />
-                  </Button>
-                </div>
-              </td>
-            </tr>
-          ))}
+                    {`Q.${sale.totalVenta ? Number(sale.totalVenta).toFixed(2) : '0.00'}`}
+                  </Badge>
+                </td>
+                <td
+                  className="text-center ventas-sale-date"
+                  title="Doble clic para ver detalles"
+                >
+                  {formatDateToDisplay(sale.fechaVenta)}
+                </td>
+                <td
+                  className="text-center ventas-actions-cell"
+                  onDoubleClick={(e) => e.stopPropagation()}
+                >
+                  <div className="d-flex justify-content-center gap-2">
+                    <Button
+                      variant="link"
+                      className="ventas-action-btn ventas-pdf-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onViewPdf(sale.idVenta);
+                      }}
+                      onDoubleClick={(e) => e.stopPropagation()}
+                      disabled={loadingViewPdf === sale.idVenta}
+                    >
+                      {loadingViewPdf === sale.idVenta ? (
+                        <Spinner
+                          as="span"
+                          animation="border"
+                          size="sm"
+                          role="status"
+                          aria-hidden="true"
+                        />
+                      ) : (
+                        <BsFileEarmarkPdf className="action-icon text-primary" />
+                      )}
+                    </Button>
+                    
+                    <OverlayTrigger
+                      placement="top"
+                      overlay={
+                        <Tooltip>
+                          {esHoy ? "Eliminar venta" : "Solo se pueden eliminar ventas del día actual"}
+                        </Tooltip>
+                      }
+                    >
+                      <span>
+                        <Button
+                          variant="link"
+                          className={`ventas-action-btn ventas-delete-btn ${!esHoy ? 'ventas-delete-disabled' : ''}`}
+                          onClick={(e) => {
+                            if (esHoy) {
+                              e.stopPropagation();
+                              onDelete(sale.idVenta);
+                            }
+                          }}
+                          onDoubleClick={(e) => e.stopPropagation()}
+                          disabled={!esHoy}
+                        >
+                          <FaTrashAlt className={`ventas-action-icon ${!esHoy ? 'text-muted' : ''}`} />
+                        </Button>
+                      </span>
+                    </OverlayTrigger>
+                  </div>
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </Table>
 
