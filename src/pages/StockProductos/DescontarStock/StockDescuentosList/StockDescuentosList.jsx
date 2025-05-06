@@ -17,6 +17,7 @@ import {
 } from "react-icons/fi";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './StockDescuentosList.styles.css';
+import { encryptId } from "../../../../utils/CryptoParams";
 
 const StockDescuentosList = () => {
     const { idSucursal } = useParams();
@@ -81,7 +82,8 @@ const StockDescuentosList = () => {
     };
 
     const handleViewDetails = (idDescuento) => {
-        navigate(`/descuento-stock/descuento-detalle/${encodeURIComponent(idDescuento)}`);
+        const encryptedId = encryptId(idDescuento.toString());
+        navigate(`/descuento-stock/detalle-descuento/${encodeURIComponent(encryptedId)}`);
     };
 
     const toggleFiltros = () => {
