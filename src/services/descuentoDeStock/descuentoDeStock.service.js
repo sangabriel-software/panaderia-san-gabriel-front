@@ -20,11 +20,12 @@ export const consultarGestionDeDescuentoStockService = async (idSucursal) => {
   }
 }
 
-// export const consultarStockProductosDelDiaService = async (idSucursal, fechaDelDia) => {
-//     try {
-//         const response = await api.get(`${getEndpoints.STOCK_DEL_DIA}?idSucursal=${idSucursal}&fecha=${fechaDelDia}`); 
-//         return response.data;
-//     } catch (error) {
-//       throw error;
-//     }
-// }
+export const consultarDetalleDescuentosService = async (idDescuento) => {
+    try {
+        const response = await api.get(`${getEndpoints.DETALLE_DESCUENTOS}/${idDescuento}`); 
+        return response.data;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+}

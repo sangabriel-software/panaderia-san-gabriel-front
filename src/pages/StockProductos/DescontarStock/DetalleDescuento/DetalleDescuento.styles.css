@@ -1,0 +1,363 @@
+:root {
+    --dd-primary: #3b82f6;
+    --dd-primary-light: #eff6ff;
+    --dd-primary-dark: #2563eb;
+    --dd-text: #1f2937;
+    --dd-text-light: #6b7280;
+    --dd-border: #e5e7eb;
+    --dd-bg: #ffffff;
+    --dd-success: #10b981;
+    --dd-error: #ef4444;
+    --dd-warning: #f59e0b;
+    --dd-mayoreo: #8b5cf6;
+    --dd-mal-estado: #f97316;
+    --dd-otros: #64748b;
+    --dd-radius: 8px;
+    --dd-spacing: 1rem;
+    --dd-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    --dd-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --dd-card-bg: #f8fafc;
+}
+
+.dd-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: var(--dd-spacing);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    color: var(--dd-text);
+}
+
+.dd-header {
+    margin-bottom: 2rem;
+    position: relative;
+}
+
+.dd-back-btn {
+    background: var(--dd-primary-light);
+    color: var(--dd-primary);
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: var(--dd-radius);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    margin-bottom: 1.5rem;
+}
+
+.dd-back-btn:hover {
+    background: #e0e7ff;
+    text-decoration: none;
+}
+
+.dd-header-content {
+    display: flex;
+    align-items: center;
+    gap: var(--dd-spacing);
+}
+
+.dd-header-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    background-color: var(--dd-primary-light);
+    border-radius: var(--dd-radius);
+    color: var(--dd-primary);
+    flex-shrink: 0;
+}
+
+.dd-header h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    color: var(--dd-text);
+}
+
+.dd-header p {
+    color: var(--dd-text-light);
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.dd-card {
+    background-color: var(--dd-bg);
+    border-radius: var(--dd-radius);
+    box-shadow: var(--dd-shadow);
+    overflow: hidden;
+    border: 1px solid var(--dd-border);
+}
+
+.dd-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    background-color: var(--dd-card-bg);
+    border-bottom: 1px solid var(--dd-border);
+}
+
+.dd-tipo-badge {
+    padding: 0.35rem 1rem;
+    border-radius: 1rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: white;
+    display: inline-flex;
+    align-items: center;
+}
+
+.dd-tipo-badge.mayoreo {
+    background-color: var(--dd-mayoreo);
+    box-shadow: 0 2px 4px rgba(139, 92, 246, 0.2);
+}
+
+.dd-tipo-badge.mal-estado {
+    background-color: var(--dd-mal-estado);
+    box-shadow: 0 2px 4px rgba(249, 115, 22, 0.2);
+}
+
+.dd-tipo-badge.correccion {
+    background-color: var(--dd-otros);
+    box-shadow: 0 2px 4px rgba(100, 116, 139, 0.2);
+}
+
+.dd-estado {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+}
+
+.dd-estado.active {
+    background-color: #ecfdf5;
+    color: var(--dd-success);
+}
+
+.dd-estado.inactive {
+    background-color: #fef2f2;
+    color: var(--dd-error);
+}
+
+.dd-card-body {
+    padding: 1.5rem;
+}
+
+.dd-info-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.dd-info-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+}
+
+.dd-info-icon {
+    color: var(--dd-primary);
+    font-size: 1.1rem;
+    margin-top: 0.1rem;
+    flex-shrink: 0;
+}
+
+.dd-info-label {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--dd-text-light);
+    margin-bottom: 0.2rem;
+}
+
+.dd-info-value {
+    font-weight: 500;
+    font-size: 0.95rem;
+    color: var(--dd-text);
+}
+
+.dd-products-section {
+    border-top: 1px solid var(--dd-border);
+    padding-top: 1.5rem;
+}
+
+.dd-products-section h3 {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    color: var(--dd-text);
+}
+
+.dd-products-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.dd-product-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background-color: var(--dd-card-bg);
+    border-radius: var(--dd-radius);
+    border: 1px solid var(--dd-border);
+}
+
+.dd-product-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.dd-product-name {
+    font-weight: 500;
+    margin-bottom: 0.2rem;
+}
+
+.dd-product-id {
+    font-size: 0.8rem;
+    color: var(--dd-text-light);
+}
+
+.dd-product-quantity {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 500;
+    color: var(--dd-error);
+}
+
+.dd-minus-icon {
+    color: var(--dd-error);
+}
+
+.dd-loading-screen,
+.dd-error-screen,
+.dd-empty-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 60vh;
+    text-align: center;
+    padding: var(--dd-spacing);
+}
+
+.dd-loading-spinner {
+    width: 48px;
+    height: 48px;
+    border: 3px solid var(--dd-primary-light);
+    border-top-color: var(--dd-primary);
+    border-radius: 50%;
+    animation: dd-spin 1s linear infinite;
+    margin-bottom: 1rem;
+}
+
+@keyframes dd-spin {
+    to { transform: rotate(360deg); }
+}
+
+.dd-error-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background-color: #fef2f2;
+    color: var(--dd-error);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+}
+
+.dd-empty-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background-color: var(--dd-primary-light);
+    color: var(--dd-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+}
+
+/* Responsive styles */
+@media (max-width: 767px) {
+    .dd-container {
+        padding: 0.75rem;
+    }
+    
+    .dd-header {
+        margin-bottom: 1.5rem;
+    }
+    
+    .dd-header h1 {
+        font-size: 1.3rem;
+    }
+    
+    .dd-header p {
+        font-size: 0.85rem;
+    }
+    
+    .dd-card-body {
+        padding: 1rem;
+    }
+    
+    .dd-info-group {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .dd-info-value {
+        font-size: 0.9rem;
+    }
+    
+    .dd-products-section h3 {
+        font-size: 1rem;
+    }
+    
+    .dd-product-item {
+        padding: 0.75rem;
+    }
+    
+    .dd-product-name {
+        font-size: 0.9rem;
+    }
+    
+    .dd-product-id {
+        font-size: 0.75rem;
+    }
+    
+    .dd-product-quantity {
+        font-size: 0.9rem;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+    .dd-container {
+        max-width: 100%;
+        padding: 1.5rem;
+    }
+    
+    .dd-header h1 {
+        font-size: 1.8rem;
+    }
+    
+    .dd-header p {
+        font-size: 1rem;
+    }
+    
+    .dd-card {
+        margin: 0 auto;
+        max-width: 90%;
+    }
+}

@@ -8,7 +8,7 @@ import "./VentasTable.css"; // Importa el CSS personalizado
 import { handleViewDetalleVenta } from "../../../pages/VentasPage/DetalleVenta/DetalleVenta.utils";
 import { BsFileEarmarkPdf } from "react-icons/bs";
 
-const ITEMS_PER_PAGE = 5;
+const ITEMS_PER_PAGE = 10;
 
 const getColorByName = (name) => {
   const COLORS = ["success", "primary", "info"];
