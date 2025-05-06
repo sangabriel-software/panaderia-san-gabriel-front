@@ -689,3 +689,51 @@
         font-size: 1rem;
     }
 }
+
+/* Estilos para el botón deshabilitado */
+.sdl-delete-btn.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Tooltip para el botón deshabilitado */
+.sdl-delete-btn[title]:hover:after {
+    content: attr(title);
+    position: absolute;
+    background-color: var(--sdl-text);
+    color: white;
+    padding: 0.5rem;
+    border-radius: var(--sdl-radius);
+    font-size: 0.8rem;
+    white-space: nowrap;
+    z-index: 100;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-bottom: 0.5rem;
+}
+
+.sdl-delete-btn[title]:hover:before {
+    content: "";
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid var(--sdl-text);
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-bottom: -0.25rem;
+}
+
+/* Badge para descuentos antiguos */
+.sdl-old-discount-badge {
+    font-size: 0.7rem;
+    background-color: var(--sdl-card-bg);
+    color: var(--sdl-text-light);
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--sdl-radius);
+    margin-left: 0.5rem;
+}

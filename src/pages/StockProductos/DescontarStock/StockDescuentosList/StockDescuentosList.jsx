@@ -2,33 +2,16 @@ import { useParams, useNavigate } from "react-router";
 import useGetStockDescontado from "../../../../hooks/DescuentoDeStock/useGetStockDescontado";
 import { useState, useMemo } from "react";
 import { useMediaQuery } from "react-responsive";
-import { 
-  FiTag, 
-  FiCheck, 
-  FiX, 
-  FiTrash2,
-  FiEye,
-  FiXCircle,
-  FiFilter,
-  FiUser,
-  FiMinus,
-  FiChevronRight,
-  FiClock
-} from "react-icons/fi";
+import {FiTag, FiCheck, FiX, FiTrash2, FiEye, FiXCircle, FiFilter, FiUser, FiMinus, FiChevronRight, FiClock} from "react-icons/fi";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './StockDescuentosList.styles.css';
 import { encryptId } from "../../../../utils/CryptoParams";
+import { cancelarDescuentoStockServices } from "../../../../services/descuentoDeStock/descuentoDeStock.service";
 
 const StockDescuentosList = () => {
     const { idSucursal } = useParams();
     const navigate = useNavigate();
-    const { 
-      stockDescontadoList, 
-      loadingStockDescontado, 
-      showErrorStockDescontado,
-      setStockDescontadoList
-    } = useGetStockDescontado(idSucursal);
-    
+    const { stockDescontadoList, loadingStockDescontado, showErrorStockDescontado, setStockDescontadoList } = useGetStockDescontado(idSucursal);
     const [selectedDescuento, setSelectedDescuento] = useState(null);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
@@ -38,6 +21,18 @@ const StockDescuentosList = () => {
     
     const isMobile = useMediaQuery({ maxWidth: 767 });
     const isTablet = useMediaQuery({ minWidth: 768, maxWidth: 991 });
+
+    // Función para verificar si una fecha es hoy
+    const esFechaDeHoy = (fecha) => {
+        const hoy = new Date();
+        const fechaDescuento = new Date(fecha);
+        
+        return (
+            fechaDescuento.getDate() === hoy.getDate() &&
+            fechaDescuento.getMonth() === hoy.getMonth() &&
+            fechaDescuento.getFullYear() === hoy.getFullYear()
+        );
+    };
 
     const descuentosFiltrados = useMemo(() => {
         if (!stockDescontadoList) return [];
@@ -62,14 +57,17 @@ const StockDescuentosList = () => {
     };
 
     const handleDeleteClick = (descuento) => {
-        setSelectedDescuento(descuento);
-        setShowDeleteModal(true);
+        // Solo permitir abrir el modal si el descuento es de hoy
+        if (esFechaDeHoy(descuento.fechaDescuento)) {
+            setSelectedDescuento(descuento);
+            setShowDeleteModal(true);
+        }
     };
 
     const handleDeleteConfirm = async () => {
         setIsDeleting(true);
         try {
-            await eliminarDescuentoService(selectedDescuento.idDescuento);
+            await cancelarDescuentoStockServices(selectedDescuento.idDescuento);
             setStockDescontadoList(
                 stockDescontadoList.filter(d => d.idDescuento !== selectedDescuento.idDescuento)
             );
@@ -235,6 +233,9 @@ const StockDescuentosList = () => {
                             
                             <div className="sdl-item-details">
                                 <span className="sdl-id">ID: #{descuento.idDescuento}</span>
+                                {!esFechaDeHoy(descuento.fechaDescuento) && (
+                                    <span className="sdl-old-discount-badge">Descuento anterior</span>
+                                )}
                             </div>
                         </div>
                         
@@ -247,9 +248,10 @@ const StockDescuentosList = () => {
                                 <FiEye />
                             </button>
                             <button 
-                                className="sdl-action-btn sdl-delete-btn"
+                                className={`sdl-action-btn sdl-delete-btn ${!esFechaDeHoy(descuento.fechaDescuento) ? 'disabled' : ''}`}
                                 onClick={() => handleDeleteClick(descuento)}
-                                title="Eliminar descuento"
+                                title={!esFechaDeHoy(descuento.fechaDescuento) ? "Solo se pueden eliminar descuentos del día actual" : "Eliminar descuento"}
+                                disabled={!esFechaDeHoy(descuento.fechaDescuento)}
                             >
                                 <FiTrash2 />
                             </button>
