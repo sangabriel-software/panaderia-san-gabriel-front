@@ -1,12 +1,20 @@
 import React from "react";
-import { Card, Button, Badge } from "react-bootstrap";
+import { Card, Button, Badge, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { FaCalendarAlt, FaUser, FaInfoCircle, FaTrash } from "react-icons/fa";
-import "./VentasCard.css"; // Importa el CSS
+import "./VentasCard.css";
 import { formatDateToDisplay } from "../../../utils/dateUtils";
+import dayjs from "dayjs";
 
 const VentasCard = ({ sale, onViewDetails, onDeleteSale }) => {
+  // Función para verificar si una venta es de hoy
+  const esVentaDeHoy = (fechaVenta) => {
+    return dayjs(fechaVenta).isSame(dayjs(), 'day');
+  };
+
+  const esHoy = esVentaDeHoy(sale.fechaVenta);
+
   return (
-    <Card className="ventas-card"> {/* Clase personalizada para la tarjeta */}
+    <Card className="ventas-card">
       <Card.Body>
         {/* Encabezado */}
         <div className="ventas-card-header">
@@ -52,7 +60,8 @@ const VentasCard = ({ sale, onViewDetails, onDeleteSale }) => {
           <Button 
             variant="danger" 
             className="ventas-action-btn"
-            onClick={() => onDeleteSale(sale.idVenta)}
+                onClick={() => esHoy && onDeleteSale(sale.idVenta)}
+                disabled={!esHoy}
           >
             <FaTrash className="ventas-btn-icon" />
             Eliminar
