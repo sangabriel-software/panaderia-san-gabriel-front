@@ -47,14 +47,18 @@ const IngresarStockGeneralPage = () => {
     if (productos && (initialStockGeneral || initialStockDelDia)) {
       const initialCurrentStock = {};
       
-      productos.forEach(producto => {
-        if (producto.controlarStock === 1) {
-          const stockGen = initialStockGeneral?.find(item => item.idProducto === producto.idProducto);
+      productos?.forEach(producto => {
+        if (producto?.controlarStock === 1) {
+          const stockGen = Array.isArray(initialStockGeneral) 
+            ? initialStockGeneral.find(item => item.idProducto === producto.idProducto)
+            : null;
           initialCurrentStock[producto.idProducto] = stockGen?.cantidadExistente || 0;
         }
         
-        if (producto.controlarStockDiario === 1) {
-          const stockDia = initialStockDelDia?.find(item => item.idProducto === producto.idProducto);
+        if (producto?.controlarStockDiario === 1) {
+          const stockDia = Array.isArray(initialStockDelDia) 
+            ? initialStockDelDia.find(item => item.idProducto === producto.idProducto)
+            : null;
           initialCurrentStock[producto.idProducto] = stockDia?.cantidadExistente || 0;
         }
       });

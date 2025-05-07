@@ -236,7 +236,7 @@
   }
 }
 
-/* @media (max-width: 767px) {
+@media (max-width: 767px) {
   .excel-table {
     font-size: 0.8rem;
   }
@@ -286,7 +286,7 @@
 
 @media (max-width: 575px) {
   .excel-table {
-    font-size: 0.75rem;
+    font-size: 0.95rem;
   }
   
   .excel-table th, 
@@ -304,17 +304,19 @@
   }
   
   .quantity-input {
-    width: 50px;
+    width: 70px;
     padding: 3px 5px;
-    font-size: 0.75rem;
+    font-size: 0.90rem;
+    text-align: center;
   }
   
   .product-name {
-    font-size: 0.75rem;
+    font-size: 0.95rem;
+    font-weight: bold;
   }
   
   .search-input {
     padding: 0.35rem 0.7rem;
     font-size: 0.85rem;
   }
-} */
+} 
