@@ -1,17 +1,22 @@
-import { useState, useMemo } from "react";
-import { Container, Table, Button, Form, Spinner, Dropdown, } from "react-bootstrap";
+import { useState, useMemo, useEffect } from "react";
+import { Container, Table, Button, Form, Spinner, Dropdown } from "react-bootstrap";
 import DotsMove from "../../../components/Spinners/DotsMove";
 import useGetProductosYPrecios from "../../../hooks/productosprecios/useGetProductosYprecios";
 import SuccessPopup from "../../../components/Popup/SuccessPopup";
 import "./IngresarStockPage.styles.css";
 import { getInitials, getUniqueColor, handleStockChange, handleSubmitGuardarStock } from "./IngresarStock.utils";
-import { BsArrowLeft, BsExclamationTriangleFill, BsFillInfoCircleFill, } from "react-icons/bs";
+import { BsArrowLeft, BsExclamationTriangleFill, BsFillInfoCircleFill } from "react-icons/bs";
 import { useNavigate, useParams } from "react-router-dom";
 import Alert from "../../../components/Alerts/Alert";
 import Title from "../../../components/Title/Title";
 import ErrorPopup from "../../../components/Popup/ErrorPopUp";
 import useGetSucursales from "../../../hooks/sucursales/useGetSucursales";
 import { decryptId } from "../../../utils/CryptoParams";
+import useGetStockGeneral from "../../../hooks/stock/useGetStockGeneral";
+import useGetStockDelDia from "../../../hooks/stock/useGetStockDelDia";
+import { getUserData } from "../../../utils/Auth/decodedata";
+import { currentDate, getCurrentDateTimeWithSeconds } from "../../../utils/dateUtils";
+import { ingresarStockProductos } from "../../../services/stockservices/stock.service";
 
 const IngresarStockGeneralPage = () => {
   const { idSucursal } = useParams();
@@ -19,6 +24,7 @@ const IngresarStockGeneralPage = () => {
   const { productos, loadigProducts, showErrorProductos } = useGetProductosYPrecios();
   const { sucursales, loadingSucursales } = useGetSucursales();
   const [stockValues, setStockValues] = useState({});
+  const [currentStock, setCurrentStock] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [categoriaActiva, setCategoriaActiva] = useState("Todas");
   const [searchTerm, setSearchTerm] = useState("");
@@ -28,18 +34,55 @@ const IngresarStockGeneralPage = () => {
   const [isPopupErrorOpen, setIsPopupErrorOpen] = useState(false);
   const [errorPopupMessage, setErrorPopupMessage] = useState("");
 
-    const decryptedIdSucursal = decryptId(decodeURIComponent(idSucursal));
-    const sucursal = sucursales?.find(item => 
-      Number(item.idSucursal) === Number(decryptedIdSucursal)
-    );
+  const decryptedIdSucursal = decryptId(decodeURIComponent(idSucursal));
+  const sucursal = sucursales?.find(item => 
+    Number(item.idSucursal) === Number(decryptedIdSucursal)
+  );
+
+  const { stockGeneral: initialStockGeneral, loadingStockGeneral } = useGetStockGeneral(idSucursal);
+  const { stockDelDia: initialStockDelDia, loadingStockDiario } = useGetStockDelDia(idSucursal);
+
+  // Efecto para inicializar los valores de stock actual
+  useEffect(() => {
+    if (productos && (initialStockGeneral || initialStockDelDia)) {
+      const initialCurrentStock = {};
+      
+      productos.forEach(producto => {
+        if (producto.controlarStock === 1) {
+          const stockGen = initialStockGeneral?.find(item => item.idProducto === producto.idProducto);
+          initialCurrentStock[producto.idProducto] = stockGen?.cantidadExistente || 0;
+        }
+        
+        if (producto.controlarStockDiario === 1) {
+          const stockDia = initialStockDelDia?.find(item => item.idProducto === producto.idProducto);
+          initialCurrentStock[producto.idProducto] = stockDia?.cantidadExistente || 0;
+        }
+      });
+      
+      setCurrentStock(initialCurrentStock);
+    }
+  }, [productos, initialStockGeneral, initialStockDelDia]);
+
+  // Función para actualizar el stock actual
+  const updateCurrentStock = (newStockValues) => {
+    setCurrentStock(prev => {
+      const updated = {...prev};
+      Object.entries(newStockValues).forEach(([idProducto, cantidad]) => {
+        if (cantidad !== null && !isNaN(cantidad)) {
+          updated[idProducto] = (updated[idProducto] || 0) + parseInt(cantidad);
+        }
+      });
+      return updated;
+    });
+  };
 
   const prodPorHarina = productos?.filter((item) => item.tipoProduccion !== "bandejas");
-  const categorias = [ ...new Set(productos?.map((item) => item.nombreCategoria) || []),];
+  const categorias = [...new Set(productos?.map((item) => item.nombreCategoria) || [])];
 
   const productosFiltrados = useMemo(() => {
-    let filtered = categoriaActiva === "Todas" ? prodPorHarina: prodPorHarina?.filter(
-            (item) => item.nombreCategoria === categoriaActiva
-          );
+    let filtered = categoriaActiva === "Todas" ? prodPorHarina : prodPorHarina?.filter(
+      (item) => item.nombreCategoria === categoriaActiva
+    );
 
     if (searchTerm) {
       filtered = filtered?.filter((producto) =>
@@ -56,10 +99,10 @@ const IngresarStockGeneralPage = () => {
 
   /* Guardar Stock */
   const handleSubmit = async () => {
-    await handleSubmitGuardarStock(stockValues, productos, idSucursal, setIsLoading, setIsPopupOpen, setStockValues, setErrorPopupMessage, setIsPopupErrorOpen);
+    await handleSubmitGuardarStock(stockValues, productos, idSucursal, setIsLoading, setIsPopupOpen, setStockValues, setErrorPopupMessage, setIsPopupErrorOpen, updateCurrentStock);
   };
 
-  if (loadigProducts || loadingSucursales) {
+  if (loadigProducts || loadingSucursales || loadingStockGeneral || loadingStockDiario) {
     return (
       <Container
         className="d-flex justify-content-center align-items-center"
@@ -99,8 +142,8 @@ const IngresarStockGeneralPage = () => {
           </div>
           <div className="col-8">
             <Title
-             title={`Inventario ${sucursal.nombreSucursal}`}
-             />
+              title={`Inventario ${sucursal.nombreSucursal}`}
+            />
           </div>
         </div>
       </div>
@@ -163,10 +206,13 @@ const IngresarStockGeneralPage = () => {
         <Table striped bordered hover className="excel-table">
           <thead>
             <tr>
-              <th className="dark-header text-center" style={{ width: "60%" }}>
+              <th className="dark-header text-center" style={{ width: "40%" }}>
                 Producto
               </th>
-              <th className="dark-header text-center" style={{ width: "40%" }}>
+              <th className="dark-header text-center" style={{ width: "30%" }}>
+                Stock Actual
+              </th>
+              <th className="dark-header text-center" style={{ width: "30%" }}>
                 Cantidad de Unidades
               </th>
             </tr>
@@ -192,6 +238,9 @@ const IngresarStockGeneralPage = () => {
                       </span>
                     </div>
                   </td>
+                  <td className="text-center align-middle" style={{ fontWeight: "bold" }}>
+                    {currentStock[producto.idProducto] || 0}
+                  </td>
                   <td className="text-center align-middle">
                     <Form.Control
                       type="number"
@@ -208,7 +257,7 @@ const IngresarStockGeneralPage = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="2" className="text-center py-4">
+                <td colSpan="3" className="text-center py-4">
                   No hay productos disponibles en esta categoría
                 </td>
               </tr>
@@ -255,10 +304,10 @@ const IngresarStockGeneralPage = () => {
         isOpen={isPopupOpen}
         onClose={() => setIsPopupOpen(false)}
         title="¡Éxito!"
-        message="Se agrego el stock de productos"
+        message="Se agregó el stock de productos"
         nombreBotonVolver="Ver Stock"
         nombreBotonNuevo="Ingreso nuevo"
-        onView={() => navigate(`/stock-productos/stock-general/${idSucursal}`)}
+        onView={() => navigate(`/stock-productos/stock-general/${encodeURI(idSucursal)}`)}
         onNew={() => {
           setIsPopupOpen(false);
         }}

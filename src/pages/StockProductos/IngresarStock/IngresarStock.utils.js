@@ -35,45 +35,44 @@ export const handleStockChange = (idProducto, value, setStockValues ) => {
     }));
   };
 
-export  const handleSubmitGuardarStock = async (stockValues, productos, idSucursal, setIsLoading, setIsPopupOpen, setStockValues, setErrorPopupMessage, setIsPopupErrorOpen) => {
-      setIsLoading(true);
-      const usuario = getUserData();
-      try {
+  export const handleSubmitGuardarStock = async ( stockValues, productos, idSucursal, setIsLoading, setIsPopupOpen, setStockValues, setErrorPopupMessage, setIsPopupErrorOpen, updateCurrentStock ) => {
+    setIsLoading(true);
+    const usuario = getUserData();
+    try {
+      const payload = {
+        stockProductos: Object.entries(stockValues)
+          .filter(([_, value]) => value !== null && !isNaN(value))
+          .map(([idProducto, cantidad]) => {
+            const producto = productos.find(
+              (p) => p.idProducto === parseInt(idProducto)
+            );
   
-        // Crear payload
-        const payload = {
-          stockProductos: Object.entries(stockValues)
-            .filter(([_, value]) => value !== null && !isNaN(value))
-            .map(([idProducto, cantidad]) => {
-              const producto = productos.find(
-                (p) => p.idProducto === parseInt(idProducto)
-              );
+            return {
+              idUsuario: usuario.idUsuario,
+              idProducto: parseInt(idProducto),
+              idSucursal: Number(decryptId(decodeURIComponent(idSucursal))),
+              stock: cantidad,
+              tipoProduccion: producto?.tipoProduccion || "",
+              controlarStock: producto?.controlarStock || 0,
+              controlarStockDiario: producto?.controlarStockDiario || 0,
+              fechaActualizacion: getCurrentDateTimeWithSeconds(),
+              fechaCreacion: currentDate(),
+            };
+          }),
+      };
   
-              return {
-                idUsuario: usuario.idUsuario,
-                idProducto: parseInt(idProducto),
-                idSucursal: Number(decryptId(decodeURIComponent(idSucursal))),
-                stock: cantidad,
-                tipoProduccion: producto?.tipoProduccion || "",
-                controlarStock: producto?.controlarStock || 0,
-                controlarStockDiario: producto?.controlarStockDiario || 0,
-                fechaActualizacion: getCurrentDateTimeWithSeconds(),
-                fechaCreacion: currentDate(),
-              };
-            }),
-        };
-  
-        // Llamada a la API
-        const res = await ingresarStockProductos(payload);
-        if (res.status === 201) {
-          setIsPopupOpen(true);
-          setStockValues({});
-        }
-      } catch (error) {
-        setErrorPopupMessage("Hubo un error al ingresar el stock, vuelve a intentar");
-        setIsPopupErrorOpen(true);
-      } finally {
-        setIsLoading(false);
+      const res = await ingresarStockProductos(payload);
+      if (res.status === 201) {
+        updateCurrentStock(stockValues);
+        setIsPopupOpen(true);
+        setStockValues({});
       }
-};
+    } catch (error) {
+      console.log(error);
+      setErrorPopupMessage("Hubo un error al ingresar el stock, vuelve a intentar");
+      setIsPopupErrorOpen(true);
+    } finally {
+      setIsLoading(false);
+    }
+  };
   
