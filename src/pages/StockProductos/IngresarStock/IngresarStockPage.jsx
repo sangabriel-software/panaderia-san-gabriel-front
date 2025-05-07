@@ -1,11 +1,11 @@
 import { useState, useMemo, useEffect } from "react";
-import { Container, Table, Button, Form, Spinner, Dropdown, } from "react-bootstrap";
+import { Container, Table, Button, Form, Spinner, Dropdown } from "react-bootstrap";
 import DotsMove from "../../../components/Spinners/DotsMove";
 import useGetProductosYPrecios from "../../../hooks/productosprecios/useGetProductosYprecios";
 import SuccessPopup from "../../../components/Popup/SuccessPopup";
 import "./IngresarStockPage.styles.css";
 import { getInitials, getUniqueColor, handleStockChange, handleSubmitGuardarStock } from "./IngresarStock.utils";
-import { BsArrowLeft, BsExclamationTriangleFill, BsFillInfoCircleFill, } from "react-icons/bs";
+import { BsArrowLeft, BsExclamationTriangleFill, BsFillInfoCircleFill } from "react-icons/bs";
 import { useNavigate, useParams } from "react-router-dom";
 import Alert from "../../../components/Alerts/Alert";
 import Title from "../../../components/Title/Title";
@@ -14,6 +14,9 @@ import useGetSucursales from "../../../hooks/sucursales/useGetSucursales";
 import { decryptId } from "../../../utils/CryptoParams";
 import useGetStockGeneral from "../../../hooks/stock/useGetStockGeneral";
 import useGetStockDelDia from "../../../hooks/stock/useGetStockDelDia";
+import { getUserData } from "../../../utils/Auth/decodedata";
+import { currentDate, getCurrentDateTimeWithSeconds } from "../../../utils/dateUtils";
+import { ingresarStockProductos } from "../../../services/stockservices/stock.service";
 
 const IngresarStockGeneralPage = () => {
   const { idSucursal } = useParams();
@@ -45,13 +48,11 @@ const IngresarStockGeneralPage = () => {
       const initialCurrentStock = {};
       
       productos.forEach(producto => {
-        // Buscar en stock general si controlarStock es 1
         if (producto.controlarStock === 1) {
           const stockGen = initialStockGeneral?.find(item => item.idProducto === producto.idProducto);
           initialCurrentStock[producto.idProducto] = stockGen?.cantidadExistente || 0;
         }
         
-        // Buscar en stock diario si controlarStockDiario es 1
         if (producto.controlarStockDiario === 1) {
           const stockDia = initialStockDelDia?.find(item => item.idProducto === producto.idProducto);
           initialCurrentStock[producto.idProducto] = stockDia?.cantidadExistente || 0;
@@ -62,13 +63,26 @@ const IngresarStockGeneralPage = () => {
     }
   }, [productos, initialStockGeneral, initialStockDelDia]);
 
+  // Función para actualizar el stock actual
+  const updateCurrentStock = (newStockValues) => {
+    setCurrentStock(prev => {
+      const updated = {...prev};
+      Object.entries(newStockValues).forEach(([idProducto, cantidad]) => {
+        if (cantidad !== null && !isNaN(cantidad)) {
+          updated[idProducto] = (updated[idProducto] || 0) + parseInt(cantidad);
+        }
+      });
+      return updated;
+    });
+  };
+
   const prodPorHarina = productos?.filter((item) => item.tipoProduccion !== "bandejas");
-  const categorias = [ ...new Set(productos?.map((item) => item.nombreCategoria) || []),];
+  const categorias = [...new Set(productos?.map((item) => item.nombreCategoria) || [])];
 
   const productosFiltrados = useMemo(() => {
     let filtered = categoriaActiva === "Todas" ? prodPorHarina : prodPorHarina?.filter(
-            (item) => item.nombreCategoria === categoriaActiva
-          );
+      (item) => item.nombreCategoria === categoriaActiva
+    );
 
     if (searchTerm) {
       filtered = filtered?.filter((producto) =>
@@ -85,7 +99,7 @@ const IngresarStockGeneralPage = () => {
 
   /* Guardar Stock */
   const handleSubmit = async () => {
-    await handleSubmitGuardarStock(stockValues, productos, idSucursal, setIsLoading, setIsPopupOpen, setStockValues, setErrorPopupMessage, setIsPopupErrorOpen);
+    await handleSubmitGuardarStock(stockValues, productos, idSucursal, setIsLoading, setIsPopupOpen, setStockValues, setErrorPopupMessage, setIsPopupErrorOpen, updateCurrentStock);
   };
 
   if (loadigProducts || loadingSucursales || loadingStockGeneral || loadingStockDiario) {
@@ -128,8 +142,8 @@ const IngresarStockGeneralPage = () => {
           </div>
           <div className="col-8">
             <Title
-             title={`Inventario ${sucursal.nombreSucursal}`}
-             />
+              title={`Inventario ${sucursal.nombreSucursal}`}
+            />
           </div>
         </div>
       </div>
@@ -224,7 +238,7 @@ const IngresarStockGeneralPage = () => {
                       </span>
                     </div>
                   </td>
-                  <td className="text-center align-middle" style={{ fontWeight: "bold", }}>
+                  <td className="text-center align-middle" style={{ fontWeight: "bold" }}>
                     {currentStock[producto.idProducto] || 0}
                   </td>
                   <td className="text-center align-middle">
@@ -290,7 +304,7 @@ const IngresarStockGeneralPage = () => {
         isOpen={isPopupOpen}
         onClose={() => setIsPopupOpen(false)}
         title="¡Éxito!"
-        message="Se agrego el stock de productos"
+        message="Se agregó el stock de productos"
         nombreBotonVolver="Ver Stock"
         nombreBotonNuevo="Ingreso nuevo"
         onView={() => navigate(`/stock-productos/stock-general/${idSucursal}`)}
