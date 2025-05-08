@@ -3,6 +3,7 @@ import { consultarDetalleOrdenPorCriterio } from "../../../services/ordenesprodu
 import { consultarProductosService } from "../../../services/productos/productos.service";
 import { ingresarVentaService } from "../../../services/ventas/ventas.service";
 import { currentDate, getCurrentDateTimeWithSeconds } from "../../../utils/dateUtils";
+import { consultarStockProductosDelDiaService, consultarStockProductosService } from "../../../services/stockservices/stock.service";
 
 // Función para obtener las iniciales de un nombre
 export const getInitials = (name) => {
@@ -54,6 +55,17 @@ const fetchOrden = async (turnoValue, today, sucursalValue) => {
   return resOrden.status === 200 ? resOrden.orden : null;
 };
 
+const fetchStockGeneral = async (sucursalValue) => {
+  const resStockGeneral = await consultarStockProductosService(sucursalValue);
+  return resStockGeneral.status === 200 ? resStockGeneral.stockProductos : [];
+};
+
+const fetchStockDelDia = async (sucursalValue) => {
+  const fechaValidez = currentDate();
+  const resStockDelDia = await consultarStockProductosDelDiaService(sucursalValue, fechaValidez);
+  return resStockDelDia.status === 200 ? resStockDelDia.stockDiario : [];
+};
+
 // Función para consultar los productos
 const fetchProductos = async () => {
   const resProductos = await consultarProductosService();
@@ -95,7 +107,7 @@ const filtrarProductosPanaderia = (productos, detalleOrden) => {
 };
 
 // Función principal para manejar la búsqueda de ventas
-export const handleBuscarVentas = async ( setIsLoading, turnoValue, sucursalValue, setOrden, setProductos, setOrdenYProductos, setShowModal, setErrorPopupMessage, setIsPopupErrorOpen, setHasOrdenes ) => {
+export const handleBuscarVentas = async ( setIsLoading, turnoValue, sucursalValue, setOrden, setProductos, setOrdenYProductos, setShowModal, setErrorPopupMessage, setIsPopupErrorOpen, setHasOrdenes, setStockGeneral, setStockDelDia ) => {
   setIsLoading(true);
   const today = dayjs().format("YYYY-MM-DD");
 
@@ -110,6 +122,11 @@ export const handleBuscarVentas = async ( setIsLoading, turnoValue, sucursalValu
       setHasOrdenes(false);
       return;
     }
+
+    const stockGeneral = await fetchStockGeneral(sucursalValue);
+    const stockDelDia = await fetchStockDelDia(sucursalValue);
+    setStockGeneral(stockGeneral);
+    setStockDelDia(stockDelDia);
 
     // Consultar los productos
     const productos = await fetchProductos();
@@ -128,6 +145,7 @@ export const handleBuscarVentas = async ( setIsLoading, turnoValue, sucursalValu
 
     setShowModal(false); // Cerrar el modal después de la búsqueda
   } catch (error) {
+    console.log(error);
     setErrorPopupMessage("Hubo un error al consultar los recursos");
     setIsPopupErrorOpen(true);
   } finally {

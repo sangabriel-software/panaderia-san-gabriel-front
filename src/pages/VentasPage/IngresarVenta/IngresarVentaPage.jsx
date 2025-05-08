@@ -27,6 +27,8 @@ const IngresarVentaPage = () => {
   const usuario = getUserData();
   const [orden, setOrden] = useState([]);
   const [productos, setProductos] = useState([]);
+  const [stockGeneral, setStockGeneral] = useState([]);
+  const [stockDelDia, setStockDelDia] = useState([]);
   const [ordenYProductos, setOrdenYProductos] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showModal, setShowModal] = useState(true);
@@ -48,7 +50,7 @@ const IngresarVentaPage = () => {
   const { sucursales, loadingSucursales } = useGetSucursales();
 
   // Custom hook para manejar la búsqueda de ventas
-  useBuscarOrden(turnoValue, sucursalValue, setIsLoading, setOrden, setProductos, setOrdenYProductos, setShowModal, setErrorPopupMessage, setIsPopupErrorOpen, setHasOrdenes);
+  useBuscarOrden(turnoValue, sucursalValue, setIsLoading, setOrden, setProductos, setOrdenYProductos, setShowModal, setErrorPopupMessage, setIsPopupErrorOpen, setHasOrdenes, setStockGeneral, setStockDelDia);
 
   // Custom hook para manejar categorías
   const { activeCategory, setActiveCategory, categorias } = useCategoriasActivas(ordenYProductos);
@@ -138,6 +140,8 @@ const IngresarVentaPage = () => {
           productsToShow={productsToShow}
           trayQuantities={trayQuantities}
           setTrayQuantities={setTrayQuantities}
+          stockGeneral={stockGeneral}
+          stockDelDia={stockDelDia}
         />
       )}
 

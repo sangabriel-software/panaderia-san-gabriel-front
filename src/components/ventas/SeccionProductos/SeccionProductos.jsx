@@ -4,15 +4,30 @@ import { filterProductsByName, getInitials, getUniqueColor } from "../../../page
 import "./SeccionProductos.styles.css";
 
 const SeccionProductos = ({ searchTerm, setSearchTerm, categorias, activeCategory, setActiveCategory, ordenYProductos, productsToShow, 
-                            trayQuantities, setTrayQuantities }) => {
+                            trayQuantities, setTrayQuantities, stockGeneral, stockDelDia }) => {
                               
   const [focusedInput, setFocusedInput] = useState(null);
+
+  // Filtrar productos que tienen stock (general o del día)
+  const productosConStock = ordenYProductos.filter(producto => {
+    const hasGeneralStock = stockGeneral?.some(item => item.idProducto === producto.idProducto && item.cantidadExistente > 0);
+    const hasDailyStock = stockDelDia?.some(item => item.idProducto === producto.idProducto && item.cantidadExistente > 0);
+    return hasGeneralStock || hasDailyStock;
+  });
+
+  // Obtener el stock actual de un producto
+  const getCurrentStock = (idProducto) => {
+    const generalStockItem = stockGeneral?.find(item => item.idProducto === idProducto);
+    const dailyStockItem = stockDelDia?.find(item => item.idProducto === idProducto);
+    
+    return (generalStockItem?.cantidadExistente || 0) + (dailyStockItem?.cantidadExistente || 0);
+  };
 
   // Inicializar trayQuantities con 0
   useEffect(() => {
     const initialQuantities = {};
     
-    ordenYProductos.forEach((producto) => {
+    productosConStock.forEach((producto) => {
       if (trayQuantities[producto.idProducto] === undefined) {
         initialQuantities[producto.idProducto] = {
           cantidad: 0,
@@ -24,8 +39,7 @@ const SeccionProductos = ({ searchTerm, setSearchTerm, categorias, activeCategor
     if (Object.keys(initialQuantities).length > 0) {
       setTrayQuantities((prev) => ({ ...prev, ...initialQuantities }));
     }
-  }, [ordenYProductos]);
-  
+  }, [productosConStock]);
 
   const handleFocus = (idProducto) => {
     setFocusedInput(idProducto);
@@ -95,6 +109,10 @@ const SeccionProductos = ({ searchTerm, setSearchTerm, categorias, activeCategor
     }
   };
 
+  // Filtrar productos por nombre y categoría
+  const filteredProducts = filterProductsByName(productosConStock, searchTerm)
+    .filter(producto => activeCategory === "Todas" || producto.nombreCategoria === activeCategory);
+
   return (
     <div className="ventas-products-section mt-4">
       {/* Barra de búsqueda */}
@@ -111,6 +129,14 @@ const SeccionProductos = ({ searchTerm, setSearchTerm, categorias, activeCategor
 
       {/* Selector de categoría */}
       <div className="mb-4 ventas-category-selector">
+        <Button
+          key="Todas"
+          variant={activeCategory === "Todas" ? "primary" : "outline-primary"}
+          onClick={() => setActiveCategory("Todas")}
+          className="ventas-category-btn"
+        >
+          Todas ({filterProductsByName(productosConStock, searchTerm).length})
+        </Button>
         {categorias.map((categoria) => (
           <Button
             key={categoria}
@@ -119,41 +145,46 @@ const SeccionProductos = ({ searchTerm, setSearchTerm, categorias, activeCategor
             className="ventas-category-btn"
           >
             {categoria} (
-            {
-              filterProductsByName(ordenYProductos, searchTerm).filter(
-                (p) => p.nombreCategoria === categoria
-              ).length
-            }
+            {filterProductsByName(productosConStock, searchTerm)
+              .filter(p => p.nombreCategoria === categoria).length}
             )
           </Button>
         ))}
       </div>
 
-      {/* Tabla de productos simplificada */}
-      <div className="ventas-table-responsive">
-        <Table bordered hover className="ventas-products-table">
+      {/* Tabla de productos */}
+      <div className="table-responsive excel-table-container mb-4">
+        <Table striped bordered hover className="excel-table">
           <thead>
             <tr>
-              <th className="ventas-table-header-v text-center">Producto</th>
-              <th className="ventas-table-header-v text-center">
-                {"Unidades no vendidas"}
+              <th className="dark-header text-center" style={{ width: "40%" }}>
+                Producto
+              </th>
+              <th className="dark-header text-center" style={{ width: "30%" }}>
+                Stock Actual
+              </th>
+              <th className="dark-header text-center" style={{ width: "30%" }}>
+                U/F No Vendidas
               </th>
             </tr>
           </thead>
           <tbody>
-            {productsToShow.length > 0 ? (
-              productsToShow.map((producto) => (
+            {filteredProducts.length > 0 ? (
+              filteredProducts.map((producto) => (
                 <tr key={producto.idProducto}>
-                  <td className="text-center align-middle">
-                    <div className="ventas-product-info">
-                      <div 
-                        className="ventas-product-badge"
+                  <td>
+                    <div className="product-info">
+                      <div
+                        className="product-badge-stock"
                         style={{ backgroundColor: getUniqueColor(producto.nombreProducto) }}
                       >
                         {getInitials(producto.nombreProducto)}
                       </div>
-                      <span className="ventas-product-name">{producto.nombreProducto}</span>
+                      <span className="product-name">{producto.nombreProducto}</span>
                     </div>
+                  </td>
+                  <td className="text-center align-middle" style={{ fontWeight: "bold" }}>
+                    {getCurrentStock(producto.idProducto)}
                   </td>
                   <td className="text-center align-middle">
                     {producto.nombreProducto === "Frances" ? (
@@ -163,7 +194,7 @@ const SeccionProductos = ({ searchTerm, setSearchTerm, categorias, activeCategor
                         onChange={(e) => handleInputChange(e, producto)}
                         onFocus={() => handleFocus(producto.idProducto)}
                         onBlur={(e) => handleBlur(producto.idProducto, e.target.value, producto.nombreProducto)}
-                        className="ventas-quantity-input"
+                        className="quantity-input"
                         inputMode="decimal"
                       />
                     ) : (
@@ -175,7 +206,7 @@ const SeccionProductos = ({ searchTerm, setSearchTerm, categorias, activeCategor
                         onChange={(e) => handleInputChange(e, producto)}
                         onFocus={() => handleFocus(producto.idProducto)}
                         onBlur={(e) => handleBlur(producto.idProducto, e.target.value, producto.nombreProducto)}
-                        className="ventas-quantity-input"
+                        className="quantity-input"
                       />
                     )}
                   </td>
@@ -183,9 +214,9 @@ const SeccionProductos = ({ searchTerm, setSearchTerm, categorias, activeCategor
               ))
             ) : (
               <tr>
-                <td colSpan="2" className="text-center py-4">
-                  {ordenYProductos.length === 0 
-                    ? "No hay productos disponibles." 
+                <td colSpan="3" className="text-center py-4">
+                  {productosConStock.length === 0 
+                    ? "No hay productos con stock disponible." 
                     : "No se encontraron productos con ese nombre."}
                 </td>
               </tr>
