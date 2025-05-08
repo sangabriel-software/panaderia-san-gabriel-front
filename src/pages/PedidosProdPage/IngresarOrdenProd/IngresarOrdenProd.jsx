@@ -29,7 +29,7 @@ const IngresarOrdenProd = () => {
     defaultValues: {
       sucursal: "",
       turno: "AM",
-      fechaAProducir: today,
+      fechaAProducir: tomorrow,
       nombrePanadero: "",
     },
   });
@@ -155,7 +155,7 @@ const IngresarOrdenProd = () => {
                             required: "Seleccione una fecha",
                           })}
                           className="form-control modern-datepicker"
-                          min={today}
+                          min={tomorrow}
                         />
                       </InputGroup>
                       {errors.fechaAProducir && (
