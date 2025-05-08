@@ -78,9 +78,6 @@ const VentasTable = ({ sales, onDelete, onViewPdf, loadingViewPdf }) => {
                   title="Doble clic para ver detalles"
                 >
                   VNT-{sale.idVenta}
-                  {!esHoy && (
-                    <span className="ventas-old-badge">Anterior</span>
-                  )}
                 </td>
                 <td className="text-center" title="Doble clic para ver detalles">
                   <Badge
