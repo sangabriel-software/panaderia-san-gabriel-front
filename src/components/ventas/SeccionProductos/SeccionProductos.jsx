@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { Form, Table, Button } from "react-bootstrap";
+import { Form, Table, Button, Alert } from "react-bootstrap";
 import { filterProductsByName, getInitials, getUniqueColor } from "../../../pages/VentasPage/IngresarVenta/IngresarVenta.Utils";
 import "./SeccionProductos.styles.css";
+import { BsExclamationTriangleFill } from "react-icons/bs";
+import ErrorPopup from "../../../components/Popup/ErrorPopUp";
 
 const SeccionProductos = ({ searchTerm, setSearchTerm, categorias, activeCategory, setActiveCategory, ordenYProductos, productsToShow, 
                             trayQuantities, setTrayQuantities, stockGeneral, stockDelDia }) => {
                               
   const [focusedInput, setFocusedInput] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [isPopupErrorOpen, setIsPopupErrorOpen] = useState(false);
 
   // Filtrar productos que tienen stock (general o del día)
   const productosConStock = ordenYProductos.filter(producto => {
@@ -21,6 +25,17 @@ const SeccionProductos = ({ searchTerm, setSearchTerm, categorias, activeCategor
     const dailyStockItem = stockDelDia?.find(item => item.idProducto === idProducto);
     
     return (generalStockItem?.cantidadExistente || 0) + (dailyStockItem?.cantidadExistente || 0);
+  };
+
+  // Formatear el stock para Frances (6 unidades = 1 fila)
+  const formatStock = (producto) => {
+    const stock = getCurrentStock(producto.idProducto);
+    if (producto.nombreProducto === "Frances") {
+      const filas = Math.floor(stock / 6);
+      const unidades = stock % 6;
+      return unidades > 0 ? `${filas}.${unidades}` : `${filas}`;
+    }
+    return stock;
   };
 
   // Inicializar trayQuantities con 0
@@ -43,6 +58,7 @@ const SeccionProductos = ({ searchTerm, setSearchTerm, categorias, activeCategor
 
   const handleFocus = (idProducto) => {
     setFocusedInput(idProducto);
+    setErrorMessage(null);
   };
 
   const handleBlur = (idProducto, value, productoNombre) => {
@@ -58,6 +74,23 @@ const SeccionProductos = ({ searchTerm, setSearchTerm, categorias, activeCategor
       parsedValue = Math.max(0, parsedValue);
     }
 
+    // Validar que no exceda el stock disponible
+    const producto = productosConStock.find(p => p.idProducto === idProducto);
+    const stockDisponible = getCurrentStock(idProducto);
+    let cantidadIngresada = parsedValue;
+
+    if (productoNombre === "Frances") {
+      // Convertir filas a unidades (1 fila = 6 unidades)
+      cantidadIngresada = Math.floor(parsedValue) * 6 + Math.round((parsedValue % 1) * 10);
+    }
+
+    if (cantidadIngresada > stockDisponible) {
+      const mensajeError = `No hay suficiente ${productoNombre} en stock. Stock disponible: ${formatStock(producto)} ${productoNombre === "Frances" ? "filas" : "unidades"}`;
+      setErrorMessage(mensajeError);
+      setIsPopupErrorOpen(true);
+      return;
+    }
+
     setTrayQuantities({
       ...trayQuantities,
       [idProducto]: {
@@ -68,21 +101,31 @@ const SeccionProductos = ({ searchTerm, setSearchTerm, categorias, activeCategor
     setFocusedInput(null);
   };
 
-  const getInputValue = (producto) => {
-    const cantidad = trayQuantities[producto.idProducto]?.cantidad ?? 0;
-
-    if (focusedInput === producto.idProducto) {
-      return cantidad === 0 ? "" : cantidad.toString();
-    } else {
-      return producto.nombreProducto === "Frances" 
-        ? cantidad.toString() 
-        : Math.floor(cantidad).toString();
-    }
-  };
-
   const handleInputChange = (e, producto) => {
     const value = e.target.value;
     const isFrances = producto.nombreProducto === "Frances";
+    
+    // Validación en tiempo real para Frances (no más de un decimal)
+    if (isFrances && value.includes('.') && value.split('.')[1]?.length > 1) {
+      return; // No actualizamos el estado si tiene más de un decimal
+    }
+    
+    // Validación en tiempo real para no exceder el stock
+    const productoCompleto = productosConStock.find(p => p.idProducto === producto.idProducto);
+    const stockDisponible = getCurrentStock(producto.idProducto);
+    
+    if (value !== "") {
+      let cantidadIngresada = isFrances ? 
+        Math.floor(parseFloat(value)) * 6 + Math.round((parseFloat(value) % 1) * 10) :
+        parseInt(value, 10);
+      
+      if (cantidadIngresada > stockDisponible) {
+        const mensajeError = `No hay suficiente ${producto.nombreProducto} en stock. Stock disponible: ${formatStock(productoCompleto)} ${isFrances ? "filas" : "unidades"}`;
+        setErrorMessage(mensajeError);
+        setIsPopupErrorOpen(true);
+        return;
+      }
+    }
     
     if (isFrances) {
       // Permitir decimales para Frances
@@ -106,6 +149,18 @@ const SeccionProductos = ({ searchTerm, setSearchTerm, categorias, activeCategor
           },
         });
       }
+    }
+  };
+
+  const getInputValue = (producto) => {
+    const cantidad = trayQuantities[producto.idProducto]?.cantidad ?? 0;
+
+    if (focusedInput === producto.idProducto) {
+      return cantidad === 0 ? "" : cantidad.toString();
+    } else {
+      return producto.nombreProducto === "Frances" 
+        ? cantidad.toString() 
+        : Math.floor(cantidad).toString();
     }
   };
 
@@ -170,48 +225,53 @@ const SeccionProductos = ({ searchTerm, setSearchTerm, categorias, activeCategor
           </thead>
           <tbody>
             {filteredProducts.length > 0 ? (
-              filteredProducts.map((producto) => (
-                <tr key={producto.idProducto}>
-                  <td>
-                    <div className="product-info">
-                      <div
-                        className="product-badge-stock"
-                        style={{ backgroundColor: getUniqueColor(producto.nombreProducto) }}
-                      >
-                        {getInitials(producto.nombreProducto)}
+              filteredProducts.map((producto) => {
+                const esFrances = producto.nombreProducto === "Frances";
+                const stockFormateado = formatStock(producto);
+                
+                return (
+                  <tr key={producto.idProducto}>
+                    <td>
+                      <div className="product-info">
+                        <div
+                          className="product-badge-stock"
+                          style={{ backgroundColor: getUniqueColor(producto.nombreProducto) }}
+                        >
+                          {getInitials(producto.nombreProducto)}
+                        </div>
+                        <span className="product-name">{producto.nombreProducto}</span>
                       </div>
-                      <span className="product-name">{producto.nombreProducto}</span>
-                    </div>
-                  </td>
-                  <td className="text-center align-middle" style={{ fontWeight: "bold" }}>
-                    {getCurrentStock(producto.idProducto)}
-                  </td>
-                  <td className="text-center align-middle">
-                    {producto.nombreProducto === "Frances" ? (
-                      <Form.Control
-                        type="text"
-                        value={getInputValue(producto)}
-                        onChange={(e) => handleInputChange(e, producto)}
-                        onFocus={() => handleFocus(producto.idProducto)}
-                        onBlur={(e) => handleBlur(producto.idProducto, e.target.value, producto.nombreProducto)}
-                        className="quantity-input"
-                        inputMode="decimal"
-                      />
-                    ) : (
-                      <Form.Control
-                        type="number"
-                        min="0"
-                        step="1"
-                        value={getInputValue(producto)}
-                        onChange={(e) => handleInputChange(e, producto)}
-                        onFocus={() => handleFocus(producto.idProducto)}
-                        onBlur={(e) => handleBlur(producto.idProducto, e.target.value, producto.nombreProducto)}
-                        className="quantity-input"
-                      />
-                    )}
-                  </td>
-                </tr>
-              ))
+                    </td>
+                    <td className="text-center align-middle" style={{ fontWeight: "bold" }}>
+                      {stockFormateado}
+                    </td>
+                    <td className="text-center align-middle">
+                      {esFrances ? (
+                        <Form.Control
+                          type="text"
+                          value={getInputValue(producto)}
+                          onChange={(e) => handleInputChange(e, producto)}
+                          onFocus={() => handleFocus(producto.idProducto)}
+                          onBlur={(e) => handleBlur(producto.idProducto, e.target.value, producto.nombreProducto)}
+                          className="quantity-input"
+                          inputMode="decimal"
+                        />
+                      ) : (
+                        <Form.Control
+                          type="number"
+                          min="0"
+                          step="1"
+                          value={getInputValue(producto)}
+                          onChange={(e) => handleInputChange(e, producto)}
+                          onFocus={() => handleFocus(producto.idProducto)}
+                          onBlur={(e) => handleBlur(producto.idProducto, e.target.value, producto.nombreProducto)}
+                          className="quantity-input"
+                        />
+                      )}
+                    </td>
+                  </tr>
+                );
+              })
             ) : (
               <tr>
                 <td colSpan="3" className="text-center py-4">
@@ -224,6 +284,14 @@ const SeccionProductos = ({ searchTerm, setSearchTerm, categorias, activeCategor
           </tbody>
         </Table>
       </div>
+
+      {/* Popup de error */}
+      <ErrorPopup
+        isOpen={isPopupErrorOpen}
+        onClose={() => setIsPopupErrorOpen(false)}
+        title="¡Error!"
+        message={errorMessage}
+      />
     </div>
   );
 };
