@@ -18,7 +18,7 @@ import SeccionProductos from "../../../components/ventas/SeccionProductos/Seccio
 import ErrorPopup from "../../../components/Popup/ErrorPopUp";
 import SuccessPopup from "../../../components/Popup/SuccessPopup";
 import ModalVentaEsperada from "../../../components/ventas/ModalVentaEsperada/ModalVentaEsperada";
-
+import ModalGastos from "../../../components/ventas/ModalGastos/ModalGastos";
 
 const IngresarVentaPage = () => {
   const [isPopupErrorOpen, setIsPopupErrorOpen] = useState(false);
@@ -34,11 +34,12 @@ const IngresarVentaPage = () => {
   const [showModal, setShowModal] = useState(true);
   const [hasOrdenes, setHasOrdenes] = useState(true);
   const [showVentaEsperadaModal, setShowVentaEsperadaModal] = useState(false);
+  const [showGastosModal, setShowGastosModal] = useState(false);
   const [showSalesSummary, setShowSalesSummary] = useState(false);
   const [ventaTotal, setVentaTotal] = useState(0);
-  const [ventaReal, setVentaReal] = useState(null); // Estado para la venta real
+  const [ventaReal, setVentaReal] = useState(null);
+  const [gastos, setGastos] = useState([]);
   const navigate = useNavigate();
-
 
   const { register, watch, setValue, formState: { errors }, reset } = useForm({ defaultValues: { turno: "AM", sucursal: "" } });
   const turnoValue = watch("turno");
@@ -66,15 +67,38 @@ const IngresarVentaPage = () => {
 
   // Guardar Venta
   const handleGuardarVentaWrapper = async () => {
-    await handleGuardarVenta(setIsLoading, orden, sucursalValue, usuario, productos, trayQuantities, setShowSalesSummary,
-      navigate, setErrorPopupMessage, setIsPopupErrorOpen, setIsPopupSuccessOpen, reset, setTrayQuantities, ventaReal, turnoValue);
+    await handleGuardarVenta(
+      setIsLoading,
+      orden,
+      sucursalValue,
+      usuario,
+      productos,
+      trayQuantities,
+      setShowSalesSummary,
+      navigate,
+      setErrorPopupMessage,
+      setIsPopupErrorOpen,
+      setIsPopupSuccessOpen,
+      reset,
+      setTrayQuantities,
+      ventaReal,
+      turnoValue,
+      gastos
+    );
   };
 
   // Manejar la acción de continuar desde el modal de venta esperada
   const handleContinuarVentaEsperada = (ventaReal) => {
-    setVentaReal(ventaReal); // Guardar la venta real en el estado
-    setShowVentaEsperadaModal(false); // Cierra el modal de venta esperada
-    setShowSalesSummary(true); // Abre el modal de SalesSummary
+    setVentaReal(ventaReal);
+    setShowVentaEsperadaModal(false);
+    setShowGastosModal(true);
+  };
+
+  // Manejar la acción de continuar desde el modal de gastos
+  const handleContinuarConGastos = (gastosRegistrados) => {
+    setGastos(gastosRegistrados);
+    setShowGastosModal(false);
+    setShowSalesSummary(true);
   };
 
   return (
@@ -100,6 +124,13 @@ const IngresarVentaPage = () => {
         handleClose={() => setShowVentaEsperadaModal(false)}
         onContinue={handleContinuarVentaEsperada}
         ventaTotal={ventaTotal}
+      />
+
+      {/* Modal de Gastos */}
+      <ModalGastos
+        show={showGastosModal}
+        handleClose={() => setShowGastosModal(false)}
+        onContinue={handleContinuarConGastos}
       />
 
       {/* Encabezado */}
@@ -160,7 +191,8 @@ const IngresarVentaPage = () => {
         sucursales={sucursales}
         isLoading={isLoading}
         onConfirm={handleGuardarVentaWrapper}
-        ventaReal={ventaReal} // Pasar la venta real a SalesSummary
+        ventaReal={ventaReal}
+        gastos={gastos}
       />
 
       {/* Popup de Éxito */}
@@ -176,6 +208,7 @@ const IngresarVentaPage = () => {
           setShowModal(true);
           setIsPopupSuccessOpen(false);
           reset();
+          setGastos([]);
         }}
       />
 

@@ -254,10 +254,33 @@ const crearPayloadDetalleIngreso = (montoTotalIngresado, fechaActual) => {
   return detalleingreso;
 }
 
+const construirPayloadGastos = (gastos, usuario) => {
+  // Calcular el monto total sumando todos los subtotales
+  const montoTotal = gastos.reduce((total, gasto) => total + gasto.subtotal, 0);
+  
+  // Obtener la fecha actual en formato YYYY-MM-DD
+  const fechaIngreso = dayjs().format('YYYY-MM-DD');
+  
+  // Construir el payload
+  const payload = {
+    encabezadoGastosDiarios: {
+      idUsuario: usuario.idUsuario, // Asume que el objeto usuario tiene idUsuario
+      montoTotalGasto: montoTotal,
+      fechaIngreso: fechaIngreso
+    },
+    detalleGastosDiarios: gastos.map(gasto => ({
+      detalleGasto: gasto.detalleGasto,
+      subTotal: gasto.subtotal
+    }))
+  };
+  
+  return payload;
+};
 
 // IngresarVenta.utils.js
-export const handleGuardarVenta = async (setIsLoading, orden, sucursalValue, usuario, productos, trayQuantities, setShowSalesSummary, navigate, setErrorPopupMessage, setIsPopupErrorOpen, setIsPopupSuccessOpen, reset, setTrayQuantities, ventaReal, turnoValue) => {
+export const handleGuardarVenta = async (setIsLoading, orden, sucursalValue, usuario, productos, trayQuantities, setShowSalesSummary, navigate, setErrorPopupMessage, setIsPopupErrorOpen, setIsPopupSuccessOpen, reset, setTrayQuantities, ventaReal, turnoValue, gastos) => {
   setIsLoading(true);
+
 
   const fechaActual = dayjs().format("YYYY-MM-DD");
 
@@ -270,13 +293,16 @@ export const handleGuardarVenta = async (setIsLoading, orden, sucursalValue, usu
   // Crear el detalle de la venta
   const detalleVenta = crearDetalleVenta(productos, trayQuantities, orden, fechaActual);
 
-  const detalleIngreso = crearPayloadDetalleIngreso(ventaReal, fechaActual); 
+  const detalleIngreso = crearPayloadDetalleIngreso(ventaReal, fechaActual);
+  
+  const gastosDiarios = gastos.length > 0 ? construirPayloadGastos(gastos, usuario) : null;
 
   // Construir el payload
   const payload = {
     encabezadoVenta,
     detalleVenta,
     detalleIngreso,
+    gastosDiarios: gastosDiarios ? gastosDiarios : {},
   };
 
   try {
