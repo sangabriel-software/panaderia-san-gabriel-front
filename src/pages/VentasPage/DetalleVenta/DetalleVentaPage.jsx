@@ -13,8 +13,7 @@ import DotsMove from "../../../components/Spinners/DotsMove";
 const DetalleVentaPage = () => {
   const { idVenta } = useParams();
   const decryptedIdVenta = decryptId(decodeURIComponent(idVenta));
-  const { detalleVenta, loadingDetalleVenta, showErrorDetalleVenta, showInfoDetalleVenta } =
-    useGetDetalleVenta(decryptedIdVenta);
+  const { detalleVenta, loadingDetalleVenta, showErrorDetalleVenta, showInfoDetalleVenta } = useGetDetalleVenta(decryptedIdVenta);
   const navigate = useNavigate();
 
   // Detectar si es un dispositivo móvil

@@ -13,6 +13,8 @@ import {
   BsCheckCircle,
   BsXCircle,
   BsDownload,
+  BsCashStack,
+  BsPlusCircle
 } from "react-icons/bs";
 
 const DesktopVentaDetalle = ({ venta, onDownloadXLS, onDownloadPDF }) => {
@@ -20,13 +22,8 @@ const DesktopVentaDetalle = ({ venta, onDownloadXLS, onDownloadPDF }) => {
   const detallesVenta = venta?.detalleVenta;
   const detalleIngresos = venta?.detalleIngresos;
 
-  console.log(encabezadoVenta)
-
   return (
-    <Container
-      fluid
-      className="p-0"
-    >
+    <Container fluid className="p-0">
       {/* Encabezado */}
       <DesktopHeader
         encabezadoVenta={encabezadoVenta}
@@ -37,7 +34,7 @@ const DesktopVentaDetalle = ({ venta, onDownloadXLS, onDownloadPDF }) => {
       {/* Tabla de Productos */}
       <OrderTable productos={detallesVenta} />
 
-      {/* Balance */}
+      {/* Balance Financiero */}
       <Balance detalleIngresos={detalleIngresos} />
     </Container>
   );
@@ -212,8 +209,9 @@ const Balance = ({ detalleIngresos }) => {
     return `Q ${parseFloat(value).toFixed(2)}`;
   };
 
-  const diferenciaColor =
-    detalleIngresos?.diferencia >= 0 ? "success" : "danger";
+  const ventaReal = (detalleIngresos?.montoTotalIngresado || 0) + (detalleIngresos?.montoTotalGastos || 0);
+  const diferencia = ventaReal - (detalleIngresos?.montoEsperado || 0);
+  const diferenciaColor = diferencia >= 0 ? "success" : "danger";
 
   return (
     <Card
@@ -225,29 +223,61 @@ const Balance = ({ detalleIngresos }) => {
       }}
     >
       <Card.Body className="p-3">
-        <h5 className="mb-3 fw-bold text-dark">Balance</h5>
+        <h5 className="mb-3 fw-bold text-dark">Balance Financiero</h5>
         <Row>
           <Col md={12}>
-            <div className="d-flex flex-column gap-1">
-            <div className="d-flex align-items-center gap-3">
-                <BsWallet size={16} style={{ color: "#4ECDC4" }} />
-                <span className="text-secondary">Monto Ingresado:</span>
+            <div className="d-flex flex-column gap-2">
+              <div className="d-flex justify-content-between align-items-center">
+                <div className="d-flex align-items-center gap-2">
+                  <BsWallet size={18} style={{ color: "#4ECDC4" }} />
+                  <span className="text-secondary">Monto Ingresado:</span>
+                </div>
                 <span className="fw-bold text-dark">
                   {formatCurrency(detalleIngresos?.montoTotalIngresado)}
                 </span>
               </div>
-              <div className="d-flex align-items-center gap-3">
-                <BsCash size={16} style={{ color: "#4ECDC4" }} />
-                <span className="text-secondary ">{`Monto Esperado:`}</span>
+
+              <div className="d-flex justify-content-between align-items-center">
+                <div className="d-flex align-items-center gap-2">
+                  <BsCashStack size={18} style={{ color: "#FF6B6B" }} />
+                  <span className="text-secondary">Gastos del Turno:</span>
+                </div>
+                <span className="fw-bold text-danger">
+                  {formatCurrency(detalleIngresos?.montoTotalGastos)}
+                </span>
+              </div>
+
+              <div className="d-flex justify-content-between align-items-center bg-light p-2 rounded">
+                <div className="d-flex align-items-center gap-2">
+                  <BsPlusCircle size={18} style={{ color: "#4ECDC4" }} />
+                  <span className="fw-semibold">Venta Real del Turno:</span>
+                </div>
+                <span className="fw-bold text-primary">
+                  {formatCurrency(ventaReal)}
+                </span>
+              </div>
+
+              <hr className="my-1" />
+
+              <div className="d-flex justify-content-between align-items-center">
+                <div className="d-flex align-items-center gap-2">
+                  <BsCash size={18} style={{ color: "#4ECDC4" }} />
+                  <span className="text-secondary">Venta Esperada:</span>
+                </div>
                 <span className="fw-bold text-dark">
                   {formatCurrency(detalleIngresos?.montoEsperado)}
                 </span>
               </div>
-              <div className="d-flex align-items-center gap-2">
-                <BsDashCircle size={16} style={{ color: "#FF6B6B" }} />
-                <span className="text-secondary">Diferencia:</span>
-                <Badge bg={diferenciaColor} className="px-2 py-1">
-                  {formatCurrency(detalleIngresos?.diferencia)}
+
+              <hr className="my-1" />
+
+              <div className="d-flex justify-content-between align-items-center">
+                <div className="d-flex align-items-center gap-2">
+                  <BsDashCircle size={18} style={{ color: diferenciaColor }} />
+                  <span className="fw-semibold">Diferencia:</span>
+                </div>
+                <Badge bg={diferenciaColor} className="px-3 py-1">
+                  {formatCurrency(diferencia)}
                 </Badge>
               </div>
             </div>
