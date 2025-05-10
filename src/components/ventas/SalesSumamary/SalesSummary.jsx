@@ -1,6 +1,6 @@
 import React from "react";
 import { Modal, Button, Table, Spinner } from "react-bootstrap";
-import { BsCheckCircle, BsBoxSeam, BsClock, BsShop, BsPerson, BsCash } from "react-icons/bs";
+import { BsCheckCircle, BsBoxSeam, BsClock, BsShop, BsPerson, BsCash, BsCashStack } from "react-icons/bs";
 import styled from "styled-components";
 import { formatDateToDisplay } from "../../../utils/dateUtils";
 
@@ -50,8 +50,8 @@ const StyledModal = styled(Modal)`
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    width: 80%; // Reducir el ancho de la tabla
-    margin: 0 auto; // Centrar la tabla
+    width: 80%;
+    margin: 0 auto;
     
     th {
       background: #f8f9fa;
@@ -76,9 +76,14 @@ const StyledModal = styled(Modal)`
       margin-right: 6px;
     }
   }
+
+  .total-row {
+    font-weight: bold;
+    background-color: #f8f9fa !important;
+  }
 `;
 
-const SalesSummary = ({ show, handleClose, orderData, trayQuantities, productos, sucursales, isLoading, onConfirm, ventaReal }) => {
+const SalesSummary = ({ show, handleClose, orderData, trayQuantities, productos, sucursales, isLoading, onConfirm, ventaReal, gastos }) => {
   // Función para obtener el nombre del producto basado en el idProducto
   const getProductName = (idProducto) => {
     const product = productos.find((p) => p.idProducto === idProducto);
@@ -118,6 +123,11 @@ const SalesSummary = ({ show, handleClose, orderData, trayQuantities, productos,
     (producto) => producto.cantidadNoVendida === 0
   );
 
+  // Calcular total de gastos
+  const totalGastos = gastos.reduce((sum, gasto) => sum + gasto.subtotal, 0);
+  // Calcular venta neta
+  const ventaNeta = ventaReal ? ventaReal + totalGastos : 0;
+
   return (
     <StyledModal show={show} onHide={handleClose} centered size="lg">
       <Modal.Header closeButton>
@@ -145,7 +155,7 @@ const SalesSummary = ({ show, handleClose, orderData, trayQuantities, productos,
           <div className="detail-item">
             <BsBoxSeam />
             <span>
-              <strong>Fecha Producción:</strong>{" "}
+              <strong>Fecha Venta:</strong>{" "}
               {formatDateToDisplay(orderData.fechaAProducir)}
             </span>
           </div>
@@ -165,6 +175,60 @@ const SalesSummary = ({ show, handleClose, orderData, trayQuantities, productos,
             <span>
               <strong>Monto Total:</strong> Q.{ventaReal ? ventaReal.toFixed(2) : "0.00"}
             </span>
+          </div>
+        </div>
+
+        {/* Sección de Gastos */}
+        <div className="mb-4">
+          <h5 className="mb-3 fw-semibold text-primary">Gastos del Turno</h5>
+          {gastos.length > 0 ? (
+            <div className="table-responsive">
+              <Table hover>
+                <thead>
+                  <tr>
+                    <th>Detalle</th>
+                    <th className="text-end">Monto (Q)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {gastos.map((gasto, index) => (
+                    <tr key={index}>
+                      <td>{gasto.detalleGasto}</td>
+                      <td className="text-end">Q{gasto.subtotal.toFixed(2)}</td>
+                    </tr>
+                  ))}
+                  <tr className="total-row">
+                    <td>Total Gastos</td>
+                    <td className="text-end">Q{totalGastos.toFixed(2)}</td>
+                  </tr>
+                </tbody>
+              </Table>
+            </div>
+          ) : (
+            <p className="text-center text-muted">No se registraron gastos</p>
+          )}
+        </div>
+
+        {/* Resumen Financiero */}
+        <div className="mb-4">
+          <h5 className="mb-3 fw-semibold text-primary">Resumen Financiero</h5>
+          <div className="table-responsive">
+            <Table bordered>
+              <tbody>
+                <tr>
+                  <td><strong>Venta Total</strong></td>
+                  <td className="text-end">Q{ventaReal ? ventaReal.toFixed(2) : "0.00"}</td>
+                </tr>
+                <tr>
+                  <td><strong>Total Gastos</strong></td>
+                  <td className="text-end">Q{totalGastos.toFixed(2)}</td>
+                </tr>
+                <tr className="table-active">
+                  <td><strong>Venta Neta</strong></td>
+                  <td className="text-end fw-bold">Q{ventaNeta.toFixed(2)}</td>
+                </tr>
+              </tbody>
+            </Table>
           </div>
         </div>
 
@@ -202,7 +266,7 @@ const SalesSummary = ({ show, handleClose, orderData, trayQuantities, productos,
             <thead>
               <tr>
                 <th>Producto</th>
-                <th className="text-end">Cantidad vendida</th>
+                <th className="text-end">Unidades no vendidas</th>
               </tr>
             </thead>
             <tbody>
@@ -243,7 +307,7 @@ const SalesSummary = ({ show, handleClose, orderData, trayQuantities, productos,
             </>
           ) : (
             "Confirmar y Guardar"
-          )}{" "}
+          )}
         </Button>
       </Modal.Footer>
     </StyledModal>
