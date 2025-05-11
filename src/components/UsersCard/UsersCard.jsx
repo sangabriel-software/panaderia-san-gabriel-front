@@ -223,7 +223,7 @@ const UsersCard = ({
               className="btn btn-light w-100 text-start mb-1"
               onClick={(e) => handleOptionClick("modify", e)}
               style={{ color: "#0d6efd" }}
-              disabled={role === "Admin" || !role}
+              disabled={username === "admin" || !username}
             >
               <FaEdit className="me-2" />
               Modificar
@@ -232,7 +232,7 @@ const UsersCard = ({
               className="btn btn-light w-100 text-start mb-1"
               onClick={(e) => handleOptionClick("delete", e)}
               style={{ color: "#dc3545" }}
-              disabled={role === "Admin" || !role}
+              disabled={username === "admin" || !username}
             >
               <FaTrash className="me-2" />
               Eliminar
@@ -240,7 +240,7 @@ const UsersCard = ({
             <button
               className="btn btn-light w-100 text-start fw-b"
               onClick={(e) => handleOptionClick("block", e)}
-              disabled={role === "Admin" || !role}
+              disabled={username === "admin" || !username}
               style={{
                 color:
                   status === "Activo" || status === "A" ? "#FF9800" : "#0d6efd",

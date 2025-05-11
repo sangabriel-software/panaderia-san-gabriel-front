@@ -10,3 +10,139 @@
   background-color: #0f4d8b; /* Fondo al pasar el cursor */
   color: #fefefe;
 }
+
+/* Estilos personalizados para el modal de modificación de usuario */
+.user-modal-container {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.user-modal-container .user-modal-content {
+  border-radius: 12px;
+  border: none;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+  background-color: #ffffff;
+}
+
+.user-modal-container .user-modal-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+  border-radius: 12px 12px 0 0;
+  padding: 1.2rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.user-modal-container .user-modal-title {
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 1.4rem;
+  margin: 0;
+}
+
+.user-modal-container .user-modal-body {
+  padding: 1.5rem;
+}
+
+.user-modal-container .user-modal-label {
+  font-weight: 500;
+  color: #495057;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.user-modal-container .user-modal-label.required::after {
+  content: ' *';
+  color: #dc3545;
+}
+
+.user-modal-container .user-modal-input {
+  border-radius: 8px;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid #ced4da;
+  transition: all 0.3s;
+  width: 100%;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #495057;
+  background-color: #fff;
+}
+
+.user-modal-container .user-modal-input:focus {
+  border-color: #80bdff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.1);
+  outline: none;
+}
+
+.user-modal-container .user-modal-input[readonly] {
+  background-color: #f8f9fa;
+  opacity: 1;
+}
+
+.user-modal-container .user-modal-select {
+  border-radius: 8px;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid #ced4da;
+  transition: all 0.3s;
+  width: 100%;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #495057;
+  background-color: #fff;
+}
+
+.user-modal-container .user-modal-select:disabled {
+  background-color: #e9ecef;
+  opacity: 1;
+}
+
+.user-modal-container .user-modal-footer {
+  border-top: 1px solid #e9ecef;
+  padding: 1.2rem 1.5rem;
+  background-color: #f8f9fa;
+  border-radius: 0 0 12px 12px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.user-modal-container .user-modal-btn {
+  padding: 0.5rem 1.25rem;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 1rem;
+  line-height: 1.5;
+  cursor: pointer;
+  transition: all 0.3s;
+  border: none;
+}
+
+.user-modal-container .user-modal-btn-cancel {
+  background-color: #f1f1f1;
+  color: #495057;
+}
+
+.user-modal-container .user-modal-btn-cancel:hover {
+  background-color: #e2e6ea;
+}
+
+.user-modal-container .user-modal-btn-save {
+  background-color: #3a7bd5;
+  color: white;
+}
+
+.user-modal-container .user-modal-btn-save:hover {
+  background-color: #2c5fb3;
+}
+
+.user-modal-container .user-modal-loading-text {
+  color: #6c757d;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+.user-modal-container .user-modal-error-text {
+  color: #dc3545;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
