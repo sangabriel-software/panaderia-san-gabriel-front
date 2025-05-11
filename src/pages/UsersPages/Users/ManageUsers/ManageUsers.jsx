@@ -87,7 +87,7 @@ function ManageUsers() {
     }));
   };
 
-  // Guarda los cambios del usuario
+  // Guarda los cambios del usuario y actualiza la card
   const handleSaveChanges = async () => {
     try {
       // Validación básica de campos requeridos
@@ -110,14 +110,20 @@ function ManageUsers() {
       // Llamada al servicio de actualización
       await actualizardatosUsuarioServices(payload);
       
-      // Actualiza el usuario en el estado local
+      // Encontrar el rol seleccionado para obtener su nombre
+      const rolSeleccionado = roles.find(r => r.idRol == payload.idRol);
+      
+      // Actualiza el usuario en el estado local con todos los datos necesarios para la card
       setUsuarios(prev => prev.map(u => 
         u.idUsuario === selectedUser.idUsuario ? { 
           ...u, 
           nombreUsuario: `${payload.nombreUsuario} ${payload.apellidoUsuario}`.trim(),
+          usuario: payload.usuario,
           correoUsuario: payload.correoUsuario,
           idRol: payload.idRol,
-          nombreRol: roles.find(r => r.idRol === payload.idRol)?.nombreRol || u.nombreRol
+          nombreRol: rolSeleccionado?.nombreRol || u.nombreRol,
+          // Mantener otros campos que puedan existir en el objeto usuario
+          ...(u.estadoUsuario && { estadoUsuario: u.estadoUsuario })
         } : u
       ));
       
@@ -126,7 +132,6 @@ function ManageUsers() {
       setSelectedUser(null);
       
     } catch (error) {
-      console.error("Error al actualizar usuario:", error);
       setErrorPopupMessage(error.response?.data?.message || "Error al actualizar el usuario. Por favor, intente nuevamente.");
       setIsPopupErrorOpen(true);
     }

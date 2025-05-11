@@ -53,9 +53,9 @@ export const handleConfirmDelete = async (userToDelete, setUsers, setIsPopupOpen
 
       }
     }catch(error){
-      if(error.status === 409 && error.data.error.code === 402){
+      if(error.status === 409){
         setIsPopupOpen(false); 
-        setErrorPopupMessage(`Para elminar el rol debe elminar los usuarios al que esta relacionado`);
+        setErrorPopupMessage(`No se puede eliminar el usuario ya que esta relacionad  con informacin de ventas, pedidos, roles, etc. Elimine o edite la informaci n asociada antes de eliminar el usuario.`);
         setIsPopupErrorOpen(true);
       }
 
