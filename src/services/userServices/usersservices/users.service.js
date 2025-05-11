@@ -64,3 +64,12 @@ export const cambiarPassService = async (dataNewPass) => {
     throw error;
   }
 }
+
+export const actualizardatosUsuarioServices = async (dataUSuario) => {
+  try {
+      const response = await api.put(`${putEndpoints.ACTUALIZAR_USUARIO}`, dataUSuario); 
+      return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
