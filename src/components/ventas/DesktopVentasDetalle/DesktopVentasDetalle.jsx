@@ -1,5 +1,5 @@
-import React from "react";
-import { Badge, Card, Col, Container, Row, Table } from "react-bootstrap";
+import React, { useState } from "react";
+import { Badge, Card, Col, Container, Row, Table, Modal, Button } from "react-bootstrap";
 import DownloadDropdown from "../../../components/DownloadDropdown/DownloadDropdown";
 import { formatDateToDisplay } from "../../../utils/dateUtils";
 import {
@@ -14,13 +14,15 @@ import {
   BsXCircle,
   BsDownload,
   BsCashStack,
-  BsPlusCircle
+  BsPlusCircle,
+  BsListUl
 } from "react-icons/bs";
 
 const DesktopVentaDetalle = ({ venta, onDownloadXLS, onDownloadPDF }) => {
   const encabezadoVenta = venta?.encabezadoVenta;
   const detallesVenta = venta?.detalleVenta;
   const detalleIngresos = venta?.detalleIngresos;
+  const detallesGastos = venta?.detalleGastos;
 
   return (
     <Container fluid className="p-0">
@@ -35,7 +37,10 @@ const DesktopVentaDetalle = ({ venta, onDownloadXLS, onDownloadPDF }) => {
       <OrderTable productos={detallesVenta} />
 
       {/* Balance Financiero */}
-      <Balance detalleIngresos={detalleIngresos} />
+      <Balance 
+        detalleIngresos={detalleIngresos} 
+        detallesGastos={detallesGastos} 
+      />
     </Container>
   );
 };
@@ -204,7 +209,8 @@ const OrderTable = ({ productos }) => {
   );
 };
 
-const Balance = ({ detalleIngresos }) => {
+const Balance = ({ detalleIngresos, detallesGastos }) => {
+  const [showGastosModal, setShowGastosModal] = useState(false);
   const formatCurrency = (value) => {
     return `Q ${parseFloat(value).toFixed(2)}`;
   };
@@ -214,77 +220,153 @@ const Balance = ({ detalleIngresos }) => {
   const diferenciaColor = diferencia >= 0 ? "success" : "danger";
 
   return (
-    <Card
-      className="border-0 mb-4 shadow-sm"
-      style={{
-        backgroundColor: "#FFFFFF",
-        borderRadius: "10px",
-        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-      }}
-    >
-      <Card.Body className="p-3">
-        <h5 className="mb-3 fw-bold text-dark">Balance Financiero</h5>
-        <Row>
-          <Col md={12}>
-            <div className="d-flex flex-column gap-2">
-              <div className="d-flex justify-content-between align-items-center">
-                <div className="d-flex align-items-center gap-2">
-                  <BsWallet size={18} style={{ color: "#4ECDC4" }} />
-                  <span className="text-secondary">Monto Ingresado:</span>
+    <>
+      <Card
+        className="border-0 mb-4 shadow-sm"
+        style={{
+          backgroundColor: "#FFFFFF",
+          borderRadius: "10px",
+          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+        }}
+      >
+        <Card.Body className="p-3">
+          <h5 className="mb-3 fw-bold text-dark">Balance Financiero</h5>
+          <Row>
+            <Col md={12}>
+              <div className="d-flex flex-column gap-2">
+                <div className="d-flex justify-content-between align-items-center">
+                  <div className="d-flex align-items-center gap-2">
+                    <BsWallet size={18} style={{ color: "#4ECDC4" }} />
+                    <span className="text-secondary">Monto Ingresado:</span>
+                  </div>
+                  <span className="fw-bold text-dark">
+                    {formatCurrency(detalleIngresos?.montoTotalIngresado)}
+                  </span>
                 </div>
-                <span className="fw-bold text-dark">
-                  {formatCurrency(detalleIngresos?.montoTotalIngresado)}
-                </span>
-              </div>
 
-              <div className="d-flex justify-content-between align-items-center">
-                <div className="d-flex align-items-center gap-2">
-                  <BsCashStack size={18} style={{ color: "#FF6B6B" }} />
-                  <span className="text-secondary">Gastos del Turno:</span>
+                <div 
+                  className="d-flex justify-content-between align-items-center cursor-pointer"
+                  onClick={() => setShowGastosModal(true)}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <div className="d-flex align-items-center gap-2">
+                    <div className="position-relative">
+                      <BsCashStack size={18} style={{ color: "#FF6B6B" }} />
+                      {detallesGastos?.length > 0 && (
+                        <Badge 
+                          pill 
+                          bg="danger" 
+                          className="position-absolute top-0 start-100 translate-middle"
+                          style={{ fontSize: '0.6em' }}
+                        >
+                          {detallesGastos.length}
+                        </Badge>
+                      )}
+                    </div>
+                    <span className="text-secondary">Gastos del Turno:</span>
+                  </div>
+                  <div className="d-flex align-items-center gap-2">
+                    <span className="fw-bold text-danger">
+                      {formatCurrency(detalleIngresos?.montoTotalGastos)}
+                    </span>
+                    <BsListUl size={16} style={{ color: "#6c757d" }} />
+                  </div>
                 </div>
-                <span className="fw-bold text-danger">
-                  {formatCurrency(detalleIngresos?.montoTotalGastos)}
-                </span>
-              </div>
 
-              <div className="d-flex justify-content-between align-items-center bg-light p-2 rounded">
-                <div className="d-flex align-items-center gap-2">
-                  <BsPlusCircle size={18} style={{ color: "#4ECDC4" }} />
-                  <span className="fw-semibold">Venta Real del Turno:</span>
+                <div className="d-flex justify-content-between align-items-center bg-light p-2 rounded">
+                  <div className="d-flex align-items-center gap-2">
+                    <BsPlusCircle size={18} style={{ color: "#4ECDC4" }} />
+                    <span className="fw-semibold">Venta Real del Turno:</span>
+                  </div>
+                  <span className="fw-bold text-primary">
+                    {formatCurrency(ventaReal)}
+                  </span>
                 </div>
-                <span className="fw-bold text-primary">
-                  {formatCurrency(ventaReal)}
-                </span>
-              </div>
 
-              <hr className="my-1" />
+                <hr className="my-1" />
 
-              <div className="d-flex justify-content-between align-items-center">
-                <div className="d-flex align-items-center gap-2">
-                  <BsCash size={18} style={{ color: "#4ECDC4" }} />
-                  <span className="text-secondary">Venta Esperada:</span>
+                <div className="d-flex justify-content-between align-items-center">
+                  <div className="d-flex align-items-center gap-2">
+                    <BsCash size={18} style={{ color: "#4ECDC4" }} />
+                    <span className="text-secondary">Venta Esperada:</span>
+                  </div>
+                  <span className="fw-bold text-dark">
+                    {formatCurrency(detalleIngresos?.montoEsperado)}
+                  </span>
                 </div>
-                <span className="fw-bold text-dark">
-                  {formatCurrency(detalleIngresos?.montoEsperado)}
-                </span>
-              </div>
 
-              <hr className="my-1" />
+                <hr className="my-1" />
 
-              <div className="d-flex justify-content-between align-items-center">
-                <div className="d-flex align-items-center gap-2">
-                  <BsDashCircle size={18} style={{ color: diferenciaColor }} />
-                  <span className="fw-semibold">Diferencia:</span>
+                <div className="d-flex justify-content-between align-items-center">
+                  <div className="d-flex align-items-center gap-2">
+                    <BsDashCircle size={18} style={{ color: diferenciaColor }} />
+                    <span className="fw-semibold">Diferencia:</span>
+                  </div>
+                  <Badge bg={diferenciaColor} className="px-3 py-1">
+                    {formatCurrency(diferencia)}
+                  </Badge>
                 </div>
-                <Badge bg={diferenciaColor} className="px-3 py-1">
-                  {formatCurrency(diferencia)}
-                </Badge>
               </div>
+            </Col>
+          </Row>
+        </Card.Body>
+      </Card>
+
+      {/* Modal de Detalles de Gastos */}
+      <Modal show={showGastosModal} onHide={() => setShowGastosModal(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>
+            <BsCashStack className="me-2" style={{ color: "#FF6B6B" }} />
+            Detalle de Gastos
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {detallesGastos?.length > 0 ? (
+            <div className="table-responsive">
+              <Table striped bordered hover>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Descripción</th>
+                    <th className="text-end">Monto</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {detallesGastos.map((gasto, index) => (
+                    <tr key={gasto.idGastoDiarioDetalle}>
+                      <td>{index + 1}</td>
+                      <td>{gasto.detalleGasto}</td>
+                      <td className="text-end text-info fw-bold">
+                        {formatCurrency(gasto.subtotal)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td colSpan={2} className="text-end fw-bold">Total:</td>
+                    <td className="text-end text-danger fw-bold">
+                      {formatCurrency(detalleIngresos?.montoTotalGastos)}
+                    </td>
+                  </tr>
+                </tfoot>
+              </Table>
             </div>
-          </Col>
-        </Row>
-      </Card.Body>
-    </Card>
+          ) : (
+            <div className="text-center py-4">
+              <BsCashStack size={48} className="text-muted mb-3" />
+              <h5>No hay gastos registrados</h5>
+              <p className="text-muted">No se encontraron gastos para este turno</p>
+            </div>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="danger" onClick={() => setShowGastosModal(false)}>
+            Cerrar
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </>
   );
 };
 

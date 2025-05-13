@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Badge, Card, Button, Dropdown } from "react-bootstrap";
+import { Badge, Card, Button, Dropdown, Modal, Table } from "react-bootstrap";
 import { formatDateToDisplay } from "../../../utils/dateUtils";
 import { 
   BsCash, 
@@ -16,7 +16,8 @@ import {
   BsClipboardCheck, 
   BsBox,
   BsCashStack,
-  BsPlusCircle
+  BsPlusCircle,
+  BsListUl
 } from "react-icons/bs";
 import { useMediaQuery } from "react-responsive";
 
@@ -24,12 +25,22 @@ const MobileVentaDetalle = ({ venta, onDownloadXLS, onDownloadPDF }) => {
   const encabezadoVenta = venta?.encabezadoVenta;
   const detallesVenta = venta?.detalleVenta;
   const detalleIngresos = venta?.detalleIngresos;
+  const detallesGastos = venta?.detalleGastos;
 
   const formatCurrency = (value) => {
     return `Q ${parseFloat(value).toFixed(2)}`;
   };
 
   const [showScrollButton, setShowScrollButton] = useState(false);
+  const [showGastosModal, setShowGastosModal] = useState(false);
+  const [isIconPulsing, setIsIconPulsing] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsIconPulsing(false);
+    }, 5000);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -52,6 +63,7 @@ const MobileVentaDetalle = ({ venta, onDownloadXLS, onDownloadPDF }) => {
   };
 
   const isSmallScreen = useMediaQuery({ maxWidth: 767 });
+  const isTablet = useMediaQuery({ minWidth: 768, maxWidth: 1024 });
 
   // Cálculos financieros
   const ventaReal = (detalleIngresos?.montoTotalIngresado || 0) + (detalleIngresos?.montoTotalGastos || 0);
@@ -183,14 +195,45 @@ const MobileVentaDetalle = ({ venta, onDownloadXLS, onDownloadPDF }) => {
                 </span>
               </div>
               
-              <div className="d-flex justify-content-between align-items-center mb-2">
+              <div 
+                className="d-flex justify-content-between align-items-center mb-2 cursor-pointer"
+                onClick={() => setShowGastosModal(true)}
+                style={{ cursor: 'pointer' }}
+              >
                 <span className="text-secondary d-flex align-items-center gap-2">
-                  <BsCashStack size={16} style={{ color: "#FF6B6B" }} />
+                  <div className="position-relative">
+                    <BsCashStack 
+                      size={16} 
+                      style={{ 
+                        color: "#FF6B6B",
+                        animation: isIconPulsing ? 'pulse 2s infinite' : 'none'
+                      }} 
+                    />
+                    {detallesGastos?.length > 0 && (
+                      <Badge 
+                        pill 
+                        bg="danger" 
+                        className="position-absolute top-0 start-100 translate-middle"
+                        style={{ fontSize: '0.6em' }}
+                      >
+                        {detallesGastos.length}
+                      </Badge>
+                    )}
+                  </div>
                   Gastos del Turno:
                 </span>
-                <span className="fw-bold text-danger" style={{ fontSize: isSmallScreen ? "0.875rem" : "1rem" }}>
-                  {formatCurrency(detalleIngresos?.montoTotalGastos)}
-                </span>
+                <div className="d-flex align-items-center gap-1">
+                  <span className="fw-bold text-danger" style={{ fontSize: isSmallScreen ? "0.875rem" : "1rem" }}>
+                    {formatCurrency(detalleIngresos?.montoTotalGastos)}
+                  </span>
+                  <BsListUl 
+                    size={14} 
+                    style={{ 
+                      color: "#6c757d",
+                      animation: isIconPulsing ? 'pulse 2s infinite' : 'none'
+                    }} 
+                  />
+                </div>
               </div>
 
               <div className="d-flex justify-content-between align-items-center mb-2 bg-light p-2 rounded">
@@ -227,6 +270,74 @@ const MobileVentaDetalle = ({ venta, onDownloadXLS, onDownloadPDF }) => {
         </Card.Body>
       </Card>
 
+      {/* Modal de Detalles de Gastos */}
+      <Modal 
+        show={showGastosModal} 
+        onHide={() => setShowGastosModal(false)} 
+        centered
+        size={isTablet ? "lg" : "md"}
+      >
+        <Modal.Header closeButton className="border-0 pb-2">
+          <Modal.Title className="w-100 text-center">
+            <div className="d-flex align-items-center justify-content-center gap-2">
+              <BsCashStack size={24} style={{ color: "#FF6B6B" }} />
+              <h5 className="mb-0">Detalle de Gastos</h5>
+            </div>
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="pt-0">
+          {detallesGastos?.length > 0 ? (
+            <div className="table-responsive">
+              <Table striped bordered hover className="mb-0">
+                <thead>
+                  <tr>
+                    <th style={{ width: '15%' }}>#</th>
+                    <th style={{ width: '55%' }}>Descripción</th>
+                    <th style={{ width: '30%' }} className="text-end">Monto</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {detallesGastos.map((gasto, index) => (
+                    <tr key={gasto.idGastoDiarioDetalle}>
+                      <td>{index + 1}</td>
+                      <td className="text-truncate" style={{ maxWidth: isSmallScreen ? '150px' : 'none' }}>
+                        {gasto.detalleGasto}
+                      </td>
+                      <td className="text-end text-danger fw-bold">
+                        {formatCurrency(gasto.subtotal)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td colSpan={2} className="text-end fw-bold">Total:</td>
+                    <td className="text-end text-danger fw-bold">
+                      {formatCurrency(detalleIngresos?.montoTotalGastos)}
+                    </td>
+                  </tr>
+                </tfoot>
+              </Table>
+            </div>
+          ) : (
+            <div className="text-center py-4">
+              <BsCashStack size={48} className="text-muted mb-3" />
+              <h5>No hay gastos registrados</h5>
+              <p className="text-muted">No se encontraron gastos para este turno</p>
+            </div>
+          )}
+        </Modal.Body>
+        <Modal.Footer className="border-0">
+          <Button 
+            variant="outline-secondary" 
+            onClick={() => setShowGastosModal(false)}
+            className="rounded-pill px-4"
+          >
+            Cerrar
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
       {/* Botón de flecha para volver arriba */}
       {showScrollButton && (
         <button
@@ -241,11 +352,28 @@ const MobileVentaDetalle = ({ venta, onDownloadXLS, onDownloadPDF }) => {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
+            zIndex: 1000
           }}
         >
           <BsArrowUp size={20} />
         </button>
       )}
+
+      {/* Estilos CSS para las animaciones */}
+      <style jsx global>{`
+        @keyframes pulse {
+          0% { opacity: 1; }
+          50% { opacity: 0.6; }
+          100% { opacity: 1; }
+        }
+        .cursor-pointer {
+          cursor: pointer;
+        }
+        .cursor-pointer:hover {
+          background-color: rgba(0, 0, 0, 0.03);
+          border-radius: 4px;
+        }
+      `}</style>
     </>
   );
 };
