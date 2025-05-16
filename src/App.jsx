@@ -7,6 +7,9 @@ import "./styles/globalStyles.css";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+/* reportes routes */
+const ReportesPanel = lazy(() => import("./pages/reportes/reportespanel/ReportesPanel"));
+
 const LoadingSpinner = lazy(() => import("./components/LoadingSpinner/LoadingSpinner"));
 const AccessDeniedPage = lazy(() => import("./components/AccesoDenegado/AccessDeniedPage"));
 
@@ -116,6 +119,10 @@ function App() {
               <Route path="stock-descuentos-lista/:idSucursal" element={<StockDescuentosList/>} />
               <Route path="descontar-stock/:idSucursal" element={<DescontarStock/>} />
               <Route path="detalle-descuento/:idDescuento" element={<DetalleDescuento/>} />
+            </Route>
+
+            <Route path="/reportes">
+              <Route index element={<ReportesPanel/>} />
             </Route>
 
           </Route>
