@@ -1,17 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { FiFilter, FiDownload, FiRefreshCw, FiCalendar, FiChevronDown, FiChevronUp } from 'react-icons/fi';
 import { Container, Row, Col, Form, Button, Spinner, Alert, Card, Accordion, Table } from 'react-bootstrap';
 import dayjs from 'dayjs';
 import useGetProductosYPrecios from "../../../hooks/productosprecios/useGetProductosYprecios";
 import useGetSucursales from "../../../hooks/sucursales/useGetSucursales";
 import { generarReporteHistorialStockService } from "../../../services/reportes/reportes.service";
+import SearchableSelect from "../../../components/SearchableSelect/SearchableSelect";
 import './HistorialStock.styles.css';
 
 const HistorialStock = () => {
   const { productos, loadigProducts, showErrorProductos } = useGetProductosYPrecios();
   const { sucursales, loadingSucursales, showErrorSucursales } = useGetSucursales();
   
-  const [selectedProducto, setSelectedProducto] = useState('');
+  const [selectedProducto, setSelectedProducto] = useState(null);
   const [selectedSucursal, setSelectedSucursal] = useState('');
   const [reporteData, setReporteData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
@@ -20,18 +21,30 @@ const HistorialStock = () => {
   const [fechaInicio, setFechaInicio] = useState('');
   const [fechaFin, setFechaFin] = useState('');
   const [activeMovimiento, setActiveMovimiento] = useState(null);
+  const [searchableSelectError, setSearchableSelectError] = useState('');
+
+  const productoOptions = useMemo(() => {
+    return productos.map(producto => ({
+      value: producto.idProducto,
+      label: producto.nombreProducto
+    }));
+  }, [productos]);
 
   const handleGenerarReporte = async () => {
     if (!selectedProducto || !selectedSucursal) {
       setError('Debes seleccionar un producto y una sucursal');
+      if (!selectedProducto) {
+        setSearchableSelectError('Debes seleccionar un producto');
+      }
       return;
     }
 
     setError(null);
+    setSearchableSelectError('');
     setLoadingReporte(true);
 
     try {
-      const data = await generarReporteHistorialStockService(selectedProducto, selectedSucursal);
+      const data = await generarReporteHistorialStockService(selectedProducto.value, selectedSucursal);
       setReporteData(data.reporte || []);
       setFilteredData(data.reporte || []);
       setFechaInicio('');
@@ -44,7 +57,7 @@ const HistorialStock = () => {
   };
 
   const handleReset = () => {
-    setSelectedProducto('');
+    setSelectedProducto(null);
     setSelectedSucursal('');
     setReporteData([]);
     setFilteredData([]);
@@ -52,6 +65,7 @@ const HistorialStock = () => {
     setFechaFin('');
     setError(null);
     setActiveMovimiento(null);
+    setSearchableSelectError('');
   };
 
   const handleFiltrarPorFecha = () => {
@@ -107,20 +121,17 @@ const HistorialStock = () => {
             <Col md={5} className="mb-3 mb-md-0">
               <Form.Group>
                 <Form.Label className="filter-label">Producto</Form.Label>
-                <Form.Control
-                  as="select"
-                  value={selectedProducto}
-                  onChange={(e) => setSelectedProducto(e.target.value)}
+                <SearchableSelect
+                  options={productoOptions}
+                  placeholder="Buscar producto..."
+                  onSelect={setSelectedProducto}
+                  className="mb-2"
+                  required
                   disabled={loadigProducts || reporteData.length > 0}
-                  className="filter-select"
-                >
-                  <option value="">Seleccionar producto</option>
-                  {productos.map((producto) => (
-                    <option key={producto.idProducto} value={producto.idProducto}>
-                      {producto.nombreProducto}
-                    </option>
-                  ))}
-                </Form.Control>
+                />
+                {searchableSelectError && (
+                  <div className="text-danger small">{searchableSelectError}</div>
+                )}
                 {loadigProducts && <small className="text-muted">Cargando productos...</small>}
               </Form.Group>
             </Col>
