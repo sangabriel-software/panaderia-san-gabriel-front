@@ -41,6 +41,7 @@
   box-shadow: var(--box-shadow);
   border: none;
   margin-bottom: 1.5rem;
+  background-color: #fff;
 }
 
 .filter-label {
@@ -56,6 +57,7 @@
   padding: 0.6rem 1rem;
   transition: var(--transition);
   font-size: 0.9rem;
+  background-color: #fff;
 }
 
 .filter-select:focus {
@@ -63,16 +65,16 @@
   box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.25);
 }
 
-.reporte-table-container {
-  background: white;
-  border-radius: var(--border-radius);
-  box-shadow: var(--box-shadow);
-  overflow: hidden;
+.filter-select::placeholder {
+  color: #adb5bd;
 }
 
 .reporte-table {
   margin-bottom: 0;
   font-size: 0.9rem;
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
 }
 
 .reporte-table thead th {
@@ -117,10 +119,22 @@
   color: #dc3545;
 }
 
+.stock-change-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
 .stock-change {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+}
+
+.stock-label {
+  font-size: 0.8rem;
+  color: #6c757d;
+  min-width: 60px;
 }
 
 .stock-before, .stock-after {
@@ -135,8 +149,16 @@
   color: #212529;
 }
 
-.stock-arrow {
-  color: #adb5bd;
+.stock-quantity {
+  font-weight: 600;
+}
+
+.stock-quantity.ingreso {
+  color: #28a745;
+}
+
+.stock-quantity.egreso {
+  color: #dc3545;
 }
 
 .observaciones {
@@ -146,13 +168,40 @@
   text-overflow: ellipsis;
 }
 
-/* Estilos para móvil */
+/* Custom Alert Styles */
+.custom-alert {
+  padding: 0.75rem 1.25rem;
+  border-radius: var(--border-radius);
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+}
+
+.custom-alert.error {
+  background-color: #fdecea;
+  color: #d32f2f;
+  border-left: 4px solid #d32f2f;
+}
+
+.alert-content {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.alert-message {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* Mobile Styles */
 .movimiento-card {
   margin-bottom: 1rem;
   border-radius: var(--border-radius) !important;
   border: none !important;
   box-shadow: var(--box-shadow);
   overflow: hidden;
+  background-color: #fff;
 }
 
 .movimiento-card .accordion-button {
@@ -171,8 +220,20 @@
   display: none;
 }
 
+.movimiento-fecha {
+  font-size: 0.8rem;
+  color: #6c757d;
+}
+
+.movimiento-cantidad {
+  font-weight: 600;
+  margin-right: 0.5rem;
+}
+
 .movimiento-details {
   padding: 0.5rem;
+  background-color: #f8f9fa;
+  border-radius: 0 0 var(--border-radius) var(--border-radius);
 }
 
 .detail-row {
@@ -186,6 +247,18 @@
   font-weight: 600;
   color: #495057;
   margin-right: 1rem;
+}
+
+/* Date Input Placeholder for Mobile */
+input[type="date"]::before {
+  content: attr(placeholder);
+  color: #adb5bd;
+  width: 100%;
+}
+
+input[type="date"]:focus::before,
+input[type="date"]:valid::before {
+  content: "";
 }
 
 /* Media Queries */
