@@ -1,0 +1,135 @@
+/* Contenedor principal */
+.mr-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0.1rem 1.5rem;
+    background-color: #f8fafc;
+  }
+  
+  /* Header */
+  .mr-header {
+    margin-bottom: 3rem;
+    text-align: center;
+  }
+  
+  .mr-title {
+    font-size: 2.25rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    background: #7275F2;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+  
+  .mr-subtitle {
+    color: #64748b;
+    font-size: 1.125rem;
+    max-width: 600px;
+    margin: 0 auto;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+  
+  /* Grid de tarjetas */
+  .mr-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 4rem;
+  }
+  
+  /* Tarjetas individuales */
+  .mr-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 1.75rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    transition: all 0.2s ease;
+    border: 1px solid rgba(0,0,0,0.03);
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .mr-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+  }
+  
+  /* Iconos de tarjetas */
+  .mr-card-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    color: var(--mr-accent-color);
+    background-color: rgba(var(--mr-accent-color), 0.1);
+    font-size: 1.25rem;
+  }
+  
+  .mr-icon {
+    color: inherit;
+  }
+  
+  /* Texto de tarjetas */
+  .mr-card-title {
+    font-size: 1.25rem;
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+    color: #1e293b;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+  
+  .mr-card-description {
+    color: #64748b;
+    margin-bottom: 1.5rem;
+    flex-grow: 1;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+  
+  /* Botones */
+  .mr-generate-btn {
+    align-self: flex-start;
+    border: none;
+    padding: 0.6rem 1.5rem;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  
+  .mr-generate-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    opacity: 0.9;
+  }
+  
+  /* Media Queries */
+  @media (max-width: 768px) {
+    .mr-container {
+      padding: 1.5rem 1rem;
+    }
+    
+    .mr-title {
+      font-size: 1.75rem;
+    }
+    
+    .mr-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  @media (min-width: 1600px) {
+    .mr-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }

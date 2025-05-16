@@ -11,6 +11,7 @@ const useValidarPermisos = (rutas) => {
     for (const [key, ruta] of Object.entries(rutas)) {
       permisosActualizados[key] = hasPermission(ruta);
     }
+    console.log(permisosActualizados)
     setPermisos(permisosActualizados);
   }, [rutas]);
 

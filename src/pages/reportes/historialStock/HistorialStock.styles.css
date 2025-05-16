@@ -1,0 +1,150 @@
+.historial-container {
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  
+  .historial-title {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 0.5rem;
+  }
+  
+  .historial-subtitle {
+    color: #718096;
+    font-size: 1rem;
+    margin-bottom: 0;
+  }
+  
+  .filter-label {
+    font-weight: 500;
+    color: #4a5568;
+    margin-bottom: 0.5rem;
+  }
+  
+  .filter-select {
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    padding: 0.5rem 1rem;
+    transition: all 0.2s;
+  }
+  
+  .filter-select:focus {
+    border-color: #4299e1;
+    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+  }
+  
+  .reporte-table-container {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+  }
+  
+  .reporte-table {
+    margin-bottom: 0;
+  }
+  
+  .reporte-table thead th {
+    background-color: #f7fafc;
+    color: #4a5568;
+    font-weight: 600;
+    border-bottom-width: 1px;
+    padding: 1rem;
+  }
+  
+  .reporte-table tbody td {
+    padding: 1rem;
+    vertical-align: middle;
+    border-top: 1px solid #edf2f7;
+  }
+  
+  .empty-state {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  }
+  
+  .badge {
+    padding: 0.35em 0.65em;
+    font-size: 0.75em;
+    font-weight: 600;
+    border-radius: 50rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  
+  .movimiento-ingreso {
+    background-color: #c6f6d5;
+    color: #22543d;
+  }
+  
+  .movimiento-egreso {
+    background-color: #fed7d7;
+    color: #742a2a;
+  }
+  
+  .stock-change {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .stock-before, .stock-after {
+    font-weight: 500;
+  }
+  
+  .stock-before {
+    color: #718096;
+  }
+  
+  .stock-after {
+    color: #2d3748;
+  }
+  
+  .stock-arrow {
+    color: #a0aec0;
+  }
+  
+  .observaciones {
+    max-width: 300px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  @media (max-width: 768px) {
+    .historial-container {
+      padding: 1rem;
+    }
+    
+    .reporte-table thead th,
+    .reporte-table tbody td {
+      padding: 0.75rem;
+    }
+    
+    .observaciones {
+      max-width: 150px;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .historial-title {
+      font-size: 1.5rem;
+    }
+    
+    .filter-label {
+      font-size: 0.875rem;
+    }
+    
+    .reporte-table {
+      font-size: 0.875rem;
+    }
+    
+    .badge {
+      font-size: 0.65em;
+      padding: 0.25em 0.5em;
+    }
+  }

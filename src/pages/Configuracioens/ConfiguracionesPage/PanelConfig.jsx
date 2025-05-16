@@ -69,19 +69,19 @@ const PanelConfig = () => {
         <Col xs={12} md={6} className="config-col">
           <div
             className={`config-section ${
-              permisos.otrasConfiguraciones ? "clickable" : "disabled"
+              permisos.reportes ? "clickable" : "disabled"
             }`}
             onClick={() =>
-              permisos.otrasConfiguraciones &&
-              handleNavigate("/config/otras-configuraciones", navigate)
+              permisos.reportes &&
+              handleNavigate("/reportes", navigate)
             }
           >
             <h2 className="section-title">
-              <MdSettings className="section-icon icon-otras-config" /> Otras
-              Configuraciones
+              <MdSettings className="section-icon icon-otras-config" /> 
+              Reportes
             </h2>
             <p className="section-description">
-              Configuración adicional del sistema y ajustes generales.
+              Genera reportes de stock, ventas, etc.
             </p>
           </div>
         </Col>
