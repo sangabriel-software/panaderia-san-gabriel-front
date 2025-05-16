@@ -9,11 +9,11 @@ const ModernReportPanel = () => {
   const reports = [
     {
       id: 1,
-      title: "Historial de Ingresos",
+      title: "Ingreso de stock",
       description: "Registro completo de productos ingresados",
       icon: <FiBox className="mr-icon" />,
       accentColor: "#6366F1",
-      route: "/reportes/historial"
+      route: "/reportes/ingreso-stock"
     },
     {
       id: 2,
@@ -65,7 +65,7 @@ const ModernReportPanel = () => {
     <div className="mr-container">
       <header className="mr-header">
         <h1 className="mr-title">Reportes Analíticos</h1>
-        <p className="mr-subtitle">Visualiza y genera informes detallados de tu negocio</p>
+        <p className="mr-subtitle">Visualiza y genera informes de tus procesos</p>
       </header>
 
       <div className="mr-grid">

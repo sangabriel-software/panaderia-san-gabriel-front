@@ -9,7 +9,8 @@ import "react-toastify/dist/ReactToastify.css";
 
 /* reportes routes */
 const ReportesPanel = lazy(() => import("./pages/reportes/reportespanel/ReportesPanel"));
-
+const HistorialStock = lazy(() => import("./pages/reportes/historialStock/HistorialStock"));
+  
 const LoadingSpinner = lazy(() => import("./components/LoadingSpinner/LoadingSpinner"));
 const AccessDeniedPage = lazy(() => import("./components/AccesoDenegado/AccessDeniedPage"));
 
@@ -123,6 +124,7 @@ function App() {
 
             <Route path="/reportes">
               <Route index element={<ReportesPanel/>} />
+              <Route path="ingreso-stock" element={<HistorialStock/>} />
             </Route>
 
           </Route>
