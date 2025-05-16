@@ -1,17 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { FiFilter, FiDownload, FiRefreshCw, FiCalendar, FiChevronDown, FiChevronUp } from 'react-icons/fi';
-import { Container, Row, Col, Form, Button, Spinner, Alert, Card, Accordion, Table } from 'react-bootstrap';
+import { Container, Row, Col, Form, Button, Spinner, Card, Accordion, Table } from 'react-bootstrap';
 import dayjs from 'dayjs';
 import useGetProductosYPrecios from "../../../hooks/productosprecios/useGetProductosYprecios";
 import useGetSucursales from "../../../hooks/sucursales/useGetSucursales";
 import { generarReporteHistorialStockService } from "../../../services/reportes/reportes.service";
+import SearchableSelect from "../../../components/SearchableSelect/SearchableSelect";
 import './HistorialStock.styles.css';
 
 const HistorialStock = () => {
   const { productos, loadigProducts, showErrorProductos } = useGetProductosYPrecios();
   const { sucursales, loadingSucursales, showErrorSucursales } = useGetSucursales();
   
-  const [selectedProducto, setSelectedProducto] = useState('');
+  const [selectedProducto, setSelectedProducto] = useState(null);
   const [selectedSucursal, setSelectedSucursal] = useState('');
   const [reporteData, setReporteData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
@@ -20,18 +21,30 @@ const HistorialStock = () => {
   const [fechaInicio, setFechaInicio] = useState('');
   const [fechaFin, setFechaFin] = useState('');
   const [activeMovimiento, setActiveMovimiento] = useState(null);
+  const [searchableSelectError, setSearchableSelectError] = useState('');
+
+  const productoOptions = useMemo(() => {
+    return productos.map(producto => ({
+      value: producto.idProducto,
+      label: producto.nombreProducto
+    }));
+  }, [productos]);
 
   const handleGenerarReporte = async () => {
     if (!selectedProducto || !selectedSucursal) {
       setError('Debes seleccionar un producto y una sucursal');
+      if (!selectedProducto) {
+        setSearchableSelectError('Debes seleccionar un producto');
+      }
       return;
     }
 
     setError(null);
+    setSearchableSelectError('');
     setLoadingReporte(true);
 
     try {
-      const data = await generarReporteHistorialStockService(selectedProducto, selectedSucursal);
+      const data = await generarReporteHistorialStockService(selectedProducto.value, selectedSucursal);
       setReporteData(data.reporte || []);
       setFilteredData(data.reporte || []);
       setFechaInicio('');
@@ -44,7 +57,7 @@ const HistorialStock = () => {
   };
 
   const handleReset = () => {
-    setSelectedProducto('');
+    setSelectedProducto(null);
     setSelectedSucursal('');
     setReporteData([]);
     setFilteredData([]);
@@ -52,6 +65,7 @@ const HistorialStock = () => {
     setFechaFin('');
     setError(null);
     setActiveMovimiento(null);
+    setSearchableSelectError('');
   };
 
   const handleFiltrarPorFecha = () => {
@@ -60,8 +74,8 @@ const HistorialStock = () => {
       return;
     }
 
-    const inicio = dayjs(fechaInicio);
-    const fin = dayjs(fechaFin);
+    const inicio = dayjs(fechaInicio).startOf('day');
+    const fin = dayjs(fechaFin).endOf('day');
     
     if (inicio.isAfter(fin)) {
       setError('La fecha de inicio no puede ser mayor a la fecha final');
@@ -72,8 +86,8 @@ const HistorialStock = () => {
     
     const datosFiltrados = reporteData.filter(item => {
       const fechaMovimiento = dayjs(item.fechaMovimiento);
-      return fechaMovimiento.isAfter(inicio.subtract(1, 'day')) && 
-             fechaMovimiento.isBefore(fin.add(1, 'day'));
+      return fechaMovimiento.isSameOrAfter(inicio) && 
+             fechaMovimiento.isSameOrBefore(fin);
     });
 
     setFilteredData(datosFiltrados);
@@ -84,13 +98,36 @@ const HistorialStock = () => {
     return dayjs(fecha).format('DD/MM/YYYY HH:mm');
   };
 
-  const formatFechaInput = (fecha) => {
-    return dayjs(fecha).format('YYYY-MM-DD');
-  };
-
   const toggleMovimiento = (id) => {
     setActiveMovimiento(activeMovimiento === id ? null : id);
   };
+
+  const renderErrorAlert = (message) => (
+    <div className="custom-alert error">
+      <div className="alert-content">
+        <span className="alert-message">{message}</span>
+      </div>
+    </div>
+  );
+
+  const renderStockChange = (item) => (
+    <div className="stock-change-container">
+      <div className="stock-change">
+        <span className="stock-label">Anterior:</span>
+        <span className="stock-before">{item.stockAnterior}</span>
+      </div>
+      <div className="stock-change">
+        <span className="stock-label">{item.tipoMovimiento === 'INGRESO' ? 'Ingresado:' : 'Egresado:'}</span>
+        <span className={`stock-quantity ${item.tipoMovimiento.toLowerCase()}`}>
+          {item.tipoMovimiento === 'INGRESO' ? '+' : '-'}{item.cantidad}
+        </span>
+      </div>
+      <div className="stock-change">
+        <span className="stock-label">Nuevo:</span>
+        <span className="stock-after">{item.stockNuevo}</span>
+      </div>
+    </div>
+  );
 
   return (
     <Container fluid className="historial-container">
@@ -107,20 +144,17 @@ const HistorialStock = () => {
             <Col md={5} className="mb-3 mb-md-0">
               <Form.Group>
                 <Form.Label className="filter-label">Producto</Form.Label>
-                <Form.Control
-                  as="select"
-                  value={selectedProducto}
-                  onChange={(e) => setSelectedProducto(e.target.value)}
+                <SearchableSelect
+                  options={productoOptions}
+                  placeholder="Buscar producto..."
+                  onSelect={setSelectedProducto}
+                  className="mb-2"
+                  required
                   disabled={loadigProducts || reporteData.length > 0}
-                  className="filter-select"
-                >
-                  <option value="">Seleccionar producto</option>
-                  {productos.map((producto) => (
-                    <option key={producto.idProducto} value={producto.idProducto}>
-                      {producto.nombreProducto}
-                    </option>
-                  ))}
-                </Form.Control>
+                />
+                {searchableSelectError && (
+                  <div className="text-danger small">{searchableSelectError}</div>
+                )}
                 {loadigProducts && <small className="text-muted">Cargando productos...</small>}
               </Form.Group>
             </Col>
@@ -181,9 +215,10 @@ const HistorialStock = () => {
                   <Form.Control
                     type="date"
                     value={fechaInicio}
-                    max={formatFechaInput(fechaFin) || formatFechaInput(dayjs())}
+                    max={fechaFin || dayjs().format('YYYY-MM-DD')}
                     onChange={(e) => setFechaInicio(e.target.value)}
                     className="filter-select"
+                    placeholder="dd/mm/aaaa"
                   />
                 </Form.Group>
               </Col>
@@ -193,10 +228,11 @@ const HistorialStock = () => {
                   <Form.Control
                     type="date"
                     value={fechaFin}
-                    min={formatFechaInput(fechaInicio) || ''}
-                    max={formatFechaInput(dayjs())}
+                    min={fechaInicio}
+                    max={dayjs().format('YYYY-MM-DD')}
                     onChange={(e) => setFechaFin(e.target.value)}
                     className="filter-select"
+                    placeholder="dd/mm/aaaa"
                   />
                 </Form.Group>
               </Col>
@@ -218,9 +254,7 @@ const HistorialStock = () => {
       {error && (
         <Row className="mb-3">
           <Col>
-            <Alert variant="danger" onClose={() => setError(null)} dismissible>
-              {error}
-            </Alert>
+            {renderErrorAlert(error)}
           </Col>
         </Row>
       )}
@@ -228,9 +262,7 @@ const HistorialStock = () => {
       {showErrorProductos && (
         <Row className="mb-3">
           <Col>
-            <Alert variant="danger">
-              Error al cargar los productos: {showErrorProductos}
-            </Alert>
+            {renderErrorAlert(`Error al cargar los productos: ${showErrorProductos}`)}
           </Col>
         </Row>
       )}
@@ -238,9 +270,7 @@ const HistorialStock = () => {
       {showErrorSucursales && (
         <Row className="mb-3">
           <Col>
-            <Alert variant="danger">
-              Error al cargar las sucursales: {showErrorSucursales}
-            </Alert>
+            {renderErrorAlert(`Error al cargar las sucursales: ${showErrorSucursales}`)}
           </Col>
         </Row>
       )}
@@ -272,11 +302,7 @@ const HistorialStock = () => {
                         </td>
                         <td>{item.cantidad}</td>
                         <td>
-                          <div className="stock-change">
-                            <span className="stock-before">{item.stockAnterior}</span>
-                            <span className="stock-arrow">→</span>
-                            <span className="stock-after">{item.stockNuevo}</span>
-                          </div>
+                          {renderStockChange(item)}
                         </td>
                         <td>{item.nombreUsuario}</td>
                         <td className="observaciones">{item.observaciones}</td>
@@ -295,38 +321,32 @@ const HistorialStock = () => {
                       className="movimiento-card"
                     >
                       <Accordion.Header onClick={() => toggleMovimiento(item.idHistorial)}>
-                        <div className="d-flex justify-content-between w-100 pe-2">
-                          <div>
-                            <span className={`badge movimiento-${item.tipoMovimiento.toLowerCase()} me-2`}>
+                        <div className="d-flex justify-content-between w-100 pe-2 align-items-center">
+                          <div className="d-flex flex-column">
+                            <span className={`badge movimiento-${item.tipoMovimiento.toLowerCase()} mb-1`}>
                               {item.tipoMovimiento}
                             </span>
-                            <span>{formatFecha(item.fechaMovimiento)}</span>
+                            <span className="movimiento-fecha">{formatFecha(item.fechaMovimiento)}</span>
+                          </div>
+                          <div className="movimiento-cantidad">
+                            {item.tipoMovimiento === 'INGRESO' ? '+' : '-'}{item.cantidad}
                           </div>
                           {activeMovimiento === item.idHistorial ? <FiChevronUp /> : <FiChevronDown />}
                         </div>
                       </Accordion.Header>
                       <Accordion.Body>
                         <div className="movimiento-details">
-                          <div className="detail-row">
-                            <span className="detail-label">Cantidad:</span>
-                            <span>{item.cantidad}</span>
-                          </div>
-                          <div className="detail-row">
-                            <span className="detail-label">Stock:</span>
-                            <div className="stock-change">
-                              <span className="stock-before">{item.stockAnterior}</span>
-                              <span className="stock-arrow">→</span>
-                              <span className="stock-after">{item.stockNuevo}</span>
-                            </div>
-                          </div>
+                          {renderStockChange(item)}
                           <div className="detail-row">
                             <span className="detail-label">Usuario:</span>
                             <span>{item.nombreUsuario}</span>
                           </div>
-                          <div className="detail-row">
-                            <span className="detail-label">Observaciones:</span>
-                            <span className="observaciones">{item.observaciones}</span>
-                          </div>
+                          {item.observaciones && (
+                            <div className="detail-row">
+                              <span className="detail-label">Observaciones:</span>
+                              <span className="observaciones">{item.observaciones}</span>
+                            </div>
+                          )}
                         </div>
                       </Accordion.Body>
                     </Accordion.Item>
