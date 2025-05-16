@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { FiFilter, FiDownload, FiRefreshCw } from 'react-icons/fi';
+import { FiFilter, FiDownload, FiRefreshCw, FiCalendar } from 'react-icons/fi';
 import { Container, Row, Col, Form, Button, Spinner, Alert, Table } from 'react-bootstrap';
+import dayjs from 'dayjs';
 import useGetProductosYPrecios from "../../../hooks/productosprecios/useGetProductosYprecios";
 import useGetSucursales from "../../../hooks/sucursales/useGetSucursales";
 import { generarReporteHistorialStockService } from "../../../services/reportes/reportes.service";
@@ -13,8 +14,11 @@ const HistorialStock = () => {
   const [selectedProducto, setSelectedProducto] = useState('');
   const [selectedSucursal, setSelectedSucursal] = useState('');
   const [reporteData, setReporteData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
   const [loadingReporte, setLoadingReporte] = useState(false);
   const [error, setError] = useState(null);
+  const [fechaInicio, setFechaInicio] = useState('');
+  const [fechaFin, setFechaFin] = useState('');
 
   const handleGenerarReporte = async () => {
     if (!selectedProducto || !selectedSucursal) {
@@ -28,6 +32,9 @@ const HistorialStock = () => {
     try {
       const data = await generarReporteHistorialStockService(selectedProducto, selectedSucursal);
       setReporteData(data.reporte || []);
+      setFilteredData(data.reporte || []);
+      setFechaInicio('');
+      setFechaFin('');
     } catch (err) {
       setError('Error al generar el reporte: ' + err.message);
     } finally {
@@ -39,7 +46,43 @@ const HistorialStock = () => {
     setSelectedProducto('');
     setSelectedSucursal('');
     setReporteData([]);
+    setFilteredData([]);
+    setFechaInicio('');
+    setFechaFin('');
     setError(null);
+  };
+
+  const handleFiltrarPorFecha = () => {
+    if (!fechaInicio || !fechaFin) {
+      setError('Debes seleccionar ambas fechas para filtrar');
+      return;
+    }
+
+    const inicio = dayjs(fechaInicio);
+    const fin = dayjs(fechaFin);
+    
+    if (inicio.isAfter(fin)) {
+      setError('La fecha de inicio no puede ser mayor a la fecha final');
+      return;
+    }
+
+    setError(null);
+    
+    const datosFiltrados = reporteData.filter(item => {
+      const fechaMovimiento = dayjs(item.fechaMovimiento);
+      return fechaMovimiento.isAfter(inicio.subtract(1, 'day')) && 
+             fechaMovimiento.isBefore(fin.add(1, 'day'));
+    });
+
+    setFilteredData(datosFiltrados);
+  };
+
+  const formatFecha = (fecha) => {
+    return dayjs(fecha).format('DD/MM/YYYY HH:mm');
+  };
+
+  const formatFechaInput = (fecha) => {
+    return dayjs(fecha).format('YYYY-MM-DD');
   };
 
   return (
@@ -59,7 +102,7 @@ const HistorialStock = () => {
               as="select"
               value={selectedProducto}
               onChange={(e) => setSelectedProducto(e.target.value)}
-              disabled={loadigProducts}
+              disabled={loadigProducts || reporteData.length > 0}
               className="filter-select"
             >
               <option value="">Seleccionar producto</option>
@@ -80,7 +123,7 @@ const HistorialStock = () => {
               as="select"
               value={selectedSucursal}
               onChange={(e) => setSelectedSucursal(e.target.value)}
-              disabled={loadingSucursales}
+              disabled={loadingSucursales || reporteData.length > 0}
               className="filter-select"
             >
               <option value="">Seleccionar sucursal</option>
@@ -106,7 +149,7 @@ const HistorialStock = () => {
             <Button
               variant="primary"
               onClick={handleGenerarReporte}
-              disabled={!selectedProducto || !selectedSucursal || loadingReporte}
+              disabled={!selectedProducto || !selectedSucursal || loadingReporte || reporteData.length > 0}
               className="flex-grow-1"
             >
               {loadingReporte ? (
@@ -120,6 +163,46 @@ const HistorialStock = () => {
           </div>
         </Col>
       </Row>
+
+      {reporteData.length > 0 && (
+        <Row className="mb-4">
+          <Col md={4} className="mb-2 mb-md-0">
+            <Form.Group>
+              <Form.Label className="filter-label">Fecha Inicio</Form.Label>
+              <Form.Control
+                type="date"
+                value={fechaInicio}
+                max={formatFechaInput(fechaFin) || formatFechaInput(dayjs())}
+                onChange={(e) => setFechaInicio(e.target.value)}
+                className="filter-select"
+              />
+            </Form.Group>
+          </Col>
+          <Col md={4} className="mb-2 mb-md-0">
+            <Form.Group>
+              <Form.Label className="filter-label">Fecha Fin</Form.Label>
+              <Form.Control
+                type="date"
+                value={fechaFin}
+                min={formatFechaInput(fechaInicio) || ''}
+                max={formatFechaInput(dayjs())}
+                onChange={(e) => setFechaFin(e.target.value)}
+                className="filter-select"
+              />
+            </Form.Group>
+          </Col>
+          <Col md={4} className="d-flex align-items-end">
+            <Button
+              variant="outline-primary"
+              onClick={handleFiltrarPorFecha}
+              disabled={!fechaInicio || !fechaFin}
+              className="w-100"
+            >
+              <FiCalendar className="me-1" /> Filtrar
+            </Button>
+          </Col>
+        </Row>
+      )}
 
       {error && (
         <Row className="mb-3">
@@ -154,7 +237,7 @@ const HistorialStock = () => {
       <Row>
         <Col>
           <div className="reporte-table-container">
-            {reporteData.length > 0 ? (
+            {filteredData.length > 0 ? (
               <Table responsive bordered hover className="reporte-table">
                 <thead>
                   <tr>
@@ -167,9 +250,9 @@ const HistorialStock = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {reporteData.map((item) => (
+                  {filteredData.map((item) => (
                     <tr key={item.idHistorial}>
-                      <td>{new Date(item.fechaMovimiento).toLocaleString()}</td>
+                      <td>{formatFecha(item.fechaMovimiento)}</td>
                       <td>
                         <span className={`badge movimiento-${item.tipoMovimiento.toLowerCase()}`}>
                           {item.tipoMovimiento}
@@ -189,6 +272,16 @@ const HistorialStock = () => {
                   ))}
                 </tbody>
               </Table>
+            ) : reporteData.length > 0 ? (
+              <div className="empty-state">
+                <div className="text-center py-4">
+                  <FiCalendar size={48} className="text-muted mb-3" />
+                  <h5>No hay datos para el rango de fechas seleccionado</h5>
+                  <p className="text-muted">
+                    Ajusta las fechas o haz clic en Limpiar para ver todos los datos
+                  </p>
+                </div>
+              </div>
             ) : (
               <div className="empty-state">
                 {loadingReporte ? (
@@ -211,7 +304,7 @@ const HistorialStock = () => {
         </Col>
       </Row>
 
-      {reporteData.length > 0 && (
+      {filteredData.length > 0 && (
         <Row className="mt-3">
           <Col className="text-end">
             <Button variant="outline-primary" size="sm">
