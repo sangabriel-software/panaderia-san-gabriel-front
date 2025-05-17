@@ -259,6 +259,42 @@
   margin-right: 1rem;
 }
 
+/* Nuevos estilos para los botones */
+.back-button {
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 2px solid var(--primary-color);
+  color: var(--primary-color);
+  transition: var(--transition);
+}
+
+.back-button:hover {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.export-button {
+  border-radius: var(--border-radius);
+  padding: 0.5rem 1.25rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  transition: var(--transition);
+  border: 2px solid var(--primary-color);
+  color: var(--primary-color);
+  background-color: white;
+}
+
+.export-button:hover {
+  background-color: var(--primary-color);
+  color: white;
+}
+
 @media (max-width: 768px) {
   .historial-container {
     padding: 1rem;
@@ -274,6 +310,11 @@
   
   .observaciones {
     max-width: 200px;
+  }
+
+  .back-button {
+    width: 36px;
+    height: 36px;
   }
 }
 
@@ -303,5 +344,10 @@
   .detail-label {
     margin-bottom: 0.25rem;
     font-size: 0.8rem;
+  }
+
+  .export-button {
+    padding: 0.4rem 1rem;
+    font-size: 0.9rem;
   }
 }

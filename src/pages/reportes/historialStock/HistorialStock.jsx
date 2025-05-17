@@ -1,15 +1,16 @@
 import React, { useState, useMemo, useRef } from 'react';
-import { FiFilter, FiDownload, FiRefreshCw, FiCalendar, FiChevronDown, FiChevronUp } from 'react-icons/fi';
+import { FiFilter, FiDownload, FiRefreshCw, FiCalendar, FiChevronDown, FiChevronUp, FiArrowLeft } from 'react-icons/fi';
 import { Container, Row, Col, Form, Button, Spinner, Card, Accordion, Table } from 'react-bootstrap';
 import dayjs from 'dayjs';
+import { useNavigate } from 'react-router-dom';
 import useGetProductosYPrecios from "../../../hooks/productosprecios/useGetProductosYprecios";
 import useGetSucursales from "../../../hooks/sucursales/useGetSucursales";
 import { generarReporteHistorialStockService } from "../../../services/reportes/reportes.service";
 import SearchableSelect from "../../../components/SearchableSelect/SearchableSelect";
 import './HistorialStock.styles.css';
 
-// comentarios para pull
 const HistorialStock = () => {
+  const navigate = useNavigate();
   const { productos, loadigProducts, showErrorProductos } = useGetProductosYPrecios();
   const { sucursales, loadingSucursales, showErrorSucursales } = useGetSucursales();
   
@@ -74,7 +75,6 @@ const HistorialStock = () => {
     // Resetear el SearchableSelect
     setResetSearchableSelect(prev => !prev);
   };
-
 
   const handleFiltrarPorFecha = () => {
     if (!fechaInicio || !fechaFin) {
@@ -144,7 +144,16 @@ const HistorialStock = () => {
 
   return (
     <Container fluid className="historial-container">
-      <Row className="mb-4">
+      <Row className="mb-4 align-items-center">
+        <Col xs="auto" className="pe-0">
+          <Button 
+            variant="outline-primary" 
+            onClick={() => navigate('/reportes')}
+            className="back-button"
+          >
+            <FiArrowLeft size={20} />
+          </Button>
+        </Col>
         <Col>
           <h1 className="historial-title">Historial de Stock</h1>
           <p className="historial-subtitle">Consulta los movimientos de inventario</p>
@@ -158,7 +167,7 @@ const HistorialStock = () => {
               <Form.Group>
                 <Form.Label className="filter-label">Producto</Form.Label>
                 <SearchableSelect
-                  key={`searchable-select-${resetSearchableSelect}`} // Esto fuerza el reinicio
+                  key={`searchable-select-${resetSearchableSelect}`}
                   ref={searchableSelectRef}
                   options={productoOptions}
                   placeholder="Buscar producto..."
@@ -292,6 +301,19 @@ const HistorialStock = () => {
         </Row>
       )}
 
+      {filteredData.length > 0 && (
+        <Row className="mb-3">
+          <Col className="text-end">
+            <Button 
+              variant="outline-primary" 
+              className="export-button"
+            >
+              <FiDownload className="me-1" /> Exportar a Excel
+            </Button>
+          </Col>
+        </Row>
+      )}
+
       <Row>
         <Col>
           {filteredData.length > 0 ? (
@@ -414,16 +436,6 @@ const HistorialStock = () => {
           )}
         </Col>
       </Row>
-
-      {filteredData.length > 0 && (
-        <Row className="mt-3">
-          <Col className="text-end">
-            <Button variant="outline-primary" size="sm">
-              <FiDownload className="me-1" /> Exportar
-            </Button>
-          </Col>
-        </Row>
-      )}
     </Container>
   );
 };
