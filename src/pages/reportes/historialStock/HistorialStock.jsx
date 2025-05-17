@@ -73,7 +73,7 @@ const HistorialStock = () => {
       setError('Debes seleccionar ambas fechas para filtrar');
       return;
     }
-
+  
     const inicio = dayjs(fechaInicio).startOf('day');
     const fin = dayjs(fechaFin).endOf('day');
     
@@ -81,15 +81,21 @@ const HistorialStock = () => {
       setError('La fecha de inicio no puede ser mayor a la fecha final');
       return;
     }
-
+  
     setError(null);
     
     const datosFiltrados = reporteData.filter(item => {
       const fechaMovimiento = dayjs(item.fechaMovimiento);
-      return fechaMovimiento.isSameOrAfter(inicio) && 
-             fechaMovimiento.isSameOrBefore(fin);
+      // Verificamos que la fecha esté en el rango usando isSame con 'day' como unidad de comparación
+      return (
+        (fechaMovimiento.isAfter(inicio) || 
+        fechaMovimiento.isSame(inicio, 'day')
+      ) && (
+        (fechaMovimiento.isBefore(fin)) || 
+        fechaMovimiento.isSame(fin, 'day')
+      ));
     });
-
+  
     setFilteredData(datosFiltrados);
     setActiveMovimiento(null);
   };
