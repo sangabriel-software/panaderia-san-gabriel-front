@@ -24,6 +24,8 @@ const HistorialStock = () => {
   const [searchableSelectError, setSearchableSelectError] = useState('');
   const searchableSelectRef = useRef(null);
 
+  const [resetSearchableSelect, setResetSearchableSelect] = useState(false);
+
   const productoOptions = useMemo(() => {
     return productos.map(producto => ({
       value: producto.idProducto,
@@ -68,11 +70,10 @@ const HistorialStock = () => {
     setActiveMovimiento(null);
     setSearchableSelectError('');
     
-    // Resetear el input del SearchableSelect
-    if (searchableSelectRef.current) {
-      searchableSelectRef.current.clearValue();
-    }
+    // Resetear el SearchableSelect
+    setResetSearchableSelect(prev => !prev);
   };
+
 
   const handleFiltrarPorFecha = () => {
     if (!fechaInicio || !fechaFin) {
@@ -156,6 +157,7 @@ const HistorialStock = () => {
               <Form.Group>
                 <Form.Label className="filter-label">Producto</Form.Label>
                 <SearchableSelect
+                  key={`searchable-select-${resetSearchableSelect}`} // Esto fuerza el reinicio
                   ref={searchableSelectRef}
                   options={productoOptions}
                   placeholder="Buscar producto..."
