@@ -8,6 +8,7 @@ import { generarReporteHistorialStockService } from "../../../services/reportes/
 import SearchableSelect from "../../../components/SearchableSelect/SearchableSelect";
 import './HistorialStock.styles.css';
 
+// comentarios para pull
 const HistorialStock = () => {
   const { productos, loadigProducts, showErrorProductos } = useGetProductosYPrecios();
   const { sucursales, loadingSucursales, showErrorSucursales } = useGetSucursales();
