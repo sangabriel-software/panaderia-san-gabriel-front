@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { FiFilter, FiDownload, FiRefreshCw, FiCalendar, FiChevronDown, FiChevronUp } from 'react-icons/fi';
 import { Container, Row, Col, Form, Button, Spinner, Card, Accordion, Table } from 'react-bootstrap';
 import dayjs from 'dayjs';
@@ -22,6 +22,7 @@ const HistorialStock = () => {
   const [fechaFin, setFechaFin] = useState('');
   const [activeMovimiento, setActiveMovimiento] = useState(null);
   const [searchableSelectError, setSearchableSelectError] = useState('');
+  const searchableSelectRef = useRef(null);
 
   const productoOptions = useMemo(() => {
     return productos.map(producto => ({
@@ -66,6 +67,11 @@ const HistorialStock = () => {
     setError(null);
     setActiveMovimiento(null);
     setSearchableSelectError('');
+    
+    // Resetear el input del SearchableSelect
+    if (searchableSelectRef.current) {
+      searchableSelectRef.current.clearValue();
+    }
   };
 
   const handleFiltrarPorFecha = () => {
@@ -86,7 +92,6 @@ const HistorialStock = () => {
     
     const datosFiltrados = reporteData.filter(item => {
       const fechaMovimiento = dayjs(item.fechaMovimiento);
-      // Verificamos que la fecha esté en el rango usando isSame con 'day' como unidad de comparación
       return (
         (fechaMovimiento.isAfter(inicio) || 
         fechaMovimiento.isSame(inicio, 'day')
@@ -147,10 +152,11 @@ const HistorialStock = () => {
       <Card className="filtros-card mb-4">
         <Card.Body>
           <Row>
-            <Col md={5} className="mb-3 mb-md-0">
+            <Col md={4} className="mb-3 mb-md-0">
               <Form.Group>
                 <Form.Label className="filter-label">Producto</Form.Label>
                 <SearchableSelect
+                  ref={searchableSelectRef}
                   options={productoOptions}
                   placeholder="Buscar producto..."
                   onSelect={setSelectedProducto}
@@ -165,7 +171,7 @@ const HistorialStock = () => {
               </Form.Group>
             </Col>
 
-            <Col md={5} className="mb-3 mb-md-0">
+            <Col md={4} className="mb-3 mb-md-0">
               <Form.Group>
                 <Form.Label className="filter-label">Sucursal</Form.Label>
                 <Form.Control
@@ -186,7 +192,7 @@ const HistorialStock = () => {
               </Form.Group>
             </Col>
 
-            <Col md={2} className="d-flex align-items-end">
+            <Col md={4} className="d-flex align-items-end">
               <div className="d-flex w-100">
                 <Button
                   variant="outline-secondary"
@@ -223,8 +229,9 @@ const HistorialStock = () => {
                     value={fechaInicio}
                     max={fechaFin || dayjs().format('YYYY-MM-DD')}
                     onChange={(e) => setFechaInicio(e.target.value)}
-                    className="filter-select"
-                    placeholder="dd/mm/aaaa"
+                    className="filter-select date-input"
+                    placeholder=" "
+                    onFocus={(e) => e.target.showPicker()}
                   />
                 </Form.Group>
               </Col>
@@ -237,8 +244,9 @@ const HistorialStock = () => {
                     min={fechaInicio}
                     max={dayjs().format('YYYY-MM-DD')}
                     onChange={(e) => setFechaFin(e.target.value)}
-                    className="filter-select"
-                    placeholder="dd/mm/aaaa"
+                    className="filter-select date-input"
+                    placeholder=" "
+                    onFocus={(e) => e.target.showPicker()}
                   />
                 </Form.Group>
               </Col>
@@ -266,17 +274,17 @@ const HistorialStock = () => {
       )}
 
       {showErrorProductos && (
-        <Row className="mb-3">
-          <Col>
-            {renderErrorAlert(`Error al cargar los productos: ${showErrorProductos}`)}
+        <Row style={{ justifyContent: 'center' }} className="mb-3">
+          <Col xs={12} md={6}>
+            {renderErrorAlert(`Error al cargar los productos`)}
           </Col>
         </Row>
       )}
 
       {showErrorSucursales && (
-        <Row className="mb-3">
-          <Col>
-            {renderErrorAlert(`Error al cargar las sucursales: ${showErrorSucursales}`)}
+        <Row style={{ justifyContent: 'center' }} className="mb-3">
+          <Col xs={12} md={6}>
+            {renderErrorAlert(`Error al cargar las sucursales`)}
           </Col>
         </Row>
       )}
@@ -373,13 +381,21 @@ const HistorialStock = () => {
                 </Button>
               </Card.Body>
             </Card>
-          ) : (
+          ) : !showErrorProductos && !showErrorSucursales && (
             <Card className="empty-state">
               <Card.Body className="text-center py-4">
                 {loadingReporte ? (
                   <>
                     <Spinner animation="border" variant="primary" />
                     <p className="mt-2">Generando reporte...</p>
+                  </>
+                ) : !showErrorProductos && !showErrorSucursales ? (
+                  <>
+                    <FiFilter size={48} className="text-muted mb-3" />
+                    <h5>No hay datos para mostrar</h5>
+                    <p className="text-muted">
+                      Selecciona un producto y una sucursal para generar el reporte
+                    </p>
                   </>
                 ) : (
                   <>
