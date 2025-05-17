@@ -8,6 +8,7 @@ import { generarReporteHistorialStockService } from "../../../services/reportes/
 import SearchableSelect from "../../../components/SearchableSelect/SearchableSelect";
 import './HistorialStock.styles.css';
 
+// comentarios para pull
 const HistorialStock = () => {
   const { productos, loadigProducts, showErrorProductos } = useGetProductosYPrecios();
   const { sucursales, loadingSucursales, showErrorSucursales } = useGetSucursales();
@@ -23,6 +24,8 @@ const HistorialStock = () => {
   const [activeMovimiento, setActiveMovimiento] = useState(null);
   const [searchableSelectError, setSearchableSelectError] = useState('');
   const searchableSelectRef = useRef(null);
+
+  const [resetSearchableSelect, setResetSearchableSelect] = useState(false);
 
   const productoOptions = useMemo(() => {
     return productos.map(producto => ({
@@ -68,11 +71,10 @@ const HistorialStock = () => {
     setActiveMovimiento(null);
     setSearchableSelectError('');
     
-    // Resetear el input del SearchableSelect
-    if (searchableSelectRef.current) {
-      searchableSelectRef.current.clearValue();
-    }
+    // Resetear el SearchableSelect
+    setResetSearchableSelect(prev => !prev);
   };
+
 
   const handleFiltrarPorFecha = () => {
     if (!fechaInicio || !fechaFin) {
@@ -156,6 +158,7 @@ const HistorialStock = () => {
               <Form.Group>
                 <Form.Label className="filter-label">Producto</Form.Label>
                 <SearchableSelect
+                  key={`searchable-select-${resetSearchableSelect}`} // Esto fuerza el reinicio
                   ref={searchableSelectRef}
                   options={productoOptions}
                   placeholder="Buscar producto..."
