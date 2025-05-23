@@ -1,12 +1,11 @@
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useMemo } from 'react';
 import { FiFilter, FiDownload, FiRefreshCw, FiCalendar, FiChevronDown, FiChevronUp, FiArrowLeft } from 'react-icons/fi';
-import { Container, Row, Col, Form, Button, Spinner, Card, Accordion, Table } from 'react-bootstrap';
+import { Container, Row, Col, Form, Button, Spinner, Card, Accordion, Table, Dropdown } from 'react-bootstrap';
 import dayjs from 'dayjs';
 import { useNavigate } from 'react-router-dom';
 import useGetProductosYPrecios from "../../../hooks/productosprecios/useGetProductosYprecios";
 import useGetSucursales from "../../../hooks/sucursales/useGetSucursales";
 import { generarReporteHistorialStockService } from "../../../services/reportes/reportes.service";
-import SearchableSelect from "../../../components/SearchableSelect/SearchableSelect";
 import './HistorialStock.styles.css';
 
 const HistorialStock = () => {
@@ -23,29 +22,29 @@ const HistorialStock = () => {
   const [fechaInicio, setFechaInicio] = useState('');
   const [fechaFin, setFechaFin] = useState('');
   const [activeMovimiento, setActiveMovimiento] = useState(null);
-  const [searchableSelectError, setSearchableSelectError] = useState('');
-  const searchableSelectRef = useRef(null);
+  const [categoriaActiva, setCategoriaActiva] = useState('Todas');
 
-  const [resetSearchableSelect, setResetSearchableSelect] = useState(false);
-
-  const productoOptions = useMemo(() => {
-    return productos.map(producto => ({
-      value: producto.idProducto,
-      label: producto.nombreProducto
-    }));
+  // Obtener categorías únicas de los productos
+  const categorias = useMemo(() => {
+    const cats = [...new Set(productos.map(p => p.nombreCategoria))];
+    return ['Todas', ...cats];
   }, [productos]);
+
+  // Filtrar productos por categoría
+  const productosFiltrados = useMemo(() => {
+    if (categoriaActiva === 'Todas') {
+      return productos;
+    }
+    return productos.filter(p => p.nombreCategoria === categoriaActiva);
+  }, [productos, categoriaActiva]);
 
   const handleGenerarReporte = async () => {
     if (!selectedProducto || !selectedSucursal) {
       setError('Debes seleccionar un producto y una sucursal');
-      if (!selectedProducto) {
-        setSearchableSelectError('Debes seleccionar un producto');
-      }
       return;
     }
 
     setError(null);
-    setSearchableSelectError('');
     setLoadingReporte(true);
 
     try {
@@ -70,10 +69,7 @@ const HistorialStock = () => {
     setFechaFin('');
     setError(null);
     setActiveMovimiento(null);
-    setSearchableSelectError('');
-    
-    // Resetear el SearchableSelect
-    setResetSearchableSelect(prev => !prev);
+    setCategoriaActiva('Todas');
   };
 
   const handleFiltrarPorFecha = () => {
@@ -165,21 +161,58 @@ const HistorialStock = () => {
           <Row>
             <Col md={4} className="mb-3 mb-md-0">
               <Form.Group>
+                <Form.Label className="filter-label">Categoría</Form.Label>
+                <Dropdown>
+                  <Dropdown.Toggle variant="light" className="w-100 text-start filter-select">
+                    {categoriaActiva === 'Todas' ? 'Todas las categorías' : categoriaActiva}
+                  </Dropdown.Toggle>
+                  <Dropdown.Menu className="w-100">
+                    {categorias.map(categoria => (
+                      <Dropdown.Item 
+                        key={categoria}
+                        active={categoriaActiva === categoria}
+                        onClick={() => {
+                          setCategoriaActiva(categoria);
+                          setSelectedProducto(null);
+                        }}
+                      >
+                        {categoria}
+                      </Dropdown.Item>
+                    ))}
+                  </Dropdown.Menu>
+                </Dropdown>
+              </Form.Group>
+            </Col>
+
+            <Col md={4} className="mb-3 mb-md-0">
+              <Form.Group>
                 <Form.Label className="filter-label">Producto</Form.Label>
-                <SearchableSelect
-                  key={`searchable-select-${resetSearchableSelect}`}
-                  ref={searchableSelectRef}
-                  options={productoOptions}
-                  placeholder="Buscar producto..."
-                  onSelect={setSelectedProducto}
-                  className="mb-2"
-                  required
-                  disabled={loadigProducts || reporteData.length > 0}
-                />
-                {searchableSelectError && (
-                  <div className="text-danger small">{searchableSelectError}</div>
-                )}
+                <Dropdown>
+                  <Dropdown.Toggle 
+                    variant="light" 
+                    className="w-100 text-start filter-select"
+                    disabled={loadigProducts || productosFiltrados.length === 0}
+                  >
+                    {selectedProducto ? selectedProducto.label : 'Seleccionar producto'}
+                  </Dropdown.Toggle>
+                  <Dropdown.Menu className="w-100">
+                    {productosFiltrados.map(producto => (
+                      <Dropdown.Item 
+                        key={producto.idProducto}
+                        onClick={() => setSelectedProducto({
+                          value: producto.idProducto,
+                          label: producto.nombreProducto
+                        })}
+                      >
+                        {producto.nombreProducto}
+                      </Dropdown.Item>
+                    ))}
+                  </Dropdown.Menu>
+                </Dropdown>
                 {loadigProducts && <small className="text-muted">Cargando productos...</small>}
+                {productosFiltrados.length === 0 && !loadigProducts && (
+                  <small className="text-muted">No hay productos en esta categoría</small>
+                )}
               </Form.Group>
             </Col>
 
@@ -190,7 +223,7 @@ const HistorialStock = () => {
                   as="select"
                   value={selectedSucursal}
                   onChange={(e) => setSelectedSucursal(e.target.value)}
-                  disabled={loadingSucursales || reporteData.length > 0}
+                  disabled={loadingSucursales}
                   className="filter-select"
                 >
                   <option value="">Seleccionar sucursal</option>
@@ -203,21 +236,22 @@ const HistorialStock = () => {
                 {loadingSucursales && <small className="text-muted">Cargando sucursales...</small>}
               </Form.Group>
             </Col>
+          </Row>
 
-            <Col md={4} className="d-flex align-items-end">
-              <div className="d-flex w-100">
+          <Row className="mt-3">
+            <Col className="d-flex justify-content-end">
+              <div className="d-flex">
                 <Button
                   variant="outline-secondary"
                   onClick={handleReset}
-                  className="me-2 flex-grow-1"
+                  className="me-2"
                 >
                   <FiRefreshCw />
                 </Button>
                 <Button
                   variant="primary"
                   onClick={handleGenerarReporte}
-                  disabled={!selectedProducto || !selectedSucursal || loadingReporte || reporteData.length > 0}
-                  className="flex-grow-1"
+                  disabled={!selectedProducto || !selectedSucursal || loadingReporte}
                 >
                   {loadingReporte ? (
                     <Spinner animation="border" size="sm" />
@@ -413,14 +447,6 @@ const HistorialStock = () => {
                   <>
                     <Spinner animation="border" variant="primary" />
                     <p className="mt-2">Generando reporte...</p>
-                  </>
-                ) : !showErrorProductos && !showErrorSucursales ? (
-                  <>
-                    <FiFilter size={48} className="text-muted mb-3" />
-                    <h5>No hay datos para mostrar</h5>
-                    <p className="text-muted">
-                      Selecciona un producto y una sucursal para generar el reporte
-                    </p>
                   </>
                 ) : (
                   <>
