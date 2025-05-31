@@ -7,12 +7,14 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './GestionarTraslados.styles.css';
 import { encryptId } from "../../../utils/CryptoParams";
 import dayjs from 'dayjs';
-import 'dayjs/locale/es'; // Importar locale español
-import relativeTime from 'dayjs/plugin/relativeTime'; // Plugin para tiempos relativos
+import 'dayjs/locale/es';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import { eliminarTrasladoService } from "../../../services/Traslados/traslados.service";
+
 
 // Configurar Day.js
-dayjs.locale('es'); // Establecer español como idioma
-dayjs.extend(relativeTime); // Extender con plugin de tiempos relativos
+dayjs.locale('es');
+dayjs.extend(relativeTime);
 
 const GestionarTraslados = () => {
     const navigate = useNavigate();
@@ -37,17 +39,14 @@ const GestionarTraslados = () => {
     // Efecto para extraer opciones de filtros únicas
     useEffect(() => {
         if (traslados && traslados.length > 0) {
-            // Extraer sucursales origen únicas
             const sucursalesOrigenUnicas = [...new Set(
                 traslados.map(t => t.sucursalOrigen)
             )].sort();
             
-            // Extraer sucursales destino únicas
             const sucursalesDestinoUnicas = [...new Set(
                 traslados.map(t => t.sucursalDestino)
             )].sort();
             
-            // Extraer usuarios únicos
             const usuariosUnicos = [...new Set(
                 traslados.map(t => t.usuarioResponsable)
             )].sort();
@@ -58,17 +57,14 @@ const GestionarTraslados = () => {
         }
     }, [traslados]);
 
-    // Función para formatear la fecha con Day.js
     const formatFecha = (fecha) => {
         return dayjs(fecha).format('DD MMM [·] HH:mm');
     };
 
-    // Función para mostrar tiempo relativo (ej: "hace 2 horas")
     const formatFechaRelativa = (fecha) => {
         return dayjs(fecha).fromNow();
     };
 
-    // Función para mostrar fecha completa
     const formatFechaCompleta = (fecha) => {
         return dayjs(fecha).format('dddd, D [de] MMMM [de] YYYY [a las] HH:mm');
     };
@@ -91,21 +87,36 @@ const GestionarTraslados = () => {
     }, [traslados, filtros]);
 
     const handleDeleteClick = (traslado) => {
+        if (traslado.estado === 'COMPLETADO' || traslado.estado === 'CANCELADO') {
+            setErrorMessage("No se pueden eliminar traslados completados o cancelados");
+            return;
+        }
+        
         setSelectedTraslado(traslado);
         setShowDeleteModal(true);
+        setErrorMessage("");
     };
 
     const handleDeleteConfirm = async () => {
         setIsDeleting(true);
+        setErrorMessage("");
+        
         try {
-            // Aquí iría la llamada al servicio para eliminar el traslado
-            // await cancelarTrasladoServices(selectedTraslado.idTraslado);
+            await eliminarTrasladoService(selectedTraslado.idTraslado);
+            
             setTraslados(
                 traslados.filter(t => t.idTraslado !== selectedTraslado.idTraslado)
             );
+            
             setShowDeleteModal(false);
+            setSelectedTraslado(null);
         } catch (error) {
-            setErrorMessage(error.message || "Error al eliminar el traslado");
+            console.error("Error al eliminar traslado:", error);
+            setErrorMessage(
+                error.response?.data?.message || 
+                error.message || 
+                "Ocurrió un error al intentar eliminar el traslado"
+            );
         } finally {
             setIsDeleting(false);
         }
@@ -440,7 +451,10 @@ const GestionarTraslados = () => {
                 <div className="gtl-error-message">
                     <div className="gtl-error-content">
                         <FiXCircle className="gtl-error-icon" />
-                        <p>{errorMessage}</p>
+                        <div>
+                            <p className="gtl-error-title">Error al eliminar traslado</p>
+                            <p className="gtl-error-detail">{errorMessage}</p>
+                        </div>
                         <button 
                             className="gtl-error-close"
                             onClick={() => setErrorMessage("")}
