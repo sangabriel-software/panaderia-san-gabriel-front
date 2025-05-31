@@ -80,9 +80,8 @@ function Sidebar({ show, onClose }) {
 
   return (
     <div
-      className={`sidebar bg-dark ${show ? "show" : "hide"} ${
-        isChangingTheme ? "disable-selection" : ""
-      }`}
+      className={`sidebar bg-dark ${show ? "show" : "hide"} ${isChangingTheme ? "disable-selection" : ""
+        }`}
     >
       {/* Avatar y nombre de usuario */}
       <div className="user-panel mt-3 pb-3 mb-3 d-flex align-items-center">
@@ -121,15 +120,15 @@ function Sidebar({ show, onClose }) {
         </div>
       </div>
 
-       <Nav className="flex-column">
-          <Nav.Link
-            as={NavLink}
-            to="/home"
-            className="text-light"
-            onClick={handleNavLinkClick}
-          >
-            <FiHome size={25} className="me-2" /> Inicio
-          </Nav.Link>
+      <Nav className="flex-column">
+        <Nav.Link
+          as={NavLink}
+          to="/home"
+          className="text-light"
+          onClick={handleNavLinkClick}
+        >
+          <FiHome size={25} className="me-2" /> Inicio
+        </Nav.Link>
         {isRouteAllowed("/dashboard") && (
           <Nav.Link
             as={NavLink}
@@ -141,50 +140,65 @@ function Sidebar({ show, onClose }) {
           </Nav.Link>
         )}
 
-          {/* Inventadio Dropdown */}
-          <>
-            <Nav.Link
-              className="text-light d-flex justify-content-between align-items-center"
-              onClick={() => setInvetarioOpen(!inventarioOpen)}
-              style={{ cursor: "pointer" }}
-            >
-              <span>
-                <FiBox size={25} className="me-2" /> Inventario
-              </span>
-              <FaChevronRight
-                className={`dropdown-arrow ${inventarioOpen ? "open" : ""}`}
-              />
-            </Nav.Link>
+        {/* Inventadio Dropdown */}
+        <>
+          <Nav.Link
+            className="text-light d-flex justify-content-between align-items-center"
+            onClick={() => setInvetarioOpen(!inventarioOpen)}
+            style={{ cursor: "pointer" }}
+          >
+            <span>
+              <FiBox size={25} className="me-2" /> Inventario
+            </span>
+            <FaChevronRight
+              className={`dropdown-arrow ${inventarioOpen ? "open" : ""}`}
+            />
+          </Nav.Link>
 
-            <Collapse in={inventarioOpen}>
-              <div>
+          <Collapse in={inventarioOpen}>
+            <div>
               {isRouteAllowed("/stock-productos") && (
-                  <Nav.Link
-                    as={NavLink}
-                    to="/stock-productos"
-                    className="text-light ps-4 submenu-item"
-                    onClick={handleNavLinkClick}
-                  >
-                    <FiClipboard className="me-2" /> Control de stock
-                  </Nav.Link>
-                )}
-              </div>
-            </Collapse>
-            <Collapse in={inventarioOpen}>
-              <div>
+                <Nav.Link
+                  as={NavLink}
+                  to="/stock-productos"
+                  className="text-light ps-4 submenu-item"
+                  onClick={handleNavLinkClick}
+                >
+                  <FiClipboard className="me-2" /> Control de stock
+                </Nav.Link>
+              )}
+            </div>
+          </Collapse>
+          <Collapse in={inventarioOpen}>
+            <div>
               {isRouteAllowed("/descuento-stock") && (
-                  <Nav.Link
-                    as={NavLink}
-                    to="/descuento-stock"
-                    className="text-light ps-4 submenu-item"
-                    onClick={handleNavLinkClick}
-                  >
-                    <FiAlertCircle className="me-2" /> Descontar Stock
-                  </Nav.Link>
-                )}
-              </div>
-            </Collapse>
-          </>
+                <Nav.Link
+                  as={NavLink}
+                  to="/descuento-stock"
+                  className="text-light ps-4 submenu-item"
+                  onClick={handleNavLinkClick}
+                >
+                  <FiAlertCircle className="me-2" /> Descontar Stock
+                </Nav.Link>
+              )}
+            </div>
+          </Collapse>
+
+          <Collapse in={inventarioOpen}>
+            <div>
+              {isRouteAllowed("/traslados-productos") && (
+                <Nav.Link
+                  as={NavLink}
+                  to="/traslados-productos"
+                  className="text-light ps-4 submenu-item"
+                  onClick={handleNavLinkClick}
+                >
+                  <FiTruck className="me-2" /> Traslados
+                </Nav.Link>
+              )}
+            </div>
+          </Collapse>
+        </>
 
         {/* {isRouteAllowed("/stock-productos") && (
           <Nav.Link
@@ -295,45 +309,34 @@ function Sidebar({ show, onClose }) {
           </Nav.Link>
         )}
 
-        {isRouteAllowed("/traslados-productos") && (
-          <Nav.Link
-            as={NavLink}
-            to="/traslados-productos"
-            className="text-light"
-            onClick={handleNavLinkClick}
-          >
-            <FiTruck size={25} className="me-2" /> Traslados
-          </Nav.Link>
-        )}
-
         {/* Configuraciones Dropdown */}
-          <>
-            <Nav.Link
-              className="text-light d-flex justify-content-between align-items-center"
-              onClick={() => setConfigOpen(!configOpen)}
-              style={{ cursor: "pointer" }}
-            >
-              <span>
-                <FiSettings size={25} className="me-2" /> Configuraciones
-              </span>
-              <FaChevronRight
-                className={`dropdown-arrow ${configOpen ? "open" : ""}`}
-              />
-            </Nav.Link>
+        <>
+          <Nav.Link
+            className="text-light d-flex justify-content-between align-items-center"
+            onClick={() => setConfigOpen(!configOpen)}
+            style={{ cursor: "pointer" }}
+          >
+            <span>
+              <FiSettings size={25} className="me-2" /> Configuraciones
+            </span>
+            <FaChevronRight
+              className={`dropdown-arrow ${configOpen ? "open" : ""}`}
+            />
+          </Nav.Link>
 
-            <Collapse in={configOpen}>
-              <div>
-                  <Nav.Link
-                    as={NavLink}
-                    to="/config"
-                    className="text-light ps-4 submenu-item"
-                    onClick={handleNavLinkClick}
-                  >
-                    <MdDashboard className="me-2" /> Panel de control
-                  </Nav.Link>
-              </div>
-            </Collapse>
-          </>
+          <Collapse in={configOpen}>
+            <div>
+              <Nav.Link
+                as={NavLink}
+                to="/config"
+                className="text-light ps-4 submenu-item"
+                onClick={handleNavLinkClick}
+              >
+                <MdDashboard className="me-2" /> Panel de control
+              </Nav.Link>
+            </div>
+          </Collapse>
+        </>
       </Nav>
 
       {/* Toggle Switch para el tema */}

@@ -1,0 +1,310 @@
+/* Estilos base para la tabla */
+.excel-table-container {
+    margin: auto auto; /* Centrado horizontal */
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    max-width: 800px; /* Ancho máximo reducido para PC */
+  }
+  
+  .excel-table {
+    width: 100%;
+    margin-bottom: 0;
+    color: #212529;
+    font-size: 0.9rem;
+    table-layout: fixed; /* Mantenemos fixed para control preciso */
+  }
+  
+  /* Estilos para PC - Ancho específico de columnas */
+  .excel-table th:first-child,
+  .excel-table td:first-child {
+    width: 55%; /* Reducimos el ancho de la columna de nombre */
+    min-width: 180px;
+  }
+  
+  .excel-table th:last-child,
+  .excel-table td:last-child {
+    width: 45%; /* Aumentamos proporción para columna cantidad */
+  }
+  
+  /* Resto de estilos se mantienen igual */
+  .excel-table .dark-header {
+    background-color: #343a40;
+    color: white;
+    border-color: #454d55;
+    vertical-align: middle;
+    position: sticky;
+    top: 0;
+    font-weight: 500;
+    text-align: center;
+  }
+  
+  .excel-table th, 
+  .excel-table td {
+    padding: 12px 8px;
+    vertical-align: middle;
+  }
+  
+  .excel-table td {
+    border-top: 1px solid #e9ecef;
+  }
+  
+  .excel-table tr:hover {
+    background-color: rgba(241, 243, 245, 0.5);
+  }
+  
+  /* Ajustes para los inputs */
+  .quantity-input {
+    width: 150px; /* Ancho fijo reducido */
+    margin: 0 auto;
+    text-align: center;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+  
+  .quantity-input:focus {
+    border-color: #6a01ac;
+    box-shadow: 0 0 0 0.2rem rgba(106, 1, 172, 0.25);
+  }
+  
+  /* Optimización de espacio para nombres de productos */
+  .product-info {
+    display: flex;
+    align-items: center;
+    padding: 0 5px;
+    gap: 10px;
+    min-width: 0; /* Permite que el texto se trunque */
+  }
+  
+  .product-badge-stock {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    flex-shrink: 0;
+    font-size: 0.85rem;
+  }
+  
+  .product-name {
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: left;
+    font-size: 0.9rem;
+  }
+  
+  /* Botón centrado con margen adecuado */
+  .button-container {
+    margin: 2rem auto;
+    text-align: center;
+    max-width: 800px; /* Coincide con el ancho de la tabla */
+  }
+  
+  /* Dropdown de categorías */
+  .category-dropdown {
+    background-color: #6a01ac !important;
+    border: none;
+    border-radius: 6px;
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+    min-width: 200px;
+    text-align: left;
+  }
+  
+  .category-dropdown:hover, 
+  .category-dropdown:focus {
+    background-color: #5a0199 !important;
+  }
+  
+  .category-dropdown-menu {
+    border-radius: 6px;
+    border: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+    padding: 0.5rem 0;
+    max-height: 300px;
+    overflow-y: auto;
+  }
+  
+  .category-dropdown-item {
+    padding: 0.5rem 1rem;
+    color: #495057;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+  
+  .category-dropdown-item:hover {
+    background-color: #f8f9fa;
+    color: #6a01ac;
+  }
+  
+  .category-dropdown-item.active, 
+  .category-dropdown-item:active {
+    background-color: #6a01ac;
+    color: white;
+  }
+  
+  /* Search Bar Styles */
+  .search-input {
+    width: 100%;
+    padding: 0.5rem 1rem;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    transition: all 0.2s;
+    padding-right: 2rem;
+  }
+  
+  .search-input:focus {
+    border-color: #6a01ac;
+    box-shadow: 0 0 0 0.2rem rgba(106, 1, 172, 0.25);
+  }
+  
+  .btn-clear-search {
+    background: transparent;
+    border: none;
+    color: #6c757d;
+    font-size: 1.25rem;
+    padding: 0 0.75rem;
+    line-height: 1;
+    cursor: pointer;
+    transform: translateY(-50%);
+  }
+  
+  .btn-clear-search:hover {
+    color: #495057;
+  }
+  
+  /* Responsive Design - Mantenemos los estilos para móvil/tablet existentes */
+  @media (max-width: 991px) {
+    .excel-table-container {
+      max-width: 100%; /* En tablet/móvil ocupa todo el ancho */
+      margin: 1.5rem 0;
+    }
+  
+    .excel-table {
+      font-size: 0.85rem;
+    }
+    
+    .excel-table th, 
+    .excel-table td {
+      padding: 10px 6px;
+    }
+    
+    .product-badge-stock {
+      width: 28px;
+      height: 28px;
+    }
+    
+    .product-name {
+      font-size: 0.85rem;
+    }
+    
+    .quantity-input {
+      width: 100px;
+      font-size: 0.85rem;
+    }
+    
+    .category-dropdown {
+      min-width: 180px;
+      padding: 0.4rem 0.8rem;
+    }
+    
+    .search-input {
+      padding: 0.4rem 0.8rem;
+      font-size: 0.9rem;
+    }
+  }
+  
+  @media (max-width: 767px) {
+    .excel-table {
+      font-size: 0.8rem;
+    }
+    
+    .excel-table th, 
+    .excel-table td {
+      padding: 8px 4px;
+    }
+    
+    .product-info {
+      gap: 8px;
+    }
+    
+    .product-badge {
+      width: 24px;
+      height: 24px;
+      font-size: 0.75rem;
+    }
+    
+    .product-name {
+      font-size: 0.8rem;
+    }
+    
+    .quantity-input {
+      width: 70px;
+      padding: 4px 6px;
+      font-size: 0.8rem;
+    }
+    
+    .btn-guardar-stock {
+      padding: 0.6rem 1.5rem;
+      min-width: 180px;
+      font-size: 0.9rem;
+    }
+    
+    .category-dropdown {
+      min-width: 160px;
+      padding: 0.35rem 0.7rem;
+      font-size: 0.85rem;
+    }
+    
+    .btn-clear-search {
+      padding: 0 0.5rem;
+      font-size: 1.1rem;
+    }
+  }
+  
+  @media (max-width: 575px) {
+    .excel-table {
+      font-size: 0.95rem;
+    }
+    
+    .excel-table th, 
+    .excel-table td {
+      padding: 6px 3px;
+    }
+    
+    .product-badge {
+      width: 22px;
+      height: 22px;
+    }
+    
+    .product-info {
+      gap: 6px;
+    }
+    
+    .quantity-input {
+      width: 70px;
+      padding: 3px 5px;
+      font-size: 0.90rem;
+      text-align: center;
+    }
+    
+    .product-name {
+      font-size: 0.95rem;
+      font-weight: bold;
+    }
+    
+    .search-input {
+      padding: 0.35rem 0.7rem;
+      font-size: 0.85rem;
+    }
+  }

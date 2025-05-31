@@ -15,7 +15,7 @@ export const handleViewDetails = (idTraslado, navigate) => {
 
 
 export const handleAddTraslado = (navigate) => {
-    navigate(`/crear-traslado`);
+    navigate(`ingresar-traslado`);
 };
 
 export const handleFiltroChange = (e, setFiltros) => {
