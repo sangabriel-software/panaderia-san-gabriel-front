@@ -6,6 +6,13 @@ import { FiTruck, FiCheck, FiX, FiTrash2, FiEye, FiXCircle, FiFilter, FiUser, Fi
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './GestionarTraslados.styles.css';
 import { encryptId } from "../../../utils/CryptoParams";
+import dayjs from 'dayjs';
+import 'dayjs/locale/es'; // Importar locale español
+import relativeTime from 'dayjs/plugin/relativeTime'; // Plugin para tiempos relativos
+
+// Configurar Day.js
+dayjs.locale('es'); // Establecer español como idioma
+dayjs.extend(relativeTime); // Extender con plugin de tiempos relativos
 
 const GestionarTraslados = () => {
     const navigate = useNavigate();
@@ -51,15 +58,19 @@ const GestionarTraslados = () => {
         }
     }, [traslados]);
 
-    // Función para formatear la fecha
+    // Función para formatear la fecha con Day.js
     const formatFecha = (fecha) => {
-        const date = new Date(fecha);
-        return date.toLocaleDateString('es-ES', {
-            day: '2-digit',
-            month: 'short',
-            hour: '2-digit',
-            minute: '2-digit'
-        }).replace(',', ' ·');
+        return dayjs(fecha).format('DD MMM [·] HH:mm');
+    };
+
+    // Función para mostrar tiempo relativo (ej: "hace 2 horas")
+    const formatFechaRelativa = (fecha) => {
+        return dayjs(fecha).fromNow();
+    };
+
+    // Función para mostrar fecha completa
+    const formatFechaCompleta = (fecha) => {
+        return dayjs(fecha).format('dddd, D [de] MMMM [de] YYYY [a las] HH:mm');
     };
 
     const trasladosFiltrados = useMemo(() => {
@@ -333,7 +344,9 @@ const GestionarTraslados = () => {
                                 </div>
                                 <div className="gtl-time-info">
                                     <FiClock className="gtl-time-icon" />
-                                    <span className="gtl-time-text">{formatFecha(traslado.fechaTraslado)}</span>
+                                    <span className="gtl-time-text" title={formatFechaCompleta(traslado.fechaTraslado)}>
+                                        {formatFecha(traslado.fechaTraslado)} · {formatFechaRelativa(traslado.fechaTraslado)}
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -393,6 +406,10 @@ const GestionarTraslados = () => {
                                     <FiMapPin className="gtl-modal-destination" />
                                     <span>{selectedTraslado?.sucursalDestino}</span>
                                 </div>
+                            </div>
+                            <div className="gtl-modal-date">
+                                <FiClock className="me-2" />
+                                <span>{formatFechaCompleta(selectedTraslado?.fechaTraslado)}</span>
                             </div>
                         </div>
                         <div className="gtl-modal-footer">
