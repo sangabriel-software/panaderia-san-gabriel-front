@@ -6,15 +6,8 @@ import { FiTruck, FiCheck, FiX, FiTrash2, FiEye, FiXCircle, FiFilter, FiUser, Fi
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './GestionarTraslados.styles.css';
 import { encryptId } from "../../../utils/CryptoParams";
-import dayjs from 'dayjs';
-import 'dayjs/locale/es';
-import relativeTime from 'dayjs/plugin/relativeTime';
 import { eliminarTrasladoService } from "../../../services/Traslados/traslados.service";
-
-
-// Configurar Day.js
-dayjs.locale('es');
-dayjs.extend(relativeTime);
+import { formatFecha, formatFechaCompleta, formatFechaRelativa, extraerOpcionesFiltros, filtrarTraslados, validarEliminacionTraslado, handleDeleteClick, handleDeleteConfirm, handleViewDetails, handleAddTraslado, toggleFiltros, handleFiltroChange} from "./GestionarTraslados.utils";
 
 const GestionarTraslados = () => {
     const navigate = useNavigate();
@@ -29,119 +22,14 @@ const GestionarTraslados = () => {
         sucursalDestino: "",
         usuario: ""
     });
-    const [sucursalesOrigenOptions, setSucursalesOrigenOptions] = useState([]);
-    const [sucursalesDestinoOptions, setSucursalesDestinoOptions] = useState([]);
-    const [usuariosOptions, setUsuariosOptions] = useState([]);
     
-    const isMobile = useMediaQuery({ maxWidth: 767 });
-    const isTablet = useMediaQuery({ minWidth: 768, maxWidth: 991 });
+    // Extraer opciones para los filtros
+    const { sucursalesOrigen: sucursalesOrigenOptions, sucursalesDestino: sucursalesDestinoOptions, usuarios: usuariosOptions } = useMemo(() => extraerOpcionesFiltros(traslados), [traslados]);
 
-    // Efecto para extraer opciones de filtros únicas
-    useEffect(() => {
-        if (traslados && traslados.length > 0) {
-            const sucursalesOrigenUnicas = [...new Set(
-                traslados.map(t => t.sucursalOrigen)
-            )].sort();
-            
-            const sucursalesDestinoUnicas = [...new Set(
-                traslados.map(t => t.sucursalDestino)
-            )].sort();
-            
-            const usuariosUnicos = [...new Set(
-                traslados.map(t => t.usuarioResponsable)
-            )].sort();
-            
-            setSucursalesOrigenOptions(sucursalesOrigenUnicas);
-            setSucursalesDestinoOptions(sucursalesDestinoUnicas);
-            setUsuariosOptions(usuariosUnicos);
-        }
-    }, [traslados]);
+    // Filtrar traslados
+    const trasladosFiltrados = useMemo(() => filtrarTraslados(traslados, filtros), [traslados, filtros]);
 
-    const formatFecha = (fecha) => {
-        return dayjs(fecha).format('DD MMM [·] HH:mm');
-    };
 
-    const formatFechaRelativa = (fecha) => {
-        return dayjs(fecha).fromNow();
-    };
-
-    const formatFechaCompleta = (fecha) => {
-        return dayjs(fecha).format('dddd, D [de] MMMM [de] YYYY [a las] HH:mm');
-    };
-
-    const trasladosFiltrados = useMemo(() => {
-        if (!traslados) return [];
-        
-        return traslados.filter(traslado => {
-            const matchesSucursalOrigen = !filtros.sucursalOrigen || 
-                traslado.sucursalOrigen === filtros.sucursalOrigen;
-            
-            const matchesSucursalDestino = !filtros.sucursalDestino || 
-                traslado.sucursalDestino === filtros.sucursalDestino;
-            
-            const matchesUsuario = !filtros.usuario || 
-                traslado.usuarioResponsable === filtros.usuario;
-            
-            return matchesSucursalOrigen && matchesSucursalDestino && matchesUsuario;
-        });
-    }, [traslados, filtros]);
-
-    const handleDeleteClick = (traslado) => {
-        if (traslado.estado === 'COMPLETADO' || traslado.estado === 'CANCELADO') {
-            setErrorMessage("No se pueden eliminar traslados completados o cancelados");
-            return;
-        }
-        
-        setSelectedTraslado(traslado);
-        setShowDeleteModal(true);
-        setErrorMessage("");
-    };
-
-    const handleDeleteConfirm = async () => {
-        setIsDeleting(true);
-        setErrorMessage("");
-        
-        try {
-            await eliminarTrasladoService(selectedTraslado.idTraslado);
-            
-            setTraslados(
-                traslados.filter(t => t.idTraslado !== selectedTraslado.idTraslado)
-            );
-            
-            setShowDeleteModal(false);
-            setSelectedTraslado(null);
-        } catch (error) {
-            console.error("Error al eliminar traslado:", error);
-            setErrorMessage(
-                error.response?.data?.message || 
-                error.message || 
-                "Ocurrió un error al intentar eliminar el traslado"
-            );
-        } finally {
-            setIsDeleting(false);
-        }
-    };
-
-    const handleViewDetails = (idTraslado) => {
-        const encryptedId = encryptId(idTraslado.toString());
-        navigate(`/detalles-traslados/${encodeURIComponent(encryptedId)}`);
-    };
-
-    const toggleFiltros = () => {
-        setShowFiltros(!showFiltros);
-    };
-
-    const handleAddTraslado = () => {
-        navigate(`/crear-traslado`);
-    };
-
-    const handleFiltroChange = (e) => {
-        const { name, value } = e.target;
-        setFiltros(prev => ({
-            ...prev,
-            [name]: value
-        }));
-    };
 
     const clearFiltros = () => {
         setFiltros({
@@ -153,6 +41,7 @@ const GestionarTraslados = () => {
 
     const hasFiltrosActivos = filtros.sucursalOrigen || filtros.sucursalDestino || filtros.usuario;
 
+    // Renderizado condicional
     if (loadingTraslados) {
         return (
             <div className="gtl-loading-screen">
@@ -193,7 +82,7 @@ const GestionarTraslados = () => {
                 )}
                 <button 
                     className="gtl-add-traslado-btn gtl-empty-btn"
-                    onClick={handleAddTraslado}
+                    onClick={() => handleAddTraslado(navigate)}
                 >
                     <FiPlus /> Crear nuevo traslado
                 </button>
@@ -203,6 +92,7 @@ const GestionarTraslados = () => {
 
     return (
         <div className="gtl-container">
+            {/* Header y Filtros */}
             <header className="gtl-header">
                 <div className="gtl-header-top row">
                     <div className="col-12 col-md-6">
@@ -213,7 +103,7 @@ const GestionarTraslados = () => {
                         <div className="d-flex flex-column flex-md-row justify-content-md-end gap-2">
                             <button 
                                 className="gtl-filter-toggle"
-                                onClick={toggleFiltros}
+                                onClick={() => toggleFiltros(setShowFiltros, showFiltros)}
                             >
                                 <FiFilter />
                                 {showFiltros ? 'Ocultar filtros' : 'Filtrar'}
@@ -221,7 +111,7 @@ const GestionarTraslados = () => {
                             
                             <button 
                                 className="gtl-add-traslado-btn"
-                                onClick={handleAddTraslado}
+                                onClick={() => handleAddTraslado(navigate)}
                             >
                                 <FiPlus /> Crear traslado
                             </button>
@@ -241,7 +131,7 @@ const GestionarTraslados = () => {
                                         <select
                                             name="sucursalOrigen"
                                             value={filtros.sucursalOrigen}
-                                            onChange={handleFiltroChange}
+                                            onChange={(e) => handleFiltroChange(e, setFiltros)}
                                             className="gtl-select"
                                         >
                                             <option value="">Todas las sucursales</option>
@@ -262,7 +152,7 @@ const GestionarTraslados = () => {
                                         <select
                                             name="sucursalDestino"
                                             value={filtros.sucursalDestino}
-                                            onChange={handleFiltroChange}
+                                            onChange={(e) => handleFiltroChange(e, setFiltros)}
                                             className="gtl-select"
                                         >
                                             <option value="">Todas las sucursales</option>
@@ -283,7 +173,7 @@ const GestionarTraslados = () => {
                                         <select
                                             name="usuario"
                                             value={filtros.usuario}
-                                            onChange={handleFiltroChange}
+                                            onChange={(e) => handleFiltroChange(e, setFiltros)}
                                             className="gtl-select"
                                         >
                                             <option value="">Todos los usuarios</option>
@@ -313,6 +203,7 @@ const GestionarTraslados = () => {
                 )}
             </header>
 
+            {/* Lista de Traslados */}
             <div className="gtl-list">
                 {trasladosFiltrados.map(traslado => (
                     <div key={traslado.idTraslado} className="gtl-item">
@@ -365,16 +256,16 @@ const GestionarTraslados = () => {
                         <div className="gtl-item-actions">
                             <button 
                                 className="gtl-action-btn gtl-view-btn"
-                                onClick={() => handleViewDetails(traslado.idTraslado)}
+                                onClick={() => handleViewDetails(traslado.idTraslado, navigate)}
                                 title="Ver detalles"
                             >
                                 <FiEye />
                             </button>
                             <button 
-                                className={`gtl-action-btn gtl-delete-btn ${traslado.estado === 'COMPLETADO' || traslado.estado === 'CANCELADO' ? 'disabled' : ''}`}
-                                onClick={() => handleDeleteClick(traslado)}
-                                title={traslado.estado === 'COMPLETADO' || traslado.estado === 'CANCELADO' ? "No se pueden eliminar traslados completados o cancelados" : "Eliminar traslado"}
-                                disabled={traslado.estado === 'COMPLETADO' || traslado.estado === 'CANCELADO'}
+                                className={`gtl-action-btn gtl-delete-btn ${!validarEliminacionTraslado(traslado) ? 'disabled' : ''}`}
+                                onClick={() => handleDeleteClick(traslado, setErrorMessage, setSelectedTraslado, setShowDeleteModal)}
+                                title={!validarEliminacionTraslado(traslado) ? "No se pueden eliminar traslados completados o cancelados" : "Eliminar traslado"}
+                                disabled={!validarEliminacionTraslado(traslado)}
                             >
                                 <FiTrash2 />
                             </button>
@@ -386,6 +277,7 @@ const GestionarTraslados = () => {
                 ))}
             </div>
 
+            {/* Modal de Eliminación */}
             {showDeleteModal && (
                 <div className="gtl-modal-overlay">
                     <div className="gtl-modal">
@@ -433,7 +325,7 @@ const GestionarTraslados = () => {
                             </button>
                             <button
                                 className="gtl-modal-btn gtl-modal-confirm"
-                                onClick={handleDeleteConfirm}
+                                onClick={() => handleDeleteConfirm(selectedTraslado, traslados, setTraslados, setShowDeleteModal, setSelectedTraslado, setIsDeleting, setErrorMessage)}
                                 disabled={isDeleting}
                             >
                                 {isDeleting ? (
@@ -447,6 +339,7 @@ const GestionarTraslados = () => {
                 </div>
             )}
 
+            {/* Mensaje de Error */}
             {errorMessage && (
                 <div className="gtl-error-message">
                     <div className="gtl-error-content">
