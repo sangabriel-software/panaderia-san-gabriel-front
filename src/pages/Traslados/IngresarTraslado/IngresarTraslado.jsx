@@ -12,6 +12,7 @@ import { getUserData } from "../../../utils/Auth/decodedata";
 import { format } from "date-fns";
 import "./IngresarTraslado.styles.css"
 import { consultarStockProductosDelDiaService, consultarStockProductosService } from "../../../services/stockservices/stock.service";
+import { ingresarTrasladoService } from "../../../services/Traslados/traslados.service";
 
 
 const IngresarTraslado = () => {
@@ -247,46 +248,44 @@ const IngresarTraslado = () => {
         const esFrances = producto.nombreProducto === "Frances";
         
         // Convertir el valor ingresado a unidades
-        const stockATrasladar = convertirValorAUnidades(item.value, esFrances);
+        const cantidadATrasladar = convertirValorAUnidades(item.value, esFrances);
         
         return {
           ...producto,
-          stockATrasladar: stockATrasladar
+          cantidadATrasladar: cantidadATrasladar
         };
       });
 
       const now = new Date();
       const fechaTraslado = format(now, "yyyy-MM-dd HH:mm:ss");
-      const fechaCreacion = format(now, "yyyy-MM-dd");
 
       // Construir el payload según lo que espera el backend
       const payload = {
-        trasladoInfo: {
+        traladoHeader: {
           idSucursalOrigen: sucursalOrigen.idSucursal,
           idSucursalDestino: sucursalDestino.idSucursal,
           idUsuario: userData.idUsuario,
-          fechaTraslado: fechaTraslado,
-          fechaCreacion: fechaCreacion
+          fechaTraslado: fechaTraslado
         },
-        detalleTraslado: productosCompletos.map(producto => ({
+        trasladoDetalle: productosCompletos.map(producto => ({
           idProducto: producto.idProducto,
-          tipoProduccion: producto.tipoProduccion,
+          tipoProduccion: producto.tipoProduccion || "bandejas", // Valor por defecto si no viene
           controlarStock: producto.controlarStock ? 1 : 0,
           controlarStockDiario: producto.esStockDiario ? 1 : 0,
-          cantidadTrasladada: producto.stockATrasladar,
+          cantidadATrasladar: producto.cantidadATrasladar,
           fechaTraslado: fechaTraslado
         }))
       };
 
       // Llamada al servicio para trasladar stock
-      const response = await trasladarStockService(payload);
+      const response = await ingresarTrasladoService(payload);
 
       // Verificar si la respuesta fue exitosa
       if (response) {
         // Actualizar el stock local antes de mostrar el popup
         actualizarStockLocal(productosCompletos.map(p => ({
           idProducto: p.idProducto,
-          stockATrasladar: p.stockATrasladar,
+          stockATrasladar: p.cantidadATrasladar,
           esStockDiario: p.esStockDiario
         })));
 
@@ -342,7 +341,7 @@ const IngresarTraslado = () => {
             <button
               className="btn bt-return rounded-circle d-flex align-items-center justify-content-center shadow"
               style={{ width: "40px", height: "40px" }}
-              onClick={() => navigate("/traslados")}
+              onClick={() => navigate("/traslados-productos")}
             >
               <BsArrowLeft size={20} />
             </button>
@@ -571,7 +570,7 @@ const IngresarTraslado = () => {
         message="Se trasladó el stock correctamente"
         nombreBotonVolver="Ver Traslados"
         nombreBotonNuevo="Nuevo Traslado"
-        onView={() => navigate("/traslados")}
+        onView={() => navigate("/traslados-productos")}
         onNew={() => {
           setIsPopupOpen(false);
           setStockValues({});
