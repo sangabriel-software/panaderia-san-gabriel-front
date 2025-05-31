@@ -48,6 +48,7 @@ const GestionarDecuentos = lazy(() => import("./pages/StockProductos/DescontarSt
 const StockDescuentosList = lazy(() => import("./pages/StockProductos/DescontarStock/StockDescuentosList/StockDescuentosList"));  
 const DescontarStock = lazy(() => import("./pages/StockProductos/DescontarStock/DescontarStock/DescontarStock"));
 const DetalleDescuento = lazy(() => import("./pages/StockProductos/DescontarStock/DetalleDescuento/DetalleDescuento"));
+const GestionarTraslados = lazy(() => import("./pages/Traslados/GestionarTraslados/GestionarTraslados"));
 
 function App() {
   return (
@@ -125,6 +126,10 @@ function App() {
             <Route path="/reportes">
               <Route index element={<ReportesPanel/>} />
               <Route path="ingreso-stock" element={<HistorialStock/>} />
+            </Route>
+
+            <Route path="/traslados-productos">
+              <Route index element={<GestionarTraslados/>} />
             </Route>
 
           </Route>
