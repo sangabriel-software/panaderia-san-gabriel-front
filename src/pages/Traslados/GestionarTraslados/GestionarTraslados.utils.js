@@ -10,7 +10,7 @@ dayjs.extend(relativeTime);
 
 export const handleViewDetails = (idTraslado, navigate) => {
     const encryptedId = encryptId(idTraslado.toString());
-    navigate(`/detalles-traslados/${encodeURIComponent(encryptedId)}`);
+    navigate(`detalles-traslado/${encodeURIComponent(encryptedId)}`);
 };
 
 
