@@ -20,6 +20,9 @@ const getEndpoints = {
     DESCUENTO_DE_STOCK: "consultar-descuento-stock-por-sucursal",
     DETALLE_DESCUENTOS: "consultar-detalle-descuento",
     GET_HISTORIAL_STOCK: "generar-reporte-historial-stock",
+    CONSULTAR_TRASLADOS: "consultar-traslados",
+    CONSULTAR_DETALLE_TRASLADOS: "consultar-detalle-traslado",
+    CONSULTAR_ELIMINACIONES: "consultar-eliminacion-por-dia"
 };
 
 const postEndpoints = {
@@ -38,6 +41,7 @@ const postEndpoints = {
     INGRESAR_STOCK: "ingresar-stock-productos",
     INGRESAR_ORDEN_ESPECIAL: "/ingresar-orden-especial",
     DESCONTAR_STOCK: "descontar-stock",
+    INGRESAR_TRASLADO: "registrar-traslado",
 };
 
 const putEndpoints = {
@@ -66,6 +70,7 @@ const deleteEndpoints = {
     ELIMINAR_RECETA: "elminar-receta",
     ELIMINAR_ORDEN_ESPECIAL: "eliminar-orden-especial",
     CANCELAR_DESCUENTO_STOCK: "cancelar-descuento-stock",
+    ELIMINAR_TRASLADO: "eliminar-traslado"
 };
 
 export { getEndpoints, postEndpoints, putEndpoints, deleteEndpoints};

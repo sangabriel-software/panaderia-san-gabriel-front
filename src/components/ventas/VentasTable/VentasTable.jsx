@@ -20,14 +20,38 @@ const getColorByName = (name) => {
   return COLORS[hash % COLORS.length];
 };
 
-const VentasTable = ({ sales, onDelete, onViewPdf, loadingViewPdf }) => {
+const VentasTable = ({ sales, onDelete, onViewPdf, loadingViewPdf, eliminacionesTracking }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const containerRef = useRef(null);
   const navigate = useNavigate();
+  console.log(sales)
+  console.log(eliminacionesTracking)
 
   // Función para verificar si una venta es de hoy
   const esVentaDeHoy = (fechaVenta) => {
     return dayjs(fechaVenta).isSame(dayjs(), 'day');
+  };
+
+  // Función para verificar si se puede eliminar la venta
+  const puedeEliminarVenta = (sale, eliminacionesTracking) => {
+
+    if (!esVentaDeHoy(sale.fechaVenta)) return false;
+
+    if(eliminacionesTracking.length === 0){
+      return true;
+    }
+    
+    const eliminacionExistente = eliminacionesTracking?.find(eliminacion => 
+      eliminacion.nombreSucursal === sale.nombreSucursal &&
+      eliminacion.turno === sale.ventaTurno
+    );
+
+
+    if(eliminacionExistente && eliminacionExistente.cantidadEliminaciones >= 1){
+      return false;   
+    }
+
+    return true;
   };
 
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -55,11 +79,12 @@ const VentasTable = ({ sales, onDelete, onViewPdf, loadingViewPdf }) => {
             <th className="text-center">Total Venta</th>
             <th className="text-center">Fecha venta</th>
             <th className="text-center">Acciones</th>
+            
           </tr>
         </thead>
         <tbody>
           {paginatedSales.map((sale, index) => {
-            const esHoy = esVentaDeHoy(sale.fechaVenta);
+            const puedeEliminar = puedeEliminarVenta(sale, eliminacionesTracking);
             return (
               <tr
                 key={sale.idVenta}
@@ -143,24 +168,30 @@ const VentasTable = ({ sales, onDelete, onViewPdf, loadingViewPdf }) => {
                       placement="top"
                       overlay={
                         <Tooltip>
-                          {esHoy ? "Eliminar venta" : "Solo se pueden eliminar ventas del día actual"}
+                          {puedeEliminar 
+                            ? "Eliminar venta" 
+                            : "Solo se permite una eliminación por turno por sucursal"}
                         </Tooltip>
                       }
                     >
                       <span>
                         <Button
                           variant="link"
-                          className={`ventas-action-btn ventas-delete-btn ${!esHoy ? 'ventas-delete-disabled' : ''}`}
+                          className={`ventas-action-btn ventas-delete-btn ${
+                            !puedeEliminar ? 'ventas-delete-disabled' : ''
+                          }`}
                           onClick={(e) => {
-                            if (esHoy) {
+                            if (puedeEliminar) {
                               e.stopPropagation();
                               onDelete(sale.idVenta);
                             }
                           }}
                           onDoubleClick={(e) => e.stopPropagation()}
-                          disabled={!esHoy}
+                          disabled={!puedeEliminar}
                         >
-                          <FaTrashAlt className={`ventas-action-icon ${!esHoy ? 'text-muted' : ''}`} />
+                          <FaTrashAlt className={`ventas-action-icon ${
+                            !puedeEliminar ? 'text-muted' : ''
+                          }`} />
                         </Button>
                       </span>
                     </OverlayTrigger>

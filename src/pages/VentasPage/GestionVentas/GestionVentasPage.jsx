@@ -18,12 +18,14 @@ import Alert from "../../../components/Alerts/Alert";
 import ConfirmPopUp from "../../../components/Popup/ConfirmPopup";
 import ErrorPopup from "../../../components/Popup/ErrorPopUp";
 import { handleViewDetalleVenta } from "../DetalleVenta/DetalleVenta.utils";
+import useGetEliminacionesTracking from "../../../hooks/EliminacionesTracking/useGetEliminacionesTracking";
 
 const GestionVentasPage = () => {
   const navigate = useNavigate();
   const { ventas, loadingVentas, showErrorVentas, showInfoVentas, setVentas } = useGetVentas();
   const [filters, setFilters] = useState({ search: "", date: "", sucursal: "", });
   const filteredVentas = useFilterVentas(ventas, filters);
+  const { eliminacionesTracking, loadingEliminacionesTracking, showErrorEliminacionesTracking, setEliminacionesTracking } = useGetEliminacionesTracking("VENTA");
 
   /* Variables para la paginacion */
   const [currentPage, setCurrentPage] = useState(1);
@@ -93,6 +95,7 @@ const GestionVentasPage = () => {
                     setIsPopupOpen
                   )
                 }
+                eliminacionesTracking={eliminacionesTracking}
               />
             ))}
 
@@ -119,6 +122,7 @@ const GestionVentasPage = () => {
           }
           onViewPdf={handleViewPdf}
           loadingViewPdf={null} // Puedes manejar el estado de carga aquí
+          eliminacionesTracking={eliminacionesTracking}
         />
       )}
 
