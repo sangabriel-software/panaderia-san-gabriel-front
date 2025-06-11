@@ -1,16 +1,37 @@
 import React from "react";
-import { Card, Button, Badge, OverlayTrigger, Tooltip } from "react-bootstrap";
+import { Card, Button, Badge, OverlayTrigger, Tooltip, Spinner } from "react-bootstrap";
 import { FaCalendarAlt, FaUser, FaInfoCircle, FaTrash } from "react-icons/fa";
 import "./VentasCard.css";
 import { formatDateToDisplay } from "../../../utils/dateUtils";
 import dayjs from "dayjs";
 
-const VentasCard = ({ sale, onViewDetails, onDeleteSale }) => {
+const VentasCard = ({ sale, onViewDetails, onDeleteSale, eliminacionesTracking, loadingDelete }) => {
   // Función para verificar si una venta es de hoy
   const esVentaDeHoy = (fechaVenta) => {
     return dayjs(fechaVenta).isSame(dayjs(), 'day');
   };
 
+  // Función para verificar si se puede eliminar la venta
+  const puedeEliminarVenta = (sale, eliminacionesTracking) => {
+    if (!esVentaDeHoy(sale.fechaVenta)) return false;
+
+    if (!Array.isArray(eliminacionesTracking) || eliminacionesTracking.length === 0) {
+      return true;
+    }
+    
+    const eliminacionExistente = eliminacionesTracking?.find(eliminacion => 
+      eliminacion.nombreSucursal === sale.nombreSucursal &&
+      eliminacion.turno === sale.ventaTurno
+    );
+
+    if (eliminacionExistente && eliminacionExistente.cantidadEliminaciones >= 1) {
+      return false;   
+    }
+
+    return true;
+  };
+
+  const puedeEliminar = puedeEliminarVenta(sale, eliminacionesTracking);
   const esHoy = esVentaDeHoy(sale.fechaVenta);
 
   return (
@@ -42,7 +63,7 @@ const VentasCard = ({ sale, onViewDetails, onDeleteSale }) => {
           </div>
           
           <div className="ventas-detail-item">
-            <span>Total: Q.{sale.totalVenta}</span>
+            <span>Total: Q.{Number(sale.totalVenta).toFixed(2)}</span>
           </div>
         </div>
 
@@ -57,15 +78,40 @@ const VentasCard = ({ sale, onViewDetails, onDeleteSale }) => {
             Detalles
           </Button>
           
-          <Button 
-            variant="danger" 
-            className="ventas-action-btn"
-                onClick={() => esHoy && onDeleteSale(sale.idVenta)}
-                disabled={!esHoy}
+          <OverlayTrigger
+            placement="top"
+            overlay={
+              <Tooltip>
+                {puedeEliminar 
+                  ? "Eliminar venta" 
+                  : "Solo se permite una eliminación por turno por sucursal"}
+              </Tooltip>
+            }
           >
-            <FaTrash className="ventas-btn-icon" />
-            Eliminar
-          </Button>
+            <span>
+              <Button 
+                variant="danger" 
+                className="ventas-action-btn"
+                onClick={() => puedeEliminar && onDeleteSale(sale.idVenta)}
+                disabled={!puedeEliminar || loadingDelete === sale.idVenta}
+              >
+                {loadingDelete === sale.idVenta ? (
+                  <Spinner
+                    as="span"
+                    animation="border"
+                    size="sm"
+                    role="status"
+                    aria-hidden="true"
+                  />
+                ) : (
+                  <>
+                    <FaTrash className="ventas-btn-icon" />
+                    Eliminar
+                  </>
+                )}
+              </Button>
+            </span>
+          </OverlayTrigger>
         </div>
       </Card.Body>
     </Card>

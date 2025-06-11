@@ -21,7 +21,8 @@ const getEndpoints = {
     DETALLE_DESCUENTOS: "consultar-detalle-descuento",
     GET_HISTORIAL_STOCK: "generar-reporte-historial-stock",
     CONSULTAR_TRASLADOS: "consultar-traslados",
-    CONSULTAR_DETALLE_TRASLADOS: "consultar-detalle-traslado"
+    CONSULTAR_DETALLE_TRASLADOS: "consultar-detalle-traslado",
+    CONSULTAR_ELIMINACIONES: "consultar-eliminacion-por-dia"
 };
 
 const postEndpoints = {
