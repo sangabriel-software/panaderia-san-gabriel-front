@@ -5,7 +5,7 @@ import "./VentasCard.css";
 import { formatDateToDisplay } from "../../../utils/dateUtils";
 import dayjs from "dayjs";
 
-const VentasCard = ({ sale, onViewDetails, onDeleteSale, eliminacionesTracking, loadingDelete }) => {
+const VentasCard = ({ sale, onViewDetails, onDeleteSale, eliminacionesTracking, loadingDelete, userData }) => {
   // Función para verificar si una venta es de hoy
   const esVentaDeHoy = (fechaVenta) => {
     return dayjs(fechaVenta).isSame(dayjs(), 'day');
@@ -15,7 +15,7 @@ const VentasCard = ({ sale, onViewDetails, onDeleteSale, eliminacionesTracking, 
   const puedeEliminarVenta = (sale, eliminacionesTracking) => {
     if (!esVentaDeHoy(sale.fechaVenta)) return false;
 
-    if (!Array.isArray(eliminacionesTracking) || eliminacionesTracking.length === 0) {
+    if (!Array.isArray(eliminacionesTracking) || eliminacionesTracking.length === 0 || userData?.idRol === 1) {
       return true;
     }
     
