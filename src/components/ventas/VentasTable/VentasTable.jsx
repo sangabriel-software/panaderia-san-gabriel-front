@@ -20,12 +20,10 @@ const getColorByName = (name) => {
   return COLORS[hash % COLORS.length];
 };
 
-const VentasTable = ({ sales, onDelete, onViewPdf, loadingViewPdf, eliminacionesTracking }) => {
+const VentasTable = ({ sales, onDelete, onViewPdf, loadingViewPdf, eliminacionesTracking, userData }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const containerRef = useRef(null);
   const navigate = useNavigate();
-  console.log(sales)
-  console.log(eliminacionesTracking)
 
   // Función para verificar si una venta es de hoy
   const esVentaDeHoy = (fechaVenta) => {
@@ -36,6 +34,9 @@ const VentasTable = ({ sales, onDelete, onViewPdf, loadingViewPdf, eliminaciones
   const puedeEliminarVenta = (sale, eliminacionesTracking) => {
 
     if (!esVentaDeHoy(sale.fechaVenta)) return false;
+
+    if(userData?.idRol === 1) return true;
+
 
     if(eliminacionesTracking.length === 0){
       return true;
