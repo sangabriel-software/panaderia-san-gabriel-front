@@ -12,6 +12,7 @@ import "./ManageUsersStyle.css";
 import OrderCardSkeleton from "../../../../components/OrderCardSkeleton/OrderCardSkeleton";
 import useRoles from "../../../../hooks/roleshooks/roles.hooks";
 import { actualizardatosUsuarioServices } from "../../../../services/userServices/usersservices/users.service";
+import useGetSucursales from "../../../../hooks/sucursales/useGetSucursales";
 
 function ManageUsers() {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -24,16 +25,21 @@ function ManageUsers() {
     apellidoUsuario: "",
     usuario: "", 
     correoUsuario: "",
-    idRol: ""
+    idRol: "",
+    idSucursal: ""
   }); 
   const navigate = useNavigate();
   const { roles, loading: loadingRoles, showError: showErrorRoles } = useRoles();
+  const { sucursales, loading: loadingSucursales, showError: showErrorSucursales } = useGetSucursales();
 
   /* ------------------- Usuarios -------------------- */
   const { activeOptionsId, handleOptionsClick } = useOptionsMenu();
   const { usuarios, loadingUsers, showErrorUsers, showInfoUsers, setUsuarios } = useGetUsers();
   const { filteredUsers, searchQuery, showNoResults, handleSearch } = useUsersSerch(usuarios);
   const [userToDelete, setUserToDelete] = useState(null);
+  
+
+  console.log(usuarios)
 
   // Función para separar nombre y apellido de manera inteligente
   const splitName = (fullName) => {
@@ -72,7 +78,8 @@ function ManageUsers() {
         apellidoUsuario: apellido,
         usuario: user.usuario || "",
         correoUsuario: user.correoUsuario || "",
-        idRol: user.idRol || ""
+        idRol: user.idRol || "",
+        idSucursal: user.idSucursal || ""
       });
       setIsModifyModalOpen(true);
     }
@@ -91,8 +98,8 @@ function ManageUsers() {
   const handleSaveChanges = async () => {
     try {
       // Validación básica de campos requeridos
-      if (!formData.nombreUsuario.trim() || !formData.correoUsuario.trim() || !formData.idRol) {
-        setErrorPopupMessage("Nombre, correo y rol son campos obligatorios");
+      if (!formData.nombreUsuario.trim() || !formData.correoUsuario.trim() || !formData.idRol || !formData.idSucursal) {
+        setErrorPopupMessage("Nombre, correo, rol y sucursal son campos obligatorios");
         setIsPopupErrorOpen(true);
         return;
       }
@@ -104,7 +111,8 @@ function ManageUsers() {
         apellidoUsuario: formData.apellidoUsuario.trim(),
         usuario: formData.usuario.trim(),
         correoUsuario: formData.correoUsuario.trim(),
-        idRol: formData.idRol
+        idRol: formData.idRol,
+        idSucursal: formData.idSucursal
       };
 
       // Llamada al servicio de actualización
@@ -112,6 +120,9 @@ function ManageUsers() {
       
       // Encontrar el rol seleccionado para obtener su nombre
       const rolSeleccionado = roles.find(r => r.idRol == payload.idRol);
+      
+      // Encontrar la sucursal seleccionada para obtener su nombre
+      const sucursalSeleccionada = sucursales.find(s => s.idSucursal == payload.idSucursal);
       
       // Actualiza el usuario en el estado local con todos los datos necesarios para la card
       setUsuarios(prev => prev.map(u => 
@@ -122,6 +133,8 @@ function ManageUsers() {
           correoUsuario: payload.correoUsuario,
           idRol: payload.idRol,
           nombreRol: rolSeleccionado?.nombreRol || u.nombreRol,
+          idSucursal: payload.idSucursal,
+          nombreSucursal: sucursalSeleccionada?.nombreSucursal || u.nombreSucursal,
           // Mantener otros campos que puedan existir en el objeto usuario
           ...(u.estadoUsuario && { estadoUsuario: u.estadoUsuario })
         } : u
@@ -187,6 +200,7 @@ function ManageUsers() {
                   name={`${user.nombreUsuario}`}
                   username={user.usuario}
                   role={user.nombreRol}
+                  sucursal={user.nombreSucursal || "Sin sucursal"}
                   status={user.estadoUsuario === "A" ? "Activo" : "Bloqueado"}
                   image=""
                   showOptions={activeOptionsId === user.idUsuario}
@@ -335,7 +349,7 @@ function ManageUsers() {
                 </div>
                 
                 <div className="row">
-                  <div className="col-md-12 mb-3">
+                  <div className="col-md-6 mb-3">
                     <label htmlFor="idRol" className="user-modal-label required">Rol</label>
                     <select
                       className="form-select user-modal-select"
@@ -355,6 +369,28 @@ function ManageUsers() {
                     </select>
                     {loadingRoles && <small className="user-modal-loading-text">Cargando roles...</small>}
                     {showErrorRoles && <small className="user-modal-error-text">Error al cargar roles</small>}
+                  </div>
+                  
+                  <div className="col-md-6 mb-3">
+                    <label htmlFor="idSucursal" className="user-modal-label required">Sucursal</label>
+                    <select
+                      className="form-select user-modal-select"
+                      id="idSucursal"
+                      name="idSucursal"
+                      value={formData.idSucursal}
+                      onChange={handleInputChange}
+                      disabled={loadingSucursales}
+                      required
+                    >
+                      <option value="">Seleccione una sucursal</option>
+                      {sucursales.map(sucursal => (
+                        <option key={sucursal.idSucursal} value={sucursal.idSucursal}>
+                          {sucursal.nombreSucursal} - {sucursal.municipioSucursal}
+                        </option>
+                      ))}
+                    </select>
+                    {loadingSucursales && <small className="user-modal-loading-text">Cargando sucursales...</small>}
+                    {showErrorSucursales && <small className="user-modal-error-text">Error al cargar sucursales</small>}
                   </div>
                 </div>
               </div>

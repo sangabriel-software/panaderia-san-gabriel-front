@@ -7,21 +7,23 @@ import { handleCreateUserSubmit, resetForm } from "./CreateUsersUtils";
 import SuccessPopup from "../../../../components/Popup/SuccessPopup";
 import { useState } from "react";
 import ErrorPopup from "../../../../components/Popup/ErrorPopUp";
-import { Spinner } from "react-bootstrap"; // Importamos el Spinner de react-bootstrap
+import { Spinner } from "react-bootstrap";
+import useGetSucursales from "../../../../hooks/sucursales/useGetSucursales";
 
 function CreateUsers() {
-  const [isPopupOpen, setIsPopupOpen] = useState(false); // Abrir popup de éxito
-  const [selectedOption, setSelectedOption] = useState(null); // Estado del select
-  const [isPopupErrorOpen, setIsPopupErrorOpen] = useState(false); // Manejo del popup de errores
-  const [errorPopupMessage, setErrorPopupMessage] = useState(""); // Manejo del mensaje para el popup de errores
-  const { register, handleSubmit, reset, formState: { errors }, setValue, clearErrors, } = useForm(); // Configuración de react-hook-form
-  const { roles, loading } = useRoles(); // Roles para asignar al usuario
-  const [isLoadingSave, setIsloadingSave] = useState(false); //Ingreso de usuaros loading
-  const navigate = useNavigate(); // Hook para la navegaciónlo
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [selectedOption, setSelectedOption] = useState(null);
+  const [selectedSucursal, setSelectedSucursal] = useState(null);
+  const [isPopupErrorOpen, setIsPopupErrorOpen] = useState(false);
+  const [errorPopupMessage, setErrorPopupMessage] = useState("");
+  const { register, handleSubmit, reset, formState: { errors }, setValue, clearErrors } = useForm();
+  const { roles, loading } = useRoles();
+  const [isLoadingSave, setIsloadingSave] = useState(false);
+  const navigate = useNavigate();
+  const { sucursales, loadingSucursales } = useGetSucursales();
 
   const onSubmit = (data) => {
-    // Función para guardar usuario
-    handleCreateUserSubmit( data, reset, setIsPopupOpen, setIsPopupErrorOpen, setErrorPopupMessage, setIsloadingSave );
+    handleCreateUserSubmit(data, reset, setIsPopupOpen, setIsPopupErrorOpen, setErrorPopupMessage, setIsloadingSave);
   };
 
   return (
@@ -30,7 +32,6 @@ function CreateUsers() {
       <div className="text-center mb-3">
         <div className="row">
           <div className="col-2">
-            {/* Botón de volver */}
             <button
               className="btn bt-return rounded-circle d-flex align-items-center justify-content-center shadow"
               style={{ width: "40px", height: "40px" }}
@@ -53,7 +54,7 @@ function CreateUsers() {
         className="row justify-content-center"
       >
         <div className="col-lg-6 col-md-8 col-sm-10">
-          {/* Selección del Rol con un select normal */}
+          {/* Selección del Rol */}
           <div className="mb-3">
             <label htmlFor="idRol" className="label-title form-label">
               Rol del Usuario
@@ -70,15 +71,12 @@ function CreateUsers() {
                   className={`input-data form-select ${
                     errors.idRol ? "is-invalid" : ""
                   }`}
-                  // Mantenemos el value sincronizado con nuestro estado local:
                   value={selectedOption ? selectedOption.value : ""}
                   onChange={(e) => {
-                    // Si idRol es numérico en tu backend, usamos == o parseInt para comparar
                     const selectedRole = roles.find(
                       (role) => role.idRol == e.target.value
                     );
 
-                    // Guardamos en el estado local la información del rol seleccionado
                     setSelectedOption(
                       selectedRole
                         ? {
@@ -88,10 +86,8 @@ function CreateUsers() {
                         : null
                     );
 
-                    // Sincronizamos con React Hook Form
                     setValue("idRol", e.target.value);
 
-                    // Si se ha seleccionado un rol válido, limpiamos el error de validación
                     if (e.target.value) {
                       clearErrors("idRol");
                     }
@@ -105,7 +101,6 @@ function CreateUsers() {
                   ))}
                 </select>
 
-                {/* Campo hidden para que React Hook Form lo valide internamente */}
                 <input
                   type="hidden"
                   {...register("idRol", {
@@ -117,6 +112,68 @@ function CreateUsers() {
             {errors.idRol && (
               <div className="invalid-feedback d-block">
                 {errors.idRol.message}
+              </div>
+            )}
+          </div>
+
+          {/* Selección de Sucursal */}
+          <div className="mb-3">
+            <label htmlFor="idSucursal" className="label-title form-label">
+              Sucursal Asignada
+            </label>
+            {loadingSucursales ? (
+              <div className="d-flex align-items-center">
+                <Spinner animation="border" size="sm" className="me-2" />
+                <span>Cargando Sucursales...</span>
+              </div>
+            ) : (
+              <div>
+                <select
+                  id="idSucursal"
+                  className={`input-data form-select ${
+                    errors.idSucursal ? "is-invalid" : ""
+                  }`}
+                  value={selectedSucursal ? selectedSucursal.value : ""}
+                  onChange={(e) => {
+                    const selectedSucursalItem = sucursales.find(
+                      (sucursal) => sucursal.idSucursal == e.target.value
+                    );
+
+                    setSelectedSucursal(
+                      selectedSucursalItem
+                        ? {
+                            value: selectedSucursalItem.idSucursal,
+                            label: selectedSucursalItem.nombreSucursal,
+                          }
+                        : null
+                    );
+
+                    setValue("idSucursal", e.target.value);
+
+                    if (e.target.value) {
+                      clearErrors("idSucursal");
+                    }
+                  }}
+                >
+                  <option value="">Selecciona una sucursal...</option>
+                  {sucursales.map((sucursal) => (
+                    <option key={sucursal.idSucursal} value={sucursal.idSucursal}>
+                      {sucursal.nombreSucursal} - {sucursal.municipioSucursal}
+                    </option>
+                  ))}
+                </select>
+
+                <input
+                  type="hidden"
+                  {...register("idSucursal", {
+                    required: "La sucursal del usuario es obligatoria.",
+                  })}
+                />
+              </div>
+            )}
+            {errors.idSucursal && (
+              <div className="invalid-feedback d-block">
+                {errors.idSucursal.message}
               </div>
             )}
           </div>
@@ -214,10 +271,10 @@ function CreateUsers() {
         </div>
       </form>
 
-      {/* ---------------------------- Alertas de creación o error ----------------------- */}
+      {/* Alertas de creación o error */}
       <SuccessPopup
         isOpen={isPopupOpen}
-        onClose={() => setIsPopupOpen(false)} // Cierra el popup
+        onClose={() => setIsPopupOpen(false)}
         title="¡Éxito!"
         message={
           <>
@@ -230,22 +287,22 @@ function CreateUsers() {
         }
         nombreBotonVolver="Ver Usuarios"
         nombreBotonNuevo="Nuevo Usuario"
-        onView={() => navigate("/users")} // Redirige a Ver Usuarios
+        onView={() => navigate("/users")}
         onNew={() => {
-          setIsPopupOpen(false); // Cierra el popup
-          resetForm(reset, setValue, clearErrors, setSelectedOption); // Limpia el formulario
+          setIsPopupOpen(false);
+          resetForm(reset, setValue, clearErrors, setSelectedOption, setSelectedSucursal);
         }}
       />
 
       <ErrorPopup
         isOpen={isPopupErrorOpen}
-        onClose={() => setIsPopupErrorOpen(false)} // Cierra el popup
+        onClose={() => setIsPopupErrorOpen(false)}
         title="¡Error!"
         message={errorPopupMessage}
-        onViews={() => navigate("/users/roles")} // Redirige a Ver Roles
+        onViews={() => navigate("/users/roles")}
         onNew={() => {
-          setIsPopupOpen(false); // Cierra el popup
-          resetForm(reset, setValue, clearErrors, setSelectedOption); // Limpia el formulario
+          setIsPopupOpen(false);
+          resetForm(reset, setValue, clearErrors, setSelectedOption, setSelectedSucursal);
         }}
       />
     </div>
