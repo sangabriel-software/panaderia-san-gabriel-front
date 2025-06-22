@@ -37,9 +37,6 @@ function ManageUsers() {
   const { usuarios, loadingUsers, showErrorUsers, showInfoUsers, setUsuarios } = useGetUsers();
   const { filteredUsers, searchQuery, showNoResults, handleSearch } = useUsersSerch(usuarios);
   const [userToDelete, setUserToDelete] = useState(null);
-  
-
-  console.log(usuarios)
 
   // Función para separar nombre y apellido de manera inteligente
   const splitName = (fullName) => {

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { consultarOrdenesEspecialesService } from "../../services/ordenesEspeciales/ordenesEspeciales.service";
+import { getUserData } from "../../utils/Auth/decodedata";
 
 /* Consulta a BD los permisoso */
 export const useGetOrdenEHeader = () => {
@@ -10,7 +11,13 @@ export const useGetOrdenEHeader = () => {
     useEffect(() => {
       const fetchOrdenesEspeciales = async () => {
         try {
-          const response = await consultarOrdenesEspecialesService();
+          const userData = getUserData();
+
+          if(!userData){
+            setShowErrorOrdenEspecial(true);
+          }
+
+          const response = await consultarOrdenesEspecialesService(userData.idRol, userData.idSucursal);
           const data = response;
           if (data.status === 200) {
             setOrdenesEspeciales(data.ordenesEspeciales);
