@@ -12,7 +12,7 @@ import dayjs from "dayjs";
 import ErrorPopup from "../../../components/Popup/ErrorPopUp";
 import useGetProductosYPrecios from "../../../hooks/productosprecios/useGetProductosYprecios";
 import { useGetSucursales } from "../../../hooks/sucursales/useGetSucursales";
-import { filterProductsByName, getFilteredProductsByCategory, getInitials, getUniqueColor, handleIngresarOrdenProduccionSubmit, scrollToAlert } from "./IngresarOrdenProdUtils";
+import { filterProductsByName, getFilteredProductsByCategory, getInitials, getUniqueColor, getUserSucursalName, handleIngresarOrdenProduccionSubmit, scrollToAlert } from "./IngresarOrdenProdUtils";
 import { getUserData } from "../../../utils/Auth/decodedata";
 import "./ordenes.css";
 
@@ -25,14 +25,23 @@ const IngresarOrdenProd = () => {
   const tomorrow = dayjs().add(1, "day").format("YYYY-MM-DD");
   const today = dayjs().format("YYYY-MM-DD");
   
+  const userData = getUserData();
+
   const { register, handleSubmit, formState: { errors }, setValue, watch, reset, getValues } = useForm({
     defaultValues: {
-      sucursal: "",
+      sucursal: userData.idRol === 1 ? "" : userData.idSucursal.toString(),
       turno: "AM",
       fechaAProducir: tomorrow,
       nombrePanadero: "",
     },
   });
+
+  // Setear la sucursal automáticamente si no es admin
+  useEffect(() => {
+    if (userData.idRol !== 1 && userData.idSucursal) {
+      setValue("sucursal", userData.idSucursal.toString());
+    }
+  }, [userData.idRol, userData.idSucursal, setValue]);
 
   const turnoValue = watch("turno");
   const [activeCategory] = useState("Panaderia");
@@ -211,7 +220,8 @@ const IngresarOrdenProd = () => {
                             role="status"
                           />
                         </div>
-                      ) : (
+                      ) : userData.idRol === 1 ? (
+                        // Admin puede seleccionar cualquier sucursal
                         <Form.Select
                           {...register("sucursal", {
                             required: "Seleccione sucursal",
@@ -225,6 +235,22 @@ const IngresarOrdenProd = () => {
                             </option>
                           ))}
                         </Form.Select>
+                      ) : (
+                        // Usuarios no admin ven su sucursal asignada como readonly
+                        <div className="sucursal-assigned">
+                          <Form.Control
+                            type="text"
+                            value={getUserSucursalName(sucursales, userData)}
+                            readOnly
+                            className="modern-input"
+                          />
+                          <input
+                            type="hidden"
+                            {...register("sucursal", {
+                              required: true,
+                            })}
+                          />
+                        </div>
                       )}
                       {errors.sucursal && (
                         <div className="text-danger small mt-1">
