@@ -2,9 +2,9 @@ import api from "../../config/api";
 import { getEndpoints, postEndpoints, deleteEndpoints } from "../../config/endpoints";
 
 
-export const consultarOrdenesProduccion = async () => {
+export const consultarOrdenesProduccion = async (idRol, idSucursal) => {
   try {
-    const response = await api.get(getEndpoints.CONSULTAR_ORDENES_PRODUCCION);
+    const response = await api.get(`${getEndpoints.CONSULTAR_ORDENES_PRODUCCION}?idRol=${idRol}&idSucursal=${idSucursal}`);
     return response.data;
   } catch (error) {
     throw error;

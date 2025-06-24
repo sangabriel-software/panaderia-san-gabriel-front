@@ -7,11 +7,11 @@ export const useGetOrdenEHeader = () => {
     const [ordenesEspeciales, setOrdenesEspeciales] = useState([]);
     const [loadingOrdenEspecial, setLoadingOrdenEspecial] = useState(true);
     const [showErrorOrdenEspecial, setShowErrorOrdenEspecial] = useState(false);
+    const userData = getUserData();
   
     useEffect(() => {
       const fetchOrdenesEspeciales = async () => {
         try {
-          const userData = getUserData();
 
           if(!userData){
             setShowErrorOrdenEspecial(true);
