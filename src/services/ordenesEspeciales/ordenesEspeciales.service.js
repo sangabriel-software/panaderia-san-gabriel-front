@@ -11,9 +11,9 @@ export const ingresarOrdenEspecialService = async (ordenEspecial) => {
     }
 }
 
-export const consultarOrdenesEspecialesService = async () => {
+export const consultarOrdenesEspecialesService = async (idRol, idSucursal) => {
   try {
-    const response = await api.get(getEndpoints.CONSULTAR_ORDENES_ESPECIALES);
+    const response = await api.get(`${getEndpoints.CONSULTAR_ORDENES_ESPECIALES}?idRol=${idRol}&idSucursal=${idSucursal}`);
     return response.data;
   } catch (error) {
     throw error;

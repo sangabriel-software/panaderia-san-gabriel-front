@@ -1,20 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  FiBox,
-  FiDollarSign,
-  FiUsers,
-  FiPieChart,
-  FiShoppingCart,
-  FiPlus,
-  FiTrendingUp,
-  FiFileText,
-  FiClock,
-  FiUser,
-  FiPackage,
-  FiX,
-  FiSun,
-  FiMoon,
-} from "react-icons/fi";
+import { FiBox, FiDollarSign, FiUsers, FiPieChart, FiShoppingCart, FiPlus, FiTrendingUp, FiFileText, FiClock, FiUser, FiPackage, FiX, FiSun, FiMoon, } from "react-icons/fi";
 import "./HomePage.styles.css";
 import { getUserData } from "../../utils/Auth/decodedata";
 import { useNavigate } from "react-router-dom";
@@ -63,12 +48,7 @@ const HomePage = () => {
   const [showModal, setShowModal] = useState(false);
   const [orderDetails, setOrderDetails] = useState(null);
   const [loadingDetails, setLoadingDetails] = useState(false);
-  const {
-    ordenesEspeciales,
-    loadingOrdenEspecial,
-    showErrorOrdenEspecial,
-    setOrdenesEspeciales,
-  } = useGetOrdenEHeader();
+  const { ordenesEspeciales, loadingOrdenEspecial, showErrorOrdenEspecial, setOrdenesEspeciales, } = useGetOrdenEHeader();
   const [calendarEvents, setCalendarEvents] = useState([]);
 
   // Transformar los datos de órdenes especiales a eventos del calendario

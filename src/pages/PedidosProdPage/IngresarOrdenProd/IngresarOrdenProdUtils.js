@@ -156,3 +156,10 @@ export const scrollToAlert = (errorPopupMessage, isPopupErrorOpen, alertRef) => 
     }
   }, [errorPopupMessage, isPopupErrorOpen]);
 };
+
+// Obtener el nombre de la sucursal del usuario
+export const getUserSucursalName = (sucursales, userData) => {
+  if (!userData.idSucursal) return "Sin sucursal asignada";
+  const sucursal = sucursales.find(s => s.idSucursal === userData.idSucursal);
+  return sucursal ? sucursal.nombreSucursal : "Sucursal no encontrada";
+};
