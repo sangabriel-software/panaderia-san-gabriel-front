@@ -116,6 +116,8 @@ const IngresarVentaPage = () => {
         isLoading={isLoading}
         navigate={navigate}
         hasOrdenes={hasOrdenes}
+        isAdmin={usuario.idRol === 1}
+        usuarioSucursal={usuario}
       />
 
       {/* Modal de Venta Esperada */}

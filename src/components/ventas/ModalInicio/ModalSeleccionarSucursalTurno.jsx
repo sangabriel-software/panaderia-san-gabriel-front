@@ -1,4 +1,3 @@
-// ModalSeleccionarSucursalTurno.js
 import React from "react";
 import { Modal, Button, Form, Container, Row, Col } from "react-bootstrap";
 import { FaTimes } from "react-icons/fa";
@@ -7,7 +6,7 @@ import Alert from "../../Alerts/Alert";
 import { BsFillInfoCircleFill } from "react-icons/bs";
 
 const ModalSeleccionarSucursalTurno = ({ showModal, handleCloseModal, turnoValue, setValue, errors, loadingSucursales, 
-                                         sucursales, register, isLoading, navigate, hasOrdenes }) => {
+                                         sucursales, register, isLoading, navigate, hasOrdenes, isAdmin, usuarioSucursal }) => {
   return (
     <Modal
       show={showModal}
@@ -77,7 +76,7 @@ const ModalSeleccionarSucursalTurno = ({ showModal, handleCloseModal, turnoValue
                         role="status"
                       />
                     </div>
-                  ) : (
+                  ) : isAdmin ? (
                     <Form.Select
                       {...register("sucursal", { required: true })}
                       className={`ingresar-venta-custom-select shadow w-100 ${
@@ -94,10 +93,26 @@ const ModalSeleccionarSucursalTurno = ({ showModal, handleCloseModal, turnoValue
                         </option>
                       ))}
                     </Form.Select>
+                  ) : (
+                    <Form.Select
+                      {...register("sucursal", { required: true })}
+                      className={`ingresar-venta-custom-select shadow w-100 ${
+                        errors.sucursal ? "is-invalid" : ""
+                      }`}
+                    >
+                      <option value="">Selecciona una sucursal</option>
+                        <option
+                          key={usuarioSucursal.idSucursal}
+                          value={usuarioSucursal.idSucursal}
+                        >
+                          {usuarioSucursal.sucursal || "Tu sucursal"}
+                        </option>
+
+                    </Form.Select>
                   )}
                   {errors.sucursal && (
                     <span className="ingresar-venta-text-danger small">
-                      No se pudieron cargar las sucursales. Intente más tarde.
+                      {isAdmin ? "No se pudieron cargar las sucursales. Intente más tarde." : "Error al cargar tu sucursal"}
                     </span>
                   )}
                 </Form.Group>
