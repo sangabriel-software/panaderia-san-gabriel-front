@@ -33,6 +33,16 @@ const IngresarTraslado = () => {
     const [isPopupErrorOpen, setIsPopupErrorOpen] = useState(false);
     const [errorPopupMessage, setErrorPopupMessage] = useState("");
 
+    // Establecer sucursal origen automáticamente si no es admin
+    useEffect(() => {
+        if (!loadingSucursales && sucursales.length > 0 && userData?.idRol !== 1) {
+            const sucursalUsuario = sucursales.find(s => s.idSucursal === userData.idSucursal);
+            if (sucursalUsuario) {
+                setSucursalOrigen(sucursalUsuario);
+            }
+        }
+    }, [loadingSucursales, sucursales, userData]);
+
     // Fetch stock data when sucursalOrigen changes
     useEffect(() => {
         const fetchStockData = async () => {
@@ -350,13 +360,20 @@ const IngresarTraslado = () => {
                                         setStockValues({});
                                     }}
                                     className="border-0 shadow-sm"
+                                    disabled={userData.idRol !== 1} // Solo editable para admin
                                 >
                                     <option value="">Seleccione origen</option>
-                                    {sucursales.map(sucursal => (
-                                        <option key={sucursal.idSucursal} value={sucursal.idSucursal}>
-                                            {sucursal.nombreSucursal}
+                                    {userData.idRol === 1 ? (
+                                        sucursales.map(sucursal => (
+                                            <option key={sucursal.idSucursal} value={sucursal.idSucursal}>
+                                                {sucursal.nombreSucursal}
+                                            </option>
+                                        ))
+                                    ) : (
+                                        <option value={userData.idSucursal}>
+                                            {sucursales.find(s => s.idSucursal === userData.idSucursal)?.nombreSucursal || "Tu sucursal"}
                                         </option>
-                                    ))}
+                                    )}
                                 </Form.Select>
                                 <label htmlFor="sucursalOrigen" className="d-flex align-items-center gap-2">
                                     <BsGeoAlt className="text-primary" />
