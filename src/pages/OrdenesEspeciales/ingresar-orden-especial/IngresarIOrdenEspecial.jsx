@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Container, Table, Button, Form, Spinner, Dropdown, Row, Col } from "react-bootstrap";
 import DotsMove from "../../../components/Spinners/DotsMove";
 import useGetProductosYPrecios from "../../../hooks/productosprecios/useGetProductosYprecios";
@@ -8,7 +8,6 @@ import { BsArrowLeft, BsExclamationTriangleFill, BsFillInfoCircleFill } from "re
 import { useNavigate } from "react-router-dom";
 import Alert from "../../../components/Alerts/Alert";
 import Title from "../../../components/Title/Title";
-import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { getInitials } from "../../PedidosProdPage/IngresarOrdenProd/IngresarOrdenProdUtils";
 import { getUniqueColor } from "../../../utils/utils";
@@ -38,6 +37,16 @@ const IngresarOrdenEspecialPage = () => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [isPopupErrorOpen, setIsPopupErrorOpen] = useState(false);
   const [errorPopupMessage, setErrorPopupMessage] = useState("");
+
+  // Establecer sucursal automáticamente si no es admin
+  useEffect(() => {
+    if (!loadingSucursales && sucursales.length > 0 && userData?.idRol !== 1) {
+      const sucursalUsuario = sucursales.find(s => s.idSucursal === userData.idSucursal);
+      if (sucursalUsuario) {
+        setSucursalSeleccionada(sucursalUsuario);
+      }
+    }
+  }, [loadingSucursales, sucursales, userData]);
 
   // Eliminado el filtro por tipoProducción !== "bandejas"
   const categorias = [...new Set(productos?.map((item) => item.nombreCategoria) || [])];
@@ -218,23 +227,32 @@ const IngresarOrdenEspecialPage = () => {
           <Col md={6} className="mb-3">
             <Form.Group>
               <Form.Label>Sucursal de Entrega *</Form.Label>
-              <Dropdown>
-                <Dropdown.Toggle variant="light" className="dropdown-toggle-custom w-100 text-start" style={{ border: "1px solid #e2e8f0" }}>
-                  {sucursalSeleccionada ? sucursalSeleccionada.nombreSucursal : "Seleccione una sucursal"}
-                </Dropdown.Toggle>
-                <Dropdown.Menu className="dropdown-menu-custom w-100">
-                  {sucursales?.map((sucursal) => (
-                    <Dropdown.Item 
-                      className="dropdown-item-custom"
-                      key={sucursal.idSucursal}
-                      onClick={() => setSucursalSeleccionada(sucursal)}
-                      active={sucursalSeleccionada?.idSucursal === sucursal.idSucursal}
-                    >
-                      {sucursal.nombreSucursal}
-                    </Dropdown.Item>
-                  ))}
-                </Dropdown.Menu>
-              </Dropdown>
+              {userData.idRol === 1 ? (
+                <Dropdown>
+                  <Dropdown.Toggle variant="light" className="dropdown-toggle-custom w-100 text-start" style={{ border: "1px solid #e2e8f0" }}>
+                    {sucursalSeleccionada ? sucursalSeleccionada.nombreSucursal : "Seleccione una sucursal"}
+                  </Dropdown.Toggle>
+                  <Dropdown.Menu className="dropdown-menu-custom w-100">
+                    {sucursales?.map((sucursal) => (
+                      <Dropdown.Item 
+                        className="dropdown-item-custom"
+                        key={sucursal.idSucursal}
+                        onClick={() => setSucursalSeleccionada(sucursal)}
+                        active={sucursalSeleccionada?.idSucursal === sucursal.idSucursal}
+                      >
+                        {sucursal.nombreSucursal}
+                      </Dropdown.Item>
+                    ))}
+                  </Dropdown.Menu>
+                </Dropdown>
+              ) : (
+                <Form.Control
+                  type="text"
+                  readOnly
+                  value={sucursalSeleccionada?.nombreSucursal || "Tu sucursal asignada"}
+                  className="form-control-readonly"
+                />
+              )}
             </Form.Group>
           </Col>
         </Row>
