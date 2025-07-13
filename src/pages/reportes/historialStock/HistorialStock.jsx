@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { FiFilter, FiDownload, FiRefreshCw, FiCalendar, FiChevronDown, FiChevronUp, FiArrowLeft } from 'react-icons/fi';
 import { Container, Row, Col, Form, Button, Spinner, Card, Accordion, Table, Dropdown } from 'react-bootstrap';
 import dayjs from 'dayjs';
@@ -7,11 +7,13 @@ import useGetProductosYPrecios from "../../../hooks/productosprecios/useGetProdu
 import useGetSucursales from "../../../hooks/sucursales/useGetSucursales";
 import { generarReporteHistorialStockService } from "../../../services/reportes/reportes.service";
 import './HistorialStock.styles.css';
+import { getUserData } from "../../../utils/Auth/decodedata";
 
 const HistorialStock = () => {
   const navigate = useNavigate();
   const { productos, loadigProducts, showErrorProductos } = useGetProductosYPrecios();
   const { sucursales, loadingSucursales, showErrorSucursales } = useGetSucursales();
+  const userData = getUserData();
   
   const [selectedProducto, setSelectedProducto] = useState(null);
   const [selectedSucursal, setSelectedSucursal] = useState('');
@@ -23,6 +25,16 @@ const HistorialStock = () => {
   const [fechaFin, setFechaFin] = useState('');
   const [activeMovimiento, setActiveMovimiento] = useState(null);
   const [categoriaActiva, setCategoriaActiva] = useState('Todas');
+
+  // Establecer sucursal automáticamente si no es admin
+  useEffect(() => {
+    if (!loadingSucursales && sucursales.length > 0 && userData?.idRol !== 1) {
+      const sucursalUsuario = sucursales.find(s => s.idSucursal === userData.idSucursal);
+      if (sucursalUsuario) {
+        setSelectedSucursal(sucursalUsuario.idSucursal);
+      }
+    }
+  }, [loadingSucursales, sucursales, userData]);
 
   // Obtener categorías únicas de los productos
   const categorias = useMemo(() => {
@@ -62,7 +74,7 @@ const HistorialStock = () => {
 
   const handleReset = () => {
     setSelectedProducto(null);
-    setSelectedSucursal('');
+    setSelectedSucursal(userData?.idRol === 1 ? '' : userData?.idSucursal || '');
     setReporteData([]);
     setFilteredData([]);
     setFechaInicio('');
@@ -219,20 +231,29 @@ const HistorialStock = () => {
             <Col md={4} className="mb-3 mb-md-0">
               <Form.Group>
                 <Form.Label className="filter-label">Sucursal</Form.Label>
-                <Form.Control
-                  as="select"
-                  value={selectedSucursal}
-                  onChange={(e) => setSelectedSucursal(e.target.value)}
-                  disabled={loadingSucursales}
-                  className="filter-select"
-                >
-                  <option value="">Seleccionar sucursal</option>
-                  {sucursales.map((sucursal) => (
-                    <option key={sucursal.idSucursal} value={sucursal.idSucursal}>
-                      {sucursal.nombreSucursal}
-                    </option>
-                  ))}
-                </Form.Control>
+                {userData?.idRol === 1 ? (
+                  <Form.Control
+                    as="select"
+                    value={selectedSucursal}
+                    onChange={(e) => setSelectedSucursal(e.target.value)}
+                    disabled={loadingSucursales}
+                    className="filter-select"
+                  >
+                    <option value="">Seleccionar sucursal</option>
+                    {sucursales.map((sucursal) => (
+                      <option key={sucursal.idSucursal} value={sucursal.idSucursal}>
+                        {sucursal.nombreSucursal}
+                      </option>
+                    ))}
+                  </Form.Control>
+                ) : (
+                  <Form.Control
+                    type="text"
+                    readOnly
+                    value={sucursales.find(s => s.idSucursal === userData?.idSucursal)?.nombreSucursal || "Tu sucursal"}
+                    className="filter-select"
+                  />
+                )}
                 {loadingSucursales && <small className="text-muted">Cargando sucursales...</small>}
               </Form.Group>
             </Col>
