@@ -35,3 +35,16 @@ export const getInitials = (name) => {
   const words = name.split(" ");
   return words.map((word) => word[0]).join("").toUpperCase();
 };
+
+export const formatoQuetzalesSimple = (monto) => {
+  if (isNaN(monto)) {
+    throw new Error("El valor proporcionado no es un número válido");
+  }
+  
+  const numero = Number(monto);
+  const partes = numero.toFixed(2).split('.');
+  
+  partes[0] = partes[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  
+  return `Q ${partes.join('.')}`;
+}

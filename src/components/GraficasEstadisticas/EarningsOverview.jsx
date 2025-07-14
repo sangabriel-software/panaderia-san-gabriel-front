@@ -5,13 +5,48 @@ import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement
 // Registrar componentes de Chart.js
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Legend, Filler);
 
-const EarningsOverview = () => {
+const EarningsOverview = ({ resumenMensual }) => {
+  // Mapear los meses a su formato abreviado estándar
+  const mesesAbreviados = {
+    ene: "Ene",
+    feb: "Feb",
+    mar: "Mar",
+    abr: "Abr",
+    may: "May",
+    jun: "Jun",
+    jul: "Jul",
+    ago: "Ago",
+    sep: "Sep",
+    oct: "Oct",
+    nov: "Nov",
+    dic: "Dic"
+  };
+
+  // Crear un objeto con todos los meses inicializados en 0
+  const todosLosMeses = {
+    ene: 0, feb: 0, mar: 0, abr: 0, may: 0, jun: 0,
+    jul: 0, ago: 0, sep: 0, oct: 0, nov: 0, dic: 0
+  };
+
+  // Actualizar los valores con los datos recibidos
+  if (resumenMensual && Array.isArray(resumenMensual)) {
+    resumenMensual.forEach(item => {
+      if (item.mes && item.total_ingresos !== undefined) {
+        todosLosMeses[item.mes] = item.total_ingresos;
+      }
+    });
+  }
+
+  // Preparar los datos para el gráfico
+  const labels = Object.keys(todosLosMeses).map(mes => mesesAbreviados[mes]);
+  const valores = Object.values(todosLosMeses);
+
   const data = {
-    labels: ["Ene", "Feb", "Mar", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"],
+    labels: labels,
     datasets: [
       {
-        label: "Earnings",
-        data: [0, 10000, 20000, 15000, 25000, 40000, 30000, 4500, 5000],
+        label: "Ganancias",
+        data: valores,
         borderColor: "#4e73df", // Línea principal
         backgroundColor: "rgba(78, 115, 223, 0.3)", // Relleno del área
         pointBackgroundColor: "#1cc88a", // Color de los puntos
