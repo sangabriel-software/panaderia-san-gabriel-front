@@ -22,7 +22,8 @@ const getEndpoints = {
     GET_HISTORIAL_STOCK: "generar-reporte-historial-stock",
     CONSULTAR_TRASLADOS: "consultar-traslados",
     CONSULTAR_DETALLE_TRASLADOS: "consultar-detalle-traslado",
-    CONSULTAR_ELIMINACIONES: "consultar-eliminacion-por-dia"
+    CONSULTAR_ELIMINACIONES: "consultar-eliminacion-por-dia",
+    CONSULTAR_DASHBOARD_DATA: "consultar-data-dashboard"
 };
 
 const postEndpoints = {
