@@ -8,6 +8,10 @@ import useGetSucursales from "../../../hooks/sucursales/useGetSucursales";
 import { generarReporteHistorialStockService } from "../../../services/reportes/reportes.service";
 import './HistorialStock.styles.css';
 import { getUserData } from "../../../utils/Auth/decodedata";
+import { jsPDF } from 'jspdf';
+import 'jspdf-autotable';
+import autoTable from "jspdf-autotable";
+import * as XLSX from 'xlsx';
 
 const HistorialStock = () => {
   const navigate = useNavigate();
@@ -25,6 +29,8 @@ const HistorialStock = () => {
   const [fechaFin, setFechaFin] = useState('');
   const [activeMovimiento, setActiveMovimiento] = useState(null);
   const [categoriaActiva, setCategoriaActiva] = useState('Todas');
+  const [generatingPDF, setGeneratingPDF] = useState(false);
+  const [generatingExcel, setGeneratingExcel] = useState(false);
 
   // Establecer sucursal automáticamente si no es admin
   useEffect(() => {
@@ -149,6 +155,250 @@ const HistorialStock = () => {
       </div>
     </div>
   );
+
+  const generatePDF = () => {
+    if (filteredData.length === 0 && reporteData.length === 0) {
+      setError('No hay datos para generar el reporte');
+      return;
+    }
+  
+    setGeneratingPDF(true);
+    setError(null);
+  
+    try {
+      const doc = new jsPDF('portrait', 'pt', 'a4');
+      const dataToExport = filteredData.length > 0 ? filteredData : reporteData;
+      const sucursalNombre = sucursales.find(s => s.idSucursal === selectedSucursal)?.nombreSucursal || selectedSucursal;
+      const today = new Date();
+      // Formato de fecha con hora
+      const dateStr = today.toLocaleDateString('es-GT') + ' ' + today.toLocaleTimeString('es-GT', { hour: '2-digit', minute: '2-digit' });
+  
+      // Título
+      doc.setFontSize(18);
+      doc.setTextColor(40);
+      doc.setFont('helvetica', 'bold');
+      doc.text('REPORTE DE HISTORIAL DE STOCK', doc.internal.pageSize.getWidth() / 2, 40, { align: 'center' });
+  
+      // Información del reporte
+      doc.setFontSize(10);
+      doc.setTextColor(100);
+      doc.text(`Generado el: ${dateStr}`, doc.internal.pageSize.getWidth() / 2, 60, { align: 'center' });
+      
+      doc.setFontSize(12);
+      doc.text(`Producto: ${selectedProducto?.label || 'No especificado'}`, 40, 80);
+      doc.text(`Sucursal: ${sucursalNombre}`, 40, 95);
+      
+      if (fechaInicio || fechaFin) {
+        doc.text(
+          `Rango de fechas: ${fechaInicio ? dayjs(fechaInicio).format('DD/MM/YYYY') : 'Inicio no especificado'} - ${fechaFin ? dayjs(fechaFin).format('DD/MM/YYYY') : 'Fin no especificado'}`,
+          40,
+          110
+        );
+      }
+  
+      // Preparar datos para la tabla
+      const tableData = dataToExport.map(item => [
+        dayjs(item.fechaMovimiento).format('DD/MM/YYYY HH:mm'),
+        item.tipoMovimiento,
+        item.cantidad,
+        `Ant: ${item.stockAnterior}\nMov: ${item.tipoMovimiento === 'INGRESO' ? '+' : '-'}${item.cantidad}\nNvo: ${item.stockNuevo}`,
+        item.nombreUsuario,
+        item.observaciones || 'N/A'
+      ]);
+  
+      // Configuración de la tabla
+      autoTable(doc, {
+        startY: 130,
+        head: [['Fecha', 'Movimiento', 'Cantidad', 'Stock', 'Usuario', 'Observaciones']],
+        body: tableData,
+        theme: 'grid',
+        headStyles: {
+          fillColor: [41, 128, 185],
+          textColor: 255,
+          fontStyle: 'bold'
+        },
+        alternateRowStyles: {
+          fillColor: [245, 245, 245]
+        },
+        styles: {
+          fontSize: 8,
+          cellPadding: 3,
+          overflow: 'linebreak'
+        },
+        columnStyles: {
+          0: { cellWidth: 80 },
+          1: { cellWidth: 60 },
+          2: { cellWidth: 40 },
+          3: { cellWidth: 60 },
+          4: { cellWidth: 60 },
+          5: { cellWidth: 'auto' }
+        },
+        margin: { horizontal: 20 },
+        didDrawPage: function (data) {
+          // Footer
+          doc.setFontSize(10);
+          doc.setTextColor(150);
+          doc.text(
+            `Página ${doc.internal.getNumberOfPages()}`,
+            doc.internal.pageSize.getWidth() / 2,
+            doc.internal.pageSize.getHeight() - 20,
+            { align: 'center' }
+          );
+        }
+      });
+  
+      // Guardar el PDF
+      doc.save(`historial-stock-${dateStr.replace(/\//g, '-').replace(/:/g, '-').replace(' ', '_')}.pdf`);
+    } catch (err) {
+      console.log(err)
+      setError('Error al generar el PDF: ' + err.message);
+    } finally {
+      setGeneratingPDF(false);
+    }
+  };
+
+  const generateExcel = () => {
+    if (filteredData.length === 0 && reporteData.length === 0) {
+      setError('No hay datos para generar el reporte');
+      return;
+    }
+  
+    setGeneratingExcel(true);
+    setError(null);
+  
+    try {
+      const dataToExport = filteredData.length > 0 ? filteredData : reporteData;
+      const sucursalNombre = sucursales.find(s => s.idSucursal === selectedSucursal)?.nombreSucursal || selectedSucursal;
+      const today = new Date();
+      const dateStr = today.toLocaleDateString('es-GT') + ' ' + today.toLocaleTimeString('es-GT', { hour: '2-digit', minute: '2-digit' });
+  
+      // 1. Preparar los datos para Excel
+      const excelData = dataToExport.map(item => ({
+        'Fecha': dayjs(item.fechaMovimiento).format('DD/MM/YYYY HH:mm'),
+        'Tipo Movimiento': item.tipoMovimiento,
+        'Cantidad': item.cantidad,
+        'Stock Anterior': item.stockAnterior,
+        'Movimiento': item.tipoMovimiento === 'INGRESO' ? `+${item.cantidad}` : `-${item.cantidad}`,
+        'Stock Nuevo': item.stockNuevo,
+        'Usuario': item.nombreUsuario,
+        'Observaciones': item.observaciones || 'N/A'
+      }));
+  
+      // 2. Crear libro y hoja de trabajo
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.json_to_sheet([]); // Hoja vacía inicialmente
+  
+      // 3. Definir anchos de columna
+      const colWidths = [
+        { wch: 20 }, // Fecha (columna A/0)
+        { wch: 15 }, // Tipo Movimiento (B/1)
+        { wch: 10 }, // Cantidad (C/2)
+        { wch: 15 }, // Stock Anterior (D/3)
+        { wch: 12 }, // Movimiento (E/4)
+        { wch: 12 }, // Stock Nuevo (F/5)
+        { wch: 15 }, // Usuario (G/6)
+        { wch: 30 }  // Observaciones (H/7)
+      ];
+      ws['!cols'] = colWidths;
+  
+      // 4. Agregar información del reporte
+      const reportInfo = [
+        ["REPORTE DE HISTORIAL DE STOCK"],
+        [`Generado el: ${dateStr}`],
+        [`Producto: ${selectedProducto?.label || 'No especificado'}`],
+        [`Sucursal: ${sucursalNombre}`],
+        []
+      ];
+      
+      if (fechaInicio || fechaFin) {
+        reportInfo.push([
+          `Rango de fechas: ${fechaInicio ? dayjs(fechaInicio).format('DD/MM/YYYY') : 'Inicio no especificado'} - ${fechaFin ? dayjs(fechaFin).format('DD/MM/YYYY') : 'Fin no especificado'}`
+        ]);
+        reportInfo.push([]);
+      }
+  
+      // 5. Insertar información del reporte
+      XLSX.utils.sheet_add_aoa(ws, reportInfo, { origin: 'A1' });
+  
+      // 6. Combinar celdas para los títulos
+      const merges = [
+        { s: { r: 0, c: 0 }, e: { r: 0, c: 7 } }, // Título principal
+        { s: { r: 1, c: 0 }, e: { r: 1, c: 7 } }, // Fecha generación
+        { s: { r: 2, c: 0 }, e: { r: 2, c: 7 } }, // Producto
+        { s: { r: 3, c: 0 }, e: { r: 3, c: 7 } }  // Sucursal
+      ];
+  
+      if (fechaInicio || fechaFin) {
+        merges.push({ s: { r: 4, c: 0 }, e: { r: 4, c: 7 } }); // Rango fechas
+        merges.push({ s: { r: 5, c: 0 }, e: { r: 5, c: 7 } }); // Espacio en blanco
+      }
+      ws['!merges'] = merges;
+  
+      // 7. Agregar encabezados de columnas
+      const headers = Object.keys(excelData[0] || {});
+      const headerRow = reportInfo.length;
+      XLSX.utils.sheet_add_aoa(ws, [headers], { origin: XLSX.utils.encode_row(headerRow) });
+  
+      // 8. Aplicar estilos a encabezados
+      headers.forEach((_, colIndex) => {
+        const cellRef = XLSX.utils.encode_cell({ r: headerRow, c: colIndex });
+        ws[cellRef] = ws[cellRef] || { t: 's' };
+        ws[cellRef].s = {
+          font: { bold: true, color: { rgb: "FFFFFF" } },
+          fill: { fgColor: { rgb: "4BACC6" } },
+          alignment: { horizontal: "center" }
+        };
+      });
+  
+      // 9. Agregar los datos
+      XLSX.utils.sheet_add_json(ws, excelData, {
+        header: headers,
+        skipHeader: true,
+        origin: XLSX.utils.encode_row(headerRow + 1)
+      });
+  
+      // 10. Aplicar estilos a los datos
+      excelData.forEach((row, rowIndex) => {
+        const dataRow = headerRow + 1 + rowIndex;
+        
+        // Estilo para Tipo Movimiento (columna B/1)
+        const tipoCell = XLSX.utils.encode_cell({ r: dataRow, c: 1 });
+        ws[tipoCell] = ws[tipoCell] || { t: 's' };
+        ws[tipoCell].s = {
+          font: { 
+            bold: true, 
+            color: { rgb: row['Tipo Movimiento'] === 'INGRESO' ? "007F00" : "FF0000" } 
+          },
+          fill: { 
+            fgColor: { rgb: row['Tipo Movimiento'] === 'INGRESO' ? "C6EFCE" : "FFC7CE" } 
+          }
+        };
+  
+        // Estilo para Movimiento (columna E/4)
+        const movCell = XLSX.utils.encode_cell({ r: dataRow, c: 4 });
+        ws[movCell] = ws[movCell] || { t: 's' };
+        ws[movCell].s = {
+          font: { 
+            bold: true, 
+            color: { rgb: row['Tipo Movimiento'] === 'INGRESO' ? "007F00" : "FF0000" } 
+          }
+        };
+      });
+  
+      // 11. Agregar hoja al libro
+      XLSX.utils.book_append_sheet(wb, ws, "Historial Stock");
+  
+      // 12. Generar archivo
+      const fileName = `Historial_Stock_${selectedProducto?.label || 'Producto'}_${dateStr.replace(/\//g, '-').replace(/:/g, '-').replace(' ', '_')}.xlsx`;
+      XLSX.writeFile(wb, fileName);
+  
+    } catch (err) {
+      setError('Error al generar el Excel: ' + err.message);
+      console.error('Error detallado:', err);
+    } finally {
+      setGeneratingExcel(false);
+    }
+  };
 
   return (
     <Container fluid className="historial-container">
@@ -361,9 +611,35 @@ const HistorialStock = () => {
           <Col className="text-end">
             <Button 
               variant="outline-primary" 
-              className="export-button"
+              className="export-button me-2"
+              onClick={generateExcel}
+              disabled={generatingExcel || (filteredData.length === 0 && reporteData.length === 0)}
             >
-              <FiDownload className="me-1" /> Exportar a Excel
+              {generatingExcel ? (
+                <>
+                  <Spinner animation="border" size="sm" className="me-1" /> Generando...
+                </>
+              ) : (
+                <>
+                  <FiDownload className="me-1" /> Exportar a Excel
+                </>
+              )}
+            </Button>
+            <Button 
+              variant="outline-danger" 
+              className="export-button"
+              onClick={generatePDF}
+              disabled={generatingPDF || (filteredData.length === 0 && reporteData.length === 0)}
+            >
+              {generatingPDF ? (
+                <>
+                  <Spinner animation="border" size="sm" className="me-1" /> Generando...
+                </>
+              ) : (
+                <>
+                  <FiDownload className="me-1" /> Exportar a PDF
+                </>
+              )}
             </Button>
           </Col>
         </Row>
