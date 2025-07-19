@@ -1,0 +1,201 @@
+.ventas-report-container {
+    padding: 20px;
+    max-width: 1800px;
+    margin: 0 auto;
+  }
+  
+  .report-title {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 0.25rem;
+  }
+  
+  .report-subtitle {
+    font-size: 1rem;
+    color: #7f8c8d;
+    margin-bottom: 0;
+  }
+  
+  .filtros-card {
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    border: none;
+  }
+  
+  .filter-label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #34495e;
+    margin-bottom: 0.5rem;
+  }
+  
+  .filter-select {
+    border-radius: 8px;
+    padding: 10px 15px;
+    border: 1px solid #dfe6e9;
+    transition: all 0.3s;
+    background-color: #f8f9fa;
+  }
+  
+  .filter-select:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+    background-color: #fff;
+  }
+  
+  .date-input::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.6;
+    filter: invert(0.5);
+  }
+  
+  .date-input::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+  }
+  
+  .back-button {
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+  }
+  
+  .reporte-table {
+    font-size: 0.9rem;
+  }
+  
+  .reporte-table th {
+    background-color: #2980b9;
+    color: white;
+    font-weight: 500;
+    text-align: center;
+    vertical-align: middle;
+  }
+  
+  .reporte-table td {
+    vertical-align: middle;
+  }
+  
+  .text-end {
+    text-align: right !important;
+  }
+  
+  .text-center {
+    text-align: center !important;
+  }
+  
+  .text-danger {
+    color: #e74c3c !important;
+  }
+  
+  .text-success {
+    color: #27ae60 !important;
+  }
+  
+  .venta-card {
+    margin-bottom: 10px;
+    border-radius: 8px !important;
+    overflow: hidden;
+    border: 1px solid #dfe6e9;
+  }
+  
+  .venta-card .accordion-button {
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 8px 8px 0 0 !important;
+  }
+  
+  .venta-card .accordion-button:not(.collapsed) {
+    background-color: #ecf0f1;
+    box-shadow: none;
+  }
+  
+  .venta-card .accordion-button:focus {
+    box-shadow: none;
+    border-color: #dfe6e9;
+  }
+  
+  .venta-fecha {
+    font-weight: 500;
+    font-size: 0.9rem;
+  }
+  
+  .venta-vendedor {
+    font-size: 0.8rem;
+    color: #7f8c8d;
+  }
+  
+  .venta-total {
+    font-weight: 600;
+    color: #2c3e50;
+  }
+  
+  .venta-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 10px 0;
+  }
+  
+  .detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 0;
+  }
+  
+  .detail-label {
+    font-weight: 500;
+    color: #7f8c8d;
+    font-size: 0.85rem;
+  }
+  
+  .empty-state {
+    border: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    border-radius: 10px;
+    text-align: center;
+    background-color: #f8f9fa;
+  }
+  
+  .custom-alert {
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .custom-alert.error {
+    background-color: #fdecea;
+    border-left: 4px solid #f44336;
+  }
+  
+  .alert-content {
+    display: flex;
+    align-items: center;
+  }
+  
+  .alert-message {
+    color: #f44336;
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+  
+  @media (max-width: 768px) {
+    .venta-details {
+      grid-template-columns: 1fr;
+    }
+    
+    .report-title {
+      font-size: 1.5rem;
+    }
+    
+    .report-subtitle {
+      font-size: 0.9rem;
+    }
+  }

@@ -23,7 +23,8 @@ const getEndpoints = {
     CONSULTAR_TRASLADOS: "consultar-traslados",
     CONSULTAR_DETALLE_TRASLADOS: "consultar-detalle-traslado",
     CONSULTAR_ELIMINACIONES: "consultar-eliminacion-por-dia",
-    CONSULTAR_DASHBOARD_DATA: "consultar-data-dashboard"
+    CONSULTAR_DASHBOARD_DATA: "consultar-data-dashboard",
+    GET_REPORTE_VENTAS: "generar-reporte-ventas"
 };
 
 const postEndpoints = {
