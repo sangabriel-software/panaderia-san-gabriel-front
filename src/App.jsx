@@ -11,6 +11,7 @@ import "react-toastify/dist/ReactToastify.css";
 const ReportesPanel = lazy(() => import("./pages/reportes/reportespanel/ReportesPanel"));
 const HistorialStock = lazy(() => import("./pages/reportes/historialStock/HistorialStock"));
 const VentasReportPage = lazy(() => import("./pages/reportes/ventasReport/VentasReportPage"));
+const ReportePerdidasPage = lazy(() => import("./pages/reportes/ReportePerdidas/ReportePerdidasPage"));
   
 const LoadingSpinner = lazy(() => import("./components/LoadingSpinner/LoadingSpinner"));
 const AccessDeniedPage = lazy(() => import("./components/AccesoDenegado/AccessDeniedPage"));
@@ -130,6 +131,7 @@ function App() {
               <Route index element={<ReportesPanel/>} />
               <Route path="ingreso-stock" element={<HistorialStock/>} />    
               <Route path="ventas" element={<VentasReportPage/>} />
+              <Route path="perdidas" element={<ReportePerdidasPage/>} />
             </Route>
 
             <Route path="/traslados-productos">
