@@ -19,3 +19,12 @@ export const generarReporteVentasService = async (fechaInicio, fechaFin, idSucur
     throw error;
   }
 }
+
+export const generarReportePerdidasService = async (fechaInicio, fechaFin, idSucursal) => {
+  try {
+      const response = await api.get(`${getEndpoints.GET_REPORTE_PERDIDAS}?fechaInicio=${fechaInicio}&fechaFin=${fechaFin}&idSucursal=${idSucursal}`); 
+      return response.data;
+  } catch (error) {
+    throw error;
+  }
+}

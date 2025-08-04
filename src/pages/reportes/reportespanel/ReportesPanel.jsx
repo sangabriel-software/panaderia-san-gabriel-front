@@ -23,27 +23,27 @@ const ModernReportPanel = () => {
       accentColor: "#10B981",
       route: "/reportes/ventas"
     },
-    {
+    /*{
       id: 3,
       title: "Clientes",
       description: "Comportamiento y segmentación",
       icon: <FiUsers className="mr-icon" />,
       accentColor: "#3B82F6",
       route: "/reportes/clientes"
-    },
+    },*/
     {
       id: 4,
-      title: "Tendencias",
-      description: "Productos más populares",
-      icon: <FiTrendingUp className="mr-icon" />,
+      title: "Perdidas de producto",
+      description: "Productos con perdidas",
+      icon: <FiCalendar className="mr-icon" />,
       accentColor: "#F59E0B",
-      route: "/reportes/tendencias"
+      route: "/reportes/perdidas"
     },
     {
       id: 5,
       title: "Reporte Diario",
       description: "Resumen ejecutivo del día",
-      icon: <FiCalendar className="mr-icon" />,
+      icon: <FiTrendingUp className="mr-icon" />,
       accentColor: "#EC4899",
       route: "/reportes/diario"
     },
