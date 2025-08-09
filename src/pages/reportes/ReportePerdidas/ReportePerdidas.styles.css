@@ -191,3 +191,235 @@
       font-size: 0.9rem;
     }
   }
+
+  /* Indicadores de turno */
+.turno-indicator {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  vertical-align: middle;
+}
+
+.turno-indicator.am {
+  background-color: rgba(75, 192, 192, 0.8);
+}
+
+.turno-indicator.pm {
+  background-color: rgba(153, 102, 255, 0.8);
+}
+
+/* Estilos para la tabla */
+.reporte-table th {
+  white-space: nowrap;
+}
+
+.reporte-table td {
+  vertical-align: middle;
+}
+
+.ventas-report-container {
+  padding: 20px;
+}
+
+.report-title {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 0.25rem;
+}
+
+.report-subtitle {
+  font-size: 0.9rem;
+  color: #7f8c8d;
+}
+
+.filtros-card {
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.filter-label {
+  font-weight: 500;
+  color: #34495e;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.filter-select {
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  border: 1px solid #dfe6e9;
+  transition: all 0.3s ease;
+}
+
+.filter-select:focus {
+  border-color: #3498db;
+  box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+}
+
+.date-input::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+}
+
+.export-button {
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  font-weight: 500;
+}
+
+.back-button {
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.reporte-table {
+  margin-top: 1rem;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.reporte-table th {
+  background-color: #2980b9;
+  color: white;
+  font-weight: 500;
+  padding: 0.75rem;
+  text-align: left;
+}
+
+.reporte-table td {
+  padding: 0.75rem;
+  vertical-align: middle;
+  border-top: 1px solid #dfe6e9;
+}
+
+.reporte-table tr:hover td {
+  background-color: #f8f9fa;
+}
+
+.empty-state {
+  border: none;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.venta-card {
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.venta-card .accordion-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dfe6e9;
+}
+
+.venta-card .accordion-button:not(.collapsed) {
+  background-color: #f8f9fa;
+  box-shadow: none;
+}
+
+.venta-card .accordion-button:focus {
+  box-shadow: none;
+  border-color: transparent;
+}
+
+.venta-fecha {
+  font-weight: 500;
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
+}
+
+.venta-vendedor {
+  font-size: 0.8rem;
+  color: #6c757d;
+}
+
+.venta-total {
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
+}
+
+.venta-details {
+  padding: 0.5rem 0;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.detail-label {
+  font-weight: 500;
+  color: #6c757d;
+  margin-right: 1rem;
+}
+
+.custom-alert.error {
+  background-color: #f8d7da;
+  border-left: 4px solid #dc3545;
+  padding: 0.75rem 1.25rem;
+  margin-bottom: 1rem;
+  border-radius: 4px;
+}
+
+.alert-message {
+  color: #721c24;
+  font-size: 0.9rem;
+}
+
+/* Estilos para los badges de turno */
+.turno-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.35em 0.65em;
+  margin-top: 0.25rem;
+  border-radius: 4px;
+}
+
+.turno-badge.am {
+  background-color: rgba(75, 192, 192, 0.2) !important;
+  color: rgba(75, 192, 192, 1) !important;
+  border: 1px solid rgba(75, 192, 192, 0.5);
+}
+
+.turno-badge.pm {
+  background-color: rgba(153, 102, 255, 0.2) !important;
+  color: rgba(153, 102, 255, 1) !important;
+  border: 1px solid rgba(153, 102, 255, 0.5);
+}
+
+/* Responsive adjustments */
+@media (max-width: 767.98px) {
+  .ventas-report-container {
+    padding: 15px;
+  }
+  
+  .report-title {
+    font-size: 1.5rem;
+  }
+  
+  .filtros-card {
+    margin-bottom: 1rem;
+  }
+  
+  .filter-select {
+    font-size: 0.85rem;
+  }
+  
+  .export-button {
+    font-size: 0.85rem;
+    padding: 0.4rem 0.8rem;
+  }
+}
