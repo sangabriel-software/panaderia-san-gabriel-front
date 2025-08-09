@@ -19,6 +19,7 @@ const VentasReportPage = () => {
   
   const [selectedSucursal, setSelectedSucursal] = useState('');
   const [reporteData, setReporteData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
   const [loadingReporte, setLoadingReporte] = useState(false);
   const [error, setError] = useState(null);
   const [fechaInicio, setFechaInicio] = useState(dayjs().subtract(7, 'day').format('YYYY-MM-DD'));
@@ -26,8 +27,8 @@ const VentasReportPage = () => {
   const [activeVenta, setActiveVenta] = useState(null);
   const [generatingPDF, setGeneratingPDF] = useState(false);
   const [generatingExcel, setGeneratingExcel] = useState(false);
+  const [selectedTurno, setSelectedTurno] = useState('Todos');
 
-  // Establecer sucursal automáticamente si no es admin
   useEffect(() => {
     if (!loadingSucursales && sucursales.length > 0 && userData?.idRol !== 1) {
       const sucursalUsuario = sucursales.find(s => s.idSucursal === userData.idSucursal);
@@ -36,6 +37,15 @@ const VentasReportPage = () => {
       }
     }
   }, [loadingSucursales, sucursales, userData]);
+
+  useEffect(() => {
+    if (selectedTurno === 'Todos') {
+      setFilteredData(reporteData);
+    } else {
+      const filtered = reporteData.filter(venta => venta.turno === selectedTurno);
+      setFilteredData(filtered);
+    }
+  }, [selectedTurno, reporteData]);
 
   const handleGenerarReporte = async () => {
     if (!fechaInicio || !fechaFin) {
@@ -53,10 +63,12 @@ const VentasReportPage = () => {
 
     setError(null);
     setLoadingReporte(true);
+    setSelectedTurno('Todos');
 
     try {
       const data = await generarReporteVentasService(fechaInicio, fechaFin, selectedSucursal);
       setReporteData(data.reporte || []);
+      setFilteredData(data.reporte || []);
     } catch (err) {
       setError('Error al generar el reporte: ' + err.message);
     } finally {
@@ -69,8 +81,10 @@ const VentasReportPage = () => {
     setFechaFin(dayjs().format('YYYY-MM-DD'));
     setSelectedSucursal(userData?.idRol === 1 ? '' : userData?.idSucursal || '');
     setReporteData([]);
+    setFilteredData([]);
     setError(null);
     setActiveVenta(null);
+    setSelectedTurno('Todos');
   };
 
   const formatFecha = (fecha) => {
@@ -93,21 +107,29 @@ const VentasReportPage = () => {
     </div>
   );
 
-  const renderEstadoBadge = (estado) => {
-    switch(estado) {
-      case 'Completada':
-        return <Badge bg="success">{estado}</Badge>;
-      case 'Cancelada':
-        return <Badge bg="danger">{estado}</Badge>;
-      case 'Pendiente':
-        return <Badge bg="warning" text="dark">{estado}</Badge>;
+  const renderTurnoBadge = (turno) => {
+    switch(turno) {
+      case 'AM':
+        return <Badge bg="info" className="turno-badge am">{turno}</Badge>;
+      case 'PM':
+        return <Badge bg="primary" className="turno-badge pm">{turno}</Badge>;
       default:
-        return <Badge bg="secondary">{estado}</Badge>;
+        return <Badge bg="secondary" className="turno-badge">{turno}</Badge>;
     }
   };
 
+  const getTurnoBackgroundColor = (turno) => {
+    return turno === 'AM' ? 'rgba(75, 192, 192, 0.2)' : 'rgba(153, 102, 255, 0.2)';
+  };
+
+  const getTurnoTextColor = (turno) => {
+    return turno === 'AM' ? 'rgba(75, 192, 192, 1)' : 'rgba(153, 102, 255, 1)';
+  };
+
   const generatePDF = () => {
-    if (reporteData.length === 0) {
+    const dataToExport = selectedTurno === 'Todos' ? reporteData : filteredData;
+    
+    if (dataToExport.length === 0) {
       setError('No hay datos para generar el reporte');
       return;
     }
@@ -121,13 +143,11 @@ const VentasReportPage = () => {
       const today = new Date();
       const dateStr = today.toLocaleDateString('es-GT') + ' ' + today.toLocaleTimeString('es-GT', { hour: '2-digit', minute: '2-digit' });
   
-      // Título
       doc.setFontSize(18);
       doc.setTextColor(40);
       doc.setFont('helvetica', 'bold');
       doc.text('REPORTE DE VENTAS', doc.internal.pageSize.getWidth() / 2, 40, { align: 'center' });
   
-      // Información del reporte
       doc.setFontSize(10);
       doc.setTextColor(100);
       doc.text(`Generado el: ${dateStr}`, doc.internal.pageSize.getWidth() / 2, 60, { align: 'center' });
@@ -139,21 +159,22 @@ const VentasReportPage = () => {
         40,
         95
       );
+      
+      if (selectedTurno !== 'Todos') {
+        doc.text(`Turno: ${selectedTurno}`, 40, 110);
+      }
   
-      // Calcular totales
-      const totalVentas = reporteData.reduce((sum, venta) => sum + venta.total_venta, 0);
-      const totalEfectivo = reporteData.reduce((sum, venta) => sum + venta.efectivo_ingresado, 0);
-      const totalGastos = reporteData.reduce((sum, venta) => sum + venta.gastos_del_turno, 0);
-      const totalDiferencia = reporteData.reduce((sum, venta) => sum + venta.diferencia, 0);
+      const totalVentas = dataToExport.reduce((sum, venta) => sum + venta.total_venta, 0);
+      const totalEfectivo = dataToExport.reduce((sum, venta) => sum + venta.efectivo_ingresado, 0);
+      const totalGastos = dataToExport.reduce((sum, venta) => sum + venta.gastos_del_turno, 0);
+      const totalDiferencia = dataToExport.reduce((sum, venta) => sum + venta.diferencia, 0);
   
-      // Agregar resumen
-      doc.text(`Total Ventas: ${formatCurrency(totalVentas)}`, 40, 110);
-      doc.text(`Total Efectivo: ${formatCurrency(totalEfectivo)}`, 40, 125);
-      doc.text(`Total Gastos: ${formatCurrency(totalGastos)}`, 40, 140);
-      doc.text(`Diferencia Total: ${formatCurrency(totalDiferencia)}`, 40, 155);
+      doc.text(`Total Ventas: ${formatCurrency(totalVentas)}`, 40, selectedTurno !== 'Todos' ? 125 : 110);
+      doc.text(`Total Efectivo: ${formatCurrency(totalEfectivo)}`, 40, selectedTurno !== 'Todos' ? 140 : 125);
+      doc.text(`Total Gastos: ${formatCurrency(totalGastos)}`, 40, selectedTurno !== 'Todos' ? 155 : 140);
+      doc.text(`Diferencia Total: ${formatCurrency(totalDiferencia)}`, 40, selectedTurno !== 'Todos' ? 170 : 155);
   
-      // Preparar datos para la tabla
-      const tableData = reporteData.map(venta => [
+      const tableData = dataToExport.map(venta => [
         dayjs(venta.fecha_hora_venta).format('DD/MM/YYYY'),
         venta.sucursal,
         venta.vendedor,
@@ -167,9 +188,8 @@ const VentasReportPage = () => {
         formatCurrency(venta.diferencia),
       ]);
   
-      // Configuración de la tabla
       autoTable(doc, {
-        startY: 170,
+        startY: selectedTurno !== 'Todos' ? 185 : 170,
         head: [
           ['Fecha', 'Sucursal', 'Vendedor', 'Turno', 'Total Venta', 'Productos', 'Unidades', 
            'Efectivo', 'Gastos', 'Total Esperado', 'Diferencia', 'Estado']
@@ -192,7 +212,6 @@ const VentasReportPage = () => {
         },
         margin: { horizontal: 20 },
         didDrawPage: function (data) {
-          // Footer
           doc.setFontSize(10);
           doc.setTextColor(150);
           doc.text(
@@ -204,7 +223,6 @@ const VentasReportPage = () => {
         }
       });
   
-      // Guardar el PDF
       doc.save(`reporte-ventas-${dateStr.replace(/\//g, '-').replace(/:/g, '-').replace(' ', '_')}.pdf`);
     } catch (err) {
       setError('Error al generar el PDF: ' + err.message);
@@ -214,7 +232,9 @@ const VentasReportPage = () => {
   };
 
   const generateExcel = () => {
-    if (reporteData.length === 0) {
+    const dataToExport = selectedTurno === 'Todos' ? reporteData : filteredData;
+    
+    if (dataToExport.length === 0) {
       setError('No hay datos para generar el reporte');
       return;
     }
@@ -227,8 +247,7 @@ const VentasReportPage = () => {
       const today = new Date();
       const dateStr = today.toLocaleDateString('es-GT') + ' ' + today.toLocaleTimeString('es-GT', { hour: '2-digit', minute: '2-digit' });
   
-      // 1. Preparar los datos para Excel
-      const excelData = reporteData.map(venta => ({
+      const excelData = dataToExport.map(venta => ({
         'ID': venta.idVenta,
         'Fecha': dayjs(venta.fecha_hora_venta).format('DD/MM/YYYY'),
         'Sucursal': venta.sucursal,
@@ -243,54 +262,37 @@ const VentasReportPage = () => {
         'Diferencia': venta.diferencia,
       }));
   
-      // 2. Crear libro y hoja de trabajo
       const wb = XLSX.utils.book_new();
-      const ws = XLSX.utils.json_to_sheet([]); // Hoja vacía inicialmente
+      const ws = XLSX.utils.json_to_sheet([]);
   
-      // 3. Definir anchos de columna
       const colWidths = [
-        { wch: 8 },  // ID
-        { wch: 18 }, // Fecha
-        { wch: 20 }, // Sucursal
-        { wch: 15 }, // Vendedor
-        { wch: 8 },  // Turno
-        { wch: 12 }, // Total Venta
-        { wch: 10 }, // Cant. Productos
-        { wch: 10 }, // Unidades Vendidas
-        { wch: 12 }, // Efectivo Ingresado
-        { wch: 12 }, // Gastos del Turno
-        { wch: 12 }, // Total Esperado
-        { wch: 12 }, // Diferencia
+        { wch: 8 },  { wch: 18 }, { wch: 20 }, { wch: 15 }, 
+        { wch: 8 },  { wch: 12 }, { wch: 10 }, { wch: 10 }, 
+        { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 12 },
       ];
       ws['!cols'] = colWidths;
   
-      // 4. Agregar información del reporte
       const reportInfo = [
         ["REPORTE DE VENTAS"],
         [`Generado el: ${dateStr}`],
         [`Sucursal: ${sucursalNombre}`],
         [`Rango de fechas: ${dayjs(fechaInicio).format('DD/MM/YYYY')} - ${dayjs(fechaFin).format('DD/MM/YYYY')}`],
+        selectedTurno !== 'Todos' ? [`Turno: ${selectedTurno}`] : [],
         []
-      ];
+      ].filter(item => item.length > 0);
   
-      // 5. Insertar información del reporte
       XLSX.utils.sheet_add_aoa(ws, reportInfo, { origin: 'A1' });
   
-      // 6. Combinar celdas para los títulos
-      const merges = [
-        { s: { r: 0, c: 0 }, e: { r: 0, c: 12 } }, // Título principal
-        { s: { r: 1, c: 0 }, e: { r: 1, c: 12 } }, // Fecha generación
-        { s: { r: 2, c: 0 }, e: { r: 2, c: 12 } }, // Sucursal
-        { s: { r: 3, c: 0 }, e: { r: 3, c: 12 } }  // Rango fechas
-      ];
+      const merges = reportInfo.map((_, index) => ({
+        s: { r: index, c: 0 }, 
+        e: { r: index, c: 12 }
+      }));
       ws['!merges'] = merges;
   
-      // 7. Agregar encabezados de columnas
       const headers = Object.keys(excelData[0] || {});
       const headerRow = reportInfo.length;
       XLSX.utils.sheet_add_aoa(ws, [headers], { origin: XLSX.utils.encode_row(headerRow) });
   
-      // 8. Aplicar estilos a encabezados
       headers.forEach((_, colIndex) => {
         const cellRef = XLSX.utils.encode_cell({ r: headerRow, c: colIndex });
         ws[cellRef] = ws[cellRef] || { t: 's' };
@@ -301,14 +303,12 @@ const VentasReportPage = () => {
         };
       });
   
-      // 9. Agregar los datos
       XLSX.utils.sheet_add_json(ws, excelData, {
         header: headers,
         skipHeader: true,
         origin: XLSX.utils.encode_row(headerRow + 1)
       });
   
-      // 10. Aplicar formato de moneda a las columnas numéricas
       const currencyColumns = ['Total Venta', 'Efectivo Ingresado', 'Gastos del Turno', 'Total Esperado', 'Diferencia'];
       const currencyColIndices = headers
         .map((header, index) => currencyColumns.includes(header) ? index : null)
@@ -324,10 +324,8 @@ const VentasReportPage = () => {
         });
       });
   
-      // 11. Agregar hoja al libro
       XLSX.utils.book_append_sheet(wb, ws, "Reporte Ventas");
   
-      // 12. Generar archivo
       const fileName = `Reporte_Ventas_${sucursalNombre.replace(/\s+/g, '_')}_${dateStr.replace(/\//g, '-').replace(/:/g, '-').replace(' ', '_')}.xlsx`;
       XLSX.writeFile(wb, fileName);
   
@@ -360,7 +358,7 @@ const VentasReportPage = () => {
       <Card className="filtros-card mb-4">
         <Card.Body>
           <Row>
-            <Col md={4} className="mb-3 mb-md-0">
+            <Col md={3} className="mb-3 mb-md-0">
               <Form.Group>
                 <Form.Label className="filter-label">Fecha Inicio</Form.Label>
                 <Form.Control
@@ -375,7 +373,7 @@ const VentasReportPage = () => {
               </Form.Group>
             </Col>
 
-            <Col md={4} className="mb-3 mb-md-0">
+            <Col md={3} className="mb-3 mb-md-0">
               <Form.Group>
                 <Form.Label className="filter-label">Fecha Fin</Form.Label>
                 <Form.Control
@@ -391,7 +389,7 @@ const VentasReportPage = () => {
               </Form.Group>
             </Col>
 
-            <Col md={4} className="mb-3 mb-md-0">
+            <Col md={3} className="mb-3 mb-md-0">
               <Form.Group>
                 <Form.Label className="filter-label">Sucursal</Form.Label>
                 {userData?.idRol === 1 ? (
@@ -418,6 +416,23 @@ const VentasReportPage = () => {
                   />
                 )}
                 {loadingSucursales && <small className="text-muted">Cargando sucursales...</small>}
+              </Form.Group>
+            </Col>
+
+            <Col md={3} className="mb-3 mb-md-0">
+              <Form.Group>
+                <Form.Label className="filter-label">Turno</Form.Label>
+                <Form.Control
+                  as="select"
+                  value={selectedTurno}
+                  onChange={(e) => setSelectedTurno(e.target.value)}
+                  disabled={reporteData.length === 0}
+                  className="filter-select"
+                >
+                  <option value="Todos">Todos los turnos</option>
+                  <option value="AM">Turno AM</option>
+                  <option value="PM">Turno PM</option>
+                </Form.Control>
               </Form.Group>
             </Col>
           </Row>
@@ -468,47 +483,51 @@ const VentasReportPage = () => {
       )}
 
       {reporteData.length > 0 && (
-        <Row className="mb-3">
-          <Col className="text-end">
-            <Button 
-              variant="outline-primary" 
-              className="export-button me-2"
-              onClick={generateExcel}
-              disabled={generatingExcel || reporteData.length === 0}
-            >
-              {generatingExcel ? (
-                <>
-                  <Spinner animation="border" size="sm" className="me-1" /> Generando...
-                </>
-              ) : (
-                <>
-                  <FiDownload className="me-1" /> Exportar a Excel
-                </>
-              )}
-            </Button>
-            <Button 
-              variant="outline-danger" 
-              className="export-button"
-              onClick={generatePDF}
-              disabled={generatingPDF || reporteData.length === 0}
-            >
-              {generatingPDF ? (
-                <>
-                  <Spinner animation="border" size="sm" className="me-1" /> Generando...
-                </>
-              ) : (
-                <>
-                  <FiDownload className="me-1" /> Exportar a PDF
-                </>
-              )}
-            </Button>
-          </Col>
-        </Row>
+        <>
+          <Row className="mb-3">
+            <Col md={4}>
+            </Col>
+            <Col md={8} className="text-end">
+              <Button 
+                variant="outline-primary" 
+                className="export-button me-2"
+                onClick={generateExcel}
+                disabled={generatingExcel || filteredData.length === 0}
+              >
+                {generatingExcel ? (
+                  <>
+                    <Spinner animation="border" size="sm" className="me-1" /> Generando...
+                  </>
+                ) : (
+                  <>
+                    <FiDownload className="me-1" /> Exportar a Excel
+                  </>
+                )}
+              </Button>
+              <Button 
+                variant="outline-danger" 
+                className="export-button"
+                onClick={generatePDF}
+                disabled={generatingPDF || filteredData.length === 0}
+              >
+                {generatingPDF ? (
+                  <>
+                    <Spinner animation="border" size="sm" className="me-1" /> Generando...
+                  </>
+                ) : (
+                  <>
+                    <FiDownload className="me-1" /> Exportar a PDF
+                  </>
+                )}
+              </Button>
+            </Col>
+          </Row>
+        </>
       )}
 
       <Row>
         <Col>
-          {reporteData.length > 0 ? (
+          {filteredData.length > 0 ? (
             <>
               <div className="d-none d-md-block">
                 <Table responsive bordered hover className="reporte-table">
@@ -528,12 +547,18 @@ const VentasReportPage = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {reporteData.map((venta) => (
+                    {filteredData.map((venta) => (
                       <tr key={venta.idVenta}>
                         <td>{formatFecha(venta.fecha_hora_venta)}</td>
                         <td>{venta.sucursal}</td>
                         <td>{venta.vendedor}</td>
-                        <td>{venta.turno}</td>
+                        <td style={{
+                          backgroundColor: getTurnoBackgroundColor(venta.turno),
+                          color: getTurnoTextColor(venta.turno),
+                          fontWeight: 'bold'
+                        }}>
+                          {venta.turno}
+                        </td>
                         <td className="text-end">{formatCurrency(venta.total_venta)}</td>
                         <td className="text-center">{venta.cantidad_productos}</td>
                         <td className="text-center">{venta.unidades_vendidas}</td>
@@ -551,7 +576,7 @@ const VentasReportPage = () => {
 
               <div className="d-md-none">
                 <Accordion activeKey={activeVenta}>
-                  {reporteData.map((venta) => (
+                  {filteredData.map((venta) => (
                     <Accordion.Item 
                       key={venta.idVenta} 
                       eventKey={venta.idVenta}
@@ -561,17 +586,21 @@ const VentasReportPage = () => {
                         <div className="d-flex justify-content-between w-100 pe-2 align-items-center">
                           <div className="d-flex flex-column">
                             <span className="venta-fecha">{formatFecha(venta.fecha_hora_venta)}</span>
-                            <span className="venta-vendedor">{venta.vendedor} - {venta.turno}</span>
+                            <span className="venta-vendedor">{venta.vendedor}</span>
                           </div>
                           <div className="d-flex flex-column align-items-end">
                             <span className="venta-total">{formatCurrency(venta.total_venta)}</span>
-                            {renderEstadoBadge(venta.estado_venta)}
+                            {renderTurnoBadge(venta.turno)}
                           </div>
                           {activeVenta === venta.idVenta ? <FiChevronUp /> : <FiChevronDown />}
                         </div>
                       </Accordion.Header>
                       <Accordion.Body>
                         <div className="venta-details">
+                          <div className="detail-row">
+                            <span className="detail-label">Turno:</span>
+                            <span>{venta.turno}</span>
+                          </div>
                           <div className="detail-row">
                             <span className="detail-label">Sucursal:</span>
                             <span>{venta.sucursal}</span>
@@ -609,6 +638,16 @@ const VentasReportPage = () => {
                 </Accordion>
               </div>
             </>
+          ) : reporteData.length > 0 && filteredData.length === 0 ? (
+            <Card className="empty-state">
+              <Card.Body className="text-center py-4">
+                <FiFilter size={48} className="text-muted mb-3" />
+                <h5>No hay resultados para el filtro aplicado</h5>
+                <p className="text-muted">
+                  No se encontraron ventas para el turno seleccionado
+                </p>
+              </Card.Body>
+            </Card>
           ) : !showErrorSucursales && (
             <Card className="empty-state">
               <Card.Body className="text-center py-4">
