@@ -2,9 +2,9 @@ import api from "../../config/api";
 import {  getEndpoints,  } from "../../config/endpoints";
 
 
-export const generarReporteHistorialStockService = async (idProducto, idSucursal) => {
+export const generarReporteHistorialStockService = async (idProducto, idSucursal, fechaInicio, fechaFin) => {
   try {
-      const response = await api.get(`${getEndpoints.GET_HISTORIAL_STOCK}?idProducto=${idProducto}&idSucursal=${idSucursal}`); 
+      const response = await api.get(`${getEndpoints.GET_HISTORIAL_STOCK}?idProducto=${idProducto}&idSucursal=${idSucursal}&fechaInicio=${fechaInicio}&fechaFin=${fechaFin}`); 
       return response.data;
   } catch (error) {
     throw error;

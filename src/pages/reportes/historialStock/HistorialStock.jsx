@@ -57,8 +57,16 @@ const HistorialStock = () => {
   }, [productos, categoriaActiva]);
 
   const handleGenerarReporte = async () => {
-    if (!selectedProducto || !selectedSucursal) {
-      setError('Debes seleccionar un producto y una sucursal');
+    if (!selectedProducto || !selectedSucursal || !fechaInicio || !fechaFin) {
+      setError('Debes completar todos los campos obligatorios');
+      return;
+    }
+
+    const inicio = dayjs(fechaInicio).startOf('day');
+    const fin = dayjs(fechaFin).endOf('day');
+    
+    if (inicio.isAfter(fin)) {
+      setError('La fecha de inicio no puede ser mayor a la fecha final');
       return;
     }
 
@@ -66,11 +74,14 @@ const HistorialStock = () => {
     setLoadingReporte(true);
 
     try {
-      const data = await generarReporteHistorialStockService(selectedProducto.value, selectedSucursal);
+      const data = await generarReporteHistorialStockService(
+        selectedProducto.value, 
+        selectedSucursal,
+        fechaInicio,
+        fechaFin
+      );
       setReporteData(data.reporte || []);
       setFilteredData(data.reporte || []);
-      setFechaInicio('');
-      setFechaFin('');
     } catch (err) {
       setError('Error al generar el reporte: ' + err.message);
     } finally {
@@ -88,37 +99,6 @@ const HistorialStock = () => {
     setError(null);
     setActiveMovimiento(null);
     setCategoriaActiva('Todas');
-  };
-
-  const handleFiltrarPorFecha = () => {
-    if (!fechaInicio || !fechaFin) {
-      setError('Debes seleccionar ambas fechas para filtrar');
-      return;
-    }
-  
-    const inicio = dayjs(fechaInicio).startOf('day');
-    const fin = dayjs(fechaFin).endOf('day');
-    
-    if (inicio.isAfter(fin)) {
-      setError('La fecha de inicio no puede ser mayor a la fecha final');
-      return;
-    }
-  
-    setError(null);
-    
-    const datosFiltrados = reporteData.filter(item => {
-      const fechaMovimiento = dayjs(item.fechaMovimiento);
-      return (
-        (fechaMovimiento.isAfter(inicio) || 
-        fechaMovimiento.isSame(inicio, 'day')
-      ) && (
-        (fechaMovimiento.isBefore(fin)) || 
-        fechaMovimiento.isSame(fin, 'day')
-      ));
-    });
-  
-    setFilteredData(datosFiltrados);
-    setActiveMovimiento(null);
   };
 
   const formatFecha = (fecha) => {
@@ -400,6 +380,9 @@ const HistorialStock = () => {
     }
   };
 
+  // Verificar si todos los campos obligatorios están llenos
+  const isFormValid = selectedProducto && selectedSucursal && fechaInicio && fechaFin;
+
   return (
     <Container fluid className="historial-container">
       <Row className="mb-4 align-items-center">
@@ -421,7 +404,7 @@ const HistorialStock = () => {
       <Card className="filtros-card mb-4">
         <Card.Body>
           <Row>
-            <Col md={4} className="mb-3 mb-md-0">
+            <Col md={3} className="mb-3 mb-md-0">
               <Form.Group>
                 <Form.Label className="filter-label">Categoría</Form.Label>
                 <Dropdown>
@@ -446,7 +429,7 @@ const HistorialStock = () => {
               </Form.Group>
             </Col>
 
-            <Col md={4} className="mb-3 mb-md-0">
+            <Col md={3} className="mb-3 mb-md-0">
               <Form.Group>
                 <Form.Label className="filter-label">Producto</Form.Label>
                 <Dropdown>
@@ -478,7 +461,7 @@ const HistorialStock = () => {
               </Form.Group>
             </Col>
 
-            <Col md={4} className="mb-3 mb-md-0">
+            <Col md={3} className="mb-3 mb-md-0">
               <Form.Group>
                 <Form.Label className="filter-label">Sucursal</Form.Label>
                 {userData?.idRol === 1 ? (
@@ -507,10 +490,41 @@ const HistorialStock = () => {
                 {loadingSucursales && <small className="text-muted">Cargando sucursales...</small>}
               </Form.Group>
             </Col>
+
+            <Col md={3} className="mb-3 mb-md-0">
+              <Form.Group>
+                <Form.Label className="filter-label">Fecha Inicio</Form.Label>
+                <Form.Control
+                  type="date"
+                  value={fechaInicio}
+                  max={fechaFin || dayjs().format('YYYY-MM-DD')}
+                  onChange={(e) => setFechaInicio(e.target.value)}
+                  className="filter-select date-input"
+                  placeholder=" "
+                  onFocus={(e) => e.target.showPicker()}
+                />
+              </Form.Group>
+            </Col>
           </Row>
 
           <Row className="mt-3">
-            <Col className="d-flex justify-content-end">
+            <Col md={3} className="mb-3 mb-md-0">
+              <Form.Group>
+                <Form.Label className="filter-label">Fecha Fin</Form.Label>
+                <Form.Control
+                  type="date"
+                  value={fechaFin}
+                  min={fechaInicio}
+                  max={dayjs().format('YYYY-MM-DD')}
+                  onChange={(e) => setFechaFin(e.target.value)}
+                  className="filter-select date-input"
+                  placeholder=" "
+                  onFocus={(e) => e.target.showPicker()}
+                />
+              </Form.Group>
+            </Col>
+
+            <Col md={9} className="d-flex align-items-end justify-content-end">
               <div className="d-flex">
                 <Button
                   variant="outline-secondary"
@@ -522,7 +536,7 @@ const HistorialStock = () => {
                 <Button
                   variant="primary"
                   onClick={handleGenerarReporte}
-                  disabled={!selectedProducto || !selectedSucursal || loadingReporte}
+                  disabled={!isFormValid || loadingReporte}
                 >
                   {loadingReporte ? (
                     <Spinner animation="border" size="sm" />
@@ -535,50 +549,6 @@ const HistorialStock = () => {
               </div>
             </Col>
           </Row>
-
-          {reporteData.length > 0 && (
-            <Row className="mt-3">
-              <Col md={4} className="mb-2 mb-md-0">
-                <Form.Group>
-                  <Form.Label className="filter-label">Fecha Inicio</Form.Label>
-                  <Form.Control
-                    type="date"
-                    value={fechaInicio}
-                    max={fechaFin || dayjs().format('YYYY-MM-DD')}
-                    onChange={(e) => setFechaInicio(e.target.value)}
-                    className="filter-select date-input"
-                    placeholder=" "
-                    onFocus={(e) => e.target.showPicker()}
-                  />
-                </Form.Group>
-              </Col>
-              <Col md={4} className="mb-2 mb-md-0">
-                <Form.Group>
-                  <Form.Label className="filter-label">Fecha Fin</Form.Label>
-                  <Form.Control
-                    type="date"
-                    value={fechaFin}
-                    min={fechaInicio}
-                    max={dayjs().format('YYYY-MM-DD')}
-                    onChange={(e) => setFechaFin(e.target.value)}
-                    className="filter-select date-input"
-                    placeholder=" "
-                    onFocus={(e) => e.target.showPicker()}
-                  />
-                </Form.Group>
-              </Col>
-              <Col md={4} className="d-flex align-items-end">
-                <Button
-                  variant="outline-primary"
-                  onClick={handleFiltrarPorFecha}
-                  disabled={!fechaInicio || !fechaFin}
-                  className="w-100"
-                >
-                  <FiCalendar className="me-1" /> Filtrar
-                </Button>
-              </Col>
-            </Row>
-          )}
         </Card.Body>
       </Card>
 
@@ -750,7 +720,7 @@ const HistorialStock = () => {
                     <FiFilter size={48} className="text-muted mb-3" />
                     <h5>No hay datos para mostrar</h5>
                     <p className="text-muted">
-                      Selecciona un producto y una sucursal para generar el reporte
+                      Completa todos los campos para generar el reporte
                     </p>
                   </>
                 )}
