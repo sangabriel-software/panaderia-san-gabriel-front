@@ -53,6 +53,7 @@ const DetalleDescuento = lazy(() => import("./pages/StockProductos/DescontarStoc
 const GestionarTraslados = lazy(() => import("./pages/Traslados/GestionarTraslados/GestionarTraslados"));
 const DetalleTraslados = lazy(() => import("./pages/Traslados/DetalleTraslado/DetalleTraslados"));
 const IngresarTraslado = lazy(() => import("./pages/Traslados/IngresarTraslado/IngresarTraslado"));
+const CustomerResponses = lazy(() => import("./pages/Encuestas/CustomerResponses/CustomerResponses"));
 
 function App() {
   return (
@@ -60,9 +61,21 @@ function App() {
     <Suspense fallback={<LoadingSpinner />}>
       <ToastContainer /> {/* Contenedor para las notificaciones */}
       <Routes>
+
+        {/* Rutas publicas */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/acceso-denegado" element={<AccessDeniedPage />} /> {/* Ruta de acceso denegado */}
         <Route path="/" element={<Navigate to="/login" />} />
+
+
+        <Route path="/surveys">
+          <Route path="customer-responses" element={<CustomerResponses />} />
+
+        </Route>
+
+
+        {/* Rutas publicas */}
+
 
         {/* Rutas protegidas */}
         <Route element={<PrivateRoute />}>
@@ -142,6 +155,7 @@ function App() {
 
           </Route>
         </Route>
+        {/* Rutas protegidas */}
       </Routes>
     </Suspense>
   );
