@@ -25,7 +25,8 @@ const getEndpoints = {
     CONSULTAR_ELIMINACIONES: "consultar-eliminacion-por-dia",
     CONSULTAR_DASHBOARD_DATA: "consultar-data-dashboard",
     GET_REPORTE_VENTAS: "generar-reporte-ventas",
-    GET_REPORTE_PERDIDAS: "generar-reporte-perdidas"
+    GET_REPORTE_PERDIDAS: "generar-reporte-perdidas",
+    GET_REPORTE_VENTAS_ELIMINADAS: "generar-reporte-ventas-eliminadas"
 };
 
 const postEndpoints = {

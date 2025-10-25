@@ -1,5 +1,5 @@
 import React from 'react';
-import { FiBox, FiShoppingCart, FiUsers, FiTrendingUp, FiCalendar, FiPieChart } from 'react-icons/fi';
+import { FiBox, FiShoppingCart, FiUsers, FiTrendingUp, FiCalendar, FiPieChart, FiRotateCw } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import "./ReportesPanel.styles.css";
 
@@ -25,7 +25,8 @@ const ModernReportPanel = () => {
     },
     /*{
       id: 3,
-      title: "Clientes",
+      title: "ClientesMicrosoft
+      ",
       description: "Comportamiento y segmentación",
       icon: <FiUsers className="mr-icon" />,
       accentColor: "#3B82F6",
@@ -41,11 +42,11 @@ const ModernReportPanel = () => {
     },
     {
       id: 5,
-      title: "Reporte Diario",
-      description: "Resumen ejecutivo del día",
-      icon: <FiTrendingUp className="mr-icon" />,
+      title: "Tracking de ventas eliminadas",
+      description: "Ventas eliminadas por periodo",
+      icon: <FiRotateCw className="mr-icon" />,
       accentColor: "#EC4899",
-      route: "/reportes/diario"
+      route: "/reportes/ventas-eliminadas"
     },
     {
       id: 6,
