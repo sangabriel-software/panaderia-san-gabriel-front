@@ -12,6 +12,7 @@ const ReportesPanel = lazy(() => import("./pages/reportes/reportespanel/Reportes
 const HistorialStock = lazy(() => import("./pages/reportes/historialStock/HistorialStock"));
 const VentasReportPage = lazy(() => import("./pages/reportes/ventasReport/VentasReportPage"));
 const ReportePerdidasPage = lazy(() => import("./pages/reportes/ReportePerdidas/ReportePerdidasPage"));
+const VentasEliminadasPage = lazy(() => import("./pages/reportes/VentasEliminadas/VentasEliminadas"));
   
 const LoadingSpinner = lazy(() => import("./components/LoadingSpinner/LoadingSpinner"));
 const AccessDeniedPage = lazy(() => import("./components/AccesoDenegado/AccessDeniedPage"));
@@ -145,6 +146,7 @@ function App() {
               <Route path="ingreso-stock" element={<HistorialStock/>} />    
               <Route path="ventas" element={<VentasReportPage/>} />
               <Route path="perdidas" element={<ReportePerdidasPage/>} />
+              <Route path="ventas-eliminadas" element={<VentasEliminadasPage/>} />
             </Route>
 
             <Route path="/traslados-productos">
