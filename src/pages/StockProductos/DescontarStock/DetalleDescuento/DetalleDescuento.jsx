@@ -112,7 +112,14 @@ const DetalleDescuento = () => {
                             <FiPackage className="dd-info-icon" />
                             <div>
                                 <span className="dd-info-label">Sucursal:</span>
-                                <span className="dd-info-value">{encabezadoDescuento.nombreSucursal}</span>
+                                <div className="dd-sucursal-info">
+                                    <span className="dd-info-value">{encabezadoDescuento.nombreSucursal}</span>
+                                    {encabezadoDescuento.descuentoTurno && (
+                                        <span className="dd-turno-badge">
+                                            {encabezadoDescuento.descuentoTurno}
+                                        </span>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     </div>

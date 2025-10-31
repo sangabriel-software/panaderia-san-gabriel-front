@@ -28,6 +28,7 @@ const DescontarStock = () => {
   const [categoriaActiva, setCategoriaActiva] = useState("Todas");
   const [searchTerm, setSearchTerm] = useState("");
   const [tipoDescuento, setTipoDescuento] = useState("MAYOREO");
+  const [turno, setTurno] = useState(""); // Nuevo estado para el turno
   const [localStock, setLocalStock] = useState({ general: [], dia: [] });
   const userData = getUserData();
 
@@ -188,6 +189,12 @@ const DescontarStock = () => {
     });
   };
 
+  // Validar si el formulario está completo para habilitar el botón
+  const isFormValid = useMemo(() => {
+    const hasStockValues = Object.values(stockValues).some(val => val > 0);
+    return hasStockValues && turno !== "";
+  }, [stockValues, turno]);
+
   /* Descontar Stock */
   const handleSubmit = async () => {
     try {
@@ -203,6 +210,14 @@ const DescontarStock = () => {
 
       if (productosConStock.length === 0) {
         setErrorPopupMessage("Debe ingresar al menos un producto con cantidad a descontar");
+        setIsPopupErrorOpen(true);
+        setIsLoading(false);
+        return;
+      }
+
+      // Validar que se haya seleccionado un turno
+      if (!turno) {
+        setErrorPopupMessage("Debe seleccionar un turno");
         setIsPopupErrorOpen(true);
         setIsLoading(false);
         return;
@@ -232,6 +247,7 @@ const DescontarStock = () => {
           idSucursal: decryptedIdSucursal,
           idUsuario: userData.idUsuario,
           tipoDescuento: tipoDescuento,
+          descuentoTurno: turno, // Nueva clave agregada
           fechaDescuento: fechaDescuento,
           fechaCreacion: fechaCreacion
         },
@@ -259,6 +275,7 @@ const DescontarStock = () => {
 
         setIsPopupOpen(true);
         setStockValues({});
+        setTurno(""); // Resetear el turno después del éxito
         
         // Refrescar datos del servidor en segundo plano
       } else {
@@ -350,7 +367,7 @@ const DescontarStock = () => {
         <div>
           <h6 className="mb-3">Filtrar por categoría:</h6>
           <Dropdown>
-            <Dropdown.Toggle variant="primary" id="dropdown-categorias">
+            <Dropdown.Toggle variant="primary" id="dropdown-categorias" className="category-dropdown">
               {categoriaActiva === "Todas"
                 ? "Todas las categorías"
                 : categoriaActiva}
@@ -377,22 +394,36 @@ const DescontarStock = () => {
         </div>
       </div>
 
-      {/* Selector de tipo de descuento */}
-      <div className="ros">
-        <div className="col-md-3">
-        <div className="mb-4">
-        <h6 className="mb-3">Tipo de descuento:</h6>
-        <Form.Select
-          value={tipoDescuento}
-          onChange={(e) => setTipoDescuento(e.target.value)}
-          className="mb-3"
-        >
-          <option value="MAYOREO">Venta por mayoreo</option>
-          <option value="MAL ESTADO">Perdida</option>
-          <option value="CORRECCION">Correccion de stock</option>
-        </Form.Select>
-      </div>
-
+      {/* Selectores de tipo de descuento y turno */}
+      <div className="row">
+        <div className="col-md-4">
+          <div className="mb-4">
+            <h6 className="mb-3">Tipo de descuento:</h6>
+            <Form.Select
+              value={tipoDescuento}
+              onChange={(e) => setTipoDescuento(e.target.value)}
+              className="mb-3 category-dropdown"
+            >
+              <option value="MAYOREO">Venta por mayoreo</option>
+              <option value="MAL ESTADO">Perdida</option>
+              <option value="CORRECCION">Correccion de stock</option>
+            </Form.Select>
+          </div>
+        </div>
+        <div className="col-md-4">
+          <div className="mb-4">
+            <h6 className="mb-3">Turno:</h6>
+            <Form.Select
+              value={turno}
+              onChange={(e) => setTurno(e.target.value)}
+              className="mb-3 category-dropdown"
+              required
+            >
+              <option value="">Seleccionar turno</option>
+              <option value="AM">AM</option>
+              <option value="PM">PM</option>
+            </Form.Select>
+          </div>
         </div>
       </div>
 
@@ -475,12 +506,7 @@ const DescontarStock = () => {
           variant="danger"
           size="lg"
           onClick={handleSubmit}
-          disabled={
-            isLoading ||
-            Object.values(stockValues).every(
-              (val) => val === null || isNaN(val) || val <= 0
-            )
-          }
+          disabled={isLoading || !isFormValid}
         >
           {isLoading ? (
             <Spinner animation="border" size="sm" />
@@ -502,6 +528,7 @@ const DescontarStock = () => {
         onNew={() => {
           setIsPopupOpen(false);
           setStockValues({});
+          setTurno(""); // Resetear el turno al hacer nuevo descuento
         }}
       />
 
