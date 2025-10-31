@@ -68,8 +68,9 @@
   }
   
   .quantity-input:focus {
-    border-color: #6a01ac;
-    box-shadow: 0 0 0 0.2rem rgba(106, 1, 172, 0.25);
+    border-color: #0d6efd !important; /* Color azul consistente */
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25) !important; /* Color azul consistente */
+    outline: none !important; /* Eliminar outline por defecto */
   }
   
   /* Optimización de espacio para nombres de productos */
@@ -110,29 +111,59 @@
     max-width: 800px; /* Coincide con el ancho de la tabla */
   }
   
-  /* .btn-guardar-stock{
-    background-color: #6a01ac;
-    border: none;
-    padding: 0.75rem 2rem;
-    font-weight: 600;
-    min-width: 200px;
-  } */
-  
-  
-  /* Dropdown de categorías */
+  /* Estilos para los dropdowns de tipo de descuento y turno - COLOR ORIGINAL */
   .category-dropdown {
-    background-color: #6a01ac !important;
-    border: none;
+    background-color: white !important;
+    border: 1px solid #ced4da !important;
     border-radius: 6px;
-    padding: 0.5rem 1rem;
+    padding: 0.4rem 0.8rem;
     font-weight: 500;
-    min-width: 200px;
+    min-width: 180px; /* Más compacto para PC */
     text-align: left;
+    color: #495057 !important;
+    font-size: 0.9rem;
+    height: auto;
   }
   
   .category-dropdown:hover, 
   .category-dropdown:focus {
-    background-color: #5a0199 !important;
+    background-color: white !important;
+    color: #495057 !important;
+    border-color: #0d6efd !important; /* Color azul consistente */
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25) !important; /* Color azul consistente */
+    outline: none !important; /* Eliminar outline por defecto */
+  }
+  
+  .category-dropdown option {
+    background-color: white;
+    color: #495057;
+    padding: 0.5rem;
+  }
+  
+  /* Asegurar que los selects tengan el estilo original */
+  .form-select.category-dropdown {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23495057' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 16px 12px;
+  }
+  
+  /* Dropdown de categorías - Estilo original del botón */
+  .dropdown-toggle.category-dropdown {
+    background-color: #0d6efd !important;
+    border: none !important;
+    color: white !important;
+    min-width: 200px;
+    padding: 0.5rem 1rem;
+  }
+  
+  .dropdown-toggle.category-dropdown:hover,
+  .dropdown-toggle.category-dropdown:focus {
+    background-color: #0a58ca !important; /* Corregido: faltaba # */
+    color: white !important;
+    border: none !important;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25) !important; /* Color azul consistente */
+    outline: none !important; /* Eliminar outline por defecto */
   }
   
   .category-dropdown-menu {
@@ -153,12 +184,12 @@
   
   .category-dropdown-item:hover {
     background-color: #f8f9fa;
-    color: #6a01ac;
+    color: #0a58ca; /* Color azul consistente */
   }
   
   .category-dropdown-item.active, 
   .category-dropdown-item:active {
-    background-color: #6a01ac;
+    background-color: #0d6efd; /* Color azul consistente */
     color: white;
   }
   
@@ -173,8 +204,9 @@
   }
   
   .search-input:focus {
-    border-color: #6a01ac;
-    box-shadow: 0 0 0 0.2rem rgba(106, 1, 172, 0.25);
+    border-color: #0d6efd !important; /* Color azul consistente */
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25) !important; /* Color azul consistente */
+    outline: none !important; /* Eliminar outline por defecto */
   }
   
   .btn-clear-search {
@@ -192,10 +224,92 @@
     color: #495057;
   }
   
+  /* Botón de descontar stock */
+  .btn-descontar-stock {
+    background-color: #dc3545;
+    border: none;
+    padding: 0.75rem 2rem;
+    font-weight: 600;
+    min-width: 200px;
+    border-radius: 6px;
+    transition: all 0.2s;
+  }
   
+  .btn-descontar-stock:hover:not(:disabled) {
+    background-color: #c82333;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+  }
   
+  .btn-descontar-stock:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
   
-  /* Responsive Design - Mantenemos los estilos para móvil/tablet existentes */
+  .btn-descontar-stock:focus {
+    outline: none !important; /* Eliminar outline por defecto */
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important; /* Shadow rojo consistente */
+  }
+  
+  /* Botón de retorno */
+  .bt-return {
+    background-color: #6a01ac;
+    color: white;
+    border: none;
+    transition: all 0.2s;
+  }
+  
+  .bt-return:hover {
+    background-color: #5a0199;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(106, 1, 172, 0.3);
+  }
+  
+  .bt-return:focus {
+    outline: none !important; /* Eliminar outline por defecto */
+    box-shadow: 0 0 0 0.2rem rgba(106, 1, 172, 0.25) !important; /* Shadow morado consistente */
+  }
+  
+  /* Estilos para la disposición de los selectores en fila - Más compactos */
+  .row .col-md-6 {
+    margin-bottom: 0.5rem;
+  }
+  
+  /* Contenedor más compacto para los selectores en PC */
+  .selector-container {
+    margin-bottom: 1rem;
+  }
+  
+  .selector-container h6 {
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+  }
+  
+  /* Mejoras visuales para los títulos de sección */
+  h6.mb-3 {
+    color: #495057;
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem !important;
+  }
+  
+  /* Estilos para el contenedor principal */
+  .container {
+    padding: 1rem;
+  }
+  
+  /* Mejoras de accesibilidad - focus states CORREGIDOS */
+  .category-dropdown:focus-visible,
+  .search-input:focus-visible,
+  .quantity-input:focus-visible,
+  .btn-descontar-stock:focus-visible,
+  .bt-return:focus-visible {
+    outline: 2px solid #0d6efd !important; /* Color azul consistente */
+    outline-offset: 2px;
+  }
+  
+  /* Responsive Design */
   @media (max-width: 991px) {
     .excel-table-container {
       max-width: 100%; /* En tablet/móvil ocupa todo el ancho */
@@ -226,17 +340,25 @@
     }
     
     .category-dropdown {
-      min-width: 180px;
-      padding: 0.4rem 0.8rem;
+      min-width: 160px;
+      padding: 0.35rem 0.7rem;
+      font-size: 0.85rem;
     }
     
     .search-input {
       padding: 0.4rem 0.8rem;
       font-size: 0.9rem;
     }
+    
+    /* Dropdown de categorías en tablet */
+    .dropdown-toggle.category-dropdown {
+      min-width: 180px;
+      padding: 0.4rem 0.8rem;
+      font-size: 0.85rem;
+    }
   }
   
-   @media (max-width: 767px) {
+  @media (max-width: 767px) {
     .excel-table {
       font-size: 0.8rem;
     }
@@ -250,7 +372,7 @@
       gap: 8px;
     }
     
-    .product-badge {
+    .product-badge-stock {
       width: 24px;
       height: 24px;
       font-size: 0.75rem;
@@ -266,21 +388,28 @@
       font-size: 0.8rem;
     }
     
-    .btn-guardar-stock {
+    .btn-descontar-stock {
       padding: 0.6rem 1.5rem;
       min-width: 180px;
       font-size: 0.9rem;
     }
     
     .category-dropdown {
-      min-width: 160px;
-      padding: 0.35rem 0.7rem;
-      font-size: 0.85rem;
+      min-width: 140px;
+      padding: 0.3rem 0.6rem;
+      font-size: 0.8rem;
     }
     
     .btn-clear-search {
       padding: 0 0.5rem;
       font-size: 1.1rem;
+    }
+    
+    /* Dropdown de categorías en móvil */
+    .dropdown-toggle.category-dropdown {
+      min-width: 160px;
+      padding: 0.35rem 0.7rem;
+      font-size: 0.8rem;
     }
   }
   
@@ -294,7 +423,7 @@
       padding: 6px 3px;
     }
     
-    .product-badge {
+    .product-badge-stock {
       width: 22px;
       height: 22px;
     }
@@ -319,6 +448,24 @@
       padding: 0.35rem 0.7rem;
       font-size: 0.85rem;
     }
-  } 
-
-  
+    
+    /* Ajustes específicos para móviles pequeños */
+    .category-dropdown {
+      min-width: 100%;
+      font-size: 0.8rem;
+      padding: 0.3rem 0.6rem;
+    }
+    
+    .btn-descontar-stock {
+      min-width: 160px;
+      padding: 0.5rem 1.2rem;
+      font-size: 0.85rem;
+    }
+    
+    /* Dropdown de categorías en móviles pequeños */
+    .dropdown-toggle.category-dropdown {
+      min-width: 100%;
+      padding: 0.3rem 0.6rem;
+      font-size: 0.8rem;
+    }
+  }
