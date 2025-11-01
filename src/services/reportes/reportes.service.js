@@ -37,3 +37,12 @@ export const generarReporteVentasEliminadasService = async (fechaInicio, fechaFi
     throw error;
   }
 }
+
+export const generarReporteBalanceStockService = async (fecha, idSucursal, turno) => {
+  try {
+      const response = await api.get(`${getEndpoints.GET_REPORTE_BALANCE_STOCK}?fecha=${fecha}&idSucursal=${idSucursal}&turno=${turno}`); 
+      return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
