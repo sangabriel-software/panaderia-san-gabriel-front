@@ -22,7 +22,7 @@ const VentasReportPage = () => {
   const [filteredData, setFilteredData] = useState([]);
   const [loadingReporte, setLoadingReporte] = useState(false);
   const [error, setError] = useState(null);
-  const [fechaInicio, setFechaInicio] = useState(dayjs().subtract(7, 'day').format('YYYY-MM-DD'));
+  const [fechaInicio, setFechaInicio] = useState(dayjs().format('YYYY-MM-DD'));
   const [fechaFin, setFechaFin] = useState(dayjs().format('YYYY-MM-DD'));
   const [activeVenta, setActiveVenta] = useState(null);
   const [generatingPDF, setGeneratingPDF] = useState(false);
@@ -77,9 +77,9 @@ const VentasReportPage = () => {
   };
 
   const handleReset = () => {
-    setFechaInicio(dayjs().subtract(7, 'day').format('YYYY-MM-DD'));
+    setFechaInicio(dayjs().format('YYYY-MM-DD'));
     setFechaFin(dayjs().format('YYYY-MM-DD'));
-    setSelectedSucursal(userData?.idRol === 1 ? '' : userData?.idSucursal || '');
+    setSelectedSucursal('');
     setReporteData([]);
     setFilteredData([]);
     setError(null);
@@ -399,8 +399,9 @@ const VentasReportPage = () => {
                     onChange={(e) => setSelectedSucursal(e.target.value)}
                     disabled={loadingSucursales}
                     className="filter-select"
+                    required
                   >
-                    <option value="">Todas las sucursales</option>
+                    <option value="" disabled>Seleccione una sucursal</option>
                     {sucursales.map((sucursal) => (
                       <option key={sucursal.idSucursal} value={sucursal.idSucursal}>
                         {sucursal.nombreSucursal}
@@ -450,7 +451,9 @@ const VentasReportPage = () => {
                 <Button
                   variant="primary"
                   onClick={handleGenerarReporte}
-                  disabled={!fechaInicio || !fechaFin || loadingReporte}
+                  disabled={loadingReporte || !selectedSucursal}
+                  className="generate-button"
+                  title={!selectedSucursal ? 'Por favor seleccione una sucursal' : ''}
                 >
                   {loadingReporte ? (
                     <Spinner animation="border" size="sm" />

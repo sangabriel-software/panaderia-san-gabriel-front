@@ -54,7 +54,7 @@ const ModernReportPanel = () => {
       description: "Productos no vendidos del dia",
       icon: <FiPieChart className="mr-icon" />,
       accentColor: "#8B5CF6",
-      route: "/reportes/dashboard"
+      route: "/reportes/balance-stock"
     }
   ];
 
