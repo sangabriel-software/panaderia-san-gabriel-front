@@ -1,5 +1,5 @@
 import React from 'react';
-import { FiBox, FiShoppingCart, FiUsers, FiTrendingUp, FiCalendar, FiPieChart, FiRotateCw } from 'react-icons/fi';
+import { FiBox, FiShoppingCart, FiUsers, FiTrendingUp, FiCalendar, FiPieChart, FiRotateCw, FiPrinter, FiShieldOff } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import "./ReportesPanel.styles.css";
 
@@ -50,11 +50,19 @@ const ModernReportPanel = () => {
     },
     {
       id: 6,
-      title: "Producto sobrante",
-      description: "Productos no vendidos del dia",
+      title: "Balance de productos",
+      description: "Balance de productos",
       icon: <FiPieChart className="mr-icon" />,
       accentColor: "#8B5CF6",
       route: "/reportes/balance-stock"
+    },
+        {
+      id: 7,
+      title: "Sobrante de productos",
+      description: "Sobrante de productos por fecha",
+      icon: <FiShieldOff className="mr-icon" />,
+      accentColor: "#8B5CF6",
+      route: "/reportes/sobrantes-stock"
     }
   ];
 

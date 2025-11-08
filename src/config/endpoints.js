@@ -27,7 +27,8 @@ const getEndpoints = {
     GET_REPORTE_VENTAS: "generar-reporte-ventas",
     GET_REPORTE_PERDIDAS: "generar-reporte-perdidas",
     GET_REPORTE_VENTAS_ELIMINADAS: "generar-reporte-ventas-eliminadas",
-    GET_REPORTE_BALANCE_STOCK: "generar-reporte-balance-stock"
+    GET_REPORTE_BALANCE_STOCK: "generar-reporte-balance-stock",
+    GET_REPORTE_SOBRANTE_STOCK: "generar-reporte-sobrantes"
 };
 
 const postEndpoints = {
