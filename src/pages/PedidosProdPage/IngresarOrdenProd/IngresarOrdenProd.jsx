@@ -31,7 +31,7 @@ const IngresarOrdenProd = () => {
     defaultValues: {
       sucursal: userData.idRol === 1 ? "" : userData.idSucursal.toString(),
       turno: "AM",
-      fechaAProducir: today,
+      fechaAProducir: tomorrow,
       nombrePanadero: "",
     },
   });
@@ -164,7 +164,7 @@ const IngresarOrdenProd = () => {
                             required: "Seleccione una fecha",
                           })}
                           className="form-control modern-datepicker"
-                          min={today}
+                          min={tomorrow}
                         />
                       </InputGroup>
                       {errors.fechaAProducir && (
