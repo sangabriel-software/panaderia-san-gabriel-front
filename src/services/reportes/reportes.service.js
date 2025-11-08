@@ -46,3 +46,12 @@ export const generarReporteBalanceStockService = async (fecha, idSucursal, turno
     throw error;
   }
 }
+
+export const generarReporteSobranteStockService = async (fecha, idSucursal) => {
+  try {
+      const response = await api.get(`${getEndpoints.GET_REPORTE_SOBRANTE_STOCK}?fecha=${fecha}&idSucursal=${idSucursal}`); 
+      return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
