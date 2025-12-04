@@ -55,6 +55,7 @@ const ReportePerdidasPage = () => {
 
     try {
       const { reporte } = await generarReportePerdidasService(fechaInicio, fechaFin, selectedSucursal);
+      console.log(reporte)
       setReporteData(reporte || []);
     } catch (err) {
       setError('Error al generar el reporte: ' + err.message);
@@ -111,13 +112,13 @@ const ReportePerdidasPage = () => {
       const sucursalNombre = sucursales.find(s => s.idSucursal === selectedSucursal)?.nombreSucursal || 'Todas las sucursales';
       const today = new Date();
       const dateStr = today.toLocaleDateString('es-GT') + ' ' + today.toLocaleTimeString('es-GT', { hour: '2-digit', minute: '2-digit' });
-  
+
       // Título
       doc.setFontSize(18);
       doc.setTextColor(40);
       doc.setFont('helvetica', 'bold');
       doc.text('REPORTE DE PÉRDIDAS', doc.internal.pageSize.getWidth() / 2, 40, { align: 'center' });
-  
+
       // Información del reporte
       doc.setFontSize(10);
       doc.setTextColor(100);
@@ -130,28 +131,29 @@ const ReportePerdidasPage = () => {
         40,
         95
       );
-  
+
       // Calcular totales
       const totalPerdidas = reporteData.reduce((sum, perdida) => sum + perdida.total_perdido, 0);
       const totalDineroPerdida = reporteData.reduce((sum, perdida) => sum + perdida.dineroPerdida, 0);
-  
+
       // Agregar resumen
       doc.text(`Total unidades perdidas: ${formatNumber(totalPerdidas)}`, 40, 110);
       doc.text(`Total dinero perdido: ${formatCurrency(totalDineroPerdida)}`, 40, 125);
-  
+
       // Preparar datos para la tabla
       const tableData = reporteData.map(perdida => [
         perdida.producto,
         perdida.usuario,
+        perdida.fechaDescuento ? dayjs(perdida.fechaDescuento).format('DD/MM/YYYY HH:mm') : 'N/A',
         formatNumber(perdida.total_perdido),
         formatCurrency(perdida.dineroPerdida)
       ]);
-  
+
       // Configuración de la tabla
       autoTable(doc, {
         startY: 150,
         head: [
-          ['Producto', 'Usuario', 'Unidades Perdidas', 'Dinero Perdido']
+          ['Producto', 'Usuario', 'Fecha Descuento', 'Unidades Perdidas', 'Dinero Perdido']
         ],
         body: tableData,
         theme: 'grid',
@@ -169,6 +171,9 @@ const ReportePerdidasPage = () => {
           cellPadding: 3,
           overflow: 'linebreak'
         },
+        columnStyles: {
+          2: { cellWidth: 80 }
+        },
         margin: { horizontal: 20 },
         didDrawPage: function (data) {
           // Footer
@@ -182,7 +187,7 @@ const ReportePerdidasPage = () => {
           );
         }
       });
-  
+
       // Guardar el PDF
       doc.save(`reporte-perdidas-${dateStr.replace(/\//g, '-').replace(/:/g, '-').replace(' ', '_')}.pdf`);
     } catch (err) {
@@ -205,28 +210,30 @@ const ReportePerdidasPage = () => {
       const sucursalNombre = sucursales.find(s => s.idSucursal === selectedSucursal)?.nombreSucursal || 'Todas las sucursales';
       const today = new Date();
       const dateStr = today.toLocaleDateString('es-GT') + ' ' + today.toLocaleTimeString('es-GT', { hour: '2-digit', minute: '2-digit' });
-  
+
       // 1. Preparar los datos para Excel
       const excelData = reporteData.map(perdida => ({
         'Producto': perdida.producto,
         'Usuario': perdida.usuario,
+        'Fecha Descuento': perdida.fechaDescuento ? dayjs(perdida.fechaDescuento).format('DD/MM/YYYY HH:mm') : 'N/A',
         'Unidades Perdidas': perdida.total_perdido,
         'Dinero Perdido': perdida.dineroPerdida
       }));
-  
+
       // 2. Crear libro y hoja de trabajo
       const wb = XLSX.utils.book_new();
       const ws = XLSX.utils.json_to_sheet(excelData);
-  
+
       // 3. Definir anchos de columna
       const colWidths = [
         { wch: 30 }, // Producto
         { wch: 20 }, // Usuario
+        { wch: 20 }, // Fecha Descuento
         { wch: 15 }, // Unidades Perdidas
         { wch: 15 }  // Dinero Perdido
       ];
       ws['!cols'] = colWidths;
-  
+
       // 4. Agregar información del reporte al inicio
       const reportInfo = [
         ["REPORTE DE PÉRDIDAS"],
@@ -235,30 +242,30 @@ const ReportePerdidasPage = () => {
         [`Rango de fechas: ${dayjs(fechaInicio).format('DD/MM/YYYY')} - ${dayjs(fechaFin).format('DD/MM/YYYY')}`],
         []
       ];
-  
+
       // Insertar información del reporte al inicio
       XLSX.utils.sheet_add_aoa(ws, reportInfo, { origin: { r: 0, c: 0 } });
-  
+
       // 5. Combinar celdas para los títulos
       if (!ws['!merges']) ws['!merges'] = [];
       ws['!merges'].push(
-        { s: { r: 0, c: 0 }, e: { r: 0, c: 3 } }, // Título principal
-        { s: { r: 1, c: 0 }, e: { r: 1, c: 3 } }, // Fecha generación
-        { s: { r: 2, c: 0 }, e: { r: 2, c: 3 } }, // Sucursal
-        { s: { r: 3, c: 0 }, e: { r: 3, c: 3 } }  // Rango fechas
+        { s: { r: 0, c: 0 }, e: { r: 0, c: 4 } },
+        { s: { r: 1, c: 0 }, e: { r: 1, c: 4 } },
+        { s: { r: 2, c: 0 }, e: { r: 2, c: 4 } },
+        { s: { r: 3, c: 0 }, e: { r: 3, c: 4 } }
       );
-  
-      // 6. Mover los datos hacia abajo (debajo de la información del reporte)
+
+      // 6. Mover los datos hacia abajo
       const range = XLSX.utils.decode_range(ws['!ref']);
-      range.s.r += reportInfo.length; // Desplazar hacia abajo
+      range.s.r += reportInfo.length;
       range.e.r += reportInfo.length;
       ws['!ref'] = XLSX.utils.encode_range(range);
-  
+
       // 7. Agregar encabezados de columnas
       const headerRow = reportInfo.length;
-      const headers = ['Producto', 'Usuario', 'Unidades Perdidas', 'Dinero Perdido'];
+      const headers = ['Producto', 'Usuario', 'Fecha Descuento', 'Unidades Perdidas', 'Dinero Perdido'];
       XLSX.utils.sheet_add_aoa(ws, [headers], { origin: { r: headerRow, c: 0 } });
-  
+
       // 8. Aplicar estilos a encabezados
       headers.forEach((_, colIndex) => {
         const cellRef = XLSX.utils.encode_cell({ r: headerRow, c: colIndex });
@@ -268,46 +275,46 @@ const ReportePerdidasPage = () => {
           alignment: { horizontal: "center" }
         };
       });
-  
+
       // 9. Aplicar formatos a los datos
       const dataStartRow = headerRow + 1;
       const dataEndRow = dataStartRow + excelData.length - 1;
       
-      // Formato para unidades (columna C, índice 2)
+      // Formato para unidades
       for (let row = dataStartRow; row <= dataEndRow; row++) {
-        const unidadesCell = XLSX.utils.encode_cell({ r: row, c: 2 });
+        const unidadesCell = XLSX.utils.encode_cell({ r: row, c: 3 });
         ws[unidadesCell].z = '#,##0';
         
-        // Formato para dinero (columna D, índice 3)
-        const dineroCell = XLSX.utils.encode_cell({ r: row, c: 3 });
+        // Formato para dinero
+        const dineroCell = XLSX.utils.encode_cell({ r: row, c: 4 });
         ws[dineroCell].z = '"Q"#,##0.00';
       }
-  
+
       // 10. Agregar fila de totales
       const totalRow = dataEndRow + 1;
       const totalPerdidas = excelData.reduce((sum, item) => sum + item['Unidades Perdidas'], 0);
       const totalDinero = excelData.reduce((sum, item) => sum + item['Dinero Perdido'], 0);
       
       XLSX.utils.sheet_add_aoa(ws, [
-        ['', 'TOTALES:', totalPerdidas, totalDinero]
+        ['', '', 'TOTALES:', totalPerdidas, totalDinero]
       ], { origin: { r: totalRow, c: 0 } });
-  
+
       // Estilo para la fila de totales
-      for (let col = 1; col <= 3; col++) {
+      for (let col = 2; col <= 4; col++) {
         const cellRef = XLSX.utils.encode_cell({ r: totalRow, c: col });
         ws[cellRef].s = {
           font: { bold: true },
           fill: { fgColor: { rgb: "D9E1F2" } }
         };
       }
-  
+
       // 11. Agregar hoja al libro
       XLSX.utils.book_append_sheet(wb, ws, "Reporte Pérdidas");
-  
+
       // 12. Generar archivo
       const fileName = `Reporte_Perdidas_${sucursalNombre.replace(/\s+/g, '_')}_${dateStr.replace(/\//g, '-').replace(/:/g, '-').replace(' ', '_')}.xlsx`;
       XLSX.writeFile(wb, fileName);
-  
+
     } catch (err) {
       setError('Error al generar el Excel: ' + err.message);
       console.error('Error detallado:', err);
@@ -493,6 +500,7 @@ const ReportePerdidasPage = () => {
                     <tr>
                       <th>Producto</th>
                       <th>Usuario</th>
+                      <th>Fecha Descuento</th>
                       <th>Unidades Perdidas</th>
                       <th>Dinero Perdido</th>
                     </tr>
@@ -502,12 +510,26 @@ const ReportePerdidasPage = () => {
                       <tr key={`${perdida.idProducto}-${index}`}>
                         <td>{perdida.producto}</td>
                         <td>{perdida.usuario}</td>
+                        <td className="text-center">
+                          {perdida.fechaDescuento ? (
+                            <div className="fecha-desc-container">
+                              <div className="fecha-desc-fecha">
+                                {dayjs(perdida.fechaDescuento).format('DD/MM/YYYY')}
+                              </div>
+                              <div className="fecha-desc-hora">
+                                {dayjs(perdida.fechaDescuento).format('HH:mm')}
+                              </div>
+                            </div>
+                          ) : (
+                            <span className="text-muted">N/A</span>
+                          )}
+                        </td>
                         <td className="text-center">{formatNumber(perdida.total_perdido)}</td>
                         <td className="text-end">{formatCurrency(perdida.dineroPerdida)}</td>
                       </tr>
                     ))}
                     <tr className="table-totals">
-                      <td colSpan="2" className="text-end fw-bold">Totales:</td>
+                      <td colSpan="3" className="text-end fw-bold">Totales:</td>
                       <td className="text-center fw-bold">
                         {formatNumber(reporteData.reduce((sum, item) => sum + item.total_perdido, 0))}
                       </td>
@@ -542,6 +564,19 @@ const ReportePerdidasPage = () => {
                       </Accordion.Header>
                       <Accordion.Body>
                         <div className="perdida-details">
+                          <div className="detail-row">
+                            <span className="detail-label">Fecha descuento:</span>
+                            <span>
+                              {perdida.fechaDescuento ? (
+                                <>
+                                  {dayjs(perdida.fechaDescuento).format('DD/MM/YYYY')} a las{' '}
+                                  {dayjs(perdida.fechaDescuento).format('HH:mm')}
+                                </>
+                              ) : (
+                                'N/A'
+                              )}
+                            </span>
+                          </div>
                           <div className="detail-row">
                             <span className="detail-label">Unidades perdidas:</span>
                             <span>{formatNumber(perdida.total_perdido)}</span>
