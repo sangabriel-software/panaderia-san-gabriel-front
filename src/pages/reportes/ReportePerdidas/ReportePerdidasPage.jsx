@@ -55,7 +55,6 @@ const ReportePerdidasPage = () => {
 
     try {
       const { reporte } = await generarReportePerdidasService(fechaInicio, fechaFin, selectedSucursal);
-      console.log(reporte)
       setReporteData(reporte || []);
     } catch (err) {
       setError('Error al generar el reporte: ' + err.message);
@@ -210,112 +209,97 @@ const ReportePerdidasPage = () => {
       const sucursalNombre = sucursales.find(s => s.idSucursal === selectedSucursal)?.nombreSucursal || 'Todas las sucursales';
       const today = new Date();
       const dateStr = today.toLocaleDateString('es-GT') + ' ' + today.toLocaleTimeString('es-GT', { hour: '2-digit', minute: '2-digit' });
-
-      // 1. Preparar los datos para Excel
-      const excelData = reporteData.map(perdida => ({
-        'Producto': perdida.producto,
-        'Usuario': perdida.usuario,
-        'Fecha Descuento': perdida.fechaDescuento ? dayjs(perdida.fechaDescuento).format('DD/MM/YYYY HH:mm') : 'N/A',
-        'Unidades Perdidas': perdida.total_perdido,
-        'Dinero Perdido': perdida.dineroPerdida
-      }));
-
-      // 2. Crear libro y hoja de trabajo
+  
+      // 1. Crear libro
       const wb = XLSX.utils.book_new();
-      const ws = XLSX.utils.json_to_sheet(excelData);
-
-      // 3. Definir anchos de columna
-      const colWidths = [
+  
+      // 2. Preparar datos completos en orden
+      const reportInfo = [
+        ["REPORTE DE PÉRDIDAS"],
+        [`Generado el: ${dateStr}`],
+        [`Sucursal: ${sucursalNombre}`],
+        [`Rango de fechas: ${dayjs(fechaInicio).format('DD/MM/YYYY')} - ${dayjs(fechaFin).format('DD/MM/YYYY')}`],
+        [], // Fila vacía
+        ['Producto', 'Usuario', 'Fecha Descuento', 'Unidades Perdidas', 'Dinero Perdido'] // Headers
+      ];
+  
+      // 3. Agregar datos de pérdidas
+      const dataRows = reporteData.map(perdida => [
+        perdida.producto,
+        perdida.usuario,
+        perdida.fechaDescuento ? dayjs(perdida.fechaDescuento).format('DD/MM/YYYY HH:mm') : 'N/A',
+        perdida.total_perdido,
+        perdida.dineroPerdida
+      ]);
+  
+      // 4. Calcular totales
+      const totalPerdidas = reporteData.reduce((sum, item) => sum + item.total_perdido, 0);
+      const totalDinero = reporteData.reduce((sum, item) => sum + item.dineroPerdida, 0);
+      const totalRow = ['', '', 'TOTALES:', totalPerdidas, totalDinero];
+  
+      // 5. Combinar todo
+      const allData = [...reportInfo, ...dataRows, totalRow];
+  
+      // 6. Crear hoja de trabajo
+      const ws = XLSX.utils.aoa_to_sheet(allData);
+  
+      // 7. Definir anchos de columna
+      ws['!cols'] = [
         { wch: 30 }, // Producto
         { wch: 20 }, // Usuario
         { wch: 20 }, // Fecha Descuento
         { wch: 15 }, // Unidades Perdidas
         { wch: 15 }  // Dinero Perdido
       ];
-      ws['!cols'] = colWidths;
-
-      // 4. Agregar información del reporte al inicio
-      const reportInfo = [
-        ["REPORTE DE PÉRDIDAS"],
-        [`Generado el: ${dateStr}`],
-        [`Sucursal: ${sucursalNombre}`],
-        [`Rango de fechas: ${dayjs(fechaInicio).format('DD/MM/YYYY')} - ${dayjs(fechaFin).format('DD/MM/YYYY')}`],
-        []
+  
+      // 8. Combinar celdas para los títulos
+      ws['!merges'] = [
+        { s: { r: 0, c: 0 }, e: { r: 0, c: 4 } }, // Título
+        { s: { r: 1, c: 0 }, e: { r: 1, c: 4 } }, // Fecha generación
+        { s: { r: 2, c: 0 }, e: { r: 2, c: 4 } }, // Sucursal
+        { s: { r: 3, c: 0 }, e: { r: 3, c: 4 } }  // Rango fechas
       ];
-
-      // Insertar información del reporte al inicio
-      XLSX.utils.sheet_add_aoa(ws, reportInfo, { origin: { r: 0, c: 0 } });
-
-      // 5. Combinar celdas para los títulos
-      if (!ws['!merges']) ws['!merges'] = [];
-      ws['!merges'].push(
-        { s: { r: 0, c: 0 }, e: { r: 0, c: 4 } },
-        { s: { r: 1, c: 0 }, e: { r: 1, c: 4 } },
-        { s: { r: 2, c: 0 }, e: { r: 2, c: 4 } },
-        { s: { r: 3, c: 0 }, e: { r: 3, c: 4 } }
-      );
-
-      // 6. Mover los datos hacia abajo
-      const range = XLSX.utils.decode_range(ws['!ref']);
-      range.s.r += reportInfo.length;
-      range.e.r += reportInfo.length;
-      ws['!ref'] = XLSX.utils.encode_range(range);
-
-      // 7. Agregar encabezados de columnas
-      const headerRow = reportInfo.length;
-      const headers = ['Producto', 'Usuario', 'Fecha Descuento', 'Unidades Perdidas', 'Dinero Perdido'];
-      XLSX.utils.sheet_add_aoa(ws, [headers], { origin: { r: headerRow, c: 0 } });
-
-      // 8. Aplicar estilos a encabezados
-      headers.forEach((_, colIndex) => {
-        const cellRef = XLSX.utils.encode_cell({ r: headerRow, c: colIndex });
-        ws[cellRef].s = {
-          font: { bold: true, color: { rgb: "FFFFFF" } },
-          fill: { fgColor: { rgb: "4BACC6" } },
-          alignment: { horizontal: "center" }
-        };
-      });
-
-      // 9. Aplicar formatos a los datos
-      const dataStartRow = headerRow + 1;
-      const dataEndRow = dataStartRow + excelData.length - 1;
+  
+      // 9. Aplicar formatos a las celdas de datos
+      const headerRow = 5;
+      const dataStartRow = 6;
+      const dataEndRow = dataStartRow + dataRows.length - 1;
       
-      // Formato para unidades
       for (let row = dataStartRow; row <= dataEndRow; row++) {
+        // Formato para unidades (columna 3)
         const unidadesCell = XLSX.utils.encode_cell({ r: row, c: 3 });
-        ws[unidadesCell].z = '#,##0';
+        if (ws[unidadesCell]) {
+          ws[unidadesCell].z = '#,##0';
+        }
         
-        // Formato para dinero
+        // Formato para dinero (columna 4)
         const dineroCell = XLSX.utils.encode_cell({ r: row, c: 4 });
-        ws[dineroCell].z = '"Q"#,##0.00';
+        if (ws[dineroCell]) {
+          ws[dineroCell].z = '"Q"#,##0.00';
+        }
       }
-
-      // 10. Agregar fila de totales
-      const totalRow = dataEndRow + 1;
-      const totalPerdidas = excelData.reduce((sum, item) => sum + item['Unidades Perdidas'], 0);
-      const totalDinero = excelData.reduce((sum, item) => sum + item['Dinero Perdido'], 0);
+  
+      // 10. Formato para fila de totales
+      const totalRowIndex = dataEndRow + 1;
+      const totalUnidadesCell = XLSX.utils.encode_cell({ r: totalRowIndex, c: 3 });
+      const totalDineroCell = XLSX.utils.encode_cell({ r: totalRowIndex, c: 4 });
       
-      XLSX.utils.sheet_add_aoa(ws, [
-        ['', '', 'TOTALES:', totalPerdidas, totalDinero]
-      ], { origin: { r: totalRow, c: 0 } });
-
-      // Estilo para la fila de totales
-      for (let col = 2; col <= 4; col++) {
-        const cellRef = XLSX.utils.encode_cell({ r: totalRow, c: col });
-        ws[cellRef].s = {
-          font: { bold: true },
-          fill: { fgColor: { rgb: "D9E1F2" } }
-        };
+      if (ws[totalUnidadesCell]) {
+        ws[totalUnidadesCell].z = '#,##0';
       }
-
+      if (ws[totalDineroCell]) {
+        ws[totalDineroCell].z = '"Q"#,##0.00';
+      }
+  
       // 11. Agregar hoja al libro
       XLSX.utils.book_append_sheet(wb, ws, "Reporte Pérdidas");
-
+  
       // 12. Generar archivo
       const fileName = `Reporte_Perdidas_${sucursalNombre.replace(/\s+/g, '_')}_${dateStr.replace(/\//g, '-').replace(/:/g, '-').replace(' ', '_')}.xlsx`;
       XLSX.writeFile(wb, fileName);
-
+  
     } catch (err) {
+      console.log(err);
       setError('Error al generar el Excel: ' + err.message);
       console.error('Error detallado:', err);
     } finally {
