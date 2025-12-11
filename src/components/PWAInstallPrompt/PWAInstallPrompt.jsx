@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { X, Download, Smartphone, Monitor, Share, PlusSquare } from 'lucide-react';
-import './PWAInstallPrompt.css'; // Importamos el CSS separado
+import './PWAInstallPrompt.css';
 
 export default function PWAInstallPrompt() {
   const [showPrompt, setShowPrompt] = useState(false);
@@ -9,7 +9,7 @@ export default function PWAInstallPrompt() {
   const [isIOS, setIsIOS] = useState(false);
 
   useEffect(() => {
-    // 1. Detección de dispositivo y entorno
+    // 1. Detección básica
     const userAgent = navigator.userAgent;
     const mobileCheck = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
     const iosCheck = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
@@ -17,28 +17,31 @@ export default function PWAInstallPrompt() {
     setDeviceType(mobileCheck ? 'mobile' : 'desktop');
     setIsIOS(iosCheck);
 
-    // 2. Verificar si ya está instalada
+    // 2. Verificar si ya está instalada (Standalone mode)
     const isInstalled = window.matchMedia('(display-mode: standalone)').matches || 
                         window.navigator.standalone === true;
 
-    // 3. Verificar si el usuario ya lo descartó previamente
+    // 3. Verificar si el usuario lo descartó antes (opcional, si quieres que SIEMPRE salga, comenta estas lineas)
     const wasPromptDismissed = localStorage.getItem('pwa-prompt-dismissed');
 
     if (isInstalled || wasPromptDismissed) return;
 
-    // 4. Lógica para Android/Desktop (beforeinstallprompt)
+    // --- LÓGICA ANDROID / DESKTOP (Chrome, Edge, etc) ---
     const handleBeforeInstallPrompt = (e) => {
+      // Prevenir que el navegador muestre su banner nativo (feo) automáticamente
       e.preventDefault();
+      // Guardar el evento para dispararlo cuando el usuario haga click
       setDeferredPrompt(e);
-      // Retrasar un poco la aparición para no ser agresivo al cargar la página
-      setTimeout(() => setShowPrompt(true), 3000);
+      // ¡MOSTRAR INMEDIATAMENTE! (Sin setTimeout)
+      setShowPrompt(true);
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
 
-    // 5. Lógica para iOS (No soporta beforeinstallprompt, lo mostramos manualmente)
+    // --- LÓGICA IOS (iPhone/iPad) ---
+    // iOS no dispara eventos, así que lo mostramos manualmente nada más cargar
     if (iosCheck) {
-      setTimeout(() => setShowPrompt(true), 3000);
+      setShowPrompt(true);
     }
 
     return () => {
@@ -49,21 +52,23 @@ export default function PWAInstallPrompt() {
   const handleInstallClick = async () => {
     if (!deferredPrompt) return;
 
+    // Mostrar el prompt nativo del sistema
     deferredPrompt.prompt();
+    
+    // Esperar a ver qué decide el usuario
     const { outcome } = await deferredPrompt.userChoice;
     
     if (outcome === 'accepted') {
       console.log('Usuario aceptó instalar');
-      setShowPrompt(false);
     }
     
+    // Limpiamos
     setDeferredPrompt(null);
+    setShowPrompt(false);
   };
 
   const handleDismiss = () => {
     setShowPrompt(false);
-    // Guardamos en localStorage para no volver a molestar en esta sesión
-    // Opcional: Podrías guardar un timestamp para volver a mostrarlo en 7 días
     localStorage.setItem('pwa-prompt-dismissed', 'true');
   };
 
@@ -71,43 +76,38 @@ export default function PWAInstallPrompt() {
 
   return (
     <div className="pwa-overlay" onClick={(e) => {
-        // Cerrar si se hace click fuera del contenido (en el fondo oscuro)
         if(e.target === e.currentTarget) handleDismiss();
     }}>
       <div className="pwa-container">
         
-        {/* Botón Cerrar (X) */}
         <button onClick={handleDismiss} className="pwa-close-btn" aria-label="Cerrar">
           <X size={20} />
         </button>
 
         <div className="pwa-header">
-          {/* Icono Principal */}
           <div className="pwa-icon-wrapper">
             {deviceType === 'mobile' ? <Smartphone size={32} /> : <Monitor size={32} />}
           </div>
           
-          {/* Textos */}
           <div className="pwa-content">
-            <h2 className="pwa-title">Instalar Aplicación</h2>
+            <h2 className="pwa-title">Instalar App</h2>
             <p className="pwa-description">
               {deviceType === 'mobile' 
-                ? 'Instala nuestra app para un acceso más rápido y mejor rendimiento.' 
-                : 'Instala la aplicación en tu escritorio para una experiencia nativa.'}
+                ? 'Agrega la app a tu inicio para acceder más rápido.' 
+                : 'Instala la aplicación en tu escritorio.'}
             </p>
           </div>
         </div>
 
-        {/* Contenido condicional: Instrucciones iOS vs Botón Android */}
         {isIOS ? (
           <div className="ios-instructions">
             <div className="ios-step">
-              <span>1. Toca el botón</span>
+              <span>1. Toca</span>
               <Share size={16} className="text-blue-500 ios-icon" />
               <span className="font-semibold">Compartir</span>
             </div>
             <div className="ios-step">
-              <span>2. Selecciona</span>
+              <span>2. Elige</span>
               <PlusSquare size={16} className="text-gray-600 ios-icon" />
               <span className="font-semibold">Agregar a inicio</span>
             </div>
@@ -115,7 +115,7 @@ export default function PWAInstallPrompt() {
         ) : (
           <div className="pwa-actions">
             <button onClick={handleDismiss} className="pwa-btn pwa-btn-secondary">
-              Ahora no
+              Cerrar
             </button>
             <button onClick={handleInstallClick} className="pwa-btn pwa-btn-primary">
               <Download size={18} />
