@@ -58,11 +58,16 @@ const DetalleTraslados = lazy(() => import("./pages/Traslados/DetalleTraslado/De
 const IngresarTraslado = lazy(() => import("./pages/Traslados/IngresarTraslado/IngresarTraslado"));
 const CustomerResponses = lazy(() => import("./pages/Encuestas/CustomerResponses/CustomerResponses"));
 
+// Importar el componente PWA Install Prompt
+const PWAInstallPrompt = lazy(() => import("./components/PWAInstallPrompt/PWAInstallPrompt"));
+
 function App() {
   return (
 
     <Suspense fallback={<LoadingSpinner />}>
       <ToastContainer /> {/* Contenedor para las notificaciones */}
+      <PWAInstallPrompt /> {/* Componente para instalar PWA */}
+      
       <Routes>
 
         {/* Rutas publicas */}
