@@ -2,6 +2,11 @@ import { useState, useEffect } from 'react';
 import { X, Download, Smartphone, Monitor, Share, PlusSquare } from 'lucide-react';
 import './PWAInstallPrompt.css';
 
+// Constantes de tiempo
+const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+const INITIAL_DAYS_COUNT = 3; // Mostrar diariamente los primeros 3 días
+const SUBSEQUENT_DELAY_DAYS = 5; // Mostrar cada 5 días después de los 3 iniciales
+
 export default function PWAInstallPrompt() {
   const [showPrompt, setShowPrompt] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState(null);
@@ -11,38 +16,48 @@ export default function PWAInstallPrompt() {
   useEffect(() => {
     // 1. Detección básica
     const userAgent = navigator.userAgent;
-    const mobileCheck = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
-    const iosCheck = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+    const isApple = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
     
-    setDeviceType(mobileCheck ? 'mobile' : 'desktop');
-    setIsIOS(iosCheck);
+    setDeviceType(isMobile ? 'mobile' : 'desktop');
+    setIsIOS(isApple);
 
     // 2. Verificar si ya está instalada (Standalone mode)
     const isInstalled = window.matchMedia('(display-mode: standalone)').matches || 
                         window.navigator.standalone === true;
 
-    // 3. Verificar si el usuario lo descartó antes (opcional, si quieres que SIEMPRE salga, comenta estas lineas)
-    const wasPromptDismissed = localStorage.getItem('pwa-prompt-dismissed');
+    if (isInstalled) return;
 
-    if (isInstalled || wasPromptDismissed) return;
+    // 3. Lógica de control de frecuencia (UX Mejorada)
+    const nextShowTimeStr = localStorage.getItem('pwa-prompt-next-show');
+    const firstDismissTimeStr = localStorage.getItem('pwa-prompt-first-dismiss');
+    const currentTime = Date.now();
 
-    // --- LÓGICA ANDROID / DESKTOP (Chrome, Edge, etc) ---
+    if (nextShowTimeStr) {
+      const nextShowTime = parseInt(nextShowTimeStr, 10);
+      
+      if (nextShowTime > currentTime) {
+        // Aún no ha pasado el tiempo de espera (1 o 5 días)
+        return;
+      }
+    }
+
+    // --- CONTINUAR: Mostrar el Prompt ---
+
+    // ESTRATEGIA A: iOS (Apple)
+    if (isApple) {
+      setShowPrompt(true);
+      return;
+    }
+
+    // ESTRATEGIA B: Android / Desktop (beforeinstallprompt)
     const handleBeforeInstallPrompt = (e) => {
-      // Prevenir que el navegador muestre su banner nativo (feo) automáticamente
       e.preventDefault();
-      // Guardar el evento para dispararlo cuando el usuario haga click
       setDeferredPrompt(e);
-      // ¡MOSTRAR INMEDIATAMENTE! (Sin setTimeout)
       setShowPrompt(true);
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-
-    // --- LÓGICA IOS (iPhone/iPad) ---
-    // iOS no dispara eventos, así que lo mostramos manualmente nada más cargar
-    if (iosCheck) {
-      setShowPrompt(true);
-    }
 
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
@@ -52,24 +67,51 @@ export default function PWAInstallPrompt() {
   const handleInstallClick = async () => {
     if (!deferredPrompt) return;
 
-    // Mostrar el prompt nativo del sistema
     deferredPrompt.prompt();
-    
-    // Esperar a ver qué decide el usuario
     const { outcome } = await deferredPrompt.userChoice;
     
     if (outcome === 'accepted') {
       console.log('Usuario aceptó instalar');
     }
     
-    // Limpiamos
+    // Si se acepta o rechaza permanentemente, ocultamos el prompt
     setDeferredPrompt(null);
     setShowPrompt(false);
+    // Opcional: Eliminar la clave para no interferir en futuras instalaciones
+    localStorage.removeItem('pwa-prompt-next-show');
+    localStorage.removeItem('pwa-prompt-first-dismiss');
   };
 
   const handleDismiss = () => {
     setShowPrompt(false);
-    localStorage.setItem('pwa-prompt-dismissed', 'true');
+
+    const currentTime = Date.now();
+    let delayMS = 0;
+
+    // Guardar el primer momento de descarte si aún no existe
+    let firstDismissTime = localStorage.getItem('pwa-prompt-first-dismiss');
+    if (!firstDismissTime) {
+      firstDismissTime = currentTime;
+      localStorage.setItem('pwa-prompt-first-dismiss', firstDismissTime.toString());
+    } else {
+      firstDismissTime = parseInt(firstDismissTime, 10);
+    }
+
+    // Calcular cuántos días han pasado desde el primer descarte
+    const elapsedDays = Math.floor((currentTime - firstDismissTime) / ONE_DAY_MS);
+
+    if (elapsedDays < INITIAL_DAYS_COUNT) {
+      // Estamos dentro de los primeros 3 días: volver a mostrar en 1 día
+      delayMS = ONE_DAY_MS;
+      console.log(`Descartado. Reaparecerá en 1 día (Día ${elapsedDays + 1} de ${INITIAL_DAYS_COUNT}).`);
+    } else {
+      // Ya pasaron los 3 días iniciales: volver a mostrar en 5 días
+      delayMS = SUBSEQUENT_DELAY_DAYS * ONE_DAY_MS;
+      console.log(`Descartado. Reaparecerá en ${SUBSEQUENT_DELAY_DAYS} días.`);
+    }
+
+    const nextShowTime = currentTime + delayMS;
+    localStorage.setItem('pwa-prompt-next-show', nextShowTime.toString());
   };
 
   if (!showPrompt) return null;
