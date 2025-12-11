@@ -1,0 +1,200 @@
+/* PWAInstallPrompt.css */
+
+/* Variables para fácil personalización */
+:root {
+    --pwa-primary: #2563eb;
+    --pwa-primary-hover: #1d4ed8;
+    --pwa-bg: #ffffff;
+    --pwa-text: #1f2937;
+    --pwa-text-secondary: #6b7280;
+    --pwa-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    --pwa-overlay-bg: rgba(0, 0, 0, 0.4);
+    --pwa-radius: 16px;
+    --pwa-z-index: 9999;
+  }
+  
+  /* El fondo oscuro (Overlay) */
+  .pwa-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: var(--pwa-overlay-bg);
+    backdrop-filter: blur(4px); /* Efecto moderno de desenfoque */
+    z-index: var(--pwa-z-index);
+    display: flex;
+    align-items: flex-end; /* Por defecto abajo (móvil) */
+    justify-content: center;
+    animation: fadeIn 0.3s ease-out;
+  }
+  
+  /* El contenedor principal (La tarjeta) */
+  .pwa-container {
+    background: var(--pwa-bg);
+    width: 100%;
+    max-width: 100%;
+    padding: 1.5rem;
+    box-shadow: var(--pwa-shadow);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    animation: slideUpMobile 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  
+  /* Estilos específicos para Móvil (Bottom Sheet) */
+  @media (max-width: 768px) {
+    .pwa-container {
+      border-top-left-radius: 20px;
+      border-top-right-radius: 20px;
+      padding-bottom: max(20px, env(safe-area-inset-bottom)); /* Respetar el notch del iPhone */
+    }
+  }
+  
+  /* Estilos específicos para Desktop (Tarjeta flotante centrada o esquina) */
+  @media (min-width: 769px) {
+    .pwa-overlay {
+      align-items: center; /* Centrado en desktop */
+    }
+  
+    .pwa-container {
+      max-width: 420px;
+      border-radius: var(--pwa-radius);
+      animation: zoomIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+  }
+  
+  /* Tipografía y Layout interno */
+  .pwa-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .pwa-icon-wrapper {
+    background-color: #eff6ff;
+    padding: 12px;
+    border-radius: 12px;
+    color: var(--pwa-primary);
+    flex-shrink: 0;
+  }
+  
+  .pwa-content {
+    flex: 1;
+  }
+  
+  .pwa-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--pwa-text);
+    margin: 0 0 0.5rem 0;
+  }
+  
+  .pwa-description {
+    font-size: 0.95rem;
+    color: var(--pwa-text-secondary);
+    line-height: 1.5;
+    margin: 0;
+  }
+  
+  /* Botón de cerrar (X) */
+  .pwa-close-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: transparent;
+    border: none;
+    color: #9ca3af;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 50%;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .pwa-close-btn:hover {
+    background-color: #f3f4f6;
+    color: var(--pwa-text);
+  }
+  
+  /* Botones de acción */
+  .pwa-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+  
+  .pwa-btn {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: none;
+  }
+  
+  .pwa-btn-primary {
+    background-color: var(--pwa-primary);
+    color: white;
+    box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+  }
+  
+  .pwa-btn-primary:hover {
+    background-color: var(--pwa-primary-hover);
+    transform: translateY(-1px);
+  }
+  
+  .pwa-btn-secondary {
+    background-color: transparent;
+    color: var(--pwa-text-secondary);
+    border: 1px solid #e5e7eb;
+  }
+  
+  .pwa-btn-secondary:hover {
+    background-color: #f9fafb;
+    color: var(--pwa-text);
+  }
+  
+  /* Instrucciones iOS */
+  .ios-instructions {
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 1rem;
+    margin-top: 1rem;
+  }
+  
+  .ios-step {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: var(--pwa-text-secondary);
+    margin-bottom: 6px;
+  }
+  
+  .ios-icon {
+    display: inline-flex;
+  }
+  
+  /* Animaciones */
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  @keyframes slideUpMobile {
+    from { transform: translateY(100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  
+  @keyframes zoomIn {
+    from { transform: scale(0.95); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
