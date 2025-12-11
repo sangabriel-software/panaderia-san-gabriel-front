@@ -1,0 +1,15 @@
+[
+    {
+      "relation": [
+        "delegate_permission/common.handle_all_urls"
+      ],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "com.sangabriel.app",
+        "sha256_cert_fingerprints": [
+          "A4:79:1C:3A:43:1D:94:CF:EB:AC:74:DA:3A:F4:F1:53:91:77:00:06:C6:B7:42:93:E4:EC:C7:BB:96:06:2B:EF"
+        ]
+      }
+    }
+  ]
+  
