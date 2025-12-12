@@ -56,9 +56,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     flex: 1,
     textAlign: 'center',
-    fontSize: 9,
-    color: '#37474F',
-    fontWeight: 'bold',
+    color: '#37474F'
   },
   badge: {
     color: '#ffffff',
