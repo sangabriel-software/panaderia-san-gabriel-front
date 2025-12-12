@@ -1,0 +1,167 @@
+/* ----------------------------------- */
+/* 1. Contenedor del Fondo (Backdrop) */
+/* ----------------------------------- */
+.pdf-modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.75); 
+    z-index: 9999; 
+    display: flex;
+    justify-content: center; 
+    align-items: center; 
+    padding: 1rem;
+}
+
+/* ----------------------------------- */
+/* 2. El Diálogo (Ventana Flotante) */
+/* ----------------------------------- */
+.pdf-modal-dialog {
+    width: 95%; 
+    max-width: 1000px; 
+    height: 100%; 
+    max-height: 800px; 
+    
+    background-color: #ffffff; 
+    border-radius: 8px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4); 
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; 
+    transition: transform 0.3s ease-out;
+}
+
+/* ----------------------------------- */
+/* 3. Encabezado (Header) - Diseño Oscuro */
+/* ----------------------------------- */
+.modal-header {
+    background-color: #282828; /* Fondo Gris Oscuro */
+    color: #f1f1f1; /* Letra clara para el fondo oscuro */
+    padding: 0.75rem 1.25rem; 
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 4px -2px rgba(0, 0, 0, 0.4); /* Sombra más oscura para el header oscuro */
+    border-bottom: 1px solid #1f1f1f; /* Borde oscuro para mantener la consistencia */
+    flex-shrink: 0; 
+}
+
+.header-filename-area {
+    flex: 1;
+    min-width: 0;
+}
+
+.header-filename {
+    font-size: 1rem; 
+    font-weight: 600; 
+    color: #ffffff; /* Nombre del archivo en Blanco Puro */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ----------------------------------- */
+/* 4. Controles y Botones - Adaptados a Fondo Oscuro */
+/* ----------------------------------- */
+.header-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem; 
+}
+
+/* Estilo base de Botones de Acción (Imprimir, Descargar, Abrir) */
+.action-button {
+    padding: 0.6rem; 
+    color: #cccccc; /* Color de icono claro (Gris pálido) */
+    background: transparent;
+    border: none;
+    border-radius: 6px; 
+    cursor: pointer;
+    transition: background-color 0.15s, color 0.15s;
+    line-height: 1;
+}
+
+.action-button:hover {
+    background-color: #383838; /* Fondo de hover ligeramente más claro que el header */
+    color: #ffffff; /* Icono blanco puro en hover */
+}
+
+/* Botón de Cerrar (X) - ROJO FUERTE (sin cambios, ya contrasta) */
+.close-button {
+    padding: 0.6rem;
+    line-height: 1;
+    border: none;
+    border-radius: 6px; 
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-left: 0.75rem;
+
+    background-color: #ef4444; 
+    color: #ffffff; 
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2); 
+}
+
+.close-button:hover {
+    background-color: #dc2626; 
+    color: #ffffff; 
+}
+
+/* ----------------------------------- */
+/* 5. Área del Visor y Footer */
+/* ----------------------------------- */
+.pdf-viewer-area {
+    flex: 1; 
+    overflow: hidden;
+    background-color: #282828; 
+}
+
+.pdf-viewer-content {
+    height: 100%;
+    width: 100%;
+    padding: 0 1.5rem; 
+    
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    overflow: auto; 
+}
+
+.pdf-iframe {
+    width: 100%;
+    max-width: 800px; 
+    height: 100%;
+    background-color: #ffffff;
+    border: 1px solid #4d4d4d; 
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5); 
+    min-height: 100%; 
+    border-radius: 4px; 
+}
+
+.modal-footer {
+    /* Manteniendo el footer claro o cambiándolo si se desea un diseño completamente oscuro */
+    background-color: #4b5563; 
+    color: #4b5563;
+    font-size: 0.7rem; 
+    padding: 0.4rem 1rem; 
+    border-top: 1px solid #4b5563;
+    flex-shrink: 0;
+}
+
+.footer-tip {
+    color: #f1f5f9; 
+}
+
+/* ----------------------------------- */
+/* 6. Media Queries (Responsividad) */
+/* ----------------------------------- */
+
+@media (min-width: 768px) {
+    .desktop-only {
+        display: block !important;
+    }
+}
+.desktop-only {
+    display: none;
+}
