@@ -17,6 +17,7 @@ import { useNavigate } from "react-router";
 import { handleViewDetalle } from "../DetallesOrdenesProd/DetallesOrdenesProdUtils";
 import { getCurrentItems, handleConfirmDeleteOrdenProduccion, handleDeleteOrder, handleViewPdf } from "./GestionPedidosProdUtils";
 import ErrorPopup from "../../../components/Popup/ErrorPopUp";
+import PDFViewerModal from "../../../PDFViewerModal/PDFViewerModal";
 
 const GestionPedidosProd = () => {
   const isMobile = useMediaQuery({ maxWidth: 767 });
@@ -31,7 +32,10 @@ const GestionPedidosProd = () => {
   const [isPopupErrorOpen, setIsPopupErrorOpen] = useState(false);
   const [ordenToDelete, setOrdenToDelete] = useState(null);
 
-  const [loadingViewPdf, setLoadingViewPdf] = useState(null); // Cambia a null o un ID específico
+  const [loadingViewPdf, setLoadingViewPdf] = useState(null);
+
+  // ⭐ NUEVO ESTADO PARA EL VISOR PDF
+  const [pdfData, setPdfData] = useState(null);
 
   /* Variables para la paginacion */
   const [currentPage, setCurrentPage] = useState(1);
@@ -39,6 +43,25 @@ const GestionPedidosProd = () => {
   const currentOrders = getCurrentItems(filteredOrders, currentPage, ordersPerPage);
   
   const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
+
+  // ⭐ NUEVA FUNCIÓN PARA ABRIR EL VISOR PDF
+  const handleOpenPdfViewer = async (idOrder) => {
+    setLoadingViewPdf(idOrder);
+    try {
+      const pdfUrl = await handleViewPdf(idOrder);
+      
+      setPdfData({
+        url: pdfUrl,
+        filename: `orden-produccion-${idOrder}.pdf`
+      });
+    } catch (error) {
+      console.error("Error al cargar PDF:", error);
+      setErrorPopupMessage("No se pudo cargar el PDF. Intenta nuevamente.");
+      setIsPopupErrorOpen(true);
+    } finally {
+      setLoadingViewPdf(null);
+    }
+  };
 
   return (
     <Container>
@@ -101,7 +124,7 @@ const GestionPedidosProd = () => {
               setIsPopupOpen
             )
           }
-          onViewPdf={(idOrder) => handleViewPdf(idOrder, setLoadingViewPdf)}
+          onViewPdf={handleOpenPdfViewer} // ⭐ CAMBIO AQUÍ
           loadingViewPdf={loadingViewPdf}
         />
       )}
@@ -172,6 +195,15 @@ const GestionPedidosProd = () => {
         title="¡Error!"
         message={errorPopupMessage}
       />
+
+      {/* ⭐ VISOR PDF MODAL */}
+      {pdfData && (
+        <PDFViewerModal
+          pdfUrl={pdfData.url}
+          filename={pdfData.filename}
+          onClose={() => setPdfData(null)}
+        />
+      )}
     </Container>
   );
 };

@@ -46,3 +46,9 @@ export const generateAndOpenPDF = async (documento, fileName) => {
     console.error("Error al generar o abrir el PDF:", error);
   }
 };
+
+// NUEVA FUNCIÓN para retornar solo el Blob
+export const generatePDFBlob = async (document) => {
+  const blob = await pdf(document).toBlob();
+  return blob;
+};

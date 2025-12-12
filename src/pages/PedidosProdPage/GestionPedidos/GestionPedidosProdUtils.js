@@ -1,7 +1,7 @@
 import { eliminarOrdenProduccionService } from "../../../services/ordenesproduccion/ordenesProduccion.service";
 import { consultarDetallenOrdenProduccion } from "../../../services/ordenesproduccion/ordenesProduccion.service";
 import { consultarDetalleConsumoProduccion } from "../../../services/consumoingredientes/consumoingredientesprod.service";
-import { generateAndOpenPDF } from "../../../utils/PdfUtils/PdfUtils";
+import { generatePDFBlob } from "../../../utils/PdfUtils/PdfUtils"; // IMPORTAR DESDE PdfUtils
 import OrderDetailsPdf from "../../../components/PDFs/OrdenDetails/OrderDetailsPdf";
 import React from "react";
 
@@ -69,12 +69,11 @@ export const handleDeleteOrder = async (ordenToDelete, setOrdenesProduccion, set
 };
 
 /**
- * Función para generar y abrir un PDF con los detalles de la orden de producción.
+ * Función para generar y retornar la URL del PDF (MODIFICADA)
  * @param {string} idOrdenProduccion - El ID de la orden de producción.
- * @param {function} setLoadingViewPdf - Función para establecer el estado de carga del PDF.
+ * @returns {Promise<string>} - URL del PDF generado
  */
-export const handleViewPdf = async (idOrdenProduccion, setLoadingViewPdf) => {
-  setLoadingViewPdf(idOrdenProduccion); // Establece el ID que está cargando
+export const handleViewPdf = async (idOrdenProduccion) => {
   try {
     const order = await consultarDetallenOrdenProduccion(idOrdenProduccion);
     const detalleConsumo = await consultarDetalleConsumoProduccion(idOrdenProduccion);
@@ -85,11 +84,14 @@ export const handleViewPdf = async (idOrdenProduccion, setLoadingViewPdf) => {
       encabezadoOrden: encabezadoOrden || {},
       detalleConsumo: detalleConsumo.IngredientesConsumidos,
     });
-    const fileName = `orden_produccion_${encabezadoOrden.idOrdenProduccion}.pdf`;
-    generateAndOpenPDF(documento, fileName);
+
+    // Generar el Blob y crear URL
+    const blob = await generatePDFBlob(documento);
+    const url = URL.createObjectURL(blob);
+    
+    return url; // RETORNAMOS LA URL
   } catch (error) {
     console.error("Error al generar el PDF:", error);
-  } finally {
-    setLoadingViewPdf(null); // Restablece a null cuando termine la carga
+    throw error; // LANZAMOS EL ERROR
   }
 };
