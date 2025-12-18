@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react'; // ⭐ Agregar useEffect
 import { X, Download, Printer, ExternalLink, ZoomIn, ZoomOut } from 'lucide-react';
 import './PDFViewerModal.css'; 
 
@@ -15,6 +15,23 @@ const ActionPillButton = ({ onClick, title, icon, className = '' }) => (
 
 export default function PDFViewerModal({ pdfUrl, filename = 'documento.pdf', onClose }) {
   const [zoom, setZoom] = useState(100);
+
+  // ⭐ NUEVO: Listener para la tecla ESC
+  useEffect(() => {
+    const handleEscapeKey = (event) => {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+};
+
+// Agregar el listener cuando el componente se monta
+document.addEventListener('keydown', handleEscapeKey);
+
+    // Limpiar el listener cuando el componente se desmonta
+    return () => {
+      document.removeEventListener('keydown', handleEscapeKey);
+    };
+  }, [onClose]);
 
   if (!pdfUrl) return null;
 
@@ -108,7 +125,7 @@ export default function PDFViewerModal({ pdfUrl, filename = 'documento.pdf', onC
             <button
               onClick={onClose} 
               className="close-button"
-              title="Cerrar visor"
+              title="Cerrar visor (ESC)"
             >
               <X size={20} />
             </button>
@@ -129,7 +146,7 @@ export default function PDFViewerModal({ pdfUrl, filename = 'documento.pdf', onC
         {/* Footer */}
         <footer className="modal-footer">
           <span className="footer-tip">
-            El archivo se abre en esta ventana. Haz clic afuera o en la 'X' para cerrar.
+            El archivo se abre en esta ventana. Haz clic afuera, presiona ESC o en la 'X' para cerrar.
           </span>
         </footer>
       </div>
