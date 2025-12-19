@@ -12,6 +12,7 @@ const useGetStockGeneral = (idSucursal) => {
   useEffect(() => {
     const fetchStockGeneral = async () => {
       try {
+        setLoadingStockGeneral(true);
         const response = await consultarStockProductosService(decryptedIdSucursal);
         const data = response;
         if (data.status === 200) {

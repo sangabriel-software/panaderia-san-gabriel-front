@@ -28,7 +28,9 @@ const getEndpoints = {
     GET_REPORTE_PERDIDAS: "generar-reporte-perdidas",
     GET_REPORTE_VENTAS_ELIMINADAS: "generar-reporte-ventas-eliminadas",
     GET_REPORTE_BALANCE_STOCK: "generar-reporte-balance-stock",
-    GET_REPORTE_SOBRANTE_STOCK: "generar-reporte-sobrantes"
+    GET_REPORTE_SOBRANTE_STOCK: "generar-reporte-sobrantes",
+    GET_CAMPANIA_ENCUESTA: "consultar-campania",
+    GET_PREGUNTAS_CAMPANIA: "consultar-preguntas-por-campania",
 };
 
 const postEndpoints = {
@@ -48,6 +50,7 @@ const postEndpoints = {
     INGRESAR_ORDEN_ESPECIAL: "/ingresar-orden-especial",
     DESCONTAR_STOCK: "descontar-stock",
     INGRESAR_TRASLADO: "registrar-traslado",
+    REGISTRAR_PREGUNTAS: "registrar-respuestas",
 };
 
 const putEndpoints = {
