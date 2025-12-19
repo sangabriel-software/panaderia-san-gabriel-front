@@ -11,6 +11,7 @@ const SUBSEQUENT_DELAY_DAYS = 5; // Mostrar cada 5 días después de los 3 inici
 // Rutas públicas donde NO debe mostrarse el prompt
 const PUBLIC_ROUTES = [
   '/surveys',
+  '/login', 
   '/acceso-denegado'
 ];
 
@@ -63,6 +64,10 @@ export default function PWAInstallPrompt() {
     setDeviceType(isMobile ? 'mobile' : 'desktop');
     setIsIOS(isApple);
 
+    // 2. Verificar si ya está instalada (Standalone mode)
+    if (isPWAInstalled()) {
+      return;
+    }
 
     // 3. Lógica de control de frecuencia (UX Mejorada)
     const nextShowTimeStr = localStorage.getItem('pwa-prompt-next-show');
@@ -74,6 +79,7 @@ export default function PWAInstallPrompt() {
       
       if (nextShowTime > currentTime) {
         // Aún no ha pasado el tiempo de espera (1 o 5 días)
+        console.log('Tiempo de espera no completado, no mostrar prompt');
         return;
       }
     }
@@ -111,6 +117,7 @@ export default function PWAInstallPrompt() {
     if (!deferredPrompt) {
       // Para iOS, redirigir a instrucciones
       if (isIOS) {
+        console.log('iOS: Mostrando instrucciones de instalación');
         return;
       }
       return;
@@ -121,6 +128,7 @@ export default function PWAInstallPrompt() {
       const { outcome } = await deferredPrompt.userChoice;
       
       if (outcome === 'accepted') {
+        console.log('Usuario aceptó instalar');
         // Limpiar localStorage si se instala
         localStorage.removeItem('pwa-prompt-next-show');
         localStorage.removeItem('pwa-prompt-first-dismiss');
