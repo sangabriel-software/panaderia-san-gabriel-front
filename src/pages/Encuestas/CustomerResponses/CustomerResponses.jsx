@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import './CustomerResponses.styles.css';
 import { useGetCampaniaEncuesta } from '../../../hooks/Encuestas/useGetCampaniaEncuesta';
-import { registrarRespuestaService } from '../../../services/Encuestas/Encuestas.service';
 import { getCurrentDateTimeWithSeconds } from '../../../utils/dateUtils';
+import { registrarRespuestaService } from '../../../services/Encuestas/encuestas.service';
 
 const CustomerResponses = () => {
   // Estados de la encuesta
@@ -144,15 +144,9 @@ const CustomerResponses = () => {
   // Función para enviar las respuestas al backend
   const enviarRespuestasAlBackend = async (payload) => {
     try {
-      console.log('🚀 Enviando respuestas al backend...');
-      console.log('📤 Payload:', payload);
-      
       const response = await registrarRespuestaService(payload);
-      
-      console.log('✅ Respuesta del servidor:', response);
       return response;
     } catch (error) {
-      console.error('❌ Error al enviar respuestas:', error);
       throw error;
     }
   };
@@ -199,48 +193,12 @@ const CustomerResponses = () => {
           }
         };
         
-        console.log('🎯 PAYLOAD PARA EL BACKEND 🎯');
-        console.log('==============================');
-        console.log('📋 Información General:');
-        console.log(`ID Campaña: ${payload.idCampania}`);
-        console.log(`Nombre Campaña: ${payload.nombreCampania}`);
-        console.log(`Fecha Respuesta: ${payload.fechaRespuesta}`);
-        console.log(`Hora Respuesta: ${payload.horaRespuesta}`);
-        console.log('');
-        
-        console.log('👤 Información del Usuario:');
-        console.log(`Nombre: ${payload.usuario.nombre}`);
-        console.log(`Teléfono: ${payload.usuario.telefono}`);
-        console.log(`Correo: ${payload.usuario.correo}`);
-        console.log('');
-        
-        console.log('❓ Respuestas de la Encuesta:');
         payload.respuestas.forEach((respuesta, index) => {
           const pregunta = questions.find(q => q.idPreguntaBackend === respuesta.idPregunta);
-          console.log(`Pregunta ${index + 1}:`);
-          console.log(`  ID Pregunta: ${respuesta.idPregunta}`);
-          console.log(`  Texto: ${pregunta?.title || 'No encontrada'}`);
-          console.log(`  Tipo: ${pregunta?.tipo || 'Desconocido'}`);
-          console.log(`  Respuesta: ${respuesta.respuesta}`);
-          console.log('  ---');
         });
-        console.log(`Total respuestas: ${payload.respuestas.length}/${payload.metadata.totalPreguntas}`);
-        console.log('');
-        
-        // También mostrar el objeto completo para copiar/pegar si es necesario
-        console.log('📦 Payload completo (JSON):');
-        console.log(JSON.stringify(payload, null, 2));
         
         // Llamar al servicio para registrar las respuestas
         const resultado = await enviarRespuestasAlBackend(payload);
-        
-        console.log('✅ ENCUESTA ENVIADA EXITOSAMENTE');
-        console.log('===============================');
-        console.log(`📨 Respuesta del servidor:`, resultado);
-        console.log(`👤 Usuario: ${userInfo.nombre}`);
-        console.log(`📞 Contacto: ${userInfo.telefono}`);
-        console.log(`📊 Respuestas enviadas: ${respuestasFormateadas.length}/${questions.length}`);
-        
         // Limpiar localStorage después del envío exitoso
         localStorage.removeItem('customerSurveyResponses');
         
@@ -249,7 +207,6 @@ const CustomerResponses = () => {
         setShowThankYou(true);
         
       } catch (error) {
-        console.error('❌ Error al enviar la encuesta:', error);
         setIsSubmitting(false);
         setSubmitError('Ocurrió un error al enviar las respuestas. Por favor, intente nuevamente.');
         
