@@ -15,6 +15,7 @@ export const useGetStockDelDia = (idSucursal) => {
     useEffect(() => {
       const fetchStockDiario = async () => {
         try {
+          setLoadingStockDiario(true);
           const response = await consultarStockProductosDelDiaService(decryptedIdSucursal, fechadelDia);
           const data = response;
           if (data.status === 200) {
