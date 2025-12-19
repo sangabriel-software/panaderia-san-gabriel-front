@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { currentDate } from "../../utils/dateUtils";
-import { consultarCampaniaServices, consultarPreguntasPorCampaniaService } from "../../services/Encuestas/Encuestas.service";
+import { consultarCampaniaServices, consultarPreguntasPorCampaniaService } from "../../services/Encuestas/encuestas.service";
 
 /* Consulta a BD si hay campanias activas y si si, consulta las prguntas. */
 export const useGetCampaniaEncuesta = () => {
