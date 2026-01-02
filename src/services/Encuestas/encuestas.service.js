@@ -25,7 +25,24 @@ export const registrarRespuestaService = async (data) => {
         const response = await api.post(`${postEndpoints.REGISTRAR_PREGUNTAS}`, data);
         return response.data;
     }catch(error){
-        console.log(error)
         throw error;
     }
+}
+
+export const crearCampaniaServices = async (data) => {
+  try{
+      const response = await api.post(`${postEndpoints.CREAR_CAMPANIA}`, data);
+      return response.data;
+  }catch(error){
+      throw error;
+  }
+}
+
+export const consultarEcuestasServices = async () => {
+  try{
+    const response = await api.get(`${getEndpoints.GET_ENCUESTAS}`);
+    return response.data;
+  }catch(error){
+    throw error;
+  }
 }

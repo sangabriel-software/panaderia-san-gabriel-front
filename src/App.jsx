@@ -58,6 +58,8 @@ const DetalleTraslados = lazy(() => import("./pages/Traslados/DetalleTraslado/De
 const IngresarTraslado = lazy(() => import("./pages/Traslados/IngresarTraslado/IngresarTraslado"));
 const CustomerResponses = lazy(() => import("./pages/Encuestas/CustomerResponses/CustomerResponses"));
 
+const CreateSurvey = lazy(() => import("./pages/Encuestas/CreateSurvey/CreateSurvey"));
+
 // Importar el componente PWA Install Prompt
 const PWAInstallPrompt = lazy(() => import("./components/PWAInstallPrompt/PWAInstallPrompt"));
 
@@ -162,6 +164,10 @@ function App() {
               <Route index element={<GestionarTraslados/>} />
               <Route path="detalles-traslado/:idTraslado" element={<DetalleTraslados/>} />
               <Route path="ingresar-traslado" element={<IngresarTraslado/>} />
+            </Route>
+
+            <Route path="/encuestas-config">
+              <Route index element={<CreateSurvey/>} />
             </Route>
 
           </Route>

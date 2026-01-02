@@ -16,6 +16,8 @@ const DetalleVentaPage = () => {
   const { detalleVenta, loadingDetalleVenta, showErrorDetalleVenta, showInfoDetalleVenta } = useGetDetalleVenta(decryptedIdVenta);
   const navigate = useNavigate();
 
+  console.log(detalleVenta);
+
   // Detectar si es un dispositivo móvil
   const isMobile = useMediaQuery({ maxWidth: 767 });
 

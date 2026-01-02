@@ -118,9 +118,9 @@ export const handleBuscarVentas = async ( setIsLoading, turnoValue, sucursalValu
     if (orden.encabezadoOrden !== null) {
       setOrden(orden); // Guardar la orden en el estado
     }else{
-      setShowModal(true);
+      setShowModal(false);
       setHasOrdenes(false);
-      return;
+      //return;
     }
 
     const stockGeneral = await fetchStockGeneral(sucursalValue);

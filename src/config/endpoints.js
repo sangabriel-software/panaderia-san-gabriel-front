@@ -31,6 +31,7 @@ const getEndpoints = {
     GET_REPORTE_SOBRANTE_STOCK: "generar-reporte-sobrantes",
     GET_CAMPANIA_ENCUESTA: "consultar-campania",
     GET_PREGUNTAS_CAMPANIA: "consultar-preguntas-por-campania",
+    GET_ENCUESTAS: "consultar-encuestas",
 };
 
 const postEndpoints = {
@@ -51,6 +52,7 @@ const postEndpoints = {
     DESCONTAR_STOCK: "descontar-stock",
     INGRESAR_TRASLADO: "registrar-traslado",
     REGISTRAR_PREGUNTAS: "registrar-respuestas",
+    CREAR_CAMPANIA: "crear-campania",
 };
 
 const putEndpoints = {

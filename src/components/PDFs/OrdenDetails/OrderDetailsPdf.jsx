@@ -212,7 +212,7 @@ const OrderDetailsPdf = ({ detalleOrden, encabezadoOrden, detalleConsumo }) => {
       <Page style={styles.page}>
         <View style={styles.logoContainer}>
           <Image 
-            src="https://sangabrielpiloto.vercel.app/assets/logo-Qf7fe2hw.png" 
+            src="https://panaderiasangabriel.vercel.app/assets/logo-Qf7fe2hw.png" 
             style={styles.logo} 
           />
         </View>
