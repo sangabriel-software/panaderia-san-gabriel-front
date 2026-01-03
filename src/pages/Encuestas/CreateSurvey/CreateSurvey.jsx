@@ -71,8 +71,8 @@ const ModernAlert = ({ message, type, onClose }) => {
         <button className="modern-alert-close" onClick={onClose}>×</button>
       </div>
       <div className="modern-alert-progress">
-        <div 
-          className="modern-alert-progress-bar" 
+        <div
+          className="modern-alert-progress-bar"
           style={{ backgroundColor: styles.color }}
         />
       </div>
@@ -123,12 +123,12 @@ const CreateSurvey = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
-  
+
   // Estados para los popups
   const [isConfirmPopupOpen, setIsConfirmPopupOpen] = useState(false);
   const [isErrorPopupOpen, setIsErrorPopupOpen] = useState(false);
   const [errorPopupMessage, setErrorPopupMessage] = useState('');
-  
+
   // Estados para alertas modernas
   const [modernAlert, setModernAlert] = useState({
     show: false,
@@ -170,21 +170,21 @@ const CreateSurvey = () => {
     setSelectedSurveyId(encuestaId);
     setLoadingDetails(true);
     setShowDetailsModal(true);
-    
+
     try {
       // Buscar si la encuesta ya tiene detalles almacenados
       const encuestaExistente = encuestas.find(e => e.id === encuestaId);
-      
+
       if (encuestaExistente && encuestaExistente.detalles) {
         setSurveyDetails(encuestaExistente.detalles);
       } else {
         // Si no tiene detalles, hacer la llamada API
         const response = await consultarCampaniaDetalle(encuestaId);
         setSurveyDetails(response.campania);
-        
+
         // Actualizar la encuesta con los nuevos detalles
-        setEncuestas(prev => prev.map(encuesta => 
-          encuesta.id === encuestaId 
+        setEncuestas(prev => prev.map(encuesta =>
+          encuesta.id === encuestaId
             ? { ...encuesta, detalles: response.campania }
             : encuesta
         ));
@@ -217,13 +217,13 @@ const CreateSurvey = () => {
   const executeDeleteSurvey = async (encuestaId) => {
     setIsDeleting(true);
     setIsConfirmPopupOpen(false);
-    
+
     try {
       await eliminarCampania(encuestaId);
       const updatedEncuestas = encuestas.filter(e => e.id !== encuestaId);
       setEncuestas(updatedEncuestas);
       showModernAlert('La encuesta ha sido eliminada exitosamente.', 'success');
-      
+
     } catch (error) {
       console.error('Error al eliminar la encuesta:', error);
       showModernAlert(error.message || 'Error al eliminar la encuesta. Por favor, intenta de nuevo.', 'error');
@@ -274,7 +274,7 @@ const CreateSurvey = () => {
 
   const handleRemoveQuestion = (index) => {
     const updatedQuestions = formData.preguntas.filter((_, i) => i !== index);
-    
+
     const reorderedQuestions = updatedQuestions.map((question, idx) => ({
       ...question,
       orden: idx + 1
@@ -295,10 +295,11 @@ const CreateSurvey = () => {
     showModernAlert('Pregunta eliminada', 'info');
   };
 
-  // Función handleSubmit OPTIMIZADA
+
+  // Función handleSubmit OPTIMIZADA + DESCARGA PDF
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Validar datos usando la utilidad
     const validation = validateFormData(formData);
     if (!validation.isValid) {
@@ -310,35 +311,51 @@ const CreateSurvey = () => {
 
     try {
       const response = await crearCampania(formData);
-      
+
       // Obtener detalles inmediatamente después de crear
       const detallesResponse = await consultarCampaniaDetalle(response.idCampania);
-      
+
       // Crear objeto de encuesta incluyendo los detalles
       const nuevaEncuesta = {
         ...createEncuestaObject(formData, response),
-        detalles: detallesResponse.campania // Agregar los detalles aquí
+        detalles: detallesResponse.campania
       };
-      
+
       setEncuestas(prev => [nuevaEncuesta, ...prev]);
-      
-      // Restablecer formularios usando las utilidades
+
+      // Restablecer formularios
       setFormData(getInitialFormData());
       setCurrentQuestion(getInitialQuestion());
-      
+
       showModernAlert('¡Encuesta creada exitosamente!', 'success');
-      
+
+      // 👉 DESCARGA AUTOMÁTICA DEL PDF
+      const descargarPDF = () => {
+        const link = document.createElement('a');
+        link.href = '/CdigoQR_SanGabriel.pdf'; // archivo en public
+        link.download = 'CdigoQR_SanGabriel.pdf';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      };
+
+      // Descargar después de mostrar el éxito
       setTimeout(() => {
+        descargarPDF();
         setActiveTab('surveys');
       }, 2000);
 
     } catch (error) {
       console.error('Error al crear la encuesta:', error);
-      showModernAlert(error.message || 'Error al crear la encuesta. Por favor, intenta de nuevo.', 'error');
+      showModernAlert(
+        error.message || 'Error al crear la encuesta. Por favor, intenta de nuevo.',
+        'error'
+      );
     } finally {
       setIsSubmitting(false);
     }
   };
+
 
   // Estado de carga
   if (loading && activeTab === 'surveys') {
@@ -384,7 +401,7 @@ const CreateSurvey = () => {
         </div>
 
         <div className="module-tabs">
-          <button 
+          <button
             className={`tab ${activeTab === 'surveys' ? 'active' : ''}`}
             onClick={() => setActiveTab('surveys')}
           >
@@ -392,14 +409,14 @@ const CreateSurvey = () => {
             <span className="tab-text">Todas</span>
             <span className="tab-count">{stats.total}</span>
           </button>
-          <button 
+          <button
             className={`tab ${activeTab === 'create' ? 'active' : ''}`}
             onClick={() => setActiveTab('create')}
           >
             <span className="tab-icon">+</span>
             <span className="tab-text">Crear</span>
           </button>
-          <button 
+          <button
             className={`tab ${activeTab === 'results' ? 'active' : ''}`}
             onClick={() => setActiveTab('results')}
           >
@@ -472,7 +489,7 @@ const CreateSurvey = () => {
                             <FiEye size={16} className="me-1" />
                             Detalles
                           </Button>
-                          <button 
+                          <button
                             className="action-btn delete"
                             onClick={() => handleDeleteSurvey(encuesta.id)}
                             disabled={isDeleting && deleteId === encuesta.id}
@@ -500,8 +517,8 @@ const CreateSurvey = () => {
                 <div className="empty-icon">📋</div>
                 <h3>No hay encuestas creadas</h3>
                 <p>Crea tu primera encuesta para comenzar</p>
-                <button 
-                  className="primary-btn" 
+                <button
+                  className="primary-btn"
                   onClick={() => setActiveTab('create')}
                   style={{ marginTop: '20px' }}
                 >
@@ -517,25 +534,25 @@ const CreateSurvey = () => {
             <div className="create-section">
               <h2>Crear Nueva Encuesta</h2>
               <p>Completa todos los campos para crear una nueva encuesta</p>
-              
+
               <form onSubmit={handleSubmit} className="create-form">
                 <div className="form-row">
                   <div className="form-group">
                     <label htmlFor="nombreCampania">Nombre de la campaña</label>
-                    <input 
-                      id="nombreCampania" 
+                    <input
+                      id="nombreCampania"
                       name="nombreCampania"
-                      type="text" 
+                      type="text"
                       placeholder="Ej: Encuesta de Satisfacción 2025"
                       value={formData.nombreCampania}
                       onChange={handleFormChange}
                     />
                   </div>
-                  
+
                   <div className="form-group">
                     <label htmlFor="tipoEncuesta">Tipo de encuesta</label>
-                    <select 
-                      id="tipoEncuesta" 
+                    <select
+                      id="tipoEncuesta"
                       name="tipoEncuesta"
                       value={formData.tipoEncuesta}
                       onChange={handleFormChange}
@@ -550,8 +567,8 @@ const CreateSurvey = () => {
 
                 <div className="form-group">
                   <label htmlFor="descripcion">Descripción</label>
-                  <textarea 
-                    id="descripcion" 
+                  <textarea
+                    id="descripcion"
                     name="descripcion"
                     placeholder="Describe el propósito de esta encuesta"
                     rows="3"
@@ -559,26 +576,26 @@ const CreateSurvey = () => {
                     onChange={handleFormChange}
                   />
                 </div>
-                
+
                 <div className="form-row">
                   <div className="form-group">
                     <label htmlFor="fechaInicio">Fecha de inicio</label>
-                    <input 
-                      id="fechaInicio" 
+                    <input
+                      id="fechaInicio"
                       name="fechaInicio"
-                      type="date" 
+                      type="date"
                       value={formData.fechaInicio}
                       onChange={handleFormChange}
                       min={dayjs().format('YYYY-MM-DD')}
                     />
                   </div>
-                  
+
                   <div className="form-group">
                     <label htmlFor="fechaFin">Fecha de fin</label>
-                    <input 
-                      id="fechaFin" 
+                    <input
+                      id="fechaFin"
                       name="fechaFin"
-                      type="date" 
+                      type="date"
                       value={formData.fechaFin}
                       onChange={handleFormChange}
                       min={formData.fechaInicio}
@@ -594,20 +611,20 @@ const CreateSurvey = () => {
                     <div className="form-row">
                       <div className="form-group">
                         <label htmlFor="pregunta">Texto de la pregunta</label>
-                        <input 
-                          id="pregunta" 
+                        <input
+                          id="pregunta"
                           name="pregunta"
-                          type="text" 
+                          type="text"
                           placeholder="¿Qué te pareció nuestro servicio?"
                           value={currentQuestion.pregunta}
                           onChange={handleQuestionChange}
                         />
                       </div>
-                      
+
                       <div className="form-group">
                         <label htmlFor="tipo">Tipo de pregunta</label>
-                        <select 
-                          id="tipo" 
+                        <select
+                          id="tipo"
                           name="tipo"
                           value={currentQuestion.tipo}
                           onChange={handleQuestionChange}
@@ -621,8 +638,8 @@ const CreateSurvey = () => {
                     <div className="form-row">
                       <div className="form-group">
                         <label htmlFor="obligatoria">¿Es obligatoria?</label>
-                        <select 
-                          id="obligatoria" 
+                        <select
+                          id="obligatoria"
                           name="obligatoria"
                           value={currentQuestion.obligatoria}
                           onChange={handleQuestionChange}
@@ -631,14 +648,14 @@ const CreateSurvey = () => {
                           <option value={0}>No</option>
                         </select>
                       </div>
-                      
+
                       <div className="form-group">
                         <label>Orden: #{currentQuestion.orden}</label>
                         <div className="order-display">Automático</div>
                       </div>
                     </div>
 
-                    <button 
+                    <button
                       type="button"
                       className="add-question-btn"
                       onClick={handleAddQuestion}
@@ -664,7 +681,7 @@ const CreateSurvey = () => {
                               </span>
                             </div>
                             <div className="question-text">{question.pregunta}</div>
-                            <button 
+                            <button
                               type="button"
                               className="remove-question-btn"
                               onClick={() => handleRemoveQuestion(index)}
@@ -678,19 +695,19 @@ const CreateSurvey = () => {
                     </div>
                   )}
                 </div>
-                
+
                 <div className="form-actions">
-                  <button 
-                    type="button" 
-                    className="cancel-btn" 
+                  <button
+                    type="button"
+                    className="cancel-btn"
                     onClick={() => setActiveTab('surveys')}
                     disabled={isSubmitting}
                   >
                     Cancelar
                   </button>
-                  <button 
-                    type="submit" 
-                    className="submit-btn" 
+                  <button
+                    type="submit"
+                    className="submit-btn"
                     disabled={isSubmitting}
                   >
                     {isSubmitting ? (
@@ -712,7 +729,7 @@ const CreateSurvey = () => {
               <h2>Resultados</h2>
               <p>Selecciona una encuesta para ver sus resultados</p>
             </div>
-            
+
             {encuestas && encuestas.length > 0 ? (
               <div className="results-list">
                 {encuestas.filter(e => (e.responses || 0) > 0).map(encuesta => {
@@ -733,9 +750,9 @@ const CreateSurvey = () => {
                         <div className="result-stat">
                           <span className="stat-label">Tasa de finalización</span>
                           <div className="stat-bar">
-                            <div 
-                              className="stat-bar-fill" 
-                              style={{ 
+                            <div
+                              className="stat-bar-fill"
+                              style={{
                                 width: `${Math.min(95, 70 + (encuesta.responses || 0) % 30)}%`,
                                 backgroundColor: getTypeColor(encuesta.type)
                               }}
@@ -747,7 +764,7 @@ const CreateSurvey = () => {
                     </div>
                   );
                 })}
-                
+
                 {encuestas.filter(e => (e.responses || 0) > 0).length === 0 && (
                   <div className="empty-state">
                     <div className="empty-icon">📊</div>
@@ -926,8 +943,8 @@ const CreateSurvey = () => {
                           <div className="detail-row">
                             <span className="detail-label">Tipo de Preguntas:</span>
                             <span className="detail-value">
-                              {surveyDetails.preguntas?.some(p => p.tipo === 'texto') 
-                                ? 'Mixto' 
+                              {surveyDetails.preguntas?.some(p => p.tipo === 'texto')
+                                ? 'Mixto'
                                 : 'Opción múltiple'}
                             </span>
                           </div>
@@ -985,8 +1002,8 @@ const CreateSurvey = () => {
             <div className="text-center py-5">
               <FiX size={48} className="text-danger mb-3" />
               <p className="text-danger">No se pudieron cargar los detalles de la encuesta</p>
-              <Button 
-                variant="outline-secondary" 
+              <Button
+                variant="outline-secondary"
                 size="sm"
                 onClick={() => setShowDetailsModal(false)}
               >
@@ -1000,8 +1017,8 @@ const CreateSurvey = () => {
             <FiClock size={12} className="me-1" />
             Consultado: {dayjs().format('HH:mm:ss')}
           </div>
-          <Button 
-            variant="secondary" 
+          <Button
+            variant="secondary"
             onClick={() => {
               setShowDetailsModal(false);
               setSurveyDetails(null);
