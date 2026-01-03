@@ -221,3 +221,36 @@ export const getInitialQuestion = (nextOrder = 1) => {
     fechaCreacion: dayjs().format('YYYY-MM-DD HH:mm:ss')
   };
 };
+
+export const getAlertStyles = () => {
+    switch (type) {
+      case 'success':
+        return {
+          backgroundColor: '#d4edda',
+          borderColor: '#c3e6cb',
+          color: '#155724',
+          icon: '✅'
+        };
+      case 'error':
+        return {
+          backgroundColor: '#f8d7da',
+          borderColor: '#f5c6cb',
+          color: '#721c24',
+          icon: '❌'
+        };
+      case 'info':
+        return {
+          backgroundColor: '#d1ecf1',
+          borderColor: '#bee5eb',
+          color: '#0c5460',
+          icon: 'ℹ️'
+        };
+      default:
+        return {
+          backgroundColor: '#d4edda',
+          borderColor: '#c3e6cb',
+          color: '#155724',
+          icon: '✅'
+        };
+    }
+  };

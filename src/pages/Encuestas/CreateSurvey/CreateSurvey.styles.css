@@ -2388,3 +2388,88 @@ input, select, textarea {
   }
 }
 
+
+/* ============================================
+   ESTADÍSTICAS MÓVILES
+   ============================================ */
+
+.mobile-stats {
+  margin-bottom: 20px;
+  padding: 16px;
+  background: linear-gradient(135deg, #FFFFFF 0%, #F9FAFB 100%);
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.mobile-stats-summary {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.mobile-stats-text {
+  font-size: 14px;
+  color: #4F46E5;
+  font-weight: 600;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+.mobile-stats-text span {
+  display: inline-block;
+  padding: 4px 8px;
+  background: rgba(79, 70, 229, 0.1);
+  border-radius: 8px;
+}
+
+@media (max-width: 576px) {
+  .mobile-stats-text {
+    font-size: 13px;
+    gap: 8px;
+  }
+}
+
+/* ============================================
+   MEJORAS RESPONSIVAS GENERALES
+   ============================================ */
+
+@media (max-width: 768px) {
+  .survey-details {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .survey-actions {
+    flex-direction: column;
+  }
+  
+  .action-btn {
+    width: 100%;
+  }
+  
+  .create-section {
+    padding: 20px;
+  }
+  
+  .questions-section {
+    padding: 16px;
+  }
+}
+
+/* Opcional: Ocultar completamente las estadísticas en móvil */
+@media (max-width: 991px) {
+  .stats-row {
+    display: none;
+  }
+}
+
+/* Mostrar solo en desktop */
+@media (min-width: 992px) {
+  .mobile-stats {
+    display: none;
+  }
+}
+

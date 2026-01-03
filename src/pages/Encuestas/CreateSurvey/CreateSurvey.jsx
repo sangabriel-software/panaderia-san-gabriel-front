@@ -8,23 +8,10 @@ import { BsFillInfoCircleFill, BsExclamationTriangleFill } from 'react-icons/bs'
 import Alert from '../../../components/Alerts/Alert';
 import ConfirmPopUp from '../../../components/Popup/ConfirmPopup';
 import ErrorPopup from '../../../components/Popup/ErrorPopUp';
+import { useMediaQuery } from 'react-responsive'; // Importar useMediaQuery
 
 // Importar utilidades
-import {
-  crearCampania,
-  eliminarCampania,
-  consultarCampaniaDetalle,
-  createEncuestaObject,
-  getStatus,
-  getTypeColor,
-  getTypeIcon,
-  formatDate,
-  formatDateTime,
-  validateFormData,
-  calculateStats,
-  getInitialFormData,
-  getInitialQuestion
-} from './CreateSurvey.utils';
+import { crearCampania, eliminarCampania, consultarCampaniaDetalle, createEncuestaObject, getStatus, getTypeColor, getTypeIcon, formatDate, formatDateTime, validateFormData, calculateStats, getInitialFormData, getInitialQuestion } from './CreateSurvey.utils';
 
 // Componente de alerta moderna (se mantiene igual)
 const ModernAlert = ({ message, type, onClose }) => {
@@ -94,6 +81,39 @@ const ModernAlert = ({ message, type, onClose }) => {
   );
 };
 
+// Componente para estadísticas solo en desktop
+const DesktopStats = ({ stats }) => {
+  return (
+    <div className="stats-row">
+      <div className="stat">
+        <div className="stat-value">{stats.total}</div>
+        <div className="stat-label">Encuestas</div>
+      </div>
+      <div className="stat">
+        <div className="stat-value">{stats.active}</div>
+        <div className="stat-label">Activas</div>
+      </div>
+      <div className="stat">
+        <div className="stat-value">{stats.responses}</div>
+        <div className="stat-label">Respuestas</div>
+      </div>
+    </div>
+  );
+};
+
+// Componente para estadísticas móviles (opcional - si quieres mostrar algo diferente)
+const MobileStats = ({ stats }) => {
+  return (
+    <div className="mobile-stats">
+      <div className="mobile-stats-summary">
+        <span className="mobile-stats-text">
+          {stats.total} encuestas • {stats.active} activas • {stats.responses} respuestas
+        </span>
+      </div>
+    </div>
+  );
+};
+
 const CreateSurvey = () => {
   const [activeTab, setActiveTab] = useState('surveys');
   const { encuestas, loading, showError, showInfo, setEncuestas } = useGetEncuestasList();
@@ -125,6 +145,16 @@ const CreateSurvey = () => {
 
   // Calcular estadísticas usando la utilidad
   const stats = calculateStats(encuestas);
+
+  // Media queries con react-responsive
+  const isDesktop = useMediaQuery({ minWidth: 992 }); // Para dispositivos de escritorio (PC)
+  const isTablet = useMediaQuery({ minWidth: 768, maxWidth: 991 }); // Para tablets
+  const isMobile = useMediaQuery({ maxWidth: 767 }); // Para móviles
+  
+  // También puedes usar una combinación
+  const isDesktopOrLaptop = useMediaQuery({ minDeviceWidth: 1224 });
+  const isBigScreen = useMediaQuery({ minDeviceWidth: 1824 });
+  const isTabletOrMobile = useMediaQuery({ maxWidth: 1224 });
 
   const handleCreateSurvey = () => {
     setActiveTab('create');
@@ -374,20 +404,13 @@ const CreateSurvey = () => {
 
             {encuestas && encuestas.length > 0 ? (
               <>
-                <div className="stats-row">
-                  <div className="stat">
-                    <div className="stat-value">{stats.total}</div>
-                    <div className="stat-label">Encuestas</div>
-                  </div>
-                  <div className="stat">
-                    <div className="stat-value">{stats.active}</div>
-                    <div className="stat-label">Activas</div>
-                  </div>
-                  <div className="stat">
-                    <div className="stat-value">{stats.responses}</div>
-                    <div className="stat-label">Respuestas</div>
-                  </div>
-                </div>
+                {/* Mostrar estadísticas solo en PC (desktop) */}
+                {isDesktop ? (
+                  <DesktopStats stats={stats} />
+                ) : (
+                  // Opcional: Mostrar versión móvil/tablet de las estadísticas
+                  <MobileStats stats={stats} />
+                )}
 
                 <div className="surveys-list">
                   {encuestas.map(encuesta => {
