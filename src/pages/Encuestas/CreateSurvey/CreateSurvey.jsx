@@ -8,14 +8,13 @@ import { BsFillInfoCircleFill, BsExclamationTriangleFill } from 'react-icons/bs'
 import Alert from '../../../components/Alerts/Alert';
 import ConfirmPopUp from '../../../components/Popup/ConfirmPopup';
 import ErrorPopup from '../../../components/Popup/ErrorPopUp';
-import { useMediaQuery } from 'react-responsive'; // Importar useMediaQuery
+import { useMediaQuery } from 'react-responsive';
 
 // Importar utilidades
 import { crearCampania, eliminarCampania, consultarCampaniaDetalle, createEncuestaObject, getStatus, getTypeColor, getTypeIcon, formatDate, formatDateTime, validateFormData, calculateStats, getInitialFormData, getInitialQuestion } from './CreateSurvey.utils';
 
-// Componente de alerta moderna (se mantiene igual)
+// Componente de alerta moderna
 const ModernAlert = ({ message, type, onClose }) => {
-  // ... (código del componente ModernAlert se mantiene igual)
   const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
@@ -101,7 +100,7 @@ const DesktopStats = ({ stats }) => {
   );
 };
 
-// Componente para estadísticas móviles (opcional - si quieres mostrar algo diferente)
+// Componente para estadísticas móviles
 const MobileStats = ({ stats }) => {
   return (
     <div className="mobile-stats">
@@ -147,11 +146,9 @@ const CreateSurvey = () => {
   const stats = calculateStats(encuestas);
 
   // Media queries con react-responsive
-  const isDesktop = useMediaQuery({ minWidth: 992 }); // Para dispositivos de escritorio (PC)
-  const isTablet = useMediaQuery({ minWidth: 768, maxWidth: 991 }); // Para tablets
-  const isMobile = useMediaQuery({ maxWidth: 767 }); // Para móviles
-  
-  // También puedes usar una combinación
+  const isDesktop = useMediaQuery({ minWidth: 992 });
+  const isTablet = useMediaQuery({ minWidth: 768, maxWidth: 991 });
+  const isMobile = useMediaQuery({ maxWidth: 767 });
   const isDesktopOrLaptop = useMediaQuery({ minDeviceWidth: 1224 });
   const isBigScreen = useMediaQuery({ minDeviceWidth: 1824 });
   const isTabletOrMobile = useMediaQuery({ maxWidth: 1224 });
@@ -168,15 +165,30 @@ const CreateSurvey = () => {
     });
   };
 
-  // Función para cargar detalles de una encuesta
+  // Función para cargar detalles de una encuesta (OPTIMIZADA)
   const handleViewDetails = async (encuestaId) => {
     setSelectedSurveyId(encuestaId);
     setLoadingDetails(true);
     setShowDetailsModal(true);
     
     try {
-      const response = await consultarCampaniaDetalle(encuestaId);
-      setSurveyDetails(response.campania);
+      // Buscar si la encuesta ya tiene detalles almacenados
+      const encuestaExistente = encuestas.find(e => e.id === encuestaId);
+      
+      if (encuestaExistente && encuestaExistente.detalles) {
+        setSurveyDetails(encuestaExistente.detalles);
+      } else {
+        // Si no tiene detalles, hacer la llamada API
+        const response = await consultarCampaniaDetalle(encuestaId);
+        setSurveyDetails(response.campania);
+        
+        // Actualizar la encuesta con los nuevos detalles
+        setEncuestas(prev => prev.map(encuesta => 
+          encuesta.id === encuestaId 
+            ? { ...encuesta, detalles: response.campania }
+            : encuesta
+        ));
+      }
     } catch (error) {
       setErrorPopupMessage(error.message || 'Error al cargar los detalles de la encuesta.');
       setIsErrorPopupOpen(true);
@@ -283,6 +295,7 @@ const CreateSurvey = () => {
     showModernAlert('Pregunta eliminada', 'info');
   };
 
+  // Función handleSubmit OPTIMIZADA
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -298,8 +311,15 @@ const CreateSurvey = () => {
     try {
       const response = await crearCampania(formData);
       
-      // Crear objeto de encuesta usando la utilidad
-      const nuevaEncuesta = createEncuestaObject(formData, response);
+      // Obtener detalles inmediatamente después de crear
+      const detallesResponse = await consultarCampaniaDetalle(response.idCampania);
+      
+      // Crear objeto de encuesta incluyendo los detalles
+      const nuevaEncuesta = {
+        ...createEncuestaObject(formData, response),
+        detalles: detallesResponse.campania // Agregar los detalles aquí
+      };
+      
       setEncuestas(prev => [nuevaEncuesta, ...prev]);
       
       // Restablecer formularios usando las utilidades
@@ -408,7 +428,6 @@ const CreateSurvey = () => {
                 {isDesktop ? (
                   <DesktopStats stats={stats} />
                 ) : (
-                  // Opcional: Mostrar versión móvil/tablet de las estadísticas
                   <MobileStats stats={stats} />
                 )}
 
@@ -502,7 +521,7 @@ const CreateSurvey = () => {
               <form onSubmit={handleSubmit} className="create-form">
                 <div className="form-row">
                   <div className="form-group">
-                    <label htmlFor="nombreCampania" >Nombre de la campaña</label>
+                    <label htmlFor="nombreCampania">Nombre de la campaña</label>
                     <input 
                       id="nombreCampania" 
                       name="nombreCampania"
@@ -530,7 +549,7 @@ const CreateSurvey = () => {
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="descripcion" >Descripción</label>
+                  <label htmlFor="descripcion">Descripción</label>
                   <textarea 
                     id="descripcion" 
                     name="descripcion"
@@ -543,7 +562,7 @@ const CreateSurvey = () => {
                 
                 <div className="form-row">
                   <div className="form-group">
-                    <label htmlFor="fechaInicio" >Fecha de inicio</label>
+                    <label htmlFor="fechaInicio">Fecha de inicio</label>
                     <input 
                       id="fechaInicio" 
                       name="fechaInicio"
@@ -555,7 +574,7 @@ const CreateSurvey = () => {
                   </div>
                   
                   <div className="form-group">
-                    <label htmlFor="fechaFin" >Fecha de fin</label>
+                    <label htmlFor="fechaFin">Fecha de fin</label>
                     <input 
                       id="fechaFin" 
                       name="fechaFin"
@@ -574,7 +593,7 @@ const CreateSurvey = () => {
                   <div className="question-form">
                     <div className="form-row">
                       <div className="form-group">
-                        <label htmlFor="pregunta" >Texto de la pregunta</label>
+                        <label htmlFor="pregunta">Texto de la pregunta</label>
                         <input 
                           id="pregunta" 
                           name="pregunta"
@@ -586,7 +605,7 @@ const CreateSurvey = () => {
                       </div>
                       
                       <div className="form-group">
-                        <label htmlFor="tipo" >Tipo de pregunta</label>
+                        <label htmlFor="tipo">Tipo de pregunta</label>
                         <select 
                           id="tipo" 
                           name="tipo"
@@ -601,7 +620,7 @@ const CreateSurvey = () => {
 
                     <div className="form-row">
                       <div className="form-group">
-                        <label htmlFor="obligatoria" >¿Es obligatoria?</label>
+                        <label htmlFor="obligatoria">¿Es obligatoria?</label>
                         <select 
                           id="obligatoria" 
                           name="obligatoria"
@@ -748,7 +767,7 @@ const CreateSurvey = () => {
         )}
       </div>
 
-      {/* Modal de Detalles - Similar al de reporte de pérdidas */}
+      {/* Modal de Detalles */}
       <Modal
         show={showDetailsModal}
         onHide={() => {
@@ -948,77 +967,77 @@ const CreateSurvey = () => {
                                 <FiClock size={12} className="me-1" />
                                 ID: {pregunta.idPregunta}
                               </small>
-                        </div>
-                      </Card.Body>
-                    </Card>
-                  ))}
+                            </div>
+                          </Card.Body>
+                        </Card>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="empty-questions text-center py-4">
+                      <FiFileText size={48} className="text-muted mb-3" />
+                      <p className="text-muted">No hay preguntas en esta encuesta</p>
+                    </div>
+                  )}
                 </div>
-              ) : (
-                <div className="empty-questions text-center py-4">
-                  <FiFileText size={48} className="text-muted mb-3" />
-                  <p className="text-muted">No hay preguntas en esta encuesta</p>
-                </div>
-              )}
+              </div>
+            </>
+          ) : (
+            <div className="text-center py-5">
+              <FiX size={48} className="text-danger mb-3" />
+              <p className="text-danger">No se pudieron cargar los detalles de la encuesta</p>
+              <Button 
+                variant="outline-secondary" 
+                size="sm"
+                onClick={() => setShowDetailsModal(false)}
+              >
+                Cerrar
+              </Button>
             </div>
+          )}
+        </Modal.Body>
+        <Modal.Footer className="modal-footer-custom">
+          <div className="footer-time-info small text-muted">
+            <FiClock size={12} className="me-1" />
+            Consultado: {dayjs().format('HH:mm:ss')}
           </div>
-        </>
-      ) : (
-        <div className="text-center py-5">
-          <FiX size={48} className="text-danger mb-3" />
-          <p className="text-danger">No se pudieron cargar los detalles de la encuesta</p>
           <Button 
-            variant="outline-secondary" 
-            size="sm"
-            onClick={() => setShowDetailsModal(false)}
+            variant="secondary" 
+            onClick={() => {
+              setShowDetailsModal(false);
+              setSurveyDetails(null);
+              setSelectedSurveyId(null);
+            }}
           >
+            <FiX size={16} className="me-1" />
             Cerrar
           </Button>
-        </div>
-      )}
-    </Modal.Body>
-    <Modal.Footer className="modal-footer-custom">
-      <div className="footer-time-info small text-muted">
-        <FiClock size={12} className="me-1" />
-        Consultado: {dayjs().format('HH:mm:ss')}
-      </div>
-      <Button 
-        variant="secondary" 
-        onClick={() => {
-          setShowDetailsModal(false);
-          setSurveyDetails(null);
-          setSelectedSurveyId(null);
+        </Modal.Footer>
+      </Modal>
+
+      {/* Popup confirmación de eliminación */}
+      <ConfirmPopUp
+        isOpen={isConfirmPopupOpen}
+        onClose={() => setIsConfirmPopupOpen(false)}
+        title="Confirmar Eliminación"
+        message="¿Está seguro de eliminar esta encuesta? Esta acción no se puede deshacer."
+        isLoading={isDeleting}
+        onConfirm={() => {
+          if (deleteId) {
+            executeDeleteSurvey(deleteId);
+          }
         }}
-      >
-        <FiX size={16} className="me-1" />
-        Cerrar
-      </Button>
-    </Modal.Footer>
-  </Modal>
+        onCancel={() => setIsConfirmPopupOpen(false)}
+      />
 
-  {/* Popup confirmación de eliminación */}
-  <ConfirmPopUp
-    isOpen={isConfirmPopupOpen}
-    onClose={() => setIsConfirmPopupOpen(false)}
-    title="Confirmar Eliminación"
-    message="¿Está seguro de eliminar esta encuesta? Esta acción no se puede deshacer."
-    isLoading={isDeleting}
-    onConfirm={() => {
-      if (deleteId) {
-        executeDeleteSurvey(deleteId);
-      }
-    }}
-    onCancel={() => setIsConfirmPopupOpen(false)}
-  />
-
-  {/* Error popup */}
-  <ErrorPopup
-    isOpen={isErrorPopupOpen}
-    onClose={() => setIsErrorPopupOpen(false)}
-    title="¡Error!"
-    message={errorPopupMessage}
-  />
-</>
-);
+      {/* Error popup */}
+      <ErrorPopup
+        isOpen={isErrorPopupOpen}
+        onClose={() => setIsErrorPopupOpen(false)}
+        title="¡Error!"
+        message={errorPopupMessage}
+      />
+    </>
+  );
 };
 
 export default CreateSurvey;

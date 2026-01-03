@@ -1032,3 +1032,115 @@ body {
     transform: translateY(0);
   }
 }
+
+/* Agregar al final del archivo CSS existente */
+
+/* Estilos para el nuevo campo de vendedor */
+.vendedor-display {
+  font-weight: 500;
+  color: #10b981;
+  margin-top: 2px;
+}
+
+/* Estilos para alerta de recomendación requerida */
+.recommendation-required-alert {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  background-color: #fef3c7;
+  border: 1px solid #fde68a;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  animation: slideIn 0.3s ease-out;
+}
+
+.recommendation-required-alert .alert-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.recommendation-required-alert span {
+  color: #92400e;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Indicador para recomendación requerida en badge */
+.recommendation-warning {
+  background-color: #fef3c7;
+  color: #92400e;
+  padding: 2px 8px;
+  border-radius: 4px;
+  margin-left: 8px;
+  font-weight: 600;
+}
+
+/* Contenedor para input de texto con validación */
+.text-input-container {
+  position: relative;
+}
+
+.required-input {
+  border-color: #f59e0b !important;
+  background-color: #fef3c7 !important;
+}
+
+.required-input:focus {
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1) !important;
+}
+
+.input-required-hint {
+  font-size: 12px;
+  color: #d97706;
+  margin-top: 4px;
+  font-style: italic;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.input-required-hint::before {
+  content: "⚠";
+  font-size: 10px;
+}
+
+/* Estilo para estrellas cuando tienen calificación 1 */
+.star-rating-low .star-label {
+  color: #ef4444;
+  font-weight: 700;
+}
+
+.star-rating-low .star-description {
+  color: #ef4444;
+  font-weight: 600;
+}
+
+/* Ajustes responsive para nuevos elementos */
+@media (max-width: 640px) {
+  .recommendation-required-alert {
+    flex-direction: column;
+    text-align: center;
+    gap: 6px;
+  }
+  
+  .recommendation-warning {
+    margin-left: 4px;
+    font-size: 9px;
+  }
+  
+  .vendedor-display {
+    font-size: 11px;
+  }
+}
+
+/* Agregar esta regla en la sección de estilos de formularios (después de .required) */
+
+.optional {
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 400;
+  font-style: italic;
+  margin-left: 4px;
+}
