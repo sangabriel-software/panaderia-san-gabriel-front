@@ -145,7 +145,6 @@ export const handleBuscarVentas = async ( setIsLoading, turnoValue, sucursalValu
 
     setShowModal(false); // Cerrar el modal después de la búsqueda
   } catch (error) {
-    console.log(error);
     setErrorPopupMessage("Hubo un error al consultar los recursos");
     setIsPopupErrorOpen(true);
   } finally {

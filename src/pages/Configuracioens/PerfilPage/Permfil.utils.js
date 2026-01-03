@@ -62,8 +62,7 @@ export const handleChangePassword = async ( formData, userData, setIsSaving, set
     };
 
     const response = await cambiarPassService(payload);
-    console.log("Contraseña cambiada:", response);
-
+    
     setChangePasswordSuccess("Contraseña cambiada exitosamente");
     setShowSuccess(true);
 
@@ -96,8 +95,7 @@ export const handleSavePersonalData = async ( formData, userData, setIsSaving, s
     };
 
     const response = await actualizarDatosUsuario(payload);
-    console.log("Datos actualizados:", response);
-
+    
     setShowSuccess(true);
     setIsChanged(false);
     guardarCambiosCredenciales("userData", { ...userData, ...payload });

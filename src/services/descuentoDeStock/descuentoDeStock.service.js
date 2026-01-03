@@ -25,7 +25,6 @@ export const consultarDetalleDescuentosService = async (idDescuento) => {
         const response = await api.get(`${getEndpoints.DETALLE_DESCUENTOS}/${idDescuento}`); 
         return response.data;
     } catch (error) {
-      console.log(error);
       throw error;
     }
 }
@@ -35,7 +34,6 @@ export const cancelarDescuentoStockServices = async (idDescuento) => {
         const response = await api.delete(`${deleteEndpoints.CANCELAR_DESCUENTO_STOCK}/${idDescuento}`); 
         return response.data;
     } catch (error) {
-      console.log(error);
       throw error;
     }
 }

@@ -230,7 +230,6 @@ const HistorialStock = () => {
       // Guardar el PDF
       doc.save(`historial-stock-${dateStr.replace(/\//g, '-').replace(/:/g, '-').replace(' ', '_')}.pdf`);
     } catch (err) {
-      console.log(err)
       setError('Error al generar el PDF: ' + err.message);
     } finally {
       setGeneratingPDF(false);

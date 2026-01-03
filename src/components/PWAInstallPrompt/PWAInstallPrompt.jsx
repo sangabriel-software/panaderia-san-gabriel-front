@@ -79,7 +79,6 @@ export default function PWAInstallPrompt() {
       
       if (nextShowTime > currentTime) {
         // Aún no ha pasado el tiempo de espera (1 o 5 días)
-        console.log('Tiempo de espera no completado, no mostrar prompt');
         return;
       }
     }
@@ -117,7 +116,6 @@ export default function PWAInstallPrompt() {
     if (!deferredPrompt) {
       // Para iOS, redirigir a instrucciones
       if (isIOS) {
-        console.log('iOS: Mostrando instrucciones de instalación');
         return;
       }
       return;
@@ -128,7 +126,6 @@ export default function PWAInstallPrompt() {
       const { outcome } = await deferredPrompt.userChoice;
       
       if (outcome === 'accepted') {
-        console.log('Usuario aceptó instalar');
         // Limpiar localStorage si se instala
         localStorage.removeItem('pwa-prompt-next-show');
         localStorage.removeItem('pwa-prompt-first-dismiss');
@@ -164,12 +161,10 @@ export default function PWAInstallPrompt() {
 
       if (elapsedDays < INITIAL_DAYS_COUNT) {
         // Estamos dentro de los primeros 3 días: volver a mostrar en 1 día
-        delayMS = ONE_DAY_MS;
-        console.log(`Descartado. Reaparecerá en 1 día (Día ${elapsedDays + 1} de ${INITIAL_DAYS_COUNT}).`);
+        delayMS = ONE_DAY_MS; 
       } else {
         // Ya pasaron los 3 días iniciales: volver a mostrar en 5 días
         delayMS = SUBSEQUENT_DELAY_DAYS * ONE_DAY_MS;
-        console.log(`Descartado. Reaparecerá en ${SUBSEQUENT_DELAY_DAYS} días.`);
       }
 
       const nextShowTime = currentTime + delayMS;

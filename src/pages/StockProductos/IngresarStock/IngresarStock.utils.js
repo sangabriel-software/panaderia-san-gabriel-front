@@ -68,10 +68,9 @@ export const handleStockChange = (idProducto, value, setStockValues ) => {
         setStockValues({});
       }
     } catch (error) {
-      console.log(error);
       setErrorPopupMessage("Hubo un error al ingresar el stock, vuelve a intentar");
       setIsPopupErrorOpen(true);
-    } finally {
+    } finally { 
       setIsLoading(false);
     }
   };

@@ -23,20 +23,18 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker
       .register('/sw.js', { scope: '/' })
       .then((registration) => {
-        //console.log('✅ PWA Service Worker registrado:', registration.scope);
         
         // Actualización automática del service worker
         registration.addEventListener('updatefound', () => {
           const newWorker = registration.installing;
           newWorker.addEventListener('statechange', () => {
             if (newWorker.state === 'activated') {
-              //console.log('🔄 Nueva versión de la PWA disponible');
             }
           });
         });
       })
       .catch((error) => {
-        console.error('❌ Error al registrar Service Worker:', error);
+       
       });
   });
 }
