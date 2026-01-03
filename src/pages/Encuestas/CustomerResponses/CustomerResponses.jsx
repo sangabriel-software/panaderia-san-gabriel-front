@@ -14,7 +14,8 @@ const CustomerResponses = () => {
   const [userInfo, setUserInfo] = useState({
     nombre: '',
     telefono: '',
-    correo: ''
+    correo: '',
+    nombreVendedor: ''
   });
   const [formErrors, setFormErrors] = useState({});
   const [submitError, setSubmitError] = useState(null);
@@ -45,7 +46,7 @@ const CustomerResponses = () => {
   const validateUserInfo = () => {
     const errors = {};
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const phoneRegex = /^[0-9]{08}$/;
+    const phoneRegex = /^[0-9]{8}$/;
 
     if (!userInfo.nombre.trim()) {
       errors.nombre = 'El nombre es requerido';
@@ -59,10 +60,15 @@ const CustomerResponses = () => {
       errors.telefono = 'Ingrese un número de teléfono válido (8 dígitos)';
     }
 
-    if (!userInfo.correo.trim()) {
-      errors.correo = 'El correo es requerido';
-    } else if (!emailRegex.test(userInfo.correo)) {
+    // Correo ya no es obligatorio, pero si se ingresa debe ser válido
+    if (userInfo.correo.trim() && !emailRegex.test(userInfo.correo)) {
       errors.correo = 'Ingrese un correo electrónico válido';
+    }
+
+    if (!userInfo.nombreVendedor.trim()) {
+      errors.nombreVendedor = 'El nombre del vendedor es requerido';
+    } else if (userInfo.nombreVendedor.trim().length < 2) {
+      errors.nombreVendedor = 'El nombre del vendedor debe tener al menos 2 caracteres';
     }
 
     return errors;
@@ -135,7 +141,7 @@ const CustomerResponses = () => {
     setShowThankYou(false);
     setIsSubmitting(false);
     setShowWelcome(true);
-    setUserInfo({ nombre: '', telefono: '', correo: '' });
+    setUserInfo({ nombre: '', telefono: '', correo: '', nombreVendedor: '' });
     setFormErrors({});
     setSubmitError(null);
     localStorage.removeItem('customerSurveyResponses');
@@ -182,7 +188,8 @@ const CustomerResponses = () => {
           usuario: {
             nombre: userInfo.nombre,
             telefono: userInfo.telefono,
-            correo: userInfo.correo
+            correo: userInfo.correo || '', // Enviar string vacío si no se proporcionó
+            nombreVendedor: userInfo.nombreVendedor
           },
           respuestas: respuestasFormateadas,
           fechaRespuesta: getCurrentDateTimeWithSeconds(),
@@ -239,6 +246,10 @@ const CustomerResponses = () => {
       }
       return true;
     } else if (currentQ.tipo === 'text') {
+      // Si la pregunta de texto es obligatoria, verificar que tenga contenido
+      if (currentQ.obligatoria) {
+        return answer !== undefined && answer !== null && answer.trim() !== '';
+      }
       return true;
     }
     return false;
@@ -383,7 +394,7 @@ const CustomerResponses = () => {
               
               <div className="form-group">
                 <label htmlFor="correo">
-                  Correo electrónico <span className="required">*</span>
+                  Correo electrónico <span className="optional-label">(Opcional)</span>
                 </label>
                 <input
                   type="email"
@@ -397,6 +408,25 @@ const CustomerResponses = () => {
                 />
                 {formErrors.correo && (
                   <div className="error-message">{formErrors.correo}</div>
+                )}
+              </div>
+              
+              <div className="form-group">
+                <label htmlFor="nombreVendedor">
+                  Nombre del vendedor <span className="required">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="nombreVendedor"
+                  name="nombreVendedor"
+                  value={userInfo.nombreVendedor}
+                  onChange={handleUserInfoChange}
+                  className={formErrors.nombreVendedor ? 'input-error' : ''}
+                  placeholder="Ingrese el nombre del vendedor"
+                  autoComplete="off"
+                />
+                {formErrors.nombreVendedor && (
+                  <div className="error-message">{formErrors.nombreVendedor}</div>
                 )}
               </div>
               
@@ -530,9 +560,14 @@ const CustomerResponses = () => {
             
             <h2>¡Gracias {userInfo.nombre}!</h2>
             <p>Sus respuestas han sido registradas exitosamente.</p>
-            <p>Le contactaremos en {userInfo.correo} si es necesario.</p>
+            {userInfo.correo && (
+              <p>Le contactaremos en {userInfo.correo} si es necesario.</p>
+            )}
             <p className="campaign-reference">
               Encuesta: <strong>{campania[0]?.nombreCampania}</strong>
+            </p>
+            <p className="campaign-reference">
+              Atendido por: <strong>{userInfo.nombreVendedor}</strong>
             </p>
             
             <button className="restart-btn" onClick={resetSurvey}>
