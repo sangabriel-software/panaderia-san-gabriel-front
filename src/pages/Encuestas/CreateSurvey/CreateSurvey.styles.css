@@ -1660,3 +1660,816 @@
     transform: translateY(0);
   }
 }
+
+/* ============================================
+   MEJORAS RESPONSIVAS PARA FORMULARIO (SIN BOOTSTRAP)
+   ============================================ */
+
+/* ============================================
+   MEDIA QUERIES GENERALES
+   ============================================ */
+
+/* Tablet (768px - 1024px) */
+@media (max-width: 1024px) {
+  .survey-module {
+    padding: 24px 16px;
+    max-width: 100%;
+  }
+  
+  .create-content {
+    max-width: 100%;
+  }
+  
+  .create-section {
+    padding: 24px;
+  }
+}
+
+/* Móvil grande (576px - 768px) */
+@media (max-width: 768px) {
+  .survey-module {
+    padding: 20px 12px;
+  }
+  
+  .module-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  
+  .create-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .module-tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 4px;
+  }
+  
+  .tab {
+    min-width: 140px;
+    padding: 12px 16px;
+    font-size: 14px;
+  }
+  
+  .create-section {
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .create-section h2 {
+    font-size: 24px;
+  }
+  
+  .questions-section {
+    padding: 20px;
+    margin-top: 24px;
+  }
+  
+  .question-form {
+    padding: 20px;
+  }
+}
+
+/* Móvil pequeño (hasta 576px) */
+@media (max-width: 576px) {
+  .survey-module {
+    padding: 16px 8px;
+  }
+  
+  .header-content h1 {
+    font-size: 24px;
+  }
+  
+  .create-section {
+    padding: 16px;
+    border-radius: 8px;
+  }
+  
+  .create-section h2 {
+    font-size: 20px;
+  }
+  
+  .questions-section {
+    padding: 16px;
+  }
+  
+  .question-form {
+    padding: 16px;
+  }
+  
+  .empty-state {
+    padding: 40px 16px;
+  }
+  
+  .empty-icon {
+    font-size: 60px;
+  }
+  
+  .empty-state h3 {
+    font-size: 20px;
+  }
+}
+
+/* ============================================
+   FORMULARIO RESPONSIVO MEJORADO
+   ============================================ */
+
+/* Contenedor del formulario */
+.create-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Grid responsivo para filas del formulario */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+@media (min-width: 768px) {
+  .form-row {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+}
+
+/* Grupos de formulario mejorados */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.form-group label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1F2937;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.form-group label.required::after {
+  content: ' *';
+  color: #EF4444;
+}
+
+/* Inputs responsivos */
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #E5E7EB;
+  border-radius: 8px;
+  font-size: 16px; /* Prevenir zoom en iOS */
+  color: #1F2937;
+  background: #FFFFFF;
+  transition: all 250ms ease;
+  font-family: inherit;
+  box-sizing: border-box; /* Asegura que padding no afecte el ancho */
+}
+
+/* Tamaño mínimo para inputs táctiles */
+.form-group input,
+.form-group select,
+.form-group button {
+  min-height: 44px;
+}
+
+/* Textarea específico */
+.form-group textarea {
+  min-height: 100px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+/* Estados de focus */
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #4F46E5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+/* Inputs de fecha específicos */
+input[type="date"] {
+  min-height: 44px;
+  appearance: none;
+}
+
+/* Selects personalizados */
+.form-group select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  background-size: 16px 12px;
+  padding-right: 40px;
+}
+
+/* ============================================
+   SECCIÓN DE PREGUNTAS RESPONSIVA
+   ============================================ */
+
+/* Formulario de pregunta individual */
+.question-form .form-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+@media (min-width: 640px) {
+  .question-form .form-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .question-form .form-row:first-child {
+    grid-template-columns: 2fr 1fr;
+  }
+}
+
+@media (min-width: 1024px) {
+  .question-form .form-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .question-form .form-row:first-child {
+    grid-template-columns: 3fr 1fr;
+  }
+}
+
+/* Contenedor de orden */
+.order-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.order-display-mobile {
+  padding: 12px 16px;
+  background: #F9FAFB;
+  border: 2px solid #E5E7EB;
+  border-radius: 8px;
+  text-align: center;
+  font-weight: 600;
+  color: #4F46E5;
+  font-size: 16px;
+}
+
+/* Botón agregar pregunta responsivo */
+.add-question-btn {
+  width: 100%;
+  padding: 14px 20px;
+  background: #4F46E5;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 250ms ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 16px;
+  min-height: 44px;
+}
+
+.add-question-btn:hover {
+  background: #4338CA;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* ============================================
+   LISTA DE PREGUNTAS AGREGADAS RESPONSIVA
+   ============================================ */
+
+.questions-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.question-item {
+  background: #FFFFFF;
+  border: 2px solid #E5E7EB;
+  border-radius: 12px;
+  padding: 16px;
+  position: relative;
+  transition: all 250ms ease;
+}
+
+@media (max-width: 576px) {
+  .question-item {
+    padding: 12px;
+  }
+}
+
+.question-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+  align-items: center;
+}
+
+.question-order {
+  background: #4F46E5;
+  color: white;
+  padding: 4px 10px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 600;
+  min-width: 40px;
+  text-align: center;
+}
+
+.question-type,
+.question-required {
+  padding: 4px 10px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.question-text {
+  font-size: 15px;
+  color: #1F2937;
+  line-height: 1.5;
+  padding-right: 40px;
+  word-break: break-word;
+}
+
+@media (max-width: 576px) {
+  .question-text {
+    padding-right: 32px;
+    font-size: 14px;
+  }
+}
+
+.remove-question-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: rgba(239, 68, 68, 0.1);
+  color: #EF4444;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 250ms ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+@media (max-width: 576px) {
+  .remove-question-btn {
+    top: 12px;
+    right: 12px;
+    width: 28px;
+    height: 28px;
+  }
+}
+
+/* ============================================
+   ACCIONES DEL FORMULARIO RESPONSIVAS
+   ============================================ */
+
+.form-actions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 2px solid #E5E7EB;
+}
+
+@media (min-width: 768px) {
+  .form-actions {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.cancel-btn,
+.submit-btn {
+  width: 100%;
+  padding: 14px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 250ms ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+}
+
+.cancel-btn {
+  background: #F9FAFB;
+  color: #1F2937;
+  border: 2px solid #E5E7EB;
+}
+
+.submit-btn {
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+/* ============================================
+   ESTADÍSTICAS RESPONSIVAS
+   ============================================ */
+
+@media (max-width: 768px) {
+  .stats-row {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  
+  .stat {
+    padding: 16px;
+  }
+  
+  .stat-value {
+    font-size: 28px;
+  }
+}
+
+@media (max-width: 480px) {
+  .stats-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ============================================
+   TARJETAS DE ENCUESTA RESPONSIVAS
+   ============================================ */
+
+@media (max-width: 768px) {
+  .survey-card {
+    padding: 20px;
+  }
+  
+  .survey-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .survey-details {
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px 0;
+  }
+  
+  .survey-actions {
+    flex-direction: column;
+  }
+  
+  .action-btn {
+    width: 100%;
+  }
+}
+
+/* ============================================
+   MODAL RESPONSIVO MEJORADO
+   ============================================ */
+
+@media (max-width: 768px) {
+  .modal-survey-details .modal-dialog {
+    margin: 0;
+    max-width: 100% !important;
+    min-height: 100vh;
+  }
+  
+  .modal-survey-details .modal-content {
+    border-radius: 0;
+    min-height: 100vh;
+  }
+  
+  .modal-header-custom {
+    padding: 16px;
+  }
+  
+  .modal-title-content {
+    flex-direction: column;
+    gap: 12px;
+    text-align: center;
+  }
+  
+  .modal-title-main {
+    font-size: 20px;
+  }
+  
+  .modal-title-sub {
+    font-size: 14px;
+  }
+  
+  .modal-body-custom {
+    padding: 16px;
+    max-height: none;
+  }
+  
+  .modal-section {
+    padding: 16px;
+  }
+  
+  .summary-card .card-body {
+    padding: 16px;
+  }
+  
+  .summary-item {
+    gap: 12px;
+  }
+  
+  .summary-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+  }
+  
+  .detail-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    padding: 12px;
+  }
+  
+  .detail-value {
+    text-align: left;
+  }
+}
+
+/* ============================================
+   MEJORAS PARA TOUCH SCREEN
+   ============================================ */
+
+/* Aumenta el área táctil */
+button,
+input[type="submit"],
+input[type="button"],
+.action-btn,
+.tab {
+  touch-action: manipulation;
+}
+
+/* Mejora la legibilidad en móviles */
+@media (max-width: 768px) {
+  body {
+    font-size: 16px; /* Previene zoom automático en iOS */
+    -webkit-text-size-adjust: 100%;
+  }
+  
+  h1, h2, h3, h4 {
+    line-height: 1.3;
+  }
+  
+  p, span, div {
+    line-height: 1.5;
+  }
+}
+
+/* ============================================
+   UTILIDADES RESPONSIVAS
+   ============================================ */
+
+/* Ocultar/mostrar elementos según tamaño */
+.mobile-only {
+  display: none;
+}
+
+.desktop-only {
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .mobile-only {
+    display: block;
+  }
+  
+  .desktop-only {
+    display: none;
+  }
+}
+
+/* Contenedores fluidos */
+.container-fluid {
+  width: 100%;
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+@media (min-width: 576px) {
+  .container-fluid {
+    max-width: 540px;
+  }
+}
+
+@media (min-width: 768px) {
+  .container-fluid {
+    max-width: 720px;
+  }
+}
+
+@media (min-width: 992px) {
+  .container-fluid {
+    max-width: 960px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .container-fluid {
+    max-width: 1140px;
+  }
+}
+
+/* ============================================
+   SCROLL SUAVE
+   ============================================ */
+
+.modal-body-custom,
+.surveys-list,
+.questions-container {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ============================================
+   ANIMACIONES PARA MÓVIL
+   ============================================ */
+
+@media (max-width: 768px) {
+  .survey-card,
+  .question-item,
+  .stat {
+    animation: slideUp 0.3s ease;
+  }
+  
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+/* ============================================
+   CORRECCIÓN DE OVERFLOW
+   ============================================ */
+
+/* Previene que elementos se salgan de la pantalla */
+* {
+  max-width: 100%;
+}
+
+img, video, iframe {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Asegura que los inputs no se salgan */
+input, select, textarea {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* ============================================
+   MEJORAS DE ACCESIBILIDAD PARA MÓVIL
+   ============================================ */
+
+/* Mejora el contraste en móviles */
+@media (max-width: 768px) {
+  .form-group label {
+    font-weight: 700;
+  }
+  
+  .detail-label {
+    font-weight: 600;
+  }
+  
+  .survey-title {
+    font-weight: 700;
+  }
+}
+
+/* Aumenta el tamaño de los botones en móvil */
+@media (max-width: 576px) {
+  button,
+  .btn,
+  .action-btn {
+    padding: 12px 20px;
+    font-size: 16px;
+  }
+}
+
+
+/* ============================================
+   ESTADÍSTICAS MÓVILES
+   ============================================ */
+
+.mobile-stats {
+  margin-bottom: 20px;
+  padding: 16px;
+  background: linear-gradient(135deg, #FFFFFF 0%, #F9FAFB 100%);
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.mobile-stats-summary {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.mobile-stats-text {
+  font-size: 14px;
+  color: #4F46E5;
+  font-weight: 600;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+.mobile-stats-text span {
+  display: inline-block;
+  padding: 4px 8px;
+  background: rgba(79, 70, 229, 0.1);
+  border-radius: 8px;
+}
+
+@media (max-width: 576px) {
+  .mobile-stats-text {
+    font-size: 13px;
+    gap: 8px;
+  }
+}
+
+/* ============================================
+   MEJORAS RESPONSIVAS GENERALES
+   ============================================ */
+
+@media (max-width: 768px) {
+  .survey-details {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .survey-actions {
+    flex-direction: column;
+  }
+  
+  .action-btn {
+    width: 100%;
+  }
+  
+  .create-section {
+    padding: 20px;
+  }
+  
+  .questions-section {
+    padding: 16px;
+  }
+}
+
+/* Opcional: Ocultar completamente las estadísticas en móvil */
+@media (max-width: 991px) {
+  .stats-row {
+    display: none;
+  }
+}
+
+/* Mostrar solo en desktop */
+@media (min-width: 992px) {
+  .mobile-stats {
+    display: none;
+  }
+}
+

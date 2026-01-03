@@ -3,19 +3,19 @@ import { Container, Row, Col, Card, Badge, Button, Modal } from 'react-bootstrap
 import { FiEye, FiEdit2, FiBarChart2, FiTrash2, FiX, FiCalendar, FiUser, FiFileText, FiCheckCircle, FiClock } from 'react-icons/fi';
 import dayjs from 'dayjs';
 import './CreateSurvey.styles.css';
-import { 
-  crearCampaniaServices, 
-  eliminarCampaniaServices,
-  consultarCampaniaDetalleServices 
-} from '../../../services/Encuestas/encuestas.service';
 import useGetEncuestasList from '../../../hooks/Encuestas/useGetEncuestasList';
 import { BsFillInfoCircleFill, BsExclamationTriangleFill } from 'react-icons/bs';
 import Alert from '../../../components/Alerts/Alert';
 import ConfirmPopUp from '../../../components/Popup/ConfirmPopup';
 import ErrorPopup from '../../../components/Popup/ErrorPopUp';
+import { useMediaQuery } from 'react-responsive'; // Importar useMediaQuery
 
-// Componente de alerta moderna
+// Importar utilidades
+import { crearCampania, eliminarCampania, consultarCampaniaDetalle, createEncuestaObject, getStatus, getTypeColor, getTypeIcon, formatDate, formatDateTime, validateFormData, calculateStats, getInitialFormData, getInitialQuestion } from './CreateSurvey.utils';
+
+// Componente de alerta moderna (se mantiene igual)
 const ModernAlert = ({ message, type, onClose }) => {
+  // ... (código del componente ModernAlert se mantiene igual)
   const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
@@ -81,32 +81,46 @@ const ModernAlert = ({ message, type, onClose }) => {
   );
 };
 
+// Componente para estadísticas solo en desktop
+const DesktopStats = ({ stats }) => {
+  return (
+    <div className="stats-row">
+      <div className="stat">
+        <div className="stat-value">{stats.total}</div>
+        <div className="stat-label">Encuestas</div>
+      </div>
+      <div className="stat">
+        <div className="stat-value">{stats.active}</div>
+        <div className="stat-label">Activas</div>
+      </div>
+      <div className="stat">
+        <div className="stat-value">{stats.responses}</div>
+        <div className="stat-label">Respuestas</div>
+      </div>
+    </div>
+  );
+};
+
+// Componente para estadísticas móviles (opcional - si quieres mostrar algo diferente)
+const MobileStats = ({ stats }) => {
+  return (
+    <div className="mobile-stats">
+      <div className="mobile-stats-summary">
+        <span className="mobile-stats-text">
+          {stats.total} encuestas • {stats.active} activas • {stats.responses} respuestas
+        </span>
+      </div>
+    </div>
+  );
+};
+
 const CreateSurvey = () => {
   const [activeTab, setActiveTab] = useState('surveys');
   const { encuestas, loading, showError, showInfo, setEncuestas } = useGetEncuestasList();
 
   // Estados para el formulario de creación
-  const [formData, setFormData] = useState({
-    nombreCampania: '', 
-    descripcion: '',
-    idUsuarioCreo: 1,
-    fechaInicio: dayjs().format('YYYY-MM-DD'),
-    fechaFin: dayjs().add(30, 'day').format('YYYY-MM-DD'),
-    tipoEncuesta: 'online',
-    urlEncuesta: 'https://panaderiasangabriel.vercel.app/surveys/customer-responses',
-    fechaCreacion: dayjs().format('YYYY-MM-DD HH:mm:ss'),
-    fechaActualizacion: dayjs().format('YYYY-MM-DD HH:mm:ss'),
-    preguntas: []
-  });
-
-  const [currentQuestion, setCurrentQuestion] = useState({
-    tipo: 'pregunta',
-    pregunta: '',
-    orden: 1,
-    obligatoria: 1,
-    fechaCreacion: dayjs().format('YYYY-MM-DD HH:mm:ss')
-  });
-
+  const [formData, setFormData] = useState(getInitialFormData());
+  const [currentQuestion, setCurrentQuestion] = useState(getInitialQuestion());
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
@@ -129,55 +143,18 @@ const CreateSurvey = () => {
   const [loadingDetails, setLoadingDetails] = useState(false);
   const [selectedSurveyId, setSelectedSurveyId] = useState(null);
 
-  // Calcular estadísticas
-  const stats = {
-    total: encuestas?.length || 0,
-    active: encuestas?.filter(e => e.calculated_status === 'active')?.length || 0,
-    responses: encuestas?.reduce((sum, e) => sum + (e.responses || 0), 0) || 0
-  };
+  // Calcular estadísticas usando la utilidad
+  const stats = calculateStats(encuestas);
 
-  const getStatus = (encuesta) => {
-    const status = encuesta.calculated_status || 
-                  (() => {
-                    const now = dayjs();
-                    const start = dayjs(encuesta.start_date);
-                    const end = dayjs(encuesta.end_date);
-                    
-                    if (encuesta.status === 'draft') return 'draft';
-                    if (now.isBefore(start)) return 'scheduled';
-                    if (now.isBetween(start, end, 'day', '[]')) return 'active';
-                    if (now.isAfter(end)) return 'closed';
-                    return 'unknown';
-                  })();
-
-    switch(status) {
-      case 'active': return { text: 'Activa', className: 'status-active' };
-      case 'draft': return { text: 'Borrador', className: 'status-draft' };
-      case 'closed': return { text: 'Cerrada', className: 'status-closed' };
-      case 'scheduled': return { text: 'Programada', className: 'status-scheduled' };
-      default: return { text: 'Desconocido', className: 'status-unknown' };
-    }
-  };
-
-  const getTypeColor = (type) => {
-    switch(type) {
-      case 'online': return '#4F46E5';
-      case 'presencial': return '#059669';
-      case 'telefonica': return '#D97706';
-      case 'email': return '#7C3AED';
-      default: return '#6B7280';
-    }
-  };
-
-  const getTypeIcon = (type) => {
-    switch(type) {
-      case 'online': return '🌐';
-      case 'presencial': return '🏪';
-      case 'telefonica': return '📞';
-      case 'email': return '📧';
-      default: return '📋';
-    }
-  };
+  // Media queries con react-responsive
+  const isDesktop = useMediaQuery({ minWidth: 992 }); // Para dispositivos de escritorio (PC)
+  const isTablet = useMediaQuery({ minWidth: 768, maxWidth: 991 }); // Para tablets
+  const isMobile = useMediaQuery({ maxWidth: 767 }); // Para móviles
+  
+  // También puedes usar una combinación
+  const isDesktopOrLaptop = useMediaQuery({ minDeviceWidth: 1224 });
+  const isBigScreen = useMediaQuery({ minDeviceWidth: 1824 });
+  const isTabletOrMobile = useMediaQuery({ maxWidth: 1224 });
 
   const handleCreateSurvey = () => {
     setActiveTab('create');
@@ -198,7 +175,7 @@ const CreateSurvey = () => {
     setShowDetailsModal(true);
     
     try {
-      const response = await consultarCampaniaDetalleServices(encuestaId);
+      const response = await consultarCampaniaDetalle(encuestaId);
       setSurveyDetails(response.campania);
     } catch (error) {
       setErrorPopupMessage(error.message || 'Error al cargar los detalles de la encuesta.');
@@ -230,7 +207,7 @@ const CreateSurvey = () => {
     setIsConfirmPopupOpen(false);
     
     try {
-      await eliminarCampaniaServices(encuestaId);
+      await eliminarCampania(encuestaId);
       const updatedEncuestas = encuestas.filter(e => e.id !== encuestaId);
       setEncuestas(updatedEncuestas);
       showModernAlert('La encuesta ha sido eliminada exitosamente.', 'success');
@@ -242,40 +219,6 @@ const CreateSurvey = () => {
       setIsDeleting(false);
       setDeleteId(null);
     }
-  };
-
-  const formatDate = (dateString) => {
-    return dayjs(dateString).format('DD/MM/YYYY');
-  };
-
-  const formatDateTime = (dateString) => {
-    if (!dateString) return 'N/A';
-    return dayjs(dateString).format('DD/MM/YYYY HH:mm');
-  };
-
-  // Función para crear un objeto de encuesta para la lista
-  const createEncuestaObject = (responseData) => {
-    const now = dayjs();
-    const startDate = dayjs(formData.fechaInicio);
-    const endDate = dayjs(formData.fechaFin);
-    
-    let calculatedStatus = 'active';
-    if (now.isBefore(startDate)) calculatedStatus = 'scheduled';
-    else if (now.isAfter(endDate)) calculatedStatus = 'closed';
-    
-    return {
-      id: responseData.id || Date.now(),
-      title: formData.nombreCampania,
-      descripcion: formData.descripcion,
-      type: formData.tipoEncuesta,
-      start_date: formData.fechaInicio,
-      end_date: formData.fechaFin,
-      created: dayjs().format('YYYY-MM-DD HH:mm:ss'),
-      questions: formData.preguntas.length,
-      responses: 0,
-      calculated_status: calculatedStatus,
-      status: 'active'
-    };
   };
 
   // Manejadores para el formulario
@@ -312,13 +255,7 @@ const CreateSurvey = () => {
       preguntas: [...prev.preguntas, newQuestion]
     }));
 
-    setCurrentQuestion({
-      tipo: 'pregunta',
-      pregunta: '',
-      orden: formData.preguntas.length + 2,
-      obligatoria: 1,
-      fechaCreacion: dayjs().format('YYYY-MM-DD HH:mm:ss')
-    });
+    setCurrentQuestion(getInitialQuestion(formData.preguntas.length + 2));
 
     showModernAlert('Pregunta agregada correctamente', 'success');
   };
@@ -349,49 +286,25 @@ const CreateSurvey = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!formData.nombreCampania.trim()) {
-      showModernAlert('El nombre de la campaña es obligatorio', 'error');
-      return;
-    }
-
-    if (formData.preguntas.length === 0) {
-      showModernAlert('Debes agregar al menos una pregunta', 'error');
-      return;
-    }
-
-    if (dayjs(formData.fechaFin).isBefore(dayjs(formData.fechaInicio))) {
-      showModernAlert('La fecha de fin no puede ser anterior a la fecha de inicio', 'error');
+    // Validar datos usando la utilidad
+    const validation = validateFormData(formData);
+    if (!validation.isValid) {
+      showModernAlert(validation.message, 'error');
       return;
     }
 
     setIsSubmitting(true);
 
     try {
-      const response = await crearCampaniaServices(formData);
+      const response = await crearCampania(formData);
       
-      const nuevaEncuesta = createEncuestaObject(response);
+      // Crear objeto de encuesta usando la utilidad
+      const nuevaEncuesta = createEncuestaObject(formData, response);
       setEncuestas(prev => [nuevaEncuesta, ...prev]);
       
-      setFormData({
-        nombreCampania: '',
-        descripcion: '',
-        idUsuarioCreo: 1,
-        fechaInicio: dayjs().format('YYYY-MM-DD'),
-        fechaFin: dayjs().add(30, 'day').format('YYYY-MM-DD'),
-        tipoEncuesta: 'online',
-        urlEncuesta: 'https://panaderiasangabriel.vercel.app/surveys/customer-responses',
-        fechaCreacion: dayjs().format('YYYY-MM-DD HH:mm:ss'),
-        fechaActualizacion: dayjs().format('YYYY-MM-DD HH:mm:ss'),
-        preguntas: []
-      });
-
-      setCurrentQuestion({
-        tipo: 'pregunta',
-        pregunta: '',
-        orden: 1,
-        obligatoria: 1,
-        fechaCreacion: dayjs().format('YYYY-MM-DD HH:mm:ss')
-      });
+      // Restablecer formularios usando las utilidades
+      setFormData(getInitialFormData());
+      setCurrentQuestion(getInitialQuestion());
       
       showModernAlert('¡Encuesta creada exitosamente!', 'success');
       
@@ -491,20 +404,13 @@ const CreateSurvey = () => {
 
             {encuestas && encuestas.length > 0 ? (
               <>
-                <div className="stats-row">
-                  <div className="stat">
-                    <div className="stat-value">{stats.total}</div>
-                    <div className="stat-label">Encuestas</div>
-                  </div>
-                  <div className="stat">
-                    <div className="stat-value">{stats.active}</div>
-                    <div className="stat-label">Activas</div>
-                  </div>
-                  <div className="stat">
-                    <div className="stat-value">{stats.responses}</div>
-                    <div className="stat-label">Respuestas</div>
-                  </div>
-                </div>
+                {/* Mostrar estadísticas solo en PC (desktop) */}
+                {isDesktop ? (
+                  <DesktopStats stats={stats} />
+                ) : (
+                  // Opcional: Mostrar versión móvil/tablet de las estadísticas
+                  <MobileStats stats={stats} />
+                )}
 
                 <div className="surveys-list">
                   {encuestas.map(encuesta => {
@@ -1042,77 +948,77 @@ const CreateSurvey = () => {
                                 <FiClock size={12} className="me-1" />
                                 ID: {pregunta.idPregunta}
                               </small>
-                            </div>
-                          </Card.Body>
-                        </Card>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="empty-questions text-center py-4">
-                      <FiFileText size={48} className="text-muted mb-3" />
-                      <p className="text-muted">No hay preguntas en esta encuesta</p>
-                    </div>
-                  )}
+                        </div>
+                      </Card.Body>
+                    </Card>
+                  ))}
                 </div>
-              </div>
-            </>
-          ) : (
-            <div className="text-center py-5">
-              <FiX size={48} className="text-danger mb-3" />
-              <p className="text-danger">No se pudieron cargar los detalles de la encuesta</p>
-              <Button 
-                variant="outline-secondary" 
-                size="sm"
-                onClick={() => setShowDetailsModal(false)}
-              >
-                Cerrar
-              </Button>
+              ) : (
+                <div className="empty-questions text-center py-4">
+                  <FiFileText size={48} className="text-muted mb-3" />
+                  <p className="text-muted">No hay preguntas en esta encuesta</p>
+                </div>
+              )}
             </div>
-          )}
-        </Modal.Body>
-        <Modal.Footer className="modal-footer-custom">
-          <div className="footer-time-info small text-muted">
-            <FiClock size={12} className="me-1" />
-            Consultado: {dayjs().format('HH:mm:ss')}
           </div>
+        </>
+      ) : (
+        <div className="text-center py-5">
+          <FiX size={48} className="text-danger mb-3" />
+          <p className="text-danger">No se pudieron cargar los detalles de la encuesta</p>
           <Button 
-            variant="secondary" 
-            onClick={() => {
-              setShowDetailsModal(false);
-              setSurveyDetails(null);
-              setSelectedSurveyId(null);
-            }}
+            variant="outline-secondary" 
+            size="sm"
+            onClick={() => setShowDetailsModal(false)}
           >
-            <FiX size={16} className="me-1" />
             Cerrar
           </Button>
-        </Modal.Footer>
-      </Modal>
-
-      {/* Popup confirmación de eliminación */}
-      <ConfirmPopUp
-        isOpen={isConfirmPopupOpen}
-        onClose={() => setIsConfirmPopupOpen(false)}
-        title="Confirmar Eliminación"
-        message="¿Está seguro de eliminar esta encuesta? Esta acción no se puede deshacer."
-        isLoading={isDeleting}
-        onConfirm={() => {
-          if (deleteId) {
-            executeDeleteSurvey(deleteId);
-          }
+        </div>
+      )}
+    </Modal.Body>
+    <Modal.Footer className="modal-footer-custom">
+      <div className="footer-time-info small text-muted">
+        <FiClock size={12} className="me-1" />
+        Consultado: {dayjs().format('HH:mm:ss')}
+      </div>
+      <Button 
+        variant="secondary" 
+        onClick={() => {
+          setShowDetailsModal(false);
+          setSurveyDetails(null);
+          setSelectedSurveyId(null);
         }}
-        onCancel={() => setIsConfirmPopupOpen(false)}
-      />
+      >
+        <FiX size={16} className="me-1" />
+        Cerrar
+      </Button>
+    </Modal.Footer>
+  </Modal>
 
-      {/* Error popup */}
-      <ErrorPopup
-        isOpen={isErrorPopupOpen}
-        onClose={() => setIsErrorPopupOpen(false)}
-        title="¡Error!"
-        message={errorPopupMessage}
-      />
-    </>
-  );
+  {/* Popup confirmación de eliminación */}
+  <ConfirmPopUp
+    isOpen={isConfirmPopupOpen}
+    onClose={() => setIsConfirmPopupOpen(false)}
+    title="Confirmar Eliminación"
+    message="¿Está seguro de eliminar esta encuesta? Esta acción no se puede deshacer."
+    isLoading={isDeleting}
+    onConfirm={() => {
+      if (deleteId) {
+        executeDeleteSurvey(deleteId);
+      }
+    }}
+    onCancel={() => setIsConfirmPopupOpen(false)}
+  />
+
+  {/* Error popup */}
+  <ErrorPopup
+    isOpen={isErrorPopupOpen}
+    onClose={() => setIsErrorPopupOpen(false)}
+    title="¡Error!"
+    message={errorPopupMessage}
+  />
+</>
+);
 };
 
 export default CreateSurvey;
