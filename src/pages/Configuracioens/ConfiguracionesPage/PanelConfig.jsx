@@ -102,7 +102,7 @@ const PanelConfig = () => {
               Configurar Encuestas
             </h2>
             <p className="section-description">
-              Congifura encuestas de satisfaccion de servicios.
+              Configura encuestas de satisfaccion de servicios.
             </p>
           </div>
         </Col>
