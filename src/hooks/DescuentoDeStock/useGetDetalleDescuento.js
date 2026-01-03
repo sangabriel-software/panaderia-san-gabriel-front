@@ -10,13 +10,12 @@ const useGetDetalleDescuento = (idDescuento) => {
   const [showErrorDescuentoDetalle, setShowErrorDescuentoDetalle] = useState(false);
   const [showInfoDescuentoDetalle, setShowInfoDescuentoDetalle] = useState(false);
   const decryptedIdDescuento = decryptId(decodeURIComponent(idDescuento));
-  console.log(decryptedIdDescuento);
   useEffect(() => {
     const fetchDescuentoDetalle = async () => {
       try {
         const response = await consultarDetalleDescuentosService(decryptedIdDescuento);
         const data = response;
-        console.log(data);
+        
         if (data.status === 200) {
           setDescuentoDetalle(data.descuentoStock);
         } else {
