@@ -3,4 +3,5 @@
     gestionarMateriaPrima: "/config/gestionar-materia-prima",
     configuracionPerfil: "/config/configuracion-perfil",
     reportes: "/reportes",
+    encuestas: "/encuestas-config"
   };

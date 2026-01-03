@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { MdStorage, MdKitchen, MdSettings, MdOutlineSettings, } from "react-icons/md"; // Importar el ícono
+import { MdStorage, MdKitchen, MdSettings, MdOutlineSettings, MdPoll, } from "react-icons/md"; // Importar el ícono
 import { Container, Row, Col } from "react-bootstrap";
 import Title from "../../../components/Title/Title";
 import useValidarPermisos from "../../../hooks/configuraciones/useValidarPermisos";
@@ -65,7 +65,7 @@ const PanelConfig = () => {
           </div>
         </Col>
 
-        {/* Sección: Otras Configuraciones */}
+        {/* Sección: reportes */}
         <Col xs={12} md={6} className="config-col">
           <div
             className={`config-section ${
@@ -82,6 +82,27 @@ const PanelConfig = () => {
             </h2>
             <p className="section-description">
               Genera reportes de stock, ventas, etc.
+            </p>
+          </div>
+        </Col>
+
+        {/* Sección: configuracion de encuestas */}
+        <Col xs={12} md={6} className="config-col">
+          <div
+            className={`config-section ${
+              permisos.encuestas ? "clickable" : "disabled"
+            }`}
+            onClick={() =>
+              permisos.encuestas &&
+              handleNavigate("/encuestas-config", navigate)
+            }
+          >
+            <h2 className="section-title">
+             <MdPoll className="section-icon icon-encuestas" />
+              Configurar Encuestas
+            </h2>
+            <p className="section-description">
+              Congifura encuestas de satisfaccion de servicios.
             </p>
           </div>
         </Col>

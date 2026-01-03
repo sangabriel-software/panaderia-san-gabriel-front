@@ -31,6 +31,8 @@ const getEndpoints = {
     GET_REPORTE_SOBRANTE_STOCK: "generar-reporte-sobrantes",
     GET_CAMPANIA_ENCUESTA: "consultar-campania",
     GET_PREGUNTAS_CAMPANIA: "consultar-preguntas-por-campania",
+    GET_ENCUESTAS: "consultar-encuestas",
+    GET_CAMPANIA_DETALLE: "consultar-encuesta-detalle",
 };
 
 const postEndpoints = {
@@ -51,6 +53,7 @@ const postEndpoints = {
     DESCONTAR_STOCK: "descontar-stock",
     INGRESAR_TRASLADO: "registrar-traslado",
     REGISTRAR_PREGUNTAS: "registrar-respuestas",
+    CREAR_CAMPANIA: "crear-campania",
 };
 
 const putEndpoints = {
@@ -79,7 +82,8 @@ const deleteEndpoints = {
     ELIMINAR_RECETA: "elminar-receta",
     ELIMINAR_ORDEN_ESPECIAL: "eliminar-orden-especial",
     CANCELAR_DESCUENTO_STOCK: "cancelar-descuento-stock",
-    ELIMINAR_TRASLADO: "eliminar-traslado"
+    ELIMINAR_TRASLADO: "eliminar-traslado",
+    ELIMINAR_ENCUESTA: "eliminar-encuesta"
 };
 
 export { getEndpoints, postEndpoints, putEndpoints, deleteEndpoints};

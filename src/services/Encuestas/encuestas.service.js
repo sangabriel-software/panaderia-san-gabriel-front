@@ -25,7 +25,42 @@ export const registrarRespuestaService = async (data) => {
         const response = await api.post(`${postEndpoints.REGISTRAR_PREGUNTAS}`, data);
         return response.data;
     }catch(error){
-        console.log(error)
         throw error;
+    }
+}
+
+export const crearCampaniaServices = async (data) => {
+  try{
+      const response = await api.post(`${postEndpoints.CREAR_CAMPANIA}`, data);
+      return response.data;
+  }catch(error){
+      throw error;
+  }
+}
+
+export const consultarEcuestasServices = async () => {
+  try{
+    const response = await api.get(`${getEndpoints.GET_ENCUESTAS}`);
+    return response.data;
+  }catch(error){
+    throw error;
+  }
+}
+
+export const eliminarCampaniaServices = async (idCampania) => {
+  try{
+    const response = await api.delete(`${deleteEndpoints.ELIMINAR_ENCUESTA}?idCampania=${idCampania}`);
+    return response.data;
+  }catch(error){
+    throw error;
+  }
+}
+
+export const consultarCampaniaDetalleServices = async (idCampania) => {
+      try {
+        const response = await api.get(`${getEndpoints.GET_CAMPANIA_DETALLE}?idCampania=${idCampania}`); 
+        return response.data;
+    } catch (error) {
+      throw error;
     }
 }
