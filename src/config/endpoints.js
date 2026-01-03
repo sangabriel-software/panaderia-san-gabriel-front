@@ -32,6 +32,7 @@ const getEndpoints = {
     GET_CAMPANIA_ENCUESTA: "consultar-campania",
     GET_PREGUNTAS_CAMPANIA: "consultar-preguntas-por-campania",
     GET_ENCUESTAS: "consultar-encuestas",
+    GET_CAMPANIA_DETALLE: "consultar-encuesta-detalle",
 };
 
 const postEndpoints = {
@@ -81,7 +82,8 @@ const deleteEndpoints = {
     ELIMINAR_RECETA: "elminar-receta",
     ELIMINAR_ORDEN_ESPECIAL: "eliminar-orden-especial",
     CANCELAR_DESCUENTO_STOCK: "cancelar-descuento-stock",
-    ELIMINAR_TRASLADO: "eliminar-traslado"
+    ELIMINAR_TRASLADO: "eliminar-traslado",
+    ELIMINAR_ENCUESTA: "eliminar-encuesta"
 };
 
 export { getEndpoints, postEndpoints, putEndpoints, deleteEndpoints};
