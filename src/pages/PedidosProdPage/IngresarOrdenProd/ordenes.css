@@ -472,3 +472,133 @@
     font-size: 0.85rem;
   }
 }
+
+/*Countdown*/
+/* ─── VentanaActivaBanner ──────────────────────────────────────────────────── */
+
+.vab-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  background: #e8f5ee;
+  border: 1px solid #b7dfc8;
+  border-radius: 12px;
+  padding: 0.75rem 1.1rem;
+  margin-bottom: 1.25rem;
+  animation: vab-slide-in 0.35s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+@keyframes vab-slide-in {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.vab-left {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.vab-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #2d6a4f;
+  flex-shrink: 0;
+  animation: vab-blink 1.4s infinite;
+}
+
+@keyframes vab-blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.25; }
+}
+
+.vab-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.vab-title {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #1b4332;
+  line-height: 1.2;
+}
+
+.vab-subtitle {
+  font-size: 0.73rem;
+  color: #2d6a4f;
+  font-weight: 400;
+}
+
+.vab-right {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-shrink: 0;
+}
+
+.vab-timer {
+  font-family: 'DM Mono', 'Courier New', monospace;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #2d6a4f;
+  letter-spacing: 0.04em;
+  background: #ffffff;
+  border: 1px solid #b7dfc8;
+  border-radius: 6px;
+  padding: 0.2rem 0.55rem;
+}
+
+.vab-close {
+  background: transparent;
+  border: none;
+  color: #2d6a4f;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.2rem;
+  border-radius: 6px;
+  opacity: 0.6;
+  transition: opacity 0.2s ease, background 0.2s ease;
+}
+
+.vab-close:hover {
+  opacity: 1;
+  background: #b7dfc8;
+}
+
+/* Badge junto al label de fecha */
+.vab-fecha-badge {
+  display: inline-block;
+  margin-left: 0.5rem;
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: #2d6a4f;
+  background: #e8f5ee;
+  border: 1px solid #b7dfc8;
+  border-radius: 999px;
+  padding: 0.1rem 0.5rem;
+  vertical-align: middle;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .vab-banner {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .vab-timer {
+    font-size: 0.88rem;
+  }
+
+  .vab-title {
+    font-size: 0.78rem;
+  }
+}

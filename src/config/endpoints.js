@@ -33,6 +33,7 @@ const getEndpoints = {
     GET_PREGUNTAS_CAMPANIA: "consultar-preguntas-por-campania",
     GET_ENCUESTAS: "consultar-encuestas",
     GET_CAMPANIA_DETALLE: "consultar-encuesta-detalle",
+    CONSULTAR_FECHA_PRODUCCION: "fecha-produccion",
 };
 
 const postEndpoints = {
@@ -54,6 +55,7 @@ const postEndpoints = {
     INGRESAR_TRASLADO: "registrar-traslado",
     REGISTRAR_PREGUNTAS: "registrar-respuestas",
     CREAR_CAMPANIA: "crear-campania",
+    ACTIVAR_FECHA_PRODUCCION: "activar-fecha-produccion",
 };
 
 const putEndpoints = {

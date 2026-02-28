@@ -57,6 +57,7 @@ const GestionarTraslados = lazy(() => import("./pages/Traslados/GestionarTraslad
 const DetalleTraslados = lazy(() => import("./pages/Traslados/DetalleTraslado/DetalleTraslados"));
 const IngresarTraslado = lazy(() => import("./pages/Traslados/IngresarTraslado/IngresarTraslado"));
 const CustomerResponses = lazy(() => import("./pages/Encuestas/CustomerResponses/CustomerResponses"));
+const ActivarFechaProduccion = lazy(() => import("./pages/Activar-Fecha-Produccion/ActivarFechaProduccion"));
 
 const CreateSurvey = lazy(() => import("./pages/Encuestas/CreateSurvey/CreateSurvey"));
 
@@ -168,6 +169,10 @@ function App() {
 
             <Route path="/encuestas-config">
               <Route index element={<CreateSurvey/>} />
+            </Route>
+
+            <Route path="/activar-fecha-produccion">
+              <Route index element={<ActivarFechaProduccion/>} />
             </Route>
 
           </Route>
