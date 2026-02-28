@@ -7,11 +7,13 @@ import useValidarPermisos from "../../../hooks/configuraciones/useValidarPermiso
 import { rutas } from "./config.routes";
 import { handleNavigate } from "./PanelConfig.utils";
 import "./PanelConfig.css";
+import { getUserData } from "../../../utils/Auth/decodedata";
 
 const PanelConfig = () => {
   const navigate = useNavigate();
   const permisos = useValidarPermisos(rutas); // Usar el custom hook para obtener los permisos
-
+  const usuario = getUserData();
+console.log(usuario);
   return (
     <Container className="panel-config-container">
       {/* Contenedor centrado para el ícono y el título */}
@@ -108,25 +110,27 @@ const PanelConfig = () => {
         </Col>
 
                 {/* Sección: configuracion de encuestas */}
-        <Col xs={12} md={6} className="config-col">
-          <div
-            className={`config-section ${
-              permisos.encuestas ? "clickable" : "disabled"
-            }`}
-            onClick={() =>
-              permisos.encuestas &&
-              handleNavigate("/activar-fecha-produccion", navigate)
-            }
-          >
-            <h2 className="section-title">
-             <MdOutlineCalendarToday className="section-icon icon-fecha-produc" />
-              Activar Fecha en curso
-            </h2>
-            <p className="section-description">
-              Activa dia en curso para ingreso de orden de Produccion.
-            </p>
-          </div>
-        </Col>
+        {(usuario?.nombreUsuario === "admin" || usuario?.usuario === "aagarcia") && (
+          <Col xs={12} md={6} className="config-col">
+            <div
+              className={`config-section ${
+                permisos.activarFechaProduccion ? "clickable" : "disabled"
+              }`}
+              onClick={() =>
+                permisos.activarFechaProduccion &&
+                handleNavigate("/activar-fecha-produccion", navigate)
+              }
+            >
+              <h2 className="section-title">
+                <MdOutlineCalendarToday className="section-icon icon-fecha-produc" />
+                Activar Fecha en curso
+              </h2>
+              <p className="section-description">
+                Activa dia en curso para ingreso de orden de Produccion.
+              </p>
+            </div>
+          </Col>
+        )}
 
       </Row>
     </Container>

@@ -3,5 +3,6 @@
     gestionarMateriaPrima: "/config/gestionar-materia-prima",
     configuracionPerfil: "/config/configuracion-perfil",
     reportes: "/reportes",
-    encuestas: "/encuestas-config"
+    encuestas: "/encuestas-config",
+    activarFechaProduccion: "/activar-fecha-produccion"
   };
