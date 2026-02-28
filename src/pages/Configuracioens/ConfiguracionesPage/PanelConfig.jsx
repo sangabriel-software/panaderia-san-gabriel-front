@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { MdStorage, MdKitchen, MdSettings, MdOutlineSettings, MdPoll, } from "react-icons/md"; // Importar el ícono
+import { MdStorage, MdKitchen, MdSettings, MdOutlineSettings, MdPoll, MdOutlineCalendarToday, } from "react-icons/md"; // Importar el ícono
 import { Container, Row, Col } from "react-bootstrap";
 import Title from "../../../components/Title/Title";
 import useValidarPermisos from "../../../hooks/configuraciones/useValidarPermisos";
@@ -106,6 +106,28 @@ const PanelConfig = () => {
             </p>
           </div>
         </Col>
+
+                {/* Sección: configuracion de encuestas */}
+        <Col xs={12} md={6} className="config-col">
+          <div
+            className={`config-section ${
+              permisos.encuestas ? "clickable" : "disabled"
+            }`}
+            onClick={() =>
+              permisos.encuestas &&
+              handleNavigate("/activar-fecha-produccion", navigate)
+            }
+          >
+            <h2 className="section-title">
+             <MdOutlineCalendarToday className="section-icon icon-fecha-produc" />
+              Activar Fecha en curso
+            </h2>
+            <p className="section-description">
+              Activa dia en curso para ingreso de orden de Produccion.
+            </p>
+          </div>
+        </Col>
+
       </Row>
     </Container>
   );
