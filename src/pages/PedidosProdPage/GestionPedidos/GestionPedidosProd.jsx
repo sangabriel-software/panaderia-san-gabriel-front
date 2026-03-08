@@ -2,58 +2,56 @@ import React, { useState } from "react";
 import Title from "../../../components/Title/Title";
 import { Container } from "react-bootstrap";
 import { useMediaQuery } from "react-responsive";
+import { useNavigate } from "react-router-dom"; // ✅ react-router-dom
+import { BsExclamationTriangleFill, BsFillInfoCircleFill } from "react-icons/bs";
 import FilterBar from "../../../components/FilterBar/FilterBar";
 import OrderTable from "../../../components/OrdersComponents/OrderTable";
 import OrderCard from "../../../components/OrdersComponents/OrderCard";
-import useGetOrdenesProduccion from "../../../hooks/ordenesproduccion/useGetOrdenesProduccion";
 import AddButton from "../../../components/AddButton/AddButton";
-import useFilterOrders from "../../../hooks/ordenesproduccion/useFilterOrders";
 import PaginationComponent from "../../../components/PaginationComponent/PaginationComponent";
 import OrderCardSkeleton from "../../../components/OrderCardSkeleton/OrderCardSkeleton";
 import ConfirmPopUp from "../../../components/Popup/ConfirmPopup";
-import Alert from "../../../components/Alerts/Alert";
-import { BsExclamationTriangleFill, BsFillInfoCircleFill } from "react-icons/bs";
-import { useNavigate } from "react-router";
-import { handleViewDetalle } from "../DetallesOrdenesProd/DetallesOrdenesProdUtils";
-import { getCurrentItems, handleConfirmDeleteOrdenProduccion, handleDeleteOrder, handleViewPdf } from "./GestionPedidosProdUtils";
 import ErrorPopup from "../../../components/Popup/ErrorPopUp";
+import Alert from "../../../components/Alerts/Alert";
 import PDFViewerModal from "../../../PDFViewerModal/PDFViewerModal";
+import useGetOrdenesProduccion from "../../../hooks/ordenesproduccion/useGetOrdenesProduccion";
+import useFilterOrders from "../../../hooks/ordenesproduccion/useFilterOrders";
+import { handleViewDetalle } from "../DetallesOrdenesProd/DetallesOrdenesProdUtils";
+import { getInitialFilters, handleFilterChange, handleClearAllFilters, hasActiveFilters, getCurrentItems, handleConfirmDeleteOrdenProduccion, handleDeleteOrder, handleViewPdf } from "./GestionPedidosProdUtils";
 
 const GestionPedidosProd = () => {
   const isMobile = useMediaQuery({ maxWidth: 767 });
-  const { ordenesProduccion, loadingOrdenes, showErrorOrdenes, showInfoOrdenes, setOrdenesProduccion } = useGetOrdenesProduccion();
-  const [filters, setFilters] = useState({ search: "", date: "", sucursal: "" });
-  const filteredOrders = useFilterOrders(ordenesProduccion, filters);
   const navigate = useNavigate();
 
-  // Variables de estado para mostrar popup y almacenar la orden a eliminar
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const [errorPopupMessage, setErrorPopupMessage] = useState(false);
-  const [isPopupErrorOpen, setIsPopupErrorOpen] = useState(false);
-  const [ordenToDelete, setOrdenToDelete] = useState(null);
+  // ── Filtros ────────────────────────────────
+  const [filters, setFilters] = useState(getInitialFilters);
 
-  const [loadingViewPdf, setLoadingViewPdf] = useState(null);
+  // ── Datos ──────────────────────────────────
+  const { ordenesProduccion, loadingOrdenes, showErrorOrdenes, showInfoOrdenes, setOrdenesProduccion } = useGetOrdenesProduccion();
+  const filteredOrders = useFilterOrders(ordenesProduccion, filters);
+  const activeFilters = hasActiveFilters(filters);
 
-  // ⭐ NUEVO ESTADO PARA EL VISOR PDF
-  const [pdfData, setPdfData] = useState(null);
-
-  /* Variables para la paginacion */
+  // ── Paginación ─────────────────────────────
   const [currentPage, setCurrentPage] = useState(1);
   const ordersPerPage = 5;
   const currentOrders = getCurrentItems(filteredOrders, currentPage, ordersPerPage);
-  
   const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
 
-  // ⭐ NUEVA FUNCIÓN PARA ABRIR EL VISOR PDF
+  // ── Popups ─────────────────────────────────
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [errorPopupMessage, setErrorPopupMessage] = useState("");
+  const [isPopupErrorOpen, setIsPopupErrorOpen] = useState(false);
+  const [ordenToDelete, setOrdenToDelete] = useState(null);
+
+  // ── PDF ────────────────────────────────────
+  const [loadingViewPdf, setLoadingViewPdf] = useState(null);
+  const [pdfData, setPdfData] = useState(null);
+
   const handleOpenPdfViewer = async (idOrder) => {
     setLoadingViewPdf(idOrder);
     try {
       const pdfUrl = await handleViewPdf(idOrder);
-      
-      setPdfData({
-        url: pdfUrl,
-        filename: `orden-produccion-${idOrder}.pdf`
-      });
+      setPdfData({ url: pdfUrl, filename: `orden-produccion-${idOrder}.pdf` });
     } catch (error) {
       console.error("Error al cargar PDF:", error);
       setErrorPopupMessage("No se pudo cargar el PDF. Intenta nuevamente.");
@@ -69,16 +67,21 @@ const GestionPedidosProd = () => {
         title="Órdenes de Producción"
         description="Gestiona los pedidos de la producción a realizar"
       />
+
       <AddButton
         buttonText="Ingresar Orden"
         onRedirect={() => navigate("ingresar-orden")}
       />
+
       <FilterBar
         filters={filters}
-        onFilterChange={setFilters}
+        onFilterChange={(newFilters) => handleFilterChange(newFilters, setFilters)}
+        onClearAll={() => handleClearAllFilters(setFilters)}
+        hasActiveFilters={activeFilters}
         ordenesProduccion={ordenesProduccion}
       />
 
+      {/* ── Lista móvil ── */}
       {isMobile ? (
         loadingOrdenes ? (
           [...Array(5)].map((_, index) => <OrderCardSkeleton key={index} />)
@@ -88,15 +91,9 @@ const GestionPedidosProd = () => {
               <OrderCard
                 key={order.idOrdenProduccion}
                 order={order}
-                onViewDetails={() => {
-                  handleViewDetalle(order.idOrdenProduccion, navigate);
-                }}
+                onViewDetails={() => handleViewDetalle(order.idOrdenProduccion, navigate)}
                 onDeleteOrder={() =>
-                  handleConfirmDeleteOrdenProduccion(
-                    order.idOrdenProduccion,
-                    setOrdenToDelete,
-                    setIsPopupOpen
-                  )
+                  handleConfirmDeleteOrdenProduccion(order.idOrdenProduccion, setOrdenToDelete, setIsPopupOpen)
                 }
               />
             ))}
@@ -108,55 +105,50 @@ const GestionPedidosProd = () => {
             />
           </>
         )
-      ) : loadingOrdenes ? (
-        <div className="d-flex justify-content-center my-5">
-          <div className="spinner-border text-primary my-5" role="status">
-            <span className="visually-hidden">Cargando...</span>
-          </div>
-        </div>
       ) : (
-        <OrderTable
-          orders={filteredOrders}
-          onDelete={(idOrder) =>
-            handleConfirmDeleteOrdenProduccion(
-              idOrder,
-              setOrdenToDelete,
-              setIsPopupOpen
-            )
-          }
-          onViewPdf={handleOpenPdfViewer} // ⭐ CAMBIO AQUÍ
-          loadingViewPdf={loadingViewPdf}
-        />
+        /* ── Tabla desktop ── */
+        loadingOrdenes ? (
+          <div className="d-flex justify-content-center my-5">
+            <div className="spinner-border text-primary my-5" role="status">
+              <span className="visually-hidden">Cargando...</span>
+            </div>
+          </div>
+        ) : (
+          <OrderTable
+            orders={filteredOrders}
+            onDelete={(idOrder) =>
+              handleConfirmDeleteOrdenProduccion(idOrder, setOrdenToDelete, setIsPopupOpen)
+            }
+            onViewPdf={handleOpenPdfViewer}
+            loadingViewPdf={loadingViewPdf}
+          />
+        )
       )}
 
-      {/* Alertas mostrar error y notificacion de informacion */}
-      {filteredOrders.length === 0 &&
-        (filters.search || filters.date || filters.sucursal) && (
-          <div className="row justify-content-center my-3">
-            <div className="col-md-6 text-center">
-              <Alert
-                type="primary"
-                message="No se encontraron ordenes que coincidan con la búsqueda."
-                icon={<BsFillInfoCircleFill />}
-              />
-            </div>
+      {/* ── Alertas ── */}
+      {filteredOrders.length === 0 && activeFilters && (
+        <div className="row justify-content-center my-3">
+          <div className="col-md-6 text-center">
+            <Alert
+              type="primary"
+              message="No se encontraron ordenes que coincidan con la búsqueda."
+              icon={<BsFillInfoCircleFill />}
+            />
           </div>
-        )}
+        </div>
+      )}
 
-      {filteredOrders.length === 0 &&
-        !loadingOrdenes &&
-        !showErrorOrdenes &&
-        showInfoOrdenes && (
-          <div className="row justify-content-center my-3">
-            <div className="col-md-6 text-center">
-              <Alert
-                type="primary"
-                message="No se han ingresado órdenes de producción."
-                icon={<BsFillInfoCircleFill />}
-              />
-            </div>
+      {filteredOrders.length === 0 && !loadingOrdenes && !showErrorOrdenes && showInfoOrdenes && (
+        <div className="row justify-content-center my-3">
+          <div className="col-md-6 text-center">
+            <Alert
+              type="primary"
+              message="No se han ingresado órdenes de producción."
+              icon={<BsFillInfoCircleFill />}
+            />
           </div>
-        )}
+        </div>
+      )}
 
       {showErrorOrdenes && (
         <div className="row justify-content-center">
@@ -170,25 +162,18 @@ const GestionPedidosProd = () => {
         </div>
       )}
 
-      {/* Popup confirmacion de eliminación */}
+      {/* ── Popups ── */}
       <ConfirmPopUp
         isOpen={isPopupOpen}
         onClose={() => setIsPopupOpen(false)}
         title="Confirmar Eliminación"
         message="¿Está seguro de eliminar la orden?"
-        onConfirm={() => {
-          handleDeleteOrder(
-            ordenToDelete,
-            setOrdenesProduccion,
-            setIsPopupOpen,
-            setErrorPopupMessage,
-            setIsPopupErrorOpen
-          );
-        }}
+        onConfirm={() =>
+          handleDeleteOrder(ordenToDelete, setOrdenesProduccion, setIsPopupOpen, setErrorPopupMessage, setIsPopupErrorOpen)
+        }
         onCancel={() => setIsPopupOpen(false)}
       />
-      
-      {/* Error popup */}
+
       <ErrorPopup
         isOpen={isPopupErrorOpen}
         onClose={() => setIsPopupErrorOpen(false)}
@@ -196,7 +181,7 @@ const GestionPedidosProd = () => {
         message={errorPopupMessage}
       />
 
-      {/* ⭐ VISOR PDF MODAL */}
+      {/* ── Visor PDF ── */}
       {pdfData && (
         <PDFViewerModal
           pdfUrl={pdfData.url}

@@ -1,22 +1,18 @@
 import React from "react";
 import { Form, Row, Col, Button, InputGroup } from "react-bootstrap";
 import { FaTimes, FaSearch, FaCalendarAlt, FaFilter } from "react-icons/fa";
+import { MdFilterAltOff } from "react-icons/md"; // ✅ ícono limpiar todo
 import "./FilterBar.css";
 
-const FilterBar = ({ filters, onFilterChange, ordenesProduccion }) => {
+const FilterBar = ({ filters, onFilterChange, onClearAll, hasActiveFilters, ordenesProduccion }) => {
   const handleSearchChange = (e) => {
     let inputValue = e.target.value.replace(/^ORD-/, "");
     if (inputValue.trim() === "") inputValue = "";
     onFilterChange({ ...filters, search: inputValue });
   };
 
-  const handleClearSearch = () => {
-    onFilterChange({ ...filters, search: "" });
-  };
-
-  const handleClearDate = () => {
-    onFilterChange({ ...filters, date: "" });
-  };
+  const handleClearSearch = () => onFilterChange({ ...filters, search: "" });
+  const handleClearDate = () => onFilterChange({ ...filters, date: "" });
 
   const uniqueSucursales = Array.from(
     new Set(ordenesProduccion?.map((order) => order.nombreSucursal))
@@ -24,7 +20,8 @@ const FilterBar = ({ filters, onFilterChange, ordenesProduccion }) => {
 
   return (
     <Form className="modern-filter" onSubmit={(e) => e.preventDefault()}>
-      <Row className="g-3">
+      <Row className="g-3 align-items-center">
+
         {/* Campo de búsqueda */}
         <Col xs={12} md={4} lg={3}>
           <InputGroup className="filter-input-group">
@@ -40,11 +37,7 @@ const FilterBar = ({ filters, onFilterChange, ordenesProduccion }) => {
               className="filter-input"
             />
             {filters.search && (
-              <Button
-                variant="link"
-                className="clear-btn"
-                onClick={handleClearSearch}
-              >
+              <Button variant="link" className="clear-btn" onClick={handleClearSearch}>
                 <FaTimes />
               </Button>
             )}
@@ -64,11 +57,7 @@ const FilterBar = ({ filters, onFilterChange, ordenesProduccion }) => {
               className="filter-input"
             />
             {filters.date && (
-              <Button
-                variant="link"
-                className="clear-btn"
-                onClick={handleClearDate}
-              >
+              <Button variant="link" className="clear-btn" onClick={handleClearDate}>
                 <FaTimes />
               </Button>
             )}
@@ -88,13 +77,26 @@ const FilterBar = ({ filters, onFilterChange, ordenesProduccion }) => {
             >
               <option value="">Todas las sucursales</option>
               {uniqueSucursales.map((sucursal, index) => (
-                <option key={index} value={sucursal}>
-                  {sucursal}
-                </option>
+                <option key={index} value={sucursal}>{sucursal}</option>
               ))}
             </Form.Select>
           </InputGroup>
         </Col>
+
+        {/* ✅ Botón limpiar todos los filtros — solo visible si hay filtro activo */}
+        {hasActiveFilters && (
+          <Col xs={12} md="auto">
+            <Button
+              variant="outline-danger"
+              className="clear-all-btn"
+              onClick={onClearAll}
+            >
+              <MdFilterAltOff size={18} className="me-2" />
+              Limpiar filtros
+            </Button>
+          </Col>
+        )}
+
       </Row>
     </Form>
   );
