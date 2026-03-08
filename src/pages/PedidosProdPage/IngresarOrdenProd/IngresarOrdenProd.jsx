@@ -91,8 +91,6 @@ const IngresarOrdenProd = () => {
   const { productos, loadigProducts, showErrorProductos } = useGetProductosYPrecios();
   const { diaProduccion, loadingFechaProduccion } = useGetFechaProduccion();
 
-
-  console.log("diaProduccion", diaProduccion);
   const tomorrow = dayjs().add(1, "day").format("YYYY-MM-DD");
   const today    = dayjs().format("YYYY-MM-DD");
   const userData = getUserData();
