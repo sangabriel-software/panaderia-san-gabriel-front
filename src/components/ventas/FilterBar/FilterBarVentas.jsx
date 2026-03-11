@@ -87,14 +87,16 @@ const FilterBarVentas = ({ filters, onFilterChange, onClearAll, hasActiveFilters
         {/* Botón limpiar — lg={3} para ocupar el espacio restante */}
         <Col xs={12} md={12} lg={3}> {/* ← md="auto" a md={12} lg={3} */}
           {hasActiveFilters && (
-            <Button
-              variant="outline-danger"
-              className="clear-all-btn w-100"
-              onClick={onClearAll}
-            >
-              <MdFilterAltOff size={18} className="me-2" />
-              Limpiar filtros
-            </Button>
+           <Col xs={12} md="auto">
+             <Button
+               variant="outline-danger"
+               className="clear-all-btn"
+               onClick={onClearAll}
+             >
+               <MdFilterAltOff size={18} className="me-2" />
+               Limpiar filtros
+             </Button>
+           </Col>
           )}
         </Col>
 
