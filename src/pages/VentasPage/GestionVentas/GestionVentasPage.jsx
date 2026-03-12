@@ -3,7 +3,6 @@ import { Container } from "react-bootstrap";
 import { useNavigate } from "react-router-dom"; // ✅ react-router-dom
 import { useMediaQuery } from "react-responsive";
 import { BsFillInfoCircleFill, BsExclamationTriangleFill } from "react-icons/bs";
-
 import Title from "../../../components/Title/Title";
 import AddButton from "../../../components/AddButton/AddButton";
 import VentasTable from "../../../components/ventas/VentasTable/VentasTable";
@@ -14,26 +13,12 @@ import FilterBarVentas from "../../../components/ventas/FilterBar/FilterBarVenta
 import Alert from "../../../components/Alerts/Alert";
 import ConfirmPopUp from "../../../components/Popup/ConfirmPopup";
 import ErrorPopup from "../../../components/Popup/ErrorPopUp";
-
 import useGetVentas from "../../../hooks/ventas/useGetVentas";
 import useFilterVentas from "../../../hooks/ventas/useFilterVentas";
 import useGetEliminacionesTracking from "../../../hooks/EliminacionesTracking/useGetEliminacionesTracking";
 import { getUserData } from "../../../utils/Auth/decodedata";
-
 import { handleViewDetalleVenta } from "../DetalleVenta/DetalleVenta.utils";
-import {
-  // filtros
-  getInitialFilters,
-  handleFilterChange,
-  handleClearAllFilters,
-  hasActiveFilters,
-  // paginación
-  getCurrentItems,
-  // ventas
-  handleConfirmDeleteVenta,
-  handleDeleteVenta,
-} from "./GestionVentas.utils";
-
+import { getInitialFilters, handleFilterChange, handleClearAllFilters, hasActiveFilters, getCurrentItems, handleConfirmDeleteVenta, handleDeleteVenta } from "./GestionVentas.utils";
 import "./GestionarVentasPage.css";
 
 const GestionVentasPage = () => {

@@ -55,3 +55,12 @@ export const generarReporteSobranteStockService = async (fecha, idSucursal) => {
     throw error;
   }
 }
+
+export const consultarGastosService = async (fechaInicio, fechaFin, idSucursal) => {
+  try {
+      const response = await api.get(`${getEndpoints.GET_GASTOS}?fechaInicio=${fechaInicio}&fechaFin=${fechaFin}&idSucursal=${idSucursal}`); 
+      return response.data;
+  } catch (error) {
+    throw error;
+  }
+}

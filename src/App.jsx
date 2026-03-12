@@ -15,6 +15,7 @@ const ReportePerdidasPage = lazy(() => import("./pages/reportes/ReportePerdidas/
 const VentasEliminadasPage = lazy(() => import("./pages/reportes/VentasEliminadas/VentasEliminadas"));
 const BalanceStockPage = lazy(() => import("./pages/reportes/BalanceStock/BalanceStock"));
 const SobrantesReport = lazy(() => import("./pages/reportes/reporteSobrantes/SobrantesReport"));
+const Gastos = lazy(() => import("./pages/reportes/Gastos/Gastos"));
   
 const LoadingSpinner = lazy(() => import("./components/LoadingSpinner/LoadingSpinner"));
 const AccessDeniedPage = lazy(() => import("./components/AccesoDenegado/AccessDeniedPage"));
@@ -144,7 +145,7 @@ function App() {
               <Route path="detalle-orden-especial/:idOrdenEspecial" element={<OrdenEspecialDetail/>} />
             </Route>
 
-            <Route path="/descuento-stock">
+            <Route path="/descuento-stock">ñ
               <Route index element={<GestionarDecuentos/>} />
               <Route path="stock-descuentos-lista/:idSucursal" element={<StockDescuentosList/>} />
               <Route path="descontar-stock/:idSucursal" element={<DescontarStock/>} />
@@ -159,6 +160,7 @@ function App() {
               <Route path="ventas-eliminadas" element={<VentasEliminadasPage/>} />
               <Route path="balance-stock" element={<BalanceStockPage/>} />
               <Route path="sobrantes-stock" element={<SobrantesReport/>} />
+              <Route path="gastos" element={<Gastos/>} />
             </Route>
 
             <Route path="/traslados-productos">
