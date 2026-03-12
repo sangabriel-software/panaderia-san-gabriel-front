@@ -1,5 +1,5 @@
 import React from 'react';
-import { FiBox, FiShoppingCart, FiUsers, FiTrendingUp, FiCalendar, FiPieChart, FiRotateCw, FiPrinter, FiShieldOff } from 'react-icons/fi';
+import { FiBox, FiShoppingCart, FiUsers, FiTrendingUp, FiCalendar, FiPieChart, FiRotateCw, FiPrinter, FiShieldOff, FiDollarSign } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import "./ReportesPanel.styles.css";
 
@@ -56,13 +56,21 @@ const ModernReportPanel = () => {
       accentColor: "#8B5CF6",
       route: "/reportes/balance-stock"
     },
-        {
+    {
       id: 7,
       title: "Sobrante de productos",
       description: "Sobrante de productos por fecha",
       icon: <FiShieldOff className="mr-icon" />,
       accentColor: "#8B5CF6",
-      route: "/reportes/sobrantes-stock"
+      route: "sobrantes-stock"
+    },
+    {
+      id: 8,
+      title: "Gastos",
+      description: "Gastos realizados diariamente",
+      icon: <FiDollarSign className="mr-icon" />,
+      accentColor: "#EF4444",
+      route: "gastos"
     }
   ];
 
@@ -73,7 +81,7 @@ const ModernReportPanel = () => {
   return (
     <div className="mr-container">
       <header className="mr-header">
-        <h1 className="mr-title">Reportes Analíticos</h1>
+        <h1 className="mr-title" style={{ color: 'black' }}>Reportes</h1>
         <p className="mr-subtitle">Visualiza y genera informes de tus procesos</p>
       </header>
 
