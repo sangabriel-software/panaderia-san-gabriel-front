@@ -35,6 +35,7 @@ const getEndpoints = {
     GET_CAMPANIA_DETALLE: "consultar-encuesta-detalle",
     CONSULTAR_FECHA_PRODUCCION: "fecha-produccion",
     GET_GASTOS: "gastos-por-fecha-y-sucursal",
+    GET_PRODUCTOS_VENDIDOS: "venta-por-producto",
 };
 
 const postEndpoints = {

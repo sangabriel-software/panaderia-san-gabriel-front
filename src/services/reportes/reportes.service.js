@@ -64,3 +64,12 @@ export const consultarGastosService = async (fechaInicio, fechaFin, idSucursal) 
     throw error;
   }
 }
+
+export const consultarProductosVendidosService = async (idProducto, idSucursal, fechaInicio, fechaFin) => {
+  try {
+      const response = await api.get(`${getEndpoints.GET_PRODUCTOS_VENDIDOS}?idProducto=${idProducto}&idSucursal=${idSucursal}&fechaInicio=${fechaInicio}&fechaFin=${fechaFin}`); 
+      return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
