@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import useGetSucursales from "../../../hooks/sucursales/useGetSucursales";
 import { consultarProductosVendidosService } from "../../../services/reportes/reportes.service";
-import "./productosVendidos.styles.css"; 
+import "./ProductosVendidos.styles.css"; 
 import useGetProductosYPrecios from "../../../hooks/productosprecios/useGetProductosYprecios";
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
