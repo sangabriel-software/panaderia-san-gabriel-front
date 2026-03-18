@@ -1,5 +1,5 @@
 import React from 'react';
-import { FiBox, FiShoppingCart, FiUsers, FiTrendingUp, FiCalendar, FiPieChart, FiRotateCw, FiPrinter, FiShieldOff, FiDollarSign } from 'react-icons/fi';
+import { FiBox, FiShoppingCart, FiUsers, FiTrendingUp, FiCalendar, FiPieChart, FiRotateCw, FiPrinter, FiShieldOff, FiDollarSign, FiShoppingBag } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import "./ReportesPanel.styles.css";
 
@@ -61,7 +61,7 @@ const ModernReportPanel = () => {
       title: "Sobrante de productos",
       description: "Sobrante de productos por fecha",
       icon: <FiShieldOff className="mr-icon" />,
-      accentColor: "#8B5CF6",
+      accentColor: "#92bd44",
       route: "sobrantes-stock"
     },
     {
@@ -71,6 +71,14 @@ const ModernReportPanel = () => {
       icon: <FiDollarSign className="mr-icon" />,
       accentColor: "#EF4444",
       route: "gastos"
+    },
+    {
+      id: 9,
+      title: "Productos Vendidos",
+      description: "Productos vendidos por fecha",
+      icon: <FiShoppingBag className="mr-icon" />,
+      accentColor: "#1a81c5",
+      route: "productos-vendidos"
     }
   ];
 

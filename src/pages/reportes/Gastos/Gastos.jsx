@@ -305,6 +305,10 @@ const Gastos = () => {
   const navigate = useNavigate();
   const { sucursales, loadingSucursales } = useGetSucursales();
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }, []);
+
   const [fechaInicio,   setFechaInicio]   = useState("");
   const [fechaFin,      setFechaFin]      = useState("");
   const [idSucursal,    setIdSucursal]    = useState("");
