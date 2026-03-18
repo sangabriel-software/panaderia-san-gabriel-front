@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import useGetSucursales from "../../../hooks/sucursales/useGetSucursales";
 import { consultarProductosVendidosService } from "../../../services/reportes/reportes.service";
-import "./ProductosVendidos.styles.css";
+import "./productosVendidos.styles.css";
 import useGetProductosYPrecios from "../../../hooks/productosprecios/useGetProductosYprecios";
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
@@ -284,7 +284,7 @@ const generarPDF = async ({ reporte, totalUnidades, totalVentas, productoNombre,
     footStyles: { fillColor: BLUE_LIGHT, textColor: BLUE_DARK, fontStyle: "bold", fontSize: 9 },
     alternateRowStyles: { fillColor: [248, 250, 252] },
     columnStyles: {
-      0: { cellWidth: 8,  halign: "center", textColor: SLATE_500 },
+      0: { cellWidth: 20,  halign: "center", textColor: SLATE_500 },
       1: { cellWidth: "auto" },
       2: { cellWidth: 14, halign: "center" },
       3: { cellWidth: 24, halign: "center" },
