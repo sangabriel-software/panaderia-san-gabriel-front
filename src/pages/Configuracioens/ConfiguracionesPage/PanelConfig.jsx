@@ -13,7 +13,6 @@ const PanelConfig = () => {
   const navigate = useNavigate();
   const permisos = useValidarPermisos(rutas); // Usar el custom hook para obtener los permisos
   const usuario = getUserData();
-console.log(usuario);
   return (
     <Container className="panel-config-container">
       {/* Contenedor centrado para el ícono y el título */}
