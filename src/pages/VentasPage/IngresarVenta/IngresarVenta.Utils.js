@@ -198,6 +198,7 @@ const obtenerCantidadesIngresadas = (productos, trayQuantities) => {
 // Función para crear el detalle de la venta
 const crearDetalleVenta = (productos, trayQuantities, orden, fechaActual) => {
   const idOrdenProduccion = orden.encabezadoOrden ? orden.encabezadoOrden.idOrdenProduccion : null;
+  let unidadesFrancesNoVendidas = 0;
 
   // Obtener las cantidades ingresadas para cada producto
   const productosConCantidad = obtenerCantidadesIngresadas(productos, trayQuantities);
@@ -206,16 +207,13 @@ const crearDetalleVenta = (productos, trayQuantities, orden, fechaActual) => {
     .map((producto) => {
       const cantidadIngresada = producto.cantidadIngresada; // Usar la cantidad obtenida
 
-
-        const unidadesFrancesNoVendidas = obtenerUnidadesFrances(cantidadIngresada);
+    if(producto.idProducto === 1){
+        unidadesFrancesNoVendidas = obtenerUnidadesFrances(cantidadIngresada);
+      }
       
-
       // Solo para la categoría 1 (Panaderia) y si hay idOrdenProduccion
       if (producto.idCategoria === 1 && idOrdenProduccion && producto.controlarStock === 0 && producto.controlarStockDiario === 1) {
         // Verificar si el producto está en la orden
-        const productoEnOrden = orden.detalleOrden.some((detalle) => detalle.idProducto === producto.idProducto);
-
-        if (productoEnOrden) {
           return {
             idProducto: producto.idProducto,
             tipoProduccion: producto.tipoProduccion,
@@ -225,9 +223,7 @@ const crearDetalleVenta = (productos, trayQuantities, orden, fechaActual) => {
             unidadesNoVendidas: producto.idProducto === 1 ? unidadesFrancesNoVendidas : cantidadIngresada, 
             fechaCreacion: fechaActual,
           };
-        } else {
-          return null; // No se incluye si no está en la orden
-        }
+        
       } else {
         // Para otras categorías
           return {
