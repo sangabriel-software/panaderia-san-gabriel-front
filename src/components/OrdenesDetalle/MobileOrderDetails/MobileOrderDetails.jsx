@@ -9,7 +9,7 @@ const MobileOrderDetails = ({ order, onDownloadXLS, onDownloadPDF }) => {
 
   // Filtrar productos por tipo de producción
   const productosBandejas = detalles?.filter(prod => prod.tipoProduccion === "bandejas") || [];
-  const productosHarina = detalles?.filter(prod => prod.tipoProduccion === "harina") || [];
+  const productosHarina = detalles?.filter(prod => prod.tipoProduccion === "harina" || prod.tipoProduccion === "Otros") || [];
 
   // Calcular total de harina
   const totalHarina = productosHarina.reduce((total, prod) => {

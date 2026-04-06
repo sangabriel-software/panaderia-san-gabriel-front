@@ -102,7 +102,7 @@ const DesktopHeader = ({ encabezado, onDownloadXLS, onDownloadPDF }) => (
 const OrderTable = ({ productos }) => {
   // Filtrar productos por tipo de producción
   const productosBandejas = productos?.filter(prod => prod.tipoProduccion === "bandejas") || [];
-  const productosHarina = productos?.filter(prod => prod.tipoProduccion === "harina") || [];
+  const productosHarina = productos?.filter(prod => prod.tipoProduccion === "harina" || prod.tipoProduccion === "Otros") || [];
 
   // Calcular total de harina
   const totalHarina = productosHarina.reduce((total, prod) => {
