@@ -10,7 +10,7 @@ const DesktopMateriaPrimaDetails = ({ order, detalleConsumo, onDownloadXLS, onDo
   
   // Filtrar productos por tipo de producción
   const prodBandejas = detalleOrden?.filter(item => item.tipoProduccion === "bandejas") || [];
-  const prodHarina = detalleOrden?.filter(item => item.tipoProduccion === "harina") || [];
+   const prodHarina = detalleOrden?.filter(prod => prod.tipoProduccion === "harina" || prod.tipoProduccion === "Otros") || [];
 
   // Agrupar los detalles de consumo por producto
   const groupedConsumo = detalleConsumo?.reduce((acc, item) => {

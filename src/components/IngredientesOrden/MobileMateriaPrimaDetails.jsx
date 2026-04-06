@@ -8,7 +8,7 @@ const MobileMateriaPrimaDetails = ({ order, detalleConsumo, onDownloadXLS, onDow
   const detalleOrden = order.detalleOrden;
   
   // Filtrar productos por tipo de producción
-  const prodHarina = detalleOrden?.filter(item => item.tipoProduccion === "harina") || [];
+  const prodHarina = detalleOrden?.filter(item => item.tipoProduccion === "harina" || item.tipoProduccion === "Otros") || [];
 
   // Agrupar los detalles de consumo por producto
   const groupedConsumo = detalleConsumo?.reduce((acc, item) => {
