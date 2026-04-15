@@ -163,7 +163,9 @@ const styles = StyleSheet.create({
 const OrderDetailsPdf = ({ detalleOrden, encabezadoOrden, detalleConsumo }) => {
 
   const prodBandejas = detalleOrden?.filter(item => item.tipoProduccion === "bandejas");
-  const prodHarina   = detalleOrden?.filter(item => item.tipoProduccion === "harina");
+  console.log("prodBandejas", prodBandejas)
+  const prodHarina   = detalleOrden?.filter(item => item.tipoProduccion === "harina" || item.tipoProduccion === "Otros");
+  console.log("prodHarina", prodHarina)
   const fechaGeneracion = getCurrentDateTimeWithSeconds();
 
   const calcularTotalHarinaProdPorHarina= () => {
