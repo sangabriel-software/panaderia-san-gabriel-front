@@ -35,9 +35,10 @@ export const handleCloseModal = (navigate) => {
 };
 
 //funcion para la modificacion de datos ingresados (turno o sucursal)
-export const handleModificarDatos = (setValue, setShowModal) => {
+export const handleModificarDatos = (setValue, setShowModal, setHasOrdenes) => {
   setValue("sucursal", "");
   setValue("turno", "AM");
+  setHasOrdenes(null);
   setShowModal(true);
 };
 
@@ -118,9 +119,8 @@ export const handleBuscarVentas = async ( setIsLoading, turnoValue, sucursalValu
     if (orden.encabezadoOrden !== null) {
       setOrden(orden); // Guardar la orden en el estado
     }else{
-      setShowModal(false);
       setHasOrdenes(false);
-      //return;
+      return;
     }
 
     const stockGeneral = await fetchStockGeneral(sucursalValue);
