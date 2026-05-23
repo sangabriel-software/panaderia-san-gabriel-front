@@ -32,7 +32,7 @@ const IngresarVentaPage = () => {
   const [ordenYProductos, setOrdenYProductos] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showModal, setShowModal] = useState(true);
-  const [hasOrdenes, setHasOrdenes] = useState(true);
+  const [hasOrdenes, setHasOrdenes] = useState(null);
   const [showVentaEsperadaModal, setShowVentaEsperadaModal] = useState(false);
   const [showGastosModal, setShowGastosModal] = useState(false);
   const [showSalesSummary, setShowSalesSummary] = useState(false);
@@ -62,7 +62,7 @@ const IngresarVentaPage = () => {
 
   // Modificar datos ingresados
   const handleModificarDatosWrapper = () => {
-    handleModificarDatos(setValue, setShowModal);
+    handleModificarDatos(setValue, setShowModal, setHasOrdenes);
   };
 
   // Guardar Venta

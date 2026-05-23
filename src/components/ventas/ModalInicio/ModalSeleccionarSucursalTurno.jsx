@@ -122,7 +122,7 @@ const ModalSeleccionarSucursalTurno = ({ showModal, handleCloseModal, turnoValue
                   </div>
                 )}
 
-                {!isLoading && showModal && !hasOrdenes && (
+                {!isLoading && showModal && hasOrdenes === false && (
                   <div className="row justify-content-center my-3">
                     <div className="col-md-12 text-center">
                       <Alert
