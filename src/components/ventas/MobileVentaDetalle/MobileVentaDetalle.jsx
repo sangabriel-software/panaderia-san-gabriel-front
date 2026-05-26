@@ -66,8 +66,8 @@ const MobileVentaDetalle = ({ venta, onDownloadXLS, onDownloadPDF }) => {
   const isTablet = useMediaQuery({ minWidth: 768, maxWidth: 1024 });
 
   // Cálculos financieros
-  const ventaReal = (detalleIngresos?.montoTotalIngresado || 0) + (detalleIngresos?.montoTotalGastos || 0);
-  const diferencia = ventaReal - (detalleIngresos?.montoEsperado || 0);
+  const ventaNeta = (detalleIngresos?.montoTotalIngresado || 0) - (detalleIngresos?.montoTotalGastos || 0);
+  const diferencia = (ventaNeta + detalleIngresos?.montoTotalGastos) - (detalleIngresos?.montoEsperado || 0);
   const diferenciaColor = diferencia >= 0 ? "success" : "danger";
 
   return (
@@ -242,7 +242,7 @@ const MobileVentaDetalle = ({ venta, onDownloadXLS, onDownloadPDF }) => {
                   Venta Real:
                 </span>
                 <span className="fw-bold text-primary">
-                  {formatCurrency(ventaReal)}
+                  {formatCurrency(ventaNeta)}
                 </span>
               </div>
 
