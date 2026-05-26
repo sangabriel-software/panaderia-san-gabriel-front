@@ -8,7 +8,11 @@ import SalesSummary from "../../../components/ventas/SalesSumamary/SalesSummary"
 import Title from "../../../components/Title/Title";
 import { BsArrowLeft } from "react-icons/bs";
 import { getUserData } from "../../../utils/Auth/decodedata";
-import { filterProductsByName, handleGuardarVenta, handleModificarDatos } from "./IngresarVenta.Utils";
+import {
+  filterProductsByName,
+  handleGuardarVenta,
+  handleModificarDatos,
+} from "./IngresarVenta.Utils";
 import "./IngresarVentaPage.css";
 import { useBuscarOrden } from "../../../hooks/ventas/useBuscarOrden";
 import { useCategoriasActivas } from "../../../hooks/ventas/useCategoriasActivas";
@@ -24,48 +28,115 @@ const IngresarVentaPage = () => {
   const [isPopupErrorOpen, setIsPopupErrorOpen] = useState(false);
   const [errorPopupMessage, setErrorPopupMessage] = useState("");
   const [isPopupSuccessOpen, setIsPopupSuccessOpen] = useState(false);
+
   const usuario = getUserData();
+
   const [orden, setOrden] = useState([]);
   const [productos, setProductos] = useState([]);
   const [stockGeneral, setStockGeneral] = useState([]);
   const [stockDelDia, setStockDelDia] = useState([]);
   const [ordenYProductos, setOrdenYProductos] = useState([]);
+
   const [isLoading, setIsLoading] = useState(false);
   const [showModal, setShowModal] = useState(true);
   const [hasOrdenes, setHasOrdenes] = useState(null);
-  const [showVentaEsperadaModal, setShowVentaEsperadaModal] = useState(false);
+
+  const [showVentaEsperadaModal, setShowVentaEsperadaModal] =
+    useState(false);
+
   const [showGastosModal, setShowGastosModal] = useState(false);
+
   const [showSalesSummary, setShowSalesSummary] = useState(false);
+
   const [ventaTotal, setVentaTotal] = useState(0);
   const [ventaReal, setVentaReal] = useState(null);
   const [gastos, setGastos] = useState([]);
+
   const navigate = useNavigate();
 
-  const { register, watch, setValue, formState: { errors }, reset } = useForm({ defaultValues: { turno: "AM", sucursal: "" } });
+  // ============================================
+  // REACT HOOK FORM
+  // ============================================
+  const {
+    register,
+    watch,
+    setValue,
+    control, // <- AGREGADO
+    formState: { errors },
+    reset,
+  } = useForm({
+    defaultValues: {
+      turno: "AM",
+      sucursal: "",
+    },
+  });
+
   const turnoValue = watch("turno");
   const sucursalValue = watch("sucursal");
+
   const [trayQuantities, setTrayQuantities] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Custom Hook para consultar las sucursales
+  // ============================================
+  // CUSTOM HOOK SUCURSALES
+  // ============================================
   const { sucursales, loadingSucursales } = useGetSucursales();
 
-  // Custom hook para manejar la búsqueda de ventas
-  useBuscarOrden(turnoValue, sucursalValue, setIsLoading, setOrden, setProductos, setOrdenYProductos, setShowModal, setErrorPopupMessage, setIsPopupErrorOpen, setHasOrdenes, setStockGeneral, setStockDelDia);
+  // ============================================
+  // CUSTOM HOOK BUSCAR ORDEN
+  // ============================================
+  useBuscarOrden(
+    turnoValue,
+    sucursalValue,
+    setIsLoading,
+    setOrden,
+    setProductos,
+    setOrdenYProductos,
+    setShowModal,
+    setErrorPopupMessage,
+    setIsPopupErrorOpen,
+    setHasOrdenes,
+    setStockGeneral,
+    setStockDelDia
+  );
 
-  // Custom hook para manejar categorías
-  const { activeCategory, setActiveCategory, categorias } = useCategoriasActivas(ordenYProductos);
+  // ============================================
+  // CUSTOM HOOK CATEGORIAS
+  // ============================================
+  const {
+    activeCategory,
+    setActiveCategory,
+    categorias,
+  } = useCategoriasActivas(ordenYProductos);
 
-  // Filtrar productos por nombre
-  const filteredProducts = filterProductsByName(ordenYProductos, searchTerm);
-  const productsToShow = searchTerm ? filteredProducts : filteredProducts.filter((p) => p.nombreCategoria === activeCategory);
+  // ============================================
+  // FILTRAR PRODUCTOS
+  // ============================================
+  const filteredProducts = filterProductsByName(
+    ordenYProductos,
+    searchTerm
+  );
 
-  // Modificar datos ingresados
+  const productsToShow = searchTerm
+    ? filteredProducts
+    : filteredProducts.filter(
+        (p) => p.nombreCategoria === activeCategory
+      );
+
+  // ============================================
+  // MODIFICAR DATOS
+  // ============================================
   const handleModificarDatosWrapper = () => {
-    handleModificarDatos(setValue, setShowModal, setHasOrdenes);
+    handleModificarDatos(
+      setValue,
+      setShowModal,
+      setHasOrdenes
+    );
   };
 
-  // Guardar Venta
+  // ============================================
+  // GUARDAR VENTA
+  // ============================================
   const handleGuardarVentaWrapper = async () => {
     await handleGuardarVenta(
       setIsLoading,
@@ -87,14 +158,18 @@ const IngresarVentaPage = () => {
     );
   };
 
-  // Manejar la acción de continuar desde el modal de venta esperada
+  // ============================================
+  // CONTINUAR VENTA ESPERADA
+  // ============================================
   const handleContinuarVentaEsperada = (ventaReal) => {
     setVentaReal(ventaReal);
     setShowVentaEsperadaModal(false);
     setShowGastosModal(true);
   };
 
-  // Manejar la acción de continuar desde el modal de gastos
+  // ============================================
+  // CONTINUAR GASTOS
+  // ============================================
   const handleContinuarConGastos = (gastosRegistrados) => {
     setGastos(gastosRegistrados);
     setShowGastosModal(false);
@@ -103,12 +178,15 @@ const IngresarVentaPage = () => {
 
   return (
     <Container>
-      {/* Modal para ingreso de datos para la consulta de ordenes */}
+      {/* ============================================ */}
+      {/* MODAL SELECCIONAR SUCURSAL Y TURNO */}
+      {/* ============================================ */}
       <ModalSeleccionarSucursalTurno
         showModal={showModal}
         handleCloseModal={() => navigate("/ventas")}
         turnoValue={turnoValue}
         setValue={setValue}
+        control={control} // <- AGREGADO
         errors={errors}
         loadingSucursales={loadingSucursales}
         sucursales={sucursales}
@@ -120,22 +198,30 @@ const IngresarVentaPage = () => {
         usuarioSucursal={usuario}
       />
 
-      {/* Modal de Venta Esperada */}
+      {/* ============================================ */}
+      {/* MODAL VENTA ESPERADA */}
+      {/* ============================================ */}
       <ModalVentaEsperada
         show={showVentaEsperadaModal}
-        handleClose={() => setShowVentaEsperadaModal(false)}
+        handleClose={() =>
+          setShowVentaEsperadaModal(false)
+        }
         onContinue={handleContinuarVentaEsperada}
         ventaTotal={ventaTotal}
       />
 
-      {/* Modal de Gastos */}
+      {/* ============================================ */}
+      {/* MODAL GASTOS */}
+      {/* ============================================ */}
       <ModalGastos
         show={showGastosModal}
         handleClose={() => setShowGastosModal(false)}
         onContinue={handleContinuarConGastos}
       />
 
-      {/* Encabezado */}
+      {/* ============================================ */}
+      {/* ENCABEZADO */}
+      {/* ============================================ */}
       <div className="text-center mb-">
         <div className="d-flex align-items-center justify-content-center gap-5">
           <button
@@ -144,24 +230,37 @@ const IngresarVentaPage = () => {
           >
             <BsArrowLeft size={20} />
           </button>
-          <Title title="Ingresar venta" className="gradient-text" icon="🍞" />
+
+          <Title
+            title="Ingresar venta"
+            className="gradient-text"
+            icon="🍞"
+          />
         </div>
       </div>
 
+      {/* ============================================ */}
+      {/* RESUMEN VENTA */}
+      {/* ============================================ */}
       {!showModal && (
-        // Encabezado de la venta
         <CardResumenVenta
           sucursales={sucursales}
           sucursalValue={sucursalValue}
           turnoValue={turnoValue}
           usuario={usuario}
-          handleModificarDatosWrapper={handleModificarDatosWrapper}
+          handleModificarDatosWrapper={
+            handleModificarDatosWrapper
+          }
           isLoading={isLoading}
-          setShowSalesSummary={() => setShowVentaEsperadaModal(true)}
+          setShowSalesSummary={() =>
+            setShowVentaEsperadaModal(true)
+          }
         />
       )}
 
-      {/* Sección de Productos */}
+      {/* ============================================ */}
+      {/* PRODUCTOS */}
+      {/* ============================================ */}
       {!showModal && (
         <SeccionProductos
           searchTerm={searchTerm}
@@ -178,10 +277,14 @@ const IngresarVentaPage = () => {
         />
       )}
 
-      {/* Modal de SalesSummary */}
+      {/* ============================================ */}
+      {/* SALES SUMMARY */}
+      {/* ============================================ */}
       <SalesSummary
         show={showSalesSummary}
-        handleClose={() => setShowSalesSummary(false)}
+        handleClose={() =>
+          setShowSalesSummary(false)
+        }
         orderData={{
           sucursal: sucursalValue,
           turno: turnoValue,
@@ -197,10 +300,14 @@ const IngresarVentaPage = () => {
         gastos={gastos}
       />
 
-      {/* Popup de Éxito */}
+      {/* ============================================ */}
+      {/* POPUP EXITO */}
+      {/* ============================================ */}
       <SuccessPopup
         isOpen={isPopupSuccessOpen}
-        onClose={() => setIsPopupSuccessOpen(false)}
+        onClose={() =>
+          setIsPopupSuccessOpen(false)
+        }
         title="¡Éxito!"
         message="La Venta se agregó correctamente"
         nombreBotonVolver="Ver Ventas"
@@ -214,10 +321,14 @@ const IngresarVentaPage = () => {
         }}
       />
 
-      {/* Popup errores */}
+      {/* ============================================ */}
+      {/* POPUP ERROR */}
+      {/* ============================================ */}
       <ErrorPopup
         isOpen={isPopupErrorOpen}
-        onClose={() => setIsPopupErrorOpen(false)}
+        onClose={() =>
+          setIsPopupErrorOpen(false)
+        }
         title="¡Error!"
         message={errorPopupMessage}
       />

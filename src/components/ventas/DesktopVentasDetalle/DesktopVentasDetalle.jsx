@@ -215,8 +215,8 @@ const Balance = ({ detalleIngresos, detallesGastos }) => {
     return `Q ${parseFloat(value).toFixed(2)}`;
   };
 
-  const ventaReal = (detalleIngresos?.montoTotalIngresado || 0) + (detalleIngresos?.montoTotalGastos || 0);
-  const diferencia = ventaReal - (detalleIngresos?.montoEsperado || 0);
+  const ventaNeta = (detalleIngresos?.montoTotalIngresado || 0) - (detalleIngresos?.montoTotalGastos || 0);
+  const diferencia = (ventaNeta + detalleIngresos?.montoTotalGastos) - (detalleIngresos?.montoEsperado || 0);
   const diferenciaColor = diferencia >= 0 ? "success" : "danger";
 
   return (
@@ -267,7 +267,7 @@ const Balance = ({ detalleIngresos, detallesGastos }) => {
                   </div>
                   <div className="d-flex align-items-center gap-2">
                     <span className="fw-bold text-danger">
-                      {formatCurrency(detalleIngresos?.montoTotalGastos)}
+                      {`-${formatCurrency(detalleIngresos?.montoTotalGastos)}`}
                     </span>
                     <BsListUl size={16} style={{ color: "#6c757d" }} />
                   </div>
@@ -276,10 +276,10 @@ const Balance = ({ detalleIngresos, detallesGastos }) => {
                 <div className="d-flex justify-content-between align-items-center bg-light p-2 rounded">
                   <div className="d-flex align-items-center gap-2">
                     <BsPlusCircle size={18} style={{ color: "#4ECDC4" }} />
-                    <span className="fw-semibold">Venta Real del Turno:</span>
+                    <span className="fw-semibold">Venta neta:</span>
                   </div>
                   <span className="fw-bold text-primary">
-                    {formatCurrency(ventaReal)}
+                    {formatCurrency(ventaNeta)}
                   </span>
                 </div>
 
