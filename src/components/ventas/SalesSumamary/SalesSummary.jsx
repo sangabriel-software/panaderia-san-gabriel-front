@@ -1,303 +1,230 @@
 import React from "react";
-import { Modal, Button, Table, Spinner } from "react-bootstrap";
-import { BsCheckCircle, BsBoxSeam, BsClock, BsShop, BsPerson, BsCash, BsCashStack } from "react-icons/bs";
-import styled from "styled-components";
+import { Modal, Spinner } from "react-bootstrap";
 import { formatDateToDisplay } from "../../../utils/dateUtils";
+import "./SalesSummary.styles.css";
 
-const StyledModal = styled(Modal)`
-  .modal-content {
-    border-radius: 15px;
-    border: none;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.12);
-  }
+const SalesSummary = ({
+  show, handleClose, orderData, trayQuantities,
+  productos, sucursales, isLoading, onConfirm, ventaReal, gastos,
+}) => {
 
-  .modal-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    border-radius: 15px 15px 0 0;
-    border: none;
-    
-    .modal-title {
-      font-weight: 600;
-      letter-spacing: 0.5px;
-    }
-    
-    .btn-close {
-      filter: invert(1);
-    }
-  }
-
-  .modal-body {
-    padding: 1.5rem;
-  }
-
-  .detail-item {
-    display: flex;
-    align-items: center;
-    margin-bottom: 1rem;
-    padding: 12px;
-    background: #f8f9fa;
-    border-radius: 8px;
-    
-    svg {
-      margin-right: 12px;
-      font-size: 1.2rem;
-      color: #6c757d;
-    }
-  }
-
-  .table-responsive {
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    width: 80%;
-    margin: 0 auto;
-    
-    th {
-      background: #f8f9fa;
-      font-weight: 600;
-    }
-    
-    td {
-      vertical-align: middle;
-    }
-  }
-
-  .product-badge {
-    display: inline-flex;
-    align-items: center;
-    padding: 4px 8px;
-    border-radius: 20px;
-    background: #e9ecef;
-    font-size: 0.85rem;
-    margin-bottom: 4px;
-    
-    svg {
-      margin-right: 6px;
-    }
-  }
-
-  .total-row {
-    font-weight: bold;
-    background-color: #f8f9fa !important;
-  }
-`;
-
-const SalesSummary = ({ show, handleClose, orderData, trayQuantities, productos, sucursales, isLoading, onConfirm, ventaReal, gastos }) => {
-  // Función para obtener el nombre del producto basado en el idProducto
   const getProductName = (idProducto) => {
     const product = productos.find((p) => p.idProducto === idProducto);
     return product ? product.nombreProducto : "Desconocido";
   };
 
-  // Función para obtener el nombre de la sucursal basado en el idSucursal
   const getSucursalName = (idSucursal) => {
-    const sucursal = sucursales.find((s) => s.idSucursal == idSucursal );
+    const sucursal = sucursales.find((s) => s.idSucursal == idSucursal);
     return sucursal ? sucursal.nombreSucursal : "Desconocida";
   };
 
-  // Filtrar y separar productos por categoría
   const productosPanaderia = productos.filter((p) => p.nombreCategoria === "Panaderia");
   const productosOtros = productos.filter((p) => p.nombreCategoria !== "Panaderia");
 
-  // Obtener la cantidad no vendida para productos de Panaderia
-  const productosPanaderiaConCantidad = productosPanaderia.map((producto) => {
-    const cantidadNoVendida = trayQuantities[producto.idProducto]?.cantidad || 0;
-    return {
-      ...producto,
-      cantidadNoVendida,
-    };
-  });
+  const productosPanaderiaConCantidad = productosPanaderia.map((p) => ({
+    ...p,
+    cantidadNoVendida: trayQuantities[p.idProducto]?.cantidad || 0,
+  }));
 
-  // Obtener la cantidad vendida para productos de otras categorías
-  const productosOtrosConCantidad = productosOtros.map((producto) => {
-    const cantidadVendida = trayQuantities[producto.idProducto]?.cantidad || 0;
-    return {
-      ...producto,
-      cantidadVendida,
-    };
-  });
+  const productosOtrosConCantidad = productosOtros.map((p) => ({
+    ...p,
+    cantidadVendida: trayQuantities[p.idProducto]?.cantidad || 0,
+  }));
 
-  // Verificar si todos los productos de Panaderia fueron vendidos
-  const todosProductosPanaderiaVendidos = productosPanaderiaConCantidad.every(
-    (producto) => producto.cantidadNoVendida === 0
+  const todosVendidos = productosPanaderiaConCantidad.every(
+    (p) => p.cantidadNoVendida === 0
   );
 
-  // Calcular total de gastos
-  const totalGastos = gastos.reduce((sum, gasto) => sum + gasto.subtotal, 0);
-  // Calcular venta neta
-  const ventaNeta = ventaReal ? ventaReal + totalGastos : 0;
+  const totalGastos = gastos.reduce((sum, g) => sum + g.subtotal, 0);
+  const ventaNeta = ventaReal ? ventaReal - totalGastos : 0;
 
   return (
-    <StyledModal show={show} onHide={handleClose} centered size="lg">
-      <Modal.Header closeButton>
-        <Modal.Title>
-          <BsCheckCircle className="me-2" />
-          Resumen de la Venta
-        </Modal.Title>
+    <Modal show={show} onHide={handleClose} centered className="ss-modal">
+      {/* HEADER */}
+      <Modal.Header>
+        <div className="ss-header-content">
+          <div className="ss-icon-wrap">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none"
+              stroke="#534AB7" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+              <polyline points="22 4 12 14.01 9 11.01"/>
+            </svg>
+          </div>
+          <div>
+            <p className="ss-title">Resumen de venta</p>
+            <p className="ss-subtitle">Revisa antes de confirmar</p>
+          </div>
+        </div>
+        <button className="ss-close-btn" onClick={handleClose} aria-label="Cerrar">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
       </Modal.Header>
 
+      {/* BODY */}
       <Modal.Body>
-        <div className="mb-4">
-          <h5 className="mb-3 fw-semibold text-primary">Detalles Generales</h5>
-          <div className="detail-item">
-            <BsShop />
-            <span>
-              <strong>Sucursal:</strong> {getSucursalName(orderData.sucursal)}
-            </span>
-          </div>
-          <div className="detail-item">
-            <BsClock />
-            <span>
-              <strong>Turno:</strong> {orderData.turno}
-            </span>
-          </div>
-          <div className="detail-item">
-            <BsBoxSeam />
-            <span>
-              <strong>Fecha Venta:</strong>{" "}
-              {formatDateToDisplay(orderData.fechaAProducir)}
-            </span>
-          </div>
-          <div className="detail-item">
-            <BsPerson />
-            <span>
-              <strong>Vendedor (a):</strong> {orderData.nombrePanadero}
-            </span>
-          </div>
-        </div>
 
-        {/* Sección de Cobro */}
-        <div className="mb-4">
-          <h5 className="mb-3 fw-semibold text-primary">Ingreso de la venta</h5>
-          <div className="detail-item">
-            <BsCash />
-            <span>
-              <strong>Monto Total:</strong> Q.{ventaReal ? ventaReal.toFixed(2) : "0.00"}
-            </span>
-          </div>
-        </div>
+        {/* Detalles generales */}
+        <div className="ss-card">
+          <p className="ss-section-label">Detalles generales</p>
 
-        {/* Sección de Gastos */}
-        <div className="mb-4">
-          <h5 className="mb-3 fw-semibold text-primary">Gastos del Turno</h5>
-          {gastos.length > 0 ? (
-            <div className="table-responsive">
-              <Table hover>
-                <thead>
-                  <tr>
-                    <th>Detalle</th>
-                    <th className="text-end">Monto (Q)</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {gastos.map((gasto, index) => (
-                    <tr key={index}>
-                      <td>{gasto.detalleGasto}</td>
-                      <td className="text-end">Q{gasto.subtotal.toFixed(2)}</td>
-                    </tr>
-                  ))}
-                  <tr className="total-row">
-                    <td>Total Gastos</td>
-                    <td className="text-end">Q{totalGastos.toFixed(2)}</td>
-                  </tr>
-                </tbody>
-              </Table>
+          <div className="ss-detail-row">
+            <div className="ss-detail-icon">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6c757d" strokeWidth="1.8" strokeLinecap="round">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                <polyline points="9 22 9 12 15 12 15 22"/>
+              </svg>
             </div>
+            <div>
+              <p className="ss-detail-label">Sucursal</p>
+              <p className="ss-detail-value">{getSucursalName(orderData.sucursal)}</p>
+            </div>
+          </div>
+
+          <div className="ss-detail-row">
+            <div className="ss-detail-icon">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6c757d" strokeWidth="1.8" strokeLinecap="round">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+            </div>
+            <div>
+              <p className="ss-detail-label">Turno</p>
+              <p className="ss-detail-value">{orderData.turno}</p>
+            </div>
+          </div>
+
+          <div className="ss-detail-row">
+            <div className="ss-detail-icon">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6c757d" strokeWidth="1.8" strokeLinecap="round">
+                <rect x="3" y="4" width="18" height="18" rx="2"/>
+                <line x1="16" y1="2" x2="16" y2="6"/>
+                <line x1="8" y1="2" x2="8" y2="6"/>
+                <line x1="3" y1="10" x2="21" y2="10"/>
+              </svg>
+            </div>
+            <div>
+              <p className="ss-detail-label">Fecha</p>
+              <p className="ss-detail-value">{formatDateToDisplay(orderData.fechaAProducir)}</p>
+            </div>
+          </div>
+
+          <div className="ss-detail-row">
+            <div className="ss-detail-icon">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6c757d" strokeWidth="1.8" strokeLinecap="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+            </div>
+            <div>
+              <p className="ss-detail-label">Vendedor/a</p>
+              <p className="ss-detail-value">{orderData.nombrePanadero}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Ingreso */}
+        <div className="ss-card">
+          <p className="ss-section-label">Ingreso de la venta</p>
+          <div className="ss-amount-row">
+            <span className="ss-amount-label-text">Monto total</span>
+            <span className="ss-amount-value">
+              Q {ventaReal ? ventaReal.toFixed(2) : "0.00"}
+            </span>
+          </div>
+        </div>
+
+        {/* Gastos */}
+        <div className="ss-card">
+          <p className="ss-section-label">Gastos del turno</p>
+          {gastos.length === 0 ? (
+            <p className="ss-empty">Sin gastos registrados</p>
           ) : (
-            <p className="text-center text-muted">No se registraron gastos</p>
+            <>
+              {gastos.map((gasto, i) => (
+                <div className="ss-table-row" key={i}>
+                  <span className="ss-row-label">{gasto.detalleGasto}</span>
+                  <span className="ss-row-value-amber">Q {gasto.subtotal.toFixed(2)}</span>
+                </div>
+              ))}
+              <div className="ss-subtotal-bar">
+                <span className="ss-subtotal-label">Total gastos</span>
+                <span className="ss-subtotal-value">Q {totalGastos.toFixed(2)}</span>
+              </div>
+            </>
           )}
         </div>
 
-        {/* Resumen Financiero */}
-        <div className="mb-4">
-          <h5 className="mb-3 fw-semibold text-primary">Resumen Financiero</h5>
-          <div className="table-responsive">
-            <Table bordered>
-              <tbody>
-                <tr>
-                  <td><strong>Venta Total</strong></td>
-                  <td className="text-end">Q{ventaReal ? ventaReal.toFixed(2) : "0.00"}</td>
-                </tr>
-                <tr>
-                  <td><strong>Total Gastos</strong></td>
-                  <td className="text-end">Q{totalGastos.toFixed(2)}</td>
-                </tr>
-                <tr className="table-active">
-                  <td><strong>Venta Neta</strong></td>
-                  <td className="text-end fw-bold">Q{ventaNeta.toFixed(2)}</td>
-                </tr>
-              </tbody>
-            </Table>
+        {/* Resumen financiero */}
+        <div className="ss-card">
+          <p className="ss-section-label">Resumen financiero</p>
+          <div className="ss-fin-row">
+            <span className="ss-fin-label">Venta total</span>
+            <span className="ss-fin-value">Q {ventaReal ? ventaReal.toFixed(2) : "0.00"}</span>
+          </div>
+          <div className="ss-fin-row">
+            <span className="ss-fin-label">Total gastos</span>
+            <span className="ss-fin-value-amber">− Q {totalGastos.toFixed(2)}</span>
+          </div>
+          <div className="ss-fin-total">
+            <span className="ss-fin-total-label">Venta neta</span>
+            <span className="ss-fin-total-value">Q {ventaNeta.toFixed(2)}</span>
           </div>
         </div>
 
-        {/* Sección de Panaderia */}
-        <h5 className="mb-3 fw-semibold text-primary">Panaderia</h5>
-        {todosProductosPanaderiaVendidos ? (
-          <p className="text-center text-muted">Todos los productos de Panaderia fueron vendidos.</p>
-        ) : (
-          <div className="table-responsive">
-            <Table hover>
-              <thead>
-                <tr>
-                  <th>Producto</th>
-                  <th className="text-end">Cantidad no vendida</th>
-                </tr>
-              </thead>
-              <tbody>
-                {productosPanaderiaConCantidad.map((producto) => (
-                  producto.cantidadNoVendida > 0 && (
-                    <tr key={producto.idProducto}>
-                      <td>{producto.nombreProducto}</td>
-                      <td className="text-end fw-semibold">{producto.cantidadNoVendida}</td>
-                    </tr>
-                  )
-                ))}
-              </tbody>
-            </Table>
-          </div>
-        )}
-
-        {/* Sección de Otros productos */}
-        <h5 className="mb-3 fw-semibold text-primary">Otros productos</h5>
-        <div className="table-responsive">
-          <Table hover>
-            <thead>
-              <tr>
-                <th>Producto</th>
-                <th className="text-end">Unidades no vendidas</th>
-              </tr>
-            </thead>
-            <tbody>
-              {productosOtrosConCantidad.map((producto) => (
-                producto.cantidadVendida > 0 && (
-                  <tr key={producto.idProducto}>
-                    <td>{producto.nombreProducto}</td>
-                    <td className="text-end fw-semibold">{producto.cantidadVendida}</td>
-                  </tr>
-                )
-              ))}
-            </tbody>
-          </Table>
+        {/* Panadería */}
+        <div className="ss-card">
+          <p className="ss-section-label">Panadería</p>
+          {todosVendidos ? (
+            <div className="ss-badge-ok">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+                stroke="#0F6E56" strokeWidth="2.2" strokeLinecap="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              Todo vendido
+            </div>
+          ) : (
+            productosPanaderiaConCantidad
+              .filter((p) => p.cantidadNoVendida > 0)
+              .map((p) => (
+                <div className="ss-table-row" key={p.idProducto}>
+                  <span className="ss-row-label">{p.nombreProducto}</span>
+                  <span className="ss-row-value">{p.cantidadNoVendida} uds.</span>
+                </div>
+              ))
+          )}
         </div>
+
+        {/* Otros productos */}
+        <div className="ss-card">
+          <p className="ss-section-label">Otros productos</p>
+          {productosOtrosConCantidad.filter((p) => p.cantidadVendida > 0).length === 0 ? (
+            <p className="ss-empty">Sin unidades registradas</p>
+          ) : (
+            productosOtrosConCantidad
+              .filter((p) => p.cantidadVendida > 0)
+              .map((p) => (
+                <div className="ss-table-row" key={p.idProducto}>
+                  <span className="ss-row-label">{p.nombreProducto}</span>
+                  <span className="ss-row-value">{p.cantidadVendida} uds.</span>
+                </div>
+              ))
+          )}
+        </div>
+
       </Modal.Body>
 
-      <Modal.Footer className="border-top-0">
-        <Button
-          variant="outline-secondary"
-          onClick={handleClose}
-          className="px-4 rounded-pill"
-        >
+      {/* FOOTER */}
+      <Modal.Footer>
+        <button className="ss-btn-cancel" onClick={handleClose}>
           Cancelar
-        </Button>
-        <Button
-          variant="primary"
-          onClick={() => {
-            onConfirm();
-            handleClose();
-          }}
-          className="px-4 rounded-pill"
+        </button>
+        <button
+          className="ss-btn-primary"
+          onClick={() => { onConfirm(); handleClose(); }}
           disabled={isLoading}
         >
           {isLoading ? (
@@ -306,11 +233,11 @@ const SalesSummary = ({ show, handleClose, orderData, trayQuantities, productos,
               Procesando...
             </>
           ) : (
-            "Confirmar y Guardar"
+            "Confirmar y guardar"
           )}
-        </Button>
+        </button>
       </Modal.Footer>
-    </StyledModal>
+    </Modal>
   );
 };
 

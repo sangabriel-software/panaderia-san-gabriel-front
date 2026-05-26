@@ -1,98 +1,96 @@
 import React, { useState } from "react";
-import { Modal, Button, Form, Container, Row, Col } from "react-bootstrap";
-import { FaTimes } from "react-icons/fa";
-import { BsCashCoin } from "react-icons/bs";
+import { Modal } from "react-bootstrap";
+import "./ModalVentaEsperada.styles.css";
 
 const ModalVentaEsperada = ({ show, handleClose, onContinue }) => {
-  const [ventaReal, setVentaReal] = useState(""); // Estado para almacenar la venta real
+  const [ventaReal, setVentaReal] = useState("");
 
-  // Manejar el cambio en el input de la venta real
   const handleVentaRealChange = (e) => {
-    setVentaReal(e.target.value); // Actualizar el estado con el valor ingresado
+    setVentaReal(e.target.value);
   };
 
-  // Manejar la acción de continuar
   const handleContinuar = () => {
-    const ventaRealNumber = parseFloat(ventaReal); // Convertir a número
-    if (!isNaN(ventaRealNumber)) {
-      onContinue(ventaRealNumber); // Pasar la venta real como número
-    } else {
-      onContinue(0); // Si no es un número válido, pasar 0
-    }
-    handleCloseModal(); // Cerrar el modal y limpiar el input
+    const ventaRealNumber = parseFloat(ventaReal);
+    onContinue(!isNaN(ventaRealNumber) ? ventaRealNumber : 0);
+    handleCloseModal();
   };
 
-  // Función para cerrar el modal y limpiar el input
   const handleCloseModal = () => {
-    setVentaReal(""); // Limpiar el input
-    handleClose(); // Cerrar el modal
+    setVentaReal("");
+    handleClose();
   };
+
+  const displayAmount = ventaReal && !isNaN(parseFloat(ventaReal))
+    ? `Q ${parseFloat(ventaReal).toFixed(2)}`
+    : "Q 0.00";
 
   return (
     <Modal
       show={show}
-      onHide={handleCloseModal} // Usar handleCloseModal para cerrar y limpiar
-      size="lg"
-      aria-labelledby="contained-modal-title-vcenter"
+      onHide={handleCloseModal}
       centered
       className="venta-esperada-modal"
     >
-      <Modal.Header className="bg-gradient-primary text-white">
-        <Modal.Title className="w-100 text-center">
-          <BsCashCoin size={28} className="me-2" />
-          Ingresos del Turno
-        </Modal.Title>
-        <Button
-          variant="link"
-          onClick={handleCloseModal} // Usar handleCloseModal para cerrar y limpiar
-          className="text-white"
-        >
-          <FaTimes />
-        </Button>
+      {/* HEADER */}
+      <Modal.Header>
+        <div className="ve-header-content">
+          <div className="ve-icon-wrap">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+              stroke="#0F6E56" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M16 8h-6a2 2 0 0 0 0 4h4a2 2 0 0 1 0 4H8"/>
+              <line x1="12" y1="6" x2="12" y2="8"/>
+              <line x1="12" y1="16" x2="12" y2="18"/>
+            </svg>
+          </div>
+          <div>
+            <p className="ve-title">Ingresos del turno</p>
+            <p className="ve-subtitle">Ingresa el monto recaudado</p>
+          </div>
+        </div>
+        <button className="ve-close-btn" onClick={handleCloseModal} aria-label="Cerrar">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
       </Modal.Header>
-      <Modal.Body className="bg-light d-flex justify-content-center align-items-center">
-        <Container>
-          <Row className="justify-content-center">
-            <Col xs={12} md={8} className="text-center">
-              <div className="venta-esperada-card p-4 shadow-sm rounded">
-                <h3 className="text-primary mb-4">Ingresar Venta</h3>
-                {/* Mostrar el valor de ventaReal dinámicamente */}
-                <div className="display-4 text-success fw-bold mb-4">
-                  Q.{ventaReal ? parseFloat(ventaReal).toFixed(2) : "0.00"}
-                </div>
-                <Form.Group className="mb-4">
-                  <Form.Label className="small text-uppercase text-muted fw-bold">
-                    Venta Real (Q)
-                  </Form.Label>
-                  <Form.Control
-                    type="number"
-                    placeholder="Ingrese la venta real"
-                    value={ventaReal}
-                    onChange={handleVentaRealChange}
-                    className="input-data text-center fs-5"
-                  />
-                </Form.Group>
-              </div>
-            </Col>
-          </Row>
-        </Container>
+
+      {/* BODY */}
+      <Modal.Body>
+        {/* Display monto */}
+        <div className="ve-display-card">
+          <p className="ve-amount-label">Venta real</p>
+          <p className="ve-amount">{displayAmount}</p>
+        </div>
+
+        {/* Input */}
+        <div className="ve-input-card">
+          <p className="ve-card-label">Monto (Q)</p>
+          <input
+            type="number"
+            className="ve-input"
+            placeholder="0.00"
+            value={ventaReal}
+            onChange={handleVentaRealChange}
+            step="0.01"
+          />
+        </div>
       </Modal.Body>
-      <Modal.Footer className="bg-gradient-primary">
-        <Button
-          variant="light"
-          onClick={handleCloseModal} // Usar handleCloseModal para cerrar y limpiar
-          className="btn-cancelar shadow"
-        >
+
+      {/* FOOTER */}
+      <Modal.Footer>
+        <button className="ve-btn-cancel" onClick={handleCloseModal}>
           Cancelar
-        </Button>
-        <Button
-          variant="primary"
+        </button>
+        <button
+          className="ve-btn-primary"
           onClick={handleContinuar}
-          className="btn-continuar shadow"
-          disabled={!ventaReal} // Deshabilitar si no se ha ingresado la venta real
+          disabled={!ventaReal}
         >
           Continuar
-        </Button>
+        </button>
       </Modal.Footer>
     </Modal>
   );
