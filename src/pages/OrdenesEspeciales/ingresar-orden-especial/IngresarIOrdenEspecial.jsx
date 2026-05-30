@@ -95,11 +95,15 @@ const IngresarOrdenEspecialPage = () => {
       
       const productosSeleccionados = Object.entries(cantidadValues)
         .filter(([_, cantidad]) => cantidad > 0)
-        .map(([idProducto, cantidadUnidades]) => ({
-          idProducto: parseInt(idProducto),
-          cantidadUnidades,
-          fechaCreacion: dayjs().format("YYYY-MM-DD")
-        }));
+        .map(([idProducto, cantidadUnidades]) => {
+          const producto = productos?.find((p) => p.idProducto === parseInt(idProducto));
+          return {
+            idProducto: parseInt(idProducto),
+            cantidadUnidades,
+            nombreProducto: producto?.nombreProducto || "",
+            fechaCreacion: dayjs().format("YYYY-MM-DD")
+          };
+        });
       
       if (productosSeleccionados.length === 0) {
         throw new Error("Debe seleccionar al menos un producto");
@@ -109,7 +113,9 @@ const IngresarOrdenEspecialPage = () => {
       const payload = {
         ordenEncabezado: {
           idSucursal: sucursalSeleccionada.idSucursal,
+          nombreSucursal: sucursalSeleccionada.nombreSucursal,
           idUsuario: userData.idUsuario, // Usuario por defecto
+          nombreUsuario: `${userData.nombre} ${userData.apellido}`,
           nombreCliente: nombreCliente.trim(),
           telefonoCliente: telefonoCliente.trim(),
           fechaEntrega: dayjs(fechaEntrega).format("YYYY-MM-DD"),
