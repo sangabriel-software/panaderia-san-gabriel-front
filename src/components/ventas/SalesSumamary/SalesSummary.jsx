@@ -36,7 +36,7 @@ const SalesSummary = ({
   );
 
   const totalGastos = gastos.reduce((sum, g) => sum + g.subtotal, 0);
-  const ventaNeta = ventaReal ? ventaReal - totalGastos : 0;
+  const ventaNeta = ventaReal ? ventaReal + totalGastos : 0;
 
   return (
     <Modal show={show} onHide={handleClose} centered className="ss-modal">
@@ -124,7 +124,7 @@ const SalesSummary = ({
               <p className="ss-detail-value">{orderData.nombrePanadero}</p>
             </div>
           </div>
-        </div>
+        </div>Resumen de venta
 
         {/* Ingreso */}
         <div className="ss-card">
@@ -167,7 +167,7 @@ const SalesSummary = ({
           </div>
           <div className="ss-fin-row">
             <span className="ss-fin-label">Total gastos</span>
-            <span className="ss-fin-value-amber">− Q {totalGastos.toFixed(2)}</span>
+            <span className="ss-fin-value-amber">+ Q {totalGastos.toFixed(2)}</span>
           </div>
           <div className="ss-fin-total">
             <span className="ss-fin-total-label">Venta neta</span>

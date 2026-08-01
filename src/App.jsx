@@ -122,8 +122,8 @@ function App() {
 
             <Route path="/ventas">
               <Route index element={<GestionVentasPage />} />
-              <Route path="ingresar-venta" element={<IngresarVentasAI />} />
-              {/* <Route path="ingresar-venta" element={<IngresarVentaPage />} /> */}
+              {/* <Route path="ingresar-venta" element={<IngresarVentasAI />} /> */}
+              <Route path="ingresar-venta" element={<IngresarVentaPage />} />
               <Route path="detalle-venta/:idVenta" element={<DetalleVentaPage />} />
             </Route>
 

@@ -215,8 +215,8 @@ const Balance = ({ detalleIngresos, detallesGastos }) => {
     return `Q ${parseFloat(value).toFixed(2)}`;
   };
 
-  const ventaNeta = (detalleIngresos?.montoTotalIngresado || 0) - (detalleIngresos?.montoTotalGastos || 0);
-  const diferencia = (ventaNeta + detalleIngresos?.montoTotalGastos) - (detalleIngresos?.montoEsperado || 0);
+  const ventaNeta = (detalleIngresos?.montoTotalIngresado || 0) + (detalleIngresos?.montoTotalGastos || 0);
+  const diferencia = (ventaNeta) - (detalleIngresos?.montoEsperado || 0);
   const diferenciaColor = diferencia >= 0 ? "success" : "danger";
 
   return (
@@ -267,7 +267,7 @@ const Balance = ({ detalleIngresos, detallesGastos }) => {
                   </div>
                   <div className="d-flex align-items-center gap-2">
                     <span className="fw-bold text-danger">
-                      {`-${formatCurrency(detalleIngresos?.montoTotalGastos)}`}
+                      {`+${formatCurrency(detalleIngresos?.montoTotalGastos)}`}
                     </span>
                     <BsListUl size={16} style={{ color: "#6c757d" }} />
                   </div>
