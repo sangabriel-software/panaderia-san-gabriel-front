@@ -7,6 +7,9 @@ import "./styles/globalStyles.css";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+/* AI routes */
+const IngresarVentasAI = lazy(() => import("./pages/VentasAI/IngresarVentasAI"));
+
 /* reportes routes */
 const ReportesPanel = lazy(() => import("./pages/reportes/reportespanel/ReportesPanel"));
 const HistorialStock = lazy(() => import("./pages/reportes/historialStock/HistorialStock"));
@@ -119,6 +122,7 @@ function App() {
 
             <Route path="/ventas">
               <Route index element={<GestionVentasPage />} />
+              {/* <Route path="ingresar-venta" element={<IngresarVentasAI />} /> */}
               <Route path="ingresar-venta" element={<IngresarVentaPage />} />
               <Route path="detalle-venta/:idVenta" element={<DetalleVentaPage />} />
             </Route>
