@@ -37,6 +37,7 @@ function IngresarProductos() {
   const tipoProduccion = watch("tipoProduccion");
   const controlStock = watch("controlStock") === 1;
   const stockDiario = watch("stockDiario") === 1;
+  const controlarInventario = watch("controlarInventario") === 1;
   
   // Determinar si la categoría seleccionada es Panaderia
   const [isPanaderia, setIsPanaderia] = useState(false);
@@ -225,6 +226,26 @@ function IngresarProductos() {
                 <Form.Control.Feedback type="invalid">
                   {errors.precio?.message}
                 </Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+          </Row>
+
+          <Row className="mb-4">
+            <Col xs={12}>
+              <Form.Group>
+                <h6 className="label-title">Configuración de Inventario</h6>
+                <Form.Label className="label-title">Controlar Inventario</Form.Label>
+                <div className="d-flex align-items-center">
+                  <span className="me-2">No</span>
+                  <Form.Check
+                    type="switch"
+                    id="controlarInventario"
+                    checked={controlarInventario}
+                    onChange={(e) => setValue("controlarInventario", e.target.checked ? 1 : 0)}
+                    disabled={isLoading || stockDiario}
+                  />
+                  <span className="ms-2">Sí</span>
+                </div>
               </Form.Group>
             </Col>
           </Row>
