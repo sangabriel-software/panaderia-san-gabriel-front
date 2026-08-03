@@ -55,3 +55,12 @@ export const actualizarPrecioProductoSevice = async (dataProducto) => {
     throw error;
   }
 }
+
+export const consultarProductosParaInventario = async () => {
+  try {
+    const response = await api.get(`${getEndpoints.GET_PRODUCTOS_INVENTARIO}`); 
+      return response.data;
+  } catch (error) {
+    throw error;
+  }
+}

@@ -17,11 +17,12 @@ import useGetStockDelDia from "../../../hooks/stock/useGetStockDelDia";
 import { getUserData } from "../../../utils/Auth/decodedata";
 import { currentDate, getCurrentDateTimeWithSeconds } from "../../../utils/dateUtils";
 import { ingresarStockProductos } from "../../../services/stockservices/stock.service";
+import useGetProductosInventario from "../../../hooks/productosprecios/useGetProductosInventario";
 
 const IngresarStockGeneralPage = () => {
   const { idSucursal } = useParams();
   const navigate = useNavigate();
-  const { productos, loadigProducts, showErrorProductos } = useGetProductosYPrecios();
+  const { productos, loadigProducts, showErrorProductos } = useGetProductosInventario();
   const { sucursales, loadingSucursales } = useGetSucursales();
   const [stockValues, setStockValues] = useState({});
   const [currentStock, setCurrentStock] = useState({});

@@ -28,7 +28,8 @@ export const crearPayloadProducto = (data) => {
     nombreProducto: capitalizeFirstLetter(data.nombreProducto),
     idCategoria: idCategoria, 
     controlarStock: controlStock,
-    controlarStockDiario: data.stockDiario,
+    controlarStockDiario: data.stockDiario || 0,
+    controlarInventario: data.controlarInventario || 0,
     tipoProduccion: tipoProduccion, 
     fechaCreacion: currentDate(),
     ...(badejasUnidades !== null && { unidadesPorBandeja: badejasUnidades }) // Agregar solo si no es null

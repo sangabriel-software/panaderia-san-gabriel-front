@@ -145,9 +145,8 @@ export const useProductFormSetup = (selectedProduct, setValue, reset, setIsPanad
         controlStock: esPanaderia ? selectedProduct.controlarStock : 1,
         stockDiario: esPanaderia ? selectedProduct.controlarStockDiario : 0,
         tipoProduccion: esPanaderia ? selectedProduct.tipoProduccion : null,
-        unidadesPorBandeja: esPanaderia
-          ? selectedProduct.unidadesPorBandeja
-          : null,
+        unidadesPorBandeja: esPanaderia ? selectedProduct.unidadesPorBandeja : null,
+        controlarInventario: selectedProduct.controlarInventario ?? 0,
       });
 
       // Configurar tipo de producción si es Panaderia
@@ -161,9 +160,8 @@ export const useProductFormSetup = (selectedProduct, setValue, reset, setIsPanad
         controlStock: esPanaderia ? selectedProduct.controlarStock : 1,
         stockDiario: esPanaderia ? selectedProduct.controlarStockDiario : 0,
         tipoProduccion: esPanaderia ? selectedProduct.tipoProduccion : null,
-        unidadesPorBandeja: esPanaderia
-          ? selectedProduct.unidadesPorBandeja
-          : null,
+        unidadesPorBandeja: esPanaderia ? selectedProduct.unidadesPorBandeja : null,
+        controlarInventario: selectedProduct.controlarInventario ?? 0, // ✅
       });
     }
   }, [selectedProduct, setValue, reset]);
@@ -239,16 +237,17 @@ export const handleModify = (producto, setSelectedProduct, setShowModifyModal, r
   setTimeout(() => {
     const esPanaderia = producto.idCategoria == 1 || producto.idCategoria == 2;
 ;
-    reset({
-      nombreProducto: producto.nombreProducto,
-      idCategoria: producto.idCategoria,
-      cantidad: producto.cantidad,
-      precio: producto.precio,
-      controlStock: esPanaderia ? producto.controlarStock : 1,
-      stockDiario: esPanaderia ? producto.controlarStockDiario : 0,
-      tipoProduccion: esPanaderia ? producto.tipoProduccion : null,
-      unidadesPorBandeja: esPanaderia ? producto.unidadesPorBandeja : null,
-    });
+  reset({
+    nombreProducto: producto.nombreProducto,
+    idCategoria: producto.idCategoria,
+    cantidad: producto.cantidad,
+    precio: producto.precio,
+    controlStock: esPanaderia ? producto.controlarStock : 1,
+    stockDiario: esPanaderia ? producto.controlarStockDiario : 0,
+    tipoProduccion: esPanaderia ? producto.tipoProduccion : null,
+    unidadesPorBandeja: esPanaderia ? producto.unidadesPorBandeja : null,
+    controlarInventario: producto.controlarInventario ?? 0, // ✅
+  });
 
     setIsPanaderia(esPanaderia);
     setTipoProduccion(
@@ -322,7 +321,6 @@ export const crearPayloadProducto = (data, selectedProduct) => {
     }
 
     const productoPayload = {
-      // Crear el payload del producto
       idProducto: selectedProduct.idProducto,
       nombreProducto: capitalizeFirstLetter(data.nombreProducto),
       idCategoria: idCategoria,
@@ -331,7 +329,8 @@ export const crearPayloadProducto = (data, selectedProduct) => {
       controlarStockDiario: data.stockDiario,
       tipoProduccion: tipoProduccion,
       fechaCreacion: currentDate(),
-      ...(badejasUnidades !== null && { unidadesPorBandeja: badejasUnidades }), // Agregar solo si no es null
+      controlarInventario: data.controlarInventario ?? 0, // ✅
+      ...(badejasUnidades !== null && { unidadesPorBandeja: badejasUnidades }),
     };
     return productoPayload;
   } catch (error) {

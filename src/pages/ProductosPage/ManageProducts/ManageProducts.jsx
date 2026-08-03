@@ -42,6 +42,7 @@ const ManageProducts = () => {
   const formValues = watch();
   const controlStock = watch("controlStock") === 1; 
   const stockDiario = watch("stockDiario") === 1;
+  const controlarInventario = watch("controlarInventario") === 1;
 
   // Custom hooks para manejar la lógica del formulario
   useProductFormSetup(selectedProduct, setValue, reset, setIsPanaderia, setTipoProduccion, setInitialProductValues);
@@ -290,6 +291,24 @@ const ManageProducts = () => {
               </Col>
             </Row>
 
+            <Form.Group className="mb-3">
+              <h6 className="label-title">Configuración de Inventario</h6>
+              <Form.Label className="label-title">Controlar Inventario</Form.Label>
+              <div className="d-flex align-items-center">
+                <span className="me-2">No</span>
+                <Form.Check
+                  type="switch"
+                  id="controlarInventario"
+                  checked={controlarInventario}
+                  onChange={(e) => {
+                    setValue("controlarInventario", e.target.checked ? 1 : 0);
+                    setHasChanges(true);
+                  }}
+                />
+                <span className="ms-2">Sí</span>
+              </div>
+            </Form.Group>
+
             {/* Sección específica para Panaderia */}
             {isPanaderia && (
               <>
@@ -448,7 +467,7 @@ const ManageProducts = () => {
         title="Confirmar Eliminación"
         message="Al eliminar el producto no se volverá a mostrar en ninguna parte"
         onConfirm={() =>
-          handleConfirmDeletePreoducto(
+          handleConfirmDeleteProducto(
             productoToDelete,
             setProductos,
             setIsPopupOpen,

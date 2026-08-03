@@ -37,6 +37,7 @@ const getEndpoints = {
     GET_GASTOS: "gastos-por-fecha-y-sucursal",
     GET_PRODUCTOS_VENDIDOS: "venta-por-producto",
     GET_NOTIFICACIONES_ACTIVAS: "consultar-activaciones-notificaciones",
+    GET_PRODUCTOS_INVENTARIO: "consultarProductosParaInventario",
 };
 
 const postEndpoints = {
