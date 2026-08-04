@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useGetProductosYPrecios } from "../../../hooks/productosprecios/useGetProductosYprecios";
-import { checkForChanges, handleConfirmDeletePreoducto, handleDeleleProducto, handleUpdateProduct, useCategoriasYFiltrado, useSerchPrductos, resetFormToInitialValues, useProductFormSetup, useCheckFormChanges, useSwitchExclusivity, handleModify, handleCloseModal } from "./ManageProductsUtils";
+import { checkForChanges, handleDeleleProducto, handleUpdateProduct, useCategoriasYFiltrado, useSerchPrductos, resetFormToInitialValues, useProductFormSetup, useCheckFormChanges, useSwitchExclusivity, handleModify, handleCloseModal, handleConfirmDeleteProducto } from "./ManageProductsUtils";
 import SearchInput from "../../../components/SerchInput/SerchInput";
 import Title from "../../../components/Title/Title";
 import CardProductos from "../../../components/CardProductos/CardPoductos";
