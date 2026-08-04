@@ -29,7 +29,7 @@ export const useGetCategorias = () => {
       fetchCategorias();
     }, []);
   
-    return { categorias, loadingCategorias, showErrorCategorias, showInfoCategorias };
+    return { categorias, loadingCategorias, showErrorCategorias, showInfoCategorias, setCategorias };
   };
   
   export default useGetCategorias;

@@ -65,7 +65,7 @@ export const handleDeleleProducto = (idProducto, setProductoToDelete, setIsPopup
 };
 
 /* funcion para ejcutar la logica de eliminacion de producto */
-export const handleConfirmDeletePreoducto = async (productoToDelete, setProducto, setIsPopupOpen, setErrorPopupMessage, setIsPopupErrorOpen) => {
+export const handleConfirmDeleteProducto = async (productoToDelete, setProducto, setIsPopupOpen, setErrorPopupMessage, setIsPopupErrorOpen) => {
   try {
     if (productoToDelete) {
       const resDelete = await desactivarProductosService(productoToDelete);

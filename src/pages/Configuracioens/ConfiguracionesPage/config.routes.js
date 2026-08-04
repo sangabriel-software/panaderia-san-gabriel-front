@@ -5,5 +5,6 @@
     reportes: "/reportes",
     encuestas: "/encuestas-config",
     activarFechaProduccion: "/activar-fecha-produccion",
-    notificaciones: "/habilitar-notificaciones"
+    notificaciones: "/habilitar-notificaciones",
+    categorias: "/categorias"
   };

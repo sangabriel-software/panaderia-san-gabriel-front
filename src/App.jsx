@@ -64,7 +64,7 @@ const IngresarTraslado = lazy(() => import("./pages/Traslados/IngresarTraslado/I
 const CustomerResponses = lazy(() => import("./pages/Encuestas/CustomerResponses/CustomerResponses"));
 const ActivarFechaProduccion = lazy(() => import("./pages/Activar-Fecha-Produccion/ActivarFechaProduccion"));
 const NotificacionesEspeciales = lazy(() => import("./pages/notificaciones/notificaciones-especiales/NotificacionesEspeciales"));
-
+const CategoriasPage = lazy(() => import("./pages/Categorias/CategoriasPage"));
 const CreateSurvey = lazy(() => import("./pages/Encuestas/CreateSurvey/CreateSurvey"));
 
 // Importar el componente PWA Install Prompt
@@ -184,9 +184,13 @@ function App() {
               <Route index element={<ActivarFechaProduccion/>} />
             </Route>
 
-            <Route path="/habilitar-notificaciones">
-              <Route index element={<NotificacionesEspeciales/>} />
-            </Route>
+              <Route path="/habilitar-notificaciones">
+                <Route index element={<NotificacionesEspeciales/>} />
+              </Route>
+
+              <Route path="/categorias">
+                <Route index element={<CategoriasPage/>} />
+              </Route>
 
           </Route>
         </Route>

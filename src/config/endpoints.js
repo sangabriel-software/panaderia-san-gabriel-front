@@ -78,7 +78,8 @@ const putEndpoints = {
     CAMBIAR_PASS: "/actualizar-pass",
     ACTUALIZAR_ORDEN_ESPECIAL: "/actualizar-orden-especial",
     ACTUALIZAR_USUARIO: "/actualizar-datos-usuario",
-    DESACTIVAR_NOTIFICACION: "desactivar-notificaciones"
+    DESACTIVAR_NOTIFICACION: "desactivar-notificaciones",
+    ACTUALIZAR_CATEGORIA: "actualizarcategoria"
 };
 
 const deleteEndpoints = {
@@ -93,7 +94,8 @@ const deleteEndpoints = {
     ELIMINAR_ORDEN_ESPECIAL: "eliminar-orden-especial",
     CANCELAR_DESCUENTO_STOCK: "cancelar-descuento-stock",
     ELIMINAR_TRASLADO: "eliminar-traslado",
-    ELIMINAR_ENCUESTA: "eliminar-encuesta"
+    ELIMINAR_ENCUESTA: "eliminar-encuesta",
+    ELIMINAR_CATEGORIA: "eliminarcategoria",
 };
 
 export { getEndpoints, postEndpoints, putEndpoints, deleteEndpoints};

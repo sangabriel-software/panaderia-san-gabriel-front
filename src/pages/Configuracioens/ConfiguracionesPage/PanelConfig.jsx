@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { MdStorage, MdKitchen, MdSettings, MdOutlineSettings, MdPoll, MdOutlineCalendarToday, MdNotificationsActive, } from "react-icons/md"; // Importar el ícono
+import { MdStorage, MdKitchen, MdSettings, MdOutlineSettings, MdPoll, MdOutlineCalendarToday, MdNotificationsActive, MdCategory, } from "react-icons/md"; // Importar el ícono
 import { Container, Row, Col } from "react-bootstrap";
 import Title from "../../../components/Title/Title";
 import useValidarPermisos from "../../../hooks/configuraciones/useValidarPermisos";
@@ -148,6 +148,27 @@ const PanelConfig = () => {
             </h2>
             <p className="section-description">
               Habilita notificaciones especiales para usuarios.
+            </p>
+          </div>
+        </Col>
+
+        {/* Sección: Confirguracion de categorigas */}
+        <Col xs={12} md={6} className="config-col">
+          <div
+            className={`config-section ${
+              permisos.categorias ? "clickable" : "disabled"
+            }`}
+            onClick={() =>
+              permisos.categorias &&
+              handleNavigate("/categorias", navigate)
+            }
+          >
+            <h2 className="section-title">
+             <MdCategory className="section-icon icon-categorias" />
+              Categorias
+            </h2>
+            <p className="section-description">
+              Configura las categorias de productos.
             </p>
           </div>
         </Col>
