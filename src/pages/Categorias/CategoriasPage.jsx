@@ -1,11 +1,7 @@
 // CategoriasPage.jsx - Componente optimizado
 import { useState, useMemo } from "react";
 import useGetCategorias from "../../hooks/categorias/UseGetCategorias";
-import {
-  ingresarCategoriaService,
-  actualizarCategoriaService,
-  eliminarCategoriaService,
-} from "../../services/categorias/categorias.service";
+import { ingresarCategoriaService, actualizarCategoriaService, eliminarCategoriaService } from "../../services/categorias/categorias.service";
 import "./CategoriasStyle.css";
 import { currentDate } from "../../utils/dateUtils";
 
@@ -70,7 +66,7 @@ const CategoriasPage = () => {
   // ── Toast ────────────────────────────────────────────
   const mostrarToast = (tipo, msg) => {
     setToast({ tipo, msg });
-    setTimeout(() => setToast(null), 3500);
+    setTimeout(() => setToast(null), 4000);
   };
 
   // ── Abrir modos ──────────────────────────────────────
@@ -178,8 +174,15 @@ const CategoriasPage = () => {
       );
       mostrarToast("success", "Categoría eliminada.");
       cerrar();
-    } catch {
-      mostrarToast("error", "No se pudo eliminar.");
+    } catch(error) {
+      if (error.status === 409) {
+        const mensaje =
+        error.response?.data?.error?.message ||
+        "No se pudo eliminar.";
+        mostrarToast("error", mensaje + "\n" + "Reasígnelos antes de eliminarla.");
+      }else{
+        mostrarToast("error", "No se pudo eliminar.");
+      }
     } finally {
       setLoading(false);
     }
@@ -371,8 +374,7 @@ const CategoriasPage = () => {
                     ¿Eliminar "{categoriaSeleccionada?.nombreCategoria}"?
                   </p>
                   <p className="cat-confirm-sub">
-                    Esta acción desactivará la categoría. Los productos asociados
-                    no se verán afectados.
+                    Esta acción desactivará la categoría. 
                   </p>
                 </div>
 
