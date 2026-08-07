@@ -109,7 +109,7 @@ const PanelConfig = () => {
         </Col>
 
         {/* Sección: activacion de fecha de produccion */}
-        {(usuario?.nombreUsuario === "admin" || usuario?.usuario === "aagarcia") && (
+        {(usuario?.usuario === "admin" || usuario?.usuario === "aagarcia") && (
           <Col xs={12} md={6} className="config-col">
             <div
               className={`config-section ${
