@@ -59,7 +59,7 @@ const IngresarTraslado = () => {
 
                 setLocalStock({
                     general: stockGeneral?.stockProductos || [],
-                    dia: stockDia?.stockDiario?.idStockDiario !== 0 ? [stockDia.stockDiario] : []
+                    dia: stockDia.stockDiario || []
                 });
             } catch (error) {
                 console.error("Error fetching stock data:", error);
