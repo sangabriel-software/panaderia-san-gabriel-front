@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Badge, Card, Button, Dropdown } from "react-bootstrap";
 import { formatDateToDisplay } from "../../utils/dateUtils";
 import { BsBox, BsClipboard, BsCalendar, BsDownload, BsFileEarmarkPdf, BsFileEarmarkExcel, BsPerson, BsClock, BsPersonBadge, BsClipboardCheck, BsBuilding, BsArrowUp } from "react-icons/bs";
+import { redondearASiguienteMultiploDe5 } from "../../utils/utils";
 
 const MobileMateriaPrimaDetails = ({ order, detalleConsumo, onDownloadXLS, onDownloadPDF }) => {
   const encabezado = order?.encabezadoOrden;
@@ -192,7 +193,7 @@ const MobileMateriaPrimaDetails = ({ order, detalleConsumo, onDownloadXLS, onDow
               <Card.Body>
                 <div className="d-flex justify-content-between align-items-center mb-2">
                   <span><strong>Harina bandejas solicitadas:</strong></span>
-                  <span className="fw-bold">{Math.round(totalHarinaIngredientes.toFixed(2))} Lb</span>
+                  <span className="fw-bold">{redondearASiguienteMultiploDe5(Math.round(totalHarinaIngredientes.toFixed(2)))} Lb</span>
                 </div>
               </Card.Body>
             </Card>
@@ -201,7 +202,7 @@ const MobileMateriaPrimaDetails = ({ order, detalleConsumo, onDownloadXLS, onDow
               <Card.Body>
                 <div className="d-flex justify-content-between align-items-center mb-2">
                   <span><strong> Harina libras solicitadas:</strong></span>
-                  <span className="fw-bold">{Math.round(totalHarinaProductos.toFixed(2))} Lb</span>
+                  <span className="fw-bold">{redondearASiguienteMultiploDe5(Math.round(totalHarinaProductos.toFixed(2)))} Lb</span>
                 </div>
               </Card.Body>
             </Card>
@@ -210,7 +211,7 @@ const MobileMateriaPrimaDetails = ({ order, detalleConsumo, onDownloadXLS, onDow
               <Card.Body>
                 <div className="d-flex justify-content-between align-items-center">
                   <span className="fw-bold">Total harina:</span>
-                  <span className="fw-bold text-danger">{totalGeneralHarina} Lb</span>
+                  <span className="fw-bold text-danger">{redondearASiguienteMultiploDe5(totalGeneralHarina)} Lb</span>
                 </div>
               </Card.Body>
             </Card>

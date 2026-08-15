@@ -28,11 +28,11 @@ const SeccionProductos = ({ searchTerm, setSearchTerm, categorias, activeCategor
 
   const formatStock = (producto) => {
     const stock = getCurrentStock(producto.idProducto);
-    if (producto.nombreProducto === "Frances") {
-      const filas = Math.floor(stock / 6);
-      const unidades = stock % 6;
-      return unidades > 0 ? `${filas}.${unidades}` : `${filas}`;
-    }
+    // if (producto.nombreProducto === "Frances") {
+    //   const filas = Math.floor(stock / 6);
+    //   const unidades = stock % 6;
+    //   return unidades > 0 ? `${filas}.${unidades}` : `${filas}`;
+    // }
     return stock;
   };
 
@@ -101,9 +101,7 @@ const SeccionProductos = ({ searchTerm, setSearchTerm, categorias, activeCategor
     const stockDisponible = getCurrentStock(producto.idProducto);
 
     if (value !== "") {
-      let cantidadIngresada = isFrances
-        ? Math.floor(parseFloat(value)) * 6 + Math.round((parseFloat(value) % 1) * 10)
-        : parseInt(value, 10);
+      let cantidadIngresada = parseInt(value, 10);
 
       if (cantidadIngresada > stockDisponible) {
         const mensajeError = `No hay suficiente ${producto.nombreProducto} en stock. Stock disponible: ${formatStock(productoCompleto)} ${isFrances ? "filas" : "unidades"}`;
