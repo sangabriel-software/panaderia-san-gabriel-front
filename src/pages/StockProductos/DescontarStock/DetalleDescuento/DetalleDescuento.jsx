@@ -135,7 +135,7 @@ const DetalleDescuento = () => {
                                     </div>
                                     <div className="dd-product-quantity">
                                         <FiMinus className="dd-minus-icon" />
-                                        <span>{producto.unidadesDescontadas} unidades</span>
+                                        <span>{producto.unidadesDescontadas} {producto.nombreProducto === "Frances" ? 'Filas' : 'unidades'}</span>
                                     </div>
                                 </div>
                             ))}
