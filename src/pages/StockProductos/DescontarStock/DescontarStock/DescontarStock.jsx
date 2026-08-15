@@ -60,14 +60,8 @@ const DescontarStock = () => {
 
   // Función para convertir valor ingresado a unidades (especial para Frances)
   const convertirValorAUnidades = (valor, esFrances) => {
-    if (!esFrances) return Math.floor(valor);
     
-    // Separar parte entera y decimal
-    const partes = valor.toString().split('.');
-    const filas = partes.length > 0 ? parseInt(partes[0]) : 0;
-    const unidadesExtra = partes.length > 1 ? parseInt(partes[1].substring(0, 1)) : 0; // Solo primer decimal
-    
-    return (filas * 6) + unidadesExtra;
+    return Math.floor(valor);
   };
 
   // Combinación de stocks similar a StockUnificado con filtro de stock > 0
@@ -224,16 +218,10 @@ const DescontarStock = () => {
       }
 
       // Obtener los productos completos para el payload
-      const productosCompletos = productosConStock.map(item => {
-        const producto = combinedStock.find(p => p.idProducto === item.idProducto);
-        const esFrances = producto.nombreProducto === "Frances";
-        
-        // Convertir el valor ingresado a unidades
-        const stockADescontar = convertirValorAUnidades(item.value, esFrances);
-        
+      const productosCompletos = productosConStock.map(item => {    
         return {
-          ...producto,
-          stockADescontar: stockADescontar
+          ...combinedStock.find(p => p.idProducto === item.idProducto),
+          stockADescontar: item.value
         };
       });
 
