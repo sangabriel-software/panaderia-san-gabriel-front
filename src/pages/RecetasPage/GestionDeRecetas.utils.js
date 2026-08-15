@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import { eliminarRectaService, ingresarRecetaService } from "../../services/recetasServices/recetas.service";
+import { actualizarRecetaService, eliminarRectaService, ingresarRecetaService } from "../../services/recetasServices/recetas.service";
 
 /* Funcion para abrir modal de ingreso de nueva receta */
 export const handleAddReceta = (setShowAddModal) => {

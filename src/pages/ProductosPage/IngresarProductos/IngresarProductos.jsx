@@ -242,7 +242,7 @@ function IngresarProductos() {
                     id="controlarInventario"
                     checked={controlarInventario}
                     onChange={(e) => setValue("controlarInventario", e.target.checked ? 1 : 0)}
-                    disabled={isLoading || stockDiario}
+                    disabled={isLoading}
                   />
                   <span className="ms-2">Sí</span>
                 </div>

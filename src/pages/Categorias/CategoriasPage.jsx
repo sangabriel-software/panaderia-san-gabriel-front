@@ -245,9 +245,16 @@ const CategoriasPage = () => {
               <button className="cat-btn-edit" onClick={() => abrirEditar(cat)}>
                 <Icons.Edit /> Editar
               </button>
-              <button className="cat-btn-delete" onClick={() => abrirEliminar(cat)}>
-                <Icons.Delete /> Eliminar
-              </button>
+              {
+                cat.idCategoria !== 1 && (
+                  <button 
+                    disabled={cat.idCategoria === 1}
+                    className="cat-btn-delete" 
+                    onClick={() => abrirEliminar(cat)}>
+                    <Icons.Delete /> Eliminar
+                  </button>
+                )
+              }
             </div>
           </div>
         ))}

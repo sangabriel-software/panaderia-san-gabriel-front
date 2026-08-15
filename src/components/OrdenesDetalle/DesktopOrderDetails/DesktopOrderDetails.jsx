@@ -156,7 +156,7 @@ const OrderTable = ({ productos, consumoIngredientes }) => {
                   <th className="ps-4 py-3 text-center fw-semibold">#</th>
                   <th className="py-3 fw-semibold">Producto</th>
                   <th className="py-3 text-center fw-semibold">Bandejas</th>
-                  <th className="py-3 text-center fw-semibold">Unidades</th>
+                  <th className="py-3 text-center fw-semibold">Unidades / Unidades</th>
                   <th className="py-3 text-center fw-semibold">Categoría</th>
                 </tr>
               </thead>

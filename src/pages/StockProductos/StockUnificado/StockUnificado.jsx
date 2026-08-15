@@ -316,9 +316,7 @@ const StockUnificado = () => {
               {filteredProducts.length > 0 ? (
                 filteredProducts.map((producto) => {
                   const esFrances = producto.nombreProducto === "Frances";
-                  const cantidadMostrada = esFrances 
-                    ? `${Math.floor(producto.cantidadExistente / 6)}.${producto.cantidadExistente % 6}`
-                    : producto.cantidadExistente;
+                  const cantidadMostrada = producto.cantidadExistente;
                   
                   return (
                     <tr key={`${producto.idProducto}-${producto.esStockDiario ? 'dia' : 'gen'}`}>
