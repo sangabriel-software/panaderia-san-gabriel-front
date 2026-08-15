@@ -199,7 +199,6 @@ const obtenerCantidadesIngresadas = (productos, trayQuantities) => {
 // Función para crear el detalle de la venta
 const crearDetalleVenta = (productos, trayQuantities, orden, fechaActual) => {
   const idOrdenProduccion = orden.encabezadoOrden ? orden.encabezadoOrden.idOrdenProduccion : null;
-  let unidadesFrancesNoVendidas = 0;
 
   // Obtener las cantidades ingresadas para cada producto
   const productosConCantidad = obtenerCantidadesIngresadas(productos, trayQuantities);
@@ -208,17 +207,14 @@ const crearDetalleVenta = (productos, trayQuantities, orden, fechaActual) => {
     .map((producto) => {
       const cantidadIngresada = producto.cantidadIngresada; // Usar la cantidad obtenida
 
-    if(producto.idProducto === 1){
-        unidadesFrancesNoVendidas = obtenerUnidadesFrances(cantidadIngresada);
-      }
-      
+
           return {
             idProducto: producto.idProducto,
             tipoProduccion: producto.tipoProduccion,
             controlarStock: producto.controlarStock,
             controlarStockDiario: producto.controlarStockDiario,
             idCategoria: producto.idCategoria,
-            unidadesNoVendidas: producto.idProducto === 1 ? unidadesFrancesNoVendidas : cantidadIngresada, 
+            unidadesNoVendidas: cantidadIngresada, 
             fechaCreacion: fechaActual,
           };
         

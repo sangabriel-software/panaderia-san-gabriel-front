@@ -249,9 +249,7 @@ const updateCurrentStock = (newStockValues) => {
                     </div>
                   </td>
                   <td className="text-center align-middle" style={{ fontWeight: "bold" }}>
-                    {producto.nombreProducto === "Frances"
-                      ? `${Math.floor((currentStock[producto.idProducto] || 0) / 6)}.${(currentStock[producto.idProducto] || 0) % 6}`
-                      : currentStock[producto.idProducto] || 0}
+                    {currentStock[producto.idProducto] || 0}
                   </td>
                   <td className="text-center align-middle">
                     <Form.Control

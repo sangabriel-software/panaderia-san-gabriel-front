@@ -48,7 +48,7 @@ export const handleStockChange = (idProducto, value, setStockValues ) => {
               (p) => p.idProducto === parseInt(idProducto)
             );
 
-            const stockFinal = parseInt(idProducto) === 1 ? cantidad * 6 : cantidad;
+            const stockFinal = cantidad;
   
             return {
               idUsuario: usuario.idUsuario,

@@ -467,9 +467,7 @@ const DescontarStock = () => {
                       </div>
                     </td>
                     <td className="text-center align-middle" style={{ fontWeight: "bold"}}>
-                      {esFrances ? 
-                        `${Math.floor(producto.cantidadMostrada)}.${Math.round((producto.cantidadMostrada % 1) * 6)}` : 
-                        producto.cantidadExistente}
+                      {producto.cantidadExistente}
                     </td>
                     <td className="text-center align-middle">
                       <Form.Control
