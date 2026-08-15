@@ -261,7 +261,7 @@ const OrderDetailsPdf = ({ detalleOrden, encabezadoOrden, detalleConsumo }) => {
                 <Text style={styles.tableCellItem}>#</Text>
                 <Text style={styles.tableHeader}>Producto</Text>
                 <Text style={styles.tableHeader}>Bandejas</Text>
-                <Text style={styles.tableHeader}>Unidades</Text>
+                <Text style={styles.tableHeader}>Unidades / Filas</Text>
               </View>
               {prodBandejas.map((item, index) => (
                 <View style={styles.tableRow} key={index}>
