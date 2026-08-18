@@ -244,7 +244,7 @@ function Sidebar({ show, onClose }) {
           </Nav.Link>
         )}
 
-        {isRouteAllowed("/productos") && (
+        {/* {isRouteAllowed("/productos") && (
           <Nav.Link
             as={NavLink}
             to="/productos"
@@ -253,10 +253,10 @@ function Sidebar({ show, onClose }) {
           >
             <MdOutlineBakeryDining size={25} className="me-2" /> Productos
           </Nav.Link>
-        )}
+        )} */}
 
         {/* Users Dropdown */}
-        {(isRouteAllowed("/users") || isRouteAllowed("/users/roles")) && (
+        {/* {(isRouteAllowed("/users") || isRouteAllowed("/users/roles")) && (
           <>
             <Nav.Link
               className="text-light d-flex justify-content-between align-items-center"
@@ -296,9 +296,9 @@ function Sidebar({ show, onClose }) {
               </div>
             </Collapse>
           </>
-        )}
+        )} */}
 
-        {isRouteAllowed("/sucursales") && (
+        {/* {isRouteAllowed("/sucursales") && (
           <Nav.Link
             as={NavLink}
             to="/sucursales"
@@ -307,7 +307,7 @@ function Sidebar({ show, onClose }) {
           >
             <FiMapPin size={25} className="me-2" /> Sucursales
           </Nav.Link>
-        )}
+        )} */}
 
         {/* Configuraciones Dropdown */}
         <>
