@@ -149,27 +149,6 @@ const PanelConfig = () => {
           </div>
         </Col>
 
-        {/* Sección: reportes */}
-        <Col xs={12} md={6} className="config-col">
-          <div
-            className={`config-section ${
-              permisos.reportes ? "clickable" : "disabled"
-            }`}
-            onClick={() =>
-              permisos.reportes &&
-              handleNavigate("/reportes", navigate)
-            }
-          >
-            <h2 className="section-title">
-              <MdSettings className="section-icon icon-otras-config" /> 
-              Reportes
-            </h2>
-            <p className="section-description">
-              Genera reportes de stock, ventas, etc.
-            </p>
-          </div>
-        </Col>
-
         {/* Sección: configuracion de encuestas */}
         <Col xs={12} md={6} className="config-col">
           <div

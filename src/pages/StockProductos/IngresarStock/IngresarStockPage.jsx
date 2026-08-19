@@ -293,7 +293,7 @@ const updateCurrentStock = (newStockValues) => {
           {isLoading ? (
             <Spinner animation="border" size="sm" />
           ) : (
-            "Guardar Stock"
+            "Guardar Inventario"
           )}
         </Button>
       </div>

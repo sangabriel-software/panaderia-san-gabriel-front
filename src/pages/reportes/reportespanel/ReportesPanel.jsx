@@ -9,7 +9,7 @@ const ModernReportPanel = () => {
   const reports = [
     {
       id: 1,
-      title: "Ingreso de stock",
+      title: "ingreso de  Inventario",
       description: "Registro completo de productos ingresados",
       icon: <FiBox className="mr-icon" />,
       accentColor: "#6366F1",
