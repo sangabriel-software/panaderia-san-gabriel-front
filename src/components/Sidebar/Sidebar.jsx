@@ -142,7 +142,7 @@ function Sidebar({ show, onClose }) {
 
         {/* Inventadio Dropdown */}
         <>
-          <Nav.Link
+          {/* <Nav.Link
             className="text-light d-flex justify-content-between align-items-center"
             onClick={() => setInvetarioOpen(!inventarioOpen)}
             style={{ cursor: "pointer" }}
@@ -153,7 +153,7 @@ function Sidebar({ show, onClose }) {
             <FaChevronRight
               className={`dropdown-arrow ${inventarioOpen ? "open" : ""}`}
             />
-          </Nav.Link>
+          </Nav.Link> */}
 
           <Collapse in={inventarioOpen}>
             <div>
@@ -210,6 +210,17 @@ function Sidebar({ show, onClose }) {
             <FiBox size={25} className="me-2" /> Inventario
           </Nav.Link>
         )} */}
+
+        {isRouteAllowed("/stock-productos") && (
+          <Nav.Link
+            as={NavLink}
+            to="/stock-productos"
+            className="text-light"
+            onClick={handleNavLinkClick}
+          >
+            <FiBox size={25} className="me-2" /> Inventario
+          </Nav.Link>
+        )}
 
         {isRouteAllowed("/ordenes-produccion") && (
           <Nav.Link
@@ -309,34 +320,16 @@ function Sidebar({ show, onClose }) {
           </Nav.Link>
         )} */}
 
-        {/* Configuraciones Dropdown */}
-        <>
+        {isRouteAllowed("/config") && (
           <Nav.Link
-            className="text-light d-flex justify-content-between align-items-center"
-            onClick={() => setConfigOpen(!configOpen)}
-            style={{ cursor: "pointer" }}
+            as={NavLink}
+            to="/config"
+            className="text-light"
+            onClick={handleNavLinkClick}
           >
-            <span>
-              <FiSettings size={25} className="me-2" /> Configuraciones
-            </span>
-            <FaChevronRight
-              className={`dropdown-arrow ${configOpen ? "open" : ""}`}
-            />
+            <FiSettings size={25} className="me-2" /> Configuraciones
           </Nav.Link>
-
-          <Collapse in={configOpen}>
-            <div>
-              <Nav.Link
-                as={NavLink}
-                to="/config"
-                className="text-light ps-4 submenu-item"
-                onClick={handleNavLinkClick}
-              >
-                <MdDashboard className="me-2" /> Panel de control
-              </Nav.Link>
-            </div>
-          </Collapse>
-        </>
+        )}
       </Nav>
 
       {/* Toggle Switch para el tema */}

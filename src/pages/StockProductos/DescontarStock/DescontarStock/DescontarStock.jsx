@@ -52,9 +52,6 @@ const DescontarStock = () => {
 
   // Función para calcular el stock mostrado (dividir por 6 si es Frances)
   const calcularStockMostrado = (producto) => {
-    if (producto.nombreProducto === "Frances") {
-      return producto.cantidadExistente / 6;
-    }
     return producto.cantidadExistente;
   };
 
