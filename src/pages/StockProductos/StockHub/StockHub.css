@@ -1,0 +1,251 @@
+.stockhub-container {
+  padding-bottom: 100px;
+  max-width: 720px;
+}
+
+/* --- Selector inicial de sucursal (solo si no hay una resuelta) --- */
+.stockhub-picker {
+  padding-top: 32px;
+  max-width: 720px;
+}
+
+.stockhub-picker-title {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.stockhub-picker-subtitle {
+  color: #6b6a63;
+  margin-bottom: 20px;
+}
+
+.stockhub-picker-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.stockhub-picker-card {
+  text-align: left;
+  border: 1px solid #e5e2d8;
+  border-radius: 14px;
+  padding: 16px;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.stockhub-picker-card:active {
+  background: #f7f5ef;
+}
+
+.stockhub-picker-name {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.stockhub-picker-location {
+  font-size: 13px;
+  color: #8a887f;
+}
+
+/* --- Header --- */
+.stockhub-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 0 8px;
+}
+
+.stockhub-back-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: none;
+  background: #f4f2ec;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.stockhub-header-info {
+  min-width: 0;
+}
+
+.stockhub-title {
+  font-size: 19px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.stockhub-subtitle {
+  font-size: 13px;
+  color: #8a887f;
+  margin: 0;
+}
+
+.stockhub-sucursal-switch {
+  border: none;
+  background: transparent;
+  padding: 0;
+  font-size: 19px;
+  font-weight: 600;
+  color: #1c1c1a;
+  display: flex;
+  align-items: center;
+}
+
+/* --- KPIs --- */
+.stockhub-kpis {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin: 12px 0 16px;
+}
+
+.stockhub-kpi {
+  background: #f7f5ef;
+  border-radius: 12px;
+  padding: 12px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stockhub-kpi--alert {
+  background: #faeeda;
+}
+
+.stockhub-kpi-value {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1c1c1a;
+}
+
+.stockhub-kpi--alert .stockhub-kpi-value {
+  color: #854f0b;
+}
+
+.stockhub-kpi-label {
+  font-size: 12px;
+  color: #8a887f;
+}
+
+/* --- Filtros --- */
+.stockhub-filters {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.stockhub-search {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.stockhub-search-icon {
+  position: absolute;
+  left: 12px;
+  color: #a5a399;
+  font-size: 14px;
+}
+
+.stockhub-search-input {
+  padding-left: 34px !important;
+  border-radius: 10px !important;
+  background: #f7f5ef !important;
+  border: none !important;
+}
+
+.stockhub-search-clear {
+  position: absolute;
+  right: 8px;
+  border: none;
+  background: transparent;
+  color: #8a887f;
+}
+
+.stockhub-cat-toggle {
+  border: none;
+  background: #f7f5ef;
+  border-radius: 10px;
+  padding: 0 14px;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  color: #1c1c1a;
+  white-space: nowrap;
+}
+
+/* --- Lista de productos --- */
+.stockhub-empty {
+  margin-top: 12px;
+}
+
+.stockhub-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.stockhub-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #ffffff;
+  border: 1px solid #eeece5;
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+
+.stockhub-item-badge {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.stockhub-item-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.stockhub-item-name {
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.stockhub-item-unit {
+  font-size: 12px;
+  color: #8a887f;
+}
+
+.stockhub-item-qty {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1c1c1a;
+  flex-shrink: 0;
+}
+
+.stockhub-item-qty--low {
+  color: #a32d2d;
+}

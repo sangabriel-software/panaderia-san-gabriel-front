@@ -6,6 +6,7 @@ import "./styles/App.css";
 import "./styles/globalStyles.css";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import StockHub from "./pages/StockProductos/StockHub/StockHub";
 
 /* AI routes */
 const IngresarVentasAI = lazy(() => import("./pages/VentasAI/IngresarVentasAI"));
@@ -138,7 +139,8 @@ function App() {
             </Route>
 
             <Route path="/stock-productos">
-              <Route index element={<GestionarStockPage/>} />
+              {/* <Route index element={<GestionarStockPage/>} /> */}
+              <Route index element={<StockHub/>} />
               <Route path="venta-diaria/:idSucursal" element={<StockDiarioPage/>} />
               <Route path="ingresar-stock/:idSucursal" element={<IngresarStockGeneralPage/>} />
               {/* <Route path="stock-general/:idSucursal" element={<StockGeneralPage/>} /> */}

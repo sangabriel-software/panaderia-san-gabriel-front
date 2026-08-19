@@ -1,0 +1,118 @@
+.fab-container {
+  position: fixed;
+  right: 20px;
+  bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  z-index: 1030;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.fab-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 20, 20, 0.28);
+  z-index: -1;
+  animation: fab-fade-in 0.18s ease-out;
+}
+
+.fab-main {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  border: none;
+  background: #d85a30;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(216, 90, 48, 0.4);
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.fab-main--open {
+  transform: rotate(45deg);
+  background: #993c1d;
+}
+
+.fab-main:active {
+  transform: scale(0.94) rotate(45deg);
+}
+
+.fab-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.fab-action {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: none;
+  border-radius: 999px;
+  padding: 0;
+  background: transparent;
+  opacity: 0;
+  transform: translateY(10px) scale(0.9);
+  pointer-events: none;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.fab-actions--open .fab-action {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.fab-action__label {
+  background: #2c2c2a;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: 999px;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+}
+
+.fab-action__icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.22);
+  flex-shrink: 0;
+}
+
+.fab-action--green .fab-action__icon,
+.fab-action.fab--green .fab-action__icon {
+  background: #3b6d11;
+}
+
+.fab-action.fab--amber .fab-action__icon {
+  background: #854f0b;
+}
+
+.fab-action.fab--blue .fab-action__icon {
+  background: #185fa5;
+}
+
+@keyframes fab-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fab-main,
+  .fab-action,
+  .fab-backdrop {
+    transition: none;
+    animation: none;
+  }
+}
