@@ -29,7 +29,7 @@ const GestionarStockPage = () => {
         <Container className="gestionar-container">
             <header className="gestionar-header">
                 <h1 className="gestionar-title">
-                    <FaBoxes className="title-icon" /> Gestión de Stock
+                    <FaBoxes className="title-icon" /> Gestión de Inventario
                 </h1>
                 <p className="gestionar-subtitle">
                     {usuario.idRol === 1 
@@ -60,18 +60,9 @@ const GestionarStockPage = () => {
                                     >
                                         <FaBoxOpen className="option-icon" />
                                         <div className="option-text">
-                                            <span>Stock</span>
+                                            <span>Inventario</span>
                                             <small>Productos en inventario</small>
                                         </div>
-                                    </Button>
-                                    
-                                    <Button
-                                        variant="outline-success"
-                                        className="option-btn add-btn"
-                                        onClick={() => handleAddProductToSucursal(navigate, sucursal.idSucursal)}
-                                    >
-                                        <FaPlus className="option-icon" />
-                                        Agregar producto
                                     </Button>
                                 </div>
                             </Card>

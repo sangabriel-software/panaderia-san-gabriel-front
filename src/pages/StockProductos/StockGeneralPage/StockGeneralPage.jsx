@@ -138,7 +138,7 @@ const StockGeneralPage = () => {
           </div>
           <div className="col-8">
             <Title
-              title={`Stock General ${sucursal?.nombreSucursal}`}
+              title={`Inventario General ${sucursal?.nombreSucursal}`}
               description="Todos los productos disponibles en inventario"
             />
           </div>

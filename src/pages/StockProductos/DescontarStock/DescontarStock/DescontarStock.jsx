@@ -320,7 +320,7 @@ const DescontarStock = () => {
           </div>
           <div className="col-8">
             <Title
-              title={`Descontar Stock - ${sucursal?.nombreSucursal}`}
+              title={`Descontar inventario - ${sucursal?.nombreSucursal}`}
             />
           </div>
         </div>
@@ -494,7 +494,7 @@ const DescontarStock = () => {
           {isLoading ? (
             <Spinner animation="border" size="sm" />
           ) : (
-            "Descontar Stock"
+            "Descontar"
           )}
         </Button>
       </div>

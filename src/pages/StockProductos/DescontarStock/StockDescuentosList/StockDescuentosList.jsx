@@ -145,7 +145,7 @@ const StockDescuentosList = () => {
             <header className="sdl-header">
                 <div className="sdl-header-top row">
                     <div className="col-12 col-md-6">
-                        <h1>Historial de Stock descontado</h1>
+                        <h1>Historial de Descuentos</h1>
                         <p className="d-none d-md-block">Registro histórico de modificaciones al stock</p>
                     </div>
                     <div className="col-12 col-md-6">

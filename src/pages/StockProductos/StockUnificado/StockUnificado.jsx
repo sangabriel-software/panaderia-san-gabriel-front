@@ -198,7 +198,7 @@ const StockUnificado = () => {
           </div>
           <div className="col-8">
             <Title
-              title={`Stock General ${sucursal?.nombreSucursal}`}
+              title={`Inventario General ${sucursal?.nombreSucursal}`}
               description="Todos los productos disponibles en inventario"
             />
           </div>
@@ -215,7 +215,7 @@ const StockUnificado = () => {
               <FaPlus size={15} />
             </span>
             <span className="su-action-btn__text">
-              <span className="su-action-btn__label">Ingresar stock</span>
+              <span className="su-action-btn__label">Ingresar Inventario</span>
               <span className="su-action-btn__sub">Agregar unidades</span>
             </span>
           </button>
@@ -234,8 +234,8 @@ const StockUnificado = () => {
               </svg>
             </span>
             <span className="su-action-btn__text">
-              <span className="su-action-btn__label">Descontar stock</span>
-              <span className="su-action-btn__sub">Reducir unidades</span>
+              <span className="su-action-btn__label">Descontar Inventario</span>
+              <span className="su-action-btn__sub">Reducir Inventario</span>
             </span>
           </button>
 
