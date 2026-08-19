@@ -6,5 +6,9 @@
     encuestas: "/encuestas-config",
     activarFechaProduccion: "/activar-fecha-produccion",
     notificaciones: "/habilitar-notificaciones",
-    categorias: "/categorias"
+    categorias: "/categorias",
+    usuarios: "/users",
+    roles: "/users/roles",
+    sucursales: "/sucursales",
+    productos: "/productos"
   };

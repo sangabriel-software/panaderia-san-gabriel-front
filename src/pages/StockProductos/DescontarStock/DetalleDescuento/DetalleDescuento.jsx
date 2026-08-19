@@ -3,6 +3,7 @@ import useGetDetalleDescuento from "../../../../hooks/DescuentoDeStock/useGetDet
 import { FiArrowLeft, FiTag, FiUser, FiClock, FiPackage, FiMinus, FiCheck, FiX } from "react-icons/fi";
 import './DetalleDescuento.styles.css';
 import { encryptId } from "../../../../utils/CryptoParams";
+import { currentDate, currentDateToFormat } from "../../../../utils/dateUtils";
 
 const DetalleDescuento = () => {
     const { idDescuento } = useParams();
@@ -135,7 +136,7 @@ const DetalleDescuento = () => {
                                     </div>
                                     <div className="dd-product-quantity">
                                         <FiMinus className="dd-minus-icon" />
-                                        <span>{producto.unidadesDescontadas} {producto.nombreProducto === "Frances" ? 'Filas' : 'unidades'}</span>
+                                        <span>{producto.unidadesDescontadas} {producto.nombreProducto === "Frances" ? (currentDateToFormat(encabezadoDescuento.fechaDescuento) < "2026-08-15" ? 'Unidades' : 'Filas') : 'Unidades'}</span>
                                     </div>
                                 </div>
                             ))}

@@ -33,6 +33,11 @@ const StockUnificado = () => {
     navigate(`/stock-productos/ingresar-stock/${encodeURIComponent(idSucursal)}`);
   };
 
+  const handleDescontarStock = () => {
+    navigate(`/descuento-stock/stock-descuentos-lista/${encodeURIComponent(idSucursal)}`);
+  };
+
+
   // Verificación segura de stocks vacíos
   const isStockDiarioEmpty = useMemo(() => {
     return !stockDelDia || 
@@ -200,55 +205,102 @@ const StockUnificado = () => {
         </div>
       </div>
 
-      {/* Filtros */}
-      <div className="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 mb-4">
-        {/* Botón Ingresar Stock */}
-        <Button 
-          variant="success" 
-          onClick={handleIngresarStock}
-          className="d-flex align-items-center gap-2 me-md-3"
-        >
-          <FaPlus /> Ingresar Stock
-        </Button>
+      {/* Acciones de inventario */}
+      <div className="su-actions-wrap">
 
-        {/* Barra de búsqueda */}
-        <div className="flex-grow-1" style={{ minWidth: "300px", maxWidth: "500px" }}>
-          <div className="position-relative">
+        {/* Botones de acción */}
+        <div className="su-action-btns">
+          <button className="su-action-btn su-action-btn--green" onClick={handleIngresarStock}>
+            <span className="su-action-btn__icon">
+              <FaPlus size={15} />
+            </span>
+            <span className="su-action-btn__text">
+              <span className="su-action-btn__label">Ingresar stock</span>
+              <span className="su-action-btn__sub">Agregar unidades</span>
+            </span>
+          </button>
+
+          <button
+            className="su-action-btn su-action-btn--amber"
+            onClick={handleDescontarStock}
+          >
+            <span className="su-action-btn__icon">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+                <line x1="12" y1="5" x2="12" y2="19"/>
+                <line x1="5" y1="12" x2="19" y2="12"/>
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="8" y1="12" x2="16" y2="12"/>
+              </svg>
+            </span>
+            <span className="su-action-btn__text">
+              <span className="su-action-btn__label">Descontar stock</span>
+              <span className="su-action-btn__sub">Reducir unidades</span>
+            </span>
+          </button>
+
+          <button
+            className="su-action-btn su-action-btn--blue"
+            onClick={() => navigate("/traslados-productos")}
+          >
+            <span className="su-action-btn__icon">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+                <path d="M5 17H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v3"/>
+                <rect x="9" y="11" width="14" height="10" rx="2"/>
+                <path d="M16 11v-3"/>
+              </svg>
+            </span>
+            <span className="su-action-btn__text">
+              <span className="su-action-btn__label">Traslados</span>
+              <span className="su-action-btn__sub">Mover entre sucursales</span>
+            </span>
+          </button>
+        </div>
+
+        {/* Búsqueda y filtro */}
+        <div className="su-search-filter">
+          <div className="su-search-wrap">
+            <FaSearch className="su-search-icon" />
             <Form.Control
               type="text"
               placeholder="Buscar producto..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="stock-general-search-input"
-              style={{ paddingRight: "2.5rem" }}
+              className="su-search-input"
             />
-            <FaSearch className="stock-general-search-icon" />
             {searchTerm && (
-              <BsX
-                className="stock-general-clear-icon"
-                onClick={handleClearSearch}
-              />
+              <button className="su-search-clear" onClick={handleClearSearch} aria-label="Limpiar">
+                <BsX size={18} />
+              </button>
             )}
           </div>
-        </div>
 
-        {/* Dropdown de categorías */}
-        <div style={{ minWidth: "250px" }}>
           <Dropdown>
-            <Dropdown.Toggle 
-              variant="primary" 
-              id="dropdown-categorias" 
-              className="stock-general-category-dropdown w-100"
+            <Dropdown.Toggle
+              variant="light"
+              id="dropdown-categorias"
+              className="su-cat-toggle"
             >
-              {categoriaActiva === "Todas" ? "Todas las categorías" : categoriaActiva}
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" strokeWidth="2" strokeLinecap="round"
+                style={{ marginRight: 6 }}>
+                <line x1="8" y1="6" x2="21" y2="6"/>
+                <line x1="8" y1="12" x2="21" y2="12"/>
+                <line x1="8" y1="18" x2="21" y2="18"/>
+                <line x1="3" y1="6" x2="3.01" y2="6"/>
+                <line x1="3" y1="12" x2="3.01" y2="12"/>
+                <line x1="3" y1="18" x2="3.01" y2="18"/>
+              </svg>
+              {categoriaActiva === "Todas" ? "Categoría" : categoriaActiva}
             </Dropdown.Toggle>
-            <Dropdown.Menu className="stock-general-category-dropdown-menu w-100">
+            <Dropdown.Menu className="su-cat-menu">
               {categorias.map((categoria) => (
                 <Dropdown.Item
                   key={categoria}
                   active={categoriaActiva === categoria}
                   onClick={() => setCategoriaActiva(categoria)}
-                  className="stock-general-category-dropdown-item"
+                  className="su-cat-item"
                 >
                   {categoria}
                 </Dropdown.Item>
@@ -256,6 +308,7 @@ const StockUnificado = () => {
             </Dropdown.Menu>
           </Dropdown>
         </div>
+
       </div>
 
       {/* Contenido condicional */}
