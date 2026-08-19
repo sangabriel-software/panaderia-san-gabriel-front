@@ -139,8 +139,7 @@ function App() {
             </Route>
 
             <Route path="/stock-productos">
-              {/* <Route index element={<GestionarStockPage/>} /> */}
-              <Route index element={<StockHub/>} />
+              <Route index element={<GestionarStockPage/>} />
               <Route path="venta-diaria/:idSucursal" element={<StockDiarioPage/>} />
               <Route path="ingresar-stock/:idSucursal" element={<IngresarStockGeneralPage/>} />
               {/* <Route path="stock-general/:idSucursal" element={<StockGeneralPage/>} /> */}
