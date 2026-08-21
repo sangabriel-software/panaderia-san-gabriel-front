@@ -70,10 +70,6 @@ const SeccionProductos = ({ searchTerm, setSearchTerm, categorias, activeCategor
     const stockDisponible = getCurrentStock(idProducto);
     let cantidadIngresada = parsedValue;
 
-    if (productoNombre === "Frances") {
-      cantidadIngresada = Math.floor(parsedValue) * 6 + Math.round((parsedValue % 1) * 10);
-    }
-
     if (cantidadIngresada > stockDisponible) {
       const mensajeError = `No hay suficiente ${productoNombre} en stock. Stock disponible: ${formatStock(producto)} ${productoNombre === "Frances" ? "filas" : "unidades"}`;
       setErrorMessage(mensajeError);

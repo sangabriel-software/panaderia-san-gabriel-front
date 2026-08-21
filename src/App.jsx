@@ -6,6 +6,7 @@ import "./styles/App.css";
 import "./styles/globalStyles.css";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import StockHub from "./pages/StockProductos/StockHub/StockHub";
 
 /* AI routes */
 const IngresarVentasAI = lazy(() => import("./pages/VentasAI/IngresarVentasAI"));

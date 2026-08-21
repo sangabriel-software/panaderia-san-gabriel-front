@@ -1,0 +1,127 @@
+.bsheet-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 20, 20, 0.5);
+  z-index: 1050;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  animation: bsheet-fade-in 0.22s ease-out;
+}
+
+.bsheet-backdrop--closing {
+  animation: bsheet-fade-out 0.22s ease-in forwards;
+}
+
+.bsheet-panel {
+  width: 100%;
+  max-width: 560px;
+  max-height: 88vh;
+  background: #ffffff;
+  border-radius: 20px 20px 0 0;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.18);
+  animation: bsheet-slide-up 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  touch-action: none;
+}
+
+.bsheet-panel--closing {
+  animation: bsheet-slide-down 0.22s ease-in forwards;
+}
+
+.bsheet-handle-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 10px 0 4px;
+  flex-shrink: 0;
+}
+
+.bsheet-handle {
+  width: 40px;
+  height: 4px;
+  border-radius: 4px;
+  background: #d8d5cc;
+}
+
+.bsheet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 20px 12px;
+  border-bottom: 1px solid #eeece5;
+  flex-shrink: 0;
+}
+
+.bsheet-title {
+  font-size: 17px;
+  font-weight: 600;
+  margin: 0;
+  color: #1c1c1a;
+}
+
+.bsheet-close {
+  background: #f4f2ec;
+  border: none;
+  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #56554f;
+  flex-shrink: 0;
+}
+
+.bsheet-close:active {
+  background: #e8e5db;
+}
+
+.bsheet-content {
+  overflow-y: auto;
+  padding: 16px 20px calc(20px + env(safe-area-inset-bottom, 0px));
+  -webkit-overflow-scrolling: touch;
+}
+
+@keyframes bsheet-slide-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+@keyframes bsheet-slide-down {
+  from { transform: translateY(0); }
+  to { transform: translateY(100%); }
+}
+
+@keyframes bsheet-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes bsheet-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bsheet-backdrop,
+  .bsheet-backdrop--closing,
+  .bsheet-panel,
+  .bsheet-panel--closing {
+    animation: none;
+  }
+}
+
+@media (min-width: 768px) {
+  .bsheet-backdrop {
+    align-items: center;
+  }
+  .bsheet-panel {
+    border-radius: 20px;
+    max-height: 80vh;
+  }
+  .bsheet-handle-wrap {
+    display: none;
+  }
+}
