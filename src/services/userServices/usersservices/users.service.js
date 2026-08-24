@@ -73,3 +73,14 @@ export const actualizardatosUsuarioServices = async (dataUSuario) => {
     throw error;
   }
 }
+
+export const resetearPassService = async (idUsuario) => {
+  try {
+      const response = await api.put(`${putEndpoints.RESETEAR_PASS}?idUsuario=${idUsuario}`); 
+      return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+

@@ -6,7 +6,7 @@ import "./styles/App.css";
 import "./styles/globalStyles.css";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import StockHub from "./pages/StockProductos/StockHub/StockHub";
+// import StockHub from "./pages/StockProductos/StockHub/StockHub";
 
 /* AI routes */
 const IngresarVentasAI = lazy(() => import("./pages/VentasAI/IngresarVentasAI"));
@@ -67,6 +67,7 @@ const ActivarFechaProduccion = lazy(() => import("./pages/Activar-Fecha-Producci
 const NotificacionesEspeciales = lazy(() => import("./pages/notificaciones/notificaciones-especiales/NotificacionesEspeciales"));
 const CategoriasPage = lazy(() => import("./pages/Categorias/CategoriasPage"));
 const CreateSurvey = lazy(() => import("./pages/Encuestas/CreateSurvey/CreateSurvey"));
+const ResetPassPage = lazy(() => import("./pages/Reset-Pass/ResetPassPage"));
 
 // Importar el componente PWA Install Prompt
 const PWAInstallPrompt = lazy(() => import("./components/PWAInstallPrompt/PWAInstallPrompt"));
@@ -191,6 +192,10 @@ function App() {
 
               <Route path="/categorias">
                 <Route index element={<CategoriasPage/>} />
+              </Route>
+
+              <Route path="/reset-pass">
+                <Route index element={<ResetPassPage/>} />
               </Route>
 
           </Route>
