@@ -79,7 +79,8 @@ const putEndpoints = {
     ACTUALIZAR_ORDEN_ESPECIAL: "/actualizar-orden-especial",
     ACTUALIZAR_USUARIO: "/actualizar-datos-usuario",
     DESACTIVAR_NOTIFICACION: "desactivar-notificaciones",
-    ACTUALIZAR_CATEGORIA: "actualizarcategoria"
+    ACTUALIZAR_CATEGORIA: "actualizarcategoria",
+    RESETEAR_PASS: "resetear-contrasenia"
 };
 
 const deleteEndpoints = {

@@ -8,7 +8,7 @@ import { rutas } from "./config.routes";
 import { handleNavigate } from "./PanelConfig.utils";
 import "./PanelConfig.css";
 import { getUserData } from "../../../utils/Auth/decodedata";
-import { FiClipboard, FiMapPin, FiUsers } from "react-icons/fi";
+import { FiClipboard, FiLock, FiMapPin, FiUsers } from "react-icons/fi";
 import { FaUserPlus } from "react-icons/fa";
 
 const PanelConfig = () => {
@@ -231,6 +231,27 @@ const PanelConfig = () => {
             </h2>
             <p className="section-description">
               Configura las categorias de productos.
+            </p>
+          </div>
+        </Col>
+
+        {/* Sección: Reseteo de contraseña */}
+        <Col xs={12} md={6} className="config-col">
+          <div
+            className={`config-section ${
+              permisos.resetPass ? "clickable" : "disabled"
+            }`}
+            onClick={() =>
+              permisos.resetPass &&
+              handleNavigate("/reset-pass", navigate)
+            }
+          >
+            <h2 className="section-title">
+             <FiLock className="section-icon icon-reset-pass" />
+              Reseto de contraseñas
+            </h2>
+            <p className="section-description">
+              Realiza el reseteo de contraseña.
             </p>
           </div>
         </Col>

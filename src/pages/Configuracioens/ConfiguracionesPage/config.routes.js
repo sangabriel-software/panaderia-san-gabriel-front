@@ -10,5 +10,6 @@
     usuarios: "/users",
     roles: "/users/roles",
     sucursales: "/sucursales",
-    productos: "/productos"
+    productos: "/productos",
+    resetPass: "/reset-pass"
   };
