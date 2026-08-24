@@ -1,4 +1,5 @@
 import { iniciarSesion } from "../../services/authServices/auth.service";
+import { getUserData } from "../../utils/Auth/decodedata";
 import { setLocalStorage } from "../../utils/Auth/localstorage";
 import { toast } from "react-toastify";
 
@@ -13,20 +14,21 @@ export const handleLogin = async (data, navigate, setIsLoading) => {
 
   try {
     const response = await iniciarSesion(data);
-
+        
     if (response.status === 200) {
-      // Guardamos el token en localStorage
       setLocalStorage("token", response.authUser);
 
-      // Mostrar notificación de éxito
-      toast.success("Inicio de sesión exitoso", {
-        autoClose: 1000,
-      });
+      toast.success("Inicio de sesión exitoso", { autoClose: 1000 });
 
-      // Redirigir al dashboard después de un pequeño retraso
       setTimeout(() => {
-        navigate("/home");
-      }, 500); // 1 segundo de retraso
+        // ✅ Verificar si debe cambiar contraseña
+        const userData = getUserData(); // importa getUserData desde decodedata
+        if (userData?.cambioContrasenia === 1) {
+          navigate("/cambiar-password");
+        } else {
+          navigate("/home");
+        }
+      }, 500);
     }
 
   } catch (error) {

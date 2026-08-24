@@ -80,7 +80,8 @@ const putEndpoints = {
     ACTUALIZAR_USUARIO: "/actualizar-datos-usuario",
     DESACTIVAR_NOTIFICACION: "desactivar-notificaciones",
     ACTUALIZAR_CATEGORIA: "actualizarcategoria",
-    RESETEAR_PASS: "resetear-contrasenia"
+    RESETEAR_PASS: "resetear-contrasenia",
+    ACTUALIZAR_CONTRASENIA: "actualizar-contrasenia"
 };
 
 const deleteEndpoints = {
