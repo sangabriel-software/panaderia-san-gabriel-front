@@ -68,6 +68,7 @@ const NotificacionesEspeciales = lazy(() => import("./pages/notificaciones/notif
 const CategoriasPage = lazy(() => import("./pages/Categorias/CategoriasPage"));
 const CreateSurvey = lazy(() => import("./pages/Encuestas/CreateSurvey/CreateSurvey"));
 const ResetPassPage = lazy(() => import("./pages/Reset-Pass/ResetPassPage"));
+import CambiarPasswordPage from "./pages/CambiarPassword/CambiarPasswordPage";
 
 // Importar el componente PWA Install Prompt
 const PWAInstallPrompt = lazy(() => import("./components/PWAInstallPrompt/PWAInstallPrompt"));
@@ -92,6 +93,7 @@ function App() {
 
         </Route>
 
+        <Route path="/cambiar-password" element={<CambiarPasswordPage />} />
 
         {/* Rutas publicas */}
 
