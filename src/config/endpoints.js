@@ -63,6 +63,7 @@ const postEndpoints = {
     ACTIVAR_NOTIFICACION: "activar-notificaciones",
     INGRESAR_ORDEN_PRODUCCION_BATCH: "ingresar-orden-batch",
     INGRESAR_VENTA_AI: "venta-AI",
+    INGRESAR_VENTA_BATCH: "ventas-por-lotes",
 };
 
 const putEndpoints = {

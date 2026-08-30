@@ -1,7 +1,7 @@
 import dayjs from "dayjs";
 import { consultarDetalleOrdenPorCriterio } from "../../../services/ordenesproduccion/ordenesProduccion.service";
 import { consultarProductosService } from "../../../services/productos/productos.service";
-import { ingresarVentaService } from "../../../services/ventas/ventas.service";
+import { ingresarVentaBatchService, ingresarVentaService } from "../../../services/ventas/ventas.service";
 import { currentDate, getCurrentDateTimeWithSeconds } from "../../../utils/dateUtils";
 import { consultarStockProductosDelDiaService, consultarStockProductosService } from "../../../services/stockservices/stock.service";
 
@@ -298,6 +298,87 @@ export const handleGuardarVenta = async (setIsLoading, orden, sucursalValue, usu
     setIsPopupErrorOpen(true);
   }finally{
     setShowSalesSummary(false); // Cerrar el modal después de guardar o en algun error
+    setIsLoading(false);
+  }
+};
+
+// ============================================
+// GUARDAR VENTA CON ARCHIVO CSV (BATCH)
+// ============================================
+export const handleGuardarVentaBatch = async (
+  setIsLoading,
+  csvFile,
+  orden,
+  sucursalValue,
+  usuario,
+  turnoValue,
+  ventaReal,
+  gastos,
+  setShowVentaEsperadaModal,
+  setShowGastosModal,
+  setErrorPopupMessage,
+  setIsPopupErrorOpen,
+  setIsPopupSuccessOpen,
+  reset,
+  setCsvFile,
+  setModoIngreso
+) => {
+  setIsLoading(true);
+
+  const fechaActual = dayjs().format("YYYY-MM-DD");
+  const idOrdenProduccion = orden?.encabezadoOrden
+    ? orden.encabezadoOrden.idOrdenProduccion
+    : null;
+
+  const encabezadoVenta = crearEncabezadoVenta(
+    idOrdenProduccion,
+    usuario,
+    turnoValue,
+    sucursalValue,
+    fechaActual
+  );
+
+  const detalleIngreso = crearPayloadDetalleIngreso(ventaReal, fechaActual);
+
+  const gastosDiarios =
+    gastos.length > 0 ? construirPayloadGastos(gastos, usuario) : {};
+
+  const payload = {
+    encabezadoVenta,
+    detalleIngreso,
+    gastosDiarios,
+  };
+
+  const formData = new FormData();
+  formData.append("archivo", csvFile);           // <- nombre del campo file
+  formData.append("venta", JSON.stringify(payload)); // <- DEBE llamarse "venta", string plano
+
+  try {
+    const res = await ingresarVentaBatchService(formData);
+    if (res.status === 200) {
+      setIsPopupSuccessOpen(true);
+      reset();
+      setCsvFile(null);
+      setModoIngreso("manual");
+    }
+  } catch (error) {
+    if (error?.status === 400) {
+      setErrorPopupMessage(error?.message || "Faltan datos o el archivo CSV en la solicitud.");
+    } else if (error?.status === 422 && error.response?.data?.error?.message && !error.response?.data?.error?.data) {
+      const errorData = error.response.data.error;
+          setErrorPopupMessage(
+            `${errorData.message}
+            📦 Producto: ${errorData.data.nombreProducto}
+            📈 Sobrante ingresado: ${errorData.data.unidadesNoVendidas}
+            📊 Unidades en existencia: ${errorData.data.unidadesProducidas}`
+          );
+    } else if (error?.status === 422 && error.response?.data?.error?.data) {
+      setErrorPopupMessage(error.response.data.error.message  + " " + "para el producto: " + error.response.data.error.data.nombreProducto + " Sobrante Ingresado: " + error.response.data.error.data.unidadesNoVendidas + " Unidades en Existencia: " + error.response.data.error.data.unidadesProducidas);
+    }
+    setIsPopupErrorOpen(true);
+  } finally {
+    setShowVentaEsperadaModal(false);
+    setShowGastosModal(false);
     setIsLoading(false);
   }
 };
