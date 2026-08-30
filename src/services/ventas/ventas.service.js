@@ -39,3 +39,18 @@ export const consultarDetalleVenta = async (idVenta) => {
     throw error;
   }
 };
+
+export const ingresarVentaBatchService = async (formData) => {
+  try {
+      const response = await api.post(`${postEndpoints.INGRESAR_VENTA_BATCH}`,
+        formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data", // ✅ sobreescribe solo para esta llamada
+        },
+      }); 
+      return response.data;
+  } catch (error) {
+    throw error;
+  }
+}

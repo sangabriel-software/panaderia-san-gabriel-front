@@ -1,0 +1,170 @@
+/* ============================================ */
+/* CARD CONTENEDORA — consistente con el resto */
+/* ============================================ */
+.carga-csv-card {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 15px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+  padding: 28px;
+  margin-top: 20px;
+  margin-bottom: 30px;
+}
+
+.carga-csv-container {
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto;
+}
+
+/* ============================================ */
+/* DROPZONE */
+/* ============================================ */
+.carga-csv-dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 48px 24px;
+  border: 2px dashed rgba(106, 1, 172, 0.35);
+  border-radius: 18px;
+  background: rgba(106, 1, 172, 0.03);
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.carga-csv-dropzone:hover,
+.carga-csv-dropzone.dragging {
+  border-color: #6a01ac;
+  background: rgba(106, 1, 172, 0.08);
+  transform: translateY(-2px);
+}
+
+.carga-csv-icon {
+  color: #6a01ac;
+  margin-bottom: 14px;
+}
+
+.carga-csv-texto-principal {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin: 0;
+}
+
+.carga-csv-texto-secundario {
+  font-size: 0.85rem;
+  color: #6c757d;
+  margin: 4px 0 0;
+}
+
+/* ============================================ */
+/* ARCHIVO SELECCIONADO */
+/* ============================================ */
+.carga-csv-archivo-seleccionado {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 20px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(106, 1, 172, 0.2);
+}
+
+.carga-csv-file-icon {
+  color: #6a01ac;
+  flex-shrink: 0;
+}
+
+.carga-csv-file-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.carga-csv-file-name {
+  font-weight: 600;
+  color: #2c3e50;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.carga-csv-file-size {
+  font-size: 0.8rem;
+  color: #6c757d;
+}
+
+.carga-csv-remove-btn {
+  background: transparent;
+  border: none;
+  color: #e74c3c;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  transition: transform 0.2s ease;
+}
+
+.carga-csv-remove-btn:hover {
+  transform: scale(1.1);
+}
+
+/* ============================================ */
+/* RESPONSIVE — TABLET */
+/* ============================================ */
+@media (max-width: 768px) {
+  .carga-csv-card {
+    padding: 20px;
+    margin-top: 15px;
+  }
+
+  .carga-csv-dropzone {
+    padding: 36px 18px;
+  }
+}
+
+/* ============================================ */
+/* RESPONSIVE — MÓVIL */
+/* ============================================ */
+@media (max-width: 480px) {
+  .carga-csv-card {
+    padding: 16px;
+    border-radius: 12px;
+  }
+
+  .carga-csv-dropzone {
+    padding: 28px 14px;
+    border-radius: 14px;
+  }
+
+  .carga-csv-icon {
+    margin-bottom: 10px;
+  }
+
+  .carga-csv-icon svg {
+    width: 34px;
+    height: 34px;
+  }
+
+  .carga-csv-texto-principal {
+    font-size: 0.95rem;
+  }
+
+  .carga-csv-texto-secundario {
+    font-size: 0.8rem;
+  }
+
+  .carga-csv-archivo-seleccionado {
+    padding: 14px;
+    gap: 10px;
+  }
+
+  .carga-csv-file-name {
+    font-size: 0.9rem;
+  }
+}

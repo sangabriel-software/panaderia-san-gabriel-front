@@ -6,11 +6,12 @@ import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import SalesSummary from "../../../components/ventas/SalesSumamary/SalesSummary";
 import Title from "../../../components/Title/Title";
-import { BsArrowLeft } from "react-icons/bs";
+import { BsArrowLeft, BsListUl, BsFileEarmarkSpreadsheet } from "react-icons/bs";
 import { getUserData } from "../../../utils/Auth/decodedata";
 import {
   filterProductsByName,
   handleGuardarVenta,
+  handleGuardarVentaBatch,
   handleModificarDatos,
 } from "./IngresarVenta.Utils";
 import "./IngresarVentaPage.css";
@@ -23,6 +24,7 @@ import ErrorPopup from "../../../components/Popup/ErrorPopUp";
 import SuccessPopup from "../../../components/Popup/SuccessPopup";
 import ModalVentaEsperada from "../../../components/ventas/ModalVentaEsperada/ModalVentaEsperada";
 import ModalGastos from "../../../components/ventas/ModalGastos/ModalGastos";
+import CargaArchivoVenta from "../../../components/ventas/CargarArchivoVenta/CargaArchivoVenta";
 
 const IngresarVentaPage = () => {
   const [isPopupErrorOpen, setIsPopupErrorOpen] = useState(false);
@@ -46,6 +48,12 @@ const IngresarVentaPage = () => {
   const [ventaReal, setVentaReal] = useState(null);
   const [gastos, setGastos] = useState([]);
 
+  // ============================================
+  // NUEVO: MODO DE INGRESO (manual / csv)
+  // ============================================
+  const [modoIngreso, setModoIngreso] = useState("manual"); // "manual" | "csv"
+  const [csvFile, setCsvFile] = useState(null);
+
   const navigate = useNavigate();
 
   // ============================================
@@ -55,7 +63,7 @@ const IngresarVentaPage = () => {
     register,
     watch,
     setValue,
-    control, // <- AGREGADO
+    control,
     formState: { errors },
     reset,
   } = useForm({
@@ -97,39 +105,30 @@ const IngresarVentaPage = () => {
   // ============================================
   // CUSTOM HOOK CATEGORIAS
   // ============================================
-  const {
-    activeCategory,
-    setActiveCategory,
-    categorias,
-  } = useCategoriasActivas(ordenYProductos);
+  const { activeCategory, setActiveCategory, categorias } =
+    useCategoriasActivas(ordenYProductos);
 
   // ============================================
   // FILTRAR PRODUCTOS
   // ============================================
-  const filteredProducts = filterProductsByName(
-    ordenYProductos,
-    searchTerm
-  );
+  const filteredProducts = filterProductsByName(ordenYProductos, searchTerm);
 
   const productsToShow = searchTerm
     ? filteredProducts
-    : filteredProducts.filter(
-        (p) => p.nombreCategoria === activeCategory
-      );
+    : filteredProducts.filter((p) => p.nombreCategoria === activeCategory);
 
   // ============================================
   // MODIFICAR DATOS
   // ============================================
   const handleModificarDatosWrapper = () => {
-    handleModificarDatos(
-      setValue,
-      setShowModal,
-      setHasOrdenes
-    );
+    handleModificarDatos(setValue, setShowModal, setHasOrdenes);
+    // al volver a seleccionar sucursal/turno, reseteamos el modo de ingreso
+    setModoIngreso("manual");
+    setCsvFile(null);
   };
 
   // ============================================
-  // GUARDAR VENTA
+  // GUARDAR VENTA (MODO MANUAL)
   // ============================================
   const handleGuardarVentaWrapper = async () => {
     await handleGuardarVenta(
@@ -153,10 +152,48 @@ const IngresarVentaPage = () => {
   };
 
   // ============================================
+  // GUARDAR VENTA (MODO CSV)
+  // ============================================
+  const handleGuardarVentaBatchWrapper = async (gastosRegistrados) => {
+    await handleGuardarVentaBatch(
+      setIsLoading,
+      csvFile,
+      orden,
+      sucursalValue,
+      usuario,
+      turnoValue,
+      ventaReal,
+      gastosRegistrados,
+      setShowVentaEsperadaModal,
+      setShowGastosModal,
+      setErrorPopupMessage,
+      setIsPopupErrorOpen,
+      setIsPopupSuccessOpen,
+      reset,
+      setCsvFile,
+      setModoIngreso
+    );
+  };
+
+  // ============================================
+  // INICIAR CIERRE DE VENTA (valida CSV si aplica)
+  // ============================================
+  const handleIniciarCierreVenta = () => {
+    if (modoIngreso === "csv" && !csvFile) {
+      setErrorPopupMessage(
+        "Debes cargar un archivo CSV antes de continuar con la venta."
+      );
+      setIsPopupErrorOpen(true);
+      return;
+    }
+    setShowVentaEsperadaModal(true);
+  };
+
+  // ============================================
   // CONTINUAR VENTA ESPERADA
   // ============================================
-  const handleContinuarVentaEsperada = (ventaReal) => {
-    setVentaReal(ventaReal);
+  const handleContinuarVentaEsperada = (ventaRealIngresada) => {
+    setVentaReal(ventaRealIngresada);
     setShowVentaEsperadaModal(false);
     setShowGastosModal(true);
   };
@@ -167,20 +204,24 @@ const IngresarVentaPage = () => {
   const handleContinuarConGastos = (gastosRegistrados) => {
     setGastos(gastosRegistrados);
     setShowGastosModal(false);
-    setShowSalesSummary(true);
+
+    if (modoIngreso === "csv") {
+      // En modo CSV se omite el resumen y se guarda directo
+      handleGuardarVentaBatchWrapper(gastosRegistrados);
+    } else {
+      setShowSalesSummary(true);
+    }
   };
 
   return (
     <Container>
-      {/* ============================================ */}
       {/* MODAL SELECCIONAR SUCURSAL Y TURNO */}
-      {/* ============================================ */}
       <ModalSeleccionarSucursalTurno
         showModal={showModal}
         handleCloseModal={() => navigate("/ventas")}
         turnoValue={turnoValue}
         setValue={setValue}
-        control={control} // <- AGREGADO
+        control={control}
         errors={errors}
         loadingSucursales={loadingSucursales}
         sucursales={sucursales}
@@ -192,30 +233,22 @@ const IngresarVentaPage = () => {
         usuarioSucursal={usuario}
       />
 
-      {/* ============================================ */}
       {/* MODAL VENTA ESPERADA */}
-      {/* ============================================ */}
       <ModalVentaEsperada
         show={showVentaEsperadaModal}
-        handleClose={() =>
-          setShowVentaEsperadaModal(false)
-        }
+        handleClose={() => setShowVentaEsperadaModal(false)}
         onContinue={handleContinuarVentaEsperada}
         ventaTotal={ventaTotal}
       />
 
-      {/* ============================================ */}
       {/* MODAL GASTOS */}
-      {/* ============================================ */}
       <ModalGastos
         show={showGastosModal}
         handleClose={() => setShowGastosModal(false)}
         onContinue={handleContinuarConGastos}
       />
 
-      {/* ============================================ */}
       {/* ENCABEZADO */}
-      {/* ============================================ */}
       <div className="text-center mb-">
         <div className="d-flex align-items-center justify-content-center gap-5">
           <button
@@ -225,37 +258,53 @@ const IngresarVentaPage = () => {
             <BsArrowLeft size={20} />
           </button>
 
-          <Title
-            title="Ingresar venta"
-            className="gradient-text"
-            icon="🍞"
-          />
+          <Title title="Ingresar venta" className="gradient-text" icon="🍞" />
         </div>
       </div>
 
-      {/* ============================================ */}
       {/* RESUMEN VENTA */}
-      {/* ============================================ */}
       {!showModal && (
         <CardResumenVenta
           sucursales={sucursales}
           sucursalValue={sucursalValue}
           turnoValue={turnoValue}
           usuario={usuario}
-          handleModificarDatosWrapper={
-            handleModificarDatosWrapper
-          }
+          handleModificarDatosWrapper={handleModificarDatosWrapper}
           isLoading={isLoading}
-          setShowSalesSummary={() =>
-            setShowVentaEsperadaModal(true)
-          }
+          setShowSalesSummary={handleIniciarCierreVenta}
         />
       )}
 
       {/* ============================================ */}
-      {/* PRODUCTOS */}
+      {/* SELECTOR DE MODO DE INGRESO */}
       {/* ============================================ */}
       {!showModal && (
+        <div className="modo-ingreso-selector">
+          <button
+            type="button"
+            className={`modo-ingreso-btn ${
+              modoIngreso === "manual" ? "active" : ""
+            }`}
+            onClick={() => setModoIngreso("manual")}
+          >
+            <BsListUl size={18} />
+            Ingreso manual
+          </button>
+          <button
+            type="button"
+            className={`modo-ingreso-btn ${
+              modoIngreso === "csv" ? "active" : ""
+            }`}
+            onClick={() => setModoIngreso("csv")}
+          >
+            <BsFileEarmarkSpreadsheet size={18} />
+            Cargar CSV
+          </button>
+        </div>
+      )}
+
+      {/* PRODUCTOS - MODO MANUAL */}
+      {!showModal && modoIngreso === "manual" && (
         <SeccionProductos
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
@@ -271,14 +320,15 @@ const IngresarVentaPage = () => {
         />
       )}
 
-      {/* ============================================ */}
-      {/* SALES SUMMARY */}
-      {/* ============================================ */}
+      {/* CARGA DE ARCHIVO - MODO CSV */}
+      {!showModal && modoIngreso === "csv" && (
+        <CargaArchivoVenta csvFile={csvFile} setCsvFile={setCsvFile} />
+      )}
+
+      {/* SALES SUMMARY (solo aplica a modo manual) */}
       <SalesSummary
         show={showSalesSummary}
-        handleClose={() =>
-          setShowSalesSummary(false)
-        }
+        handleClose={() => setShowSalesSummary(false)}
         orderData={{
           sucursal: sucursalValue,
           turno: turnoValue,
@@ -294,14 +344,10 @@ const IngresarVentaPage = () => {
         gastos={gastos}
       />
 
-      {/* ============================================ */}
       {/* POPUP EXITO */}
-      {/* ============================================ */}
       <SuccessPopup
         isOpen={isPopupSuccessOpen}
-        onClose={() =>
-          setIsPopupSuccessOpen(false)
-        }
+        onClose={() => setIsPopupSuccessOpen(false)}
         title="¡Éxito!"
         message="La Venta se agregó correctamente"
         nombreBotonVolver="Ver Ventas"
@@ -312,17 +358,15 @@ const IngresarVentaPage = () => {
           setIsPopupSuccessOpen(false);
           reset();
           setGastos([]);
+          setModoIngreso("manual");
+          setCsvFile(null);
         }}
       />
 
-      {/* ============================================ */}
       {/* POPUP ERROR */}
-      {/* ============================================ */}
       <ErrorPopup
         isOpen={isPopupErrorOpen}
-        onClose={() =>
-          setIsPopupErrorOpen(false)
-        }
+        onClose={() => setIsPopupErrorOpen(false)}
         title="¡Error!"
         message={errorPopupMessage}
       />
