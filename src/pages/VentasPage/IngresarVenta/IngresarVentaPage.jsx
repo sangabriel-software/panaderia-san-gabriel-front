@@ -102,6 +102,16 @@ const IngresarVentaPage = () => {
     setStockDelDia
   );
 
+  const stockGeneralArray = Array.isArray(stockGeneral) ? stockGeneral : [];
+  const stockDelDiaArray = Array.isArray(stockDelDia) ? stockDelDia : [];
+
+  const productosConStock = ordenYProductos.filter(producto => {
+    const hasGeneralStock = stockGeneralArray.some(item => item.idProducto === producto.idProducto && item.cantidadExistente > 0);
+    const hasDailyStock = stockDelDiaArray.some(item => item.idProducto === producto?.idProducto && item?.cantidadExistente > 0);
+    return hasGeneralStock || hasDailyStock;
+  });
+
+
   // ============================================
   // CUSTOM HOOK CATEGORIAS
   // ============================================
@@ -322,7 +332,7 @@ const IngresarVentaPage = () => {
 
       {/* CARGA DE ARCHIVO - MODO CSV */}
       {!showModal && modoIngreso === "csv" && (
-        <CargaArchivoVenta csvFile={csvFile} setCsvFile={setCsvFile} productos={productos} />
+        <CargaArchivoVenta csvFile={csvFile} setCsvFile={setCsvFile} productos={productosConStock} />
       )}
 
       {/* SALES SUMMARY (solo aplica a modo manual) */}
