@@ -234,7 +234,7 @@ const handleCsvUpload = async () => {
 
     const res = await ingresarOrdenProduccionBatchService(formData);
     if(res.status === 200){
-      descargarPdfDuranteIngresoOrden(res.idOrdenProduccion.idOrdenGenerada);
+      descargarPdfDuranteIngresoOrden(res.ordenProduccion.idOrdenGenerada);
     }
 
     setCsvResult({
