@@ -322,7 +322,7 @@ const IngresarVentaPage = () => {
 
       {/* CARGA DE ARCHIVO - MODO CSV */}
       {!showModal && modoIngreso === "csv" && (
-        <CargaArchivoVenta csvFile={csvFile} setCsvFile={setCsvFile} />
+        <CargaArchivoVenta csvFile={csvFile} setCsvFile={setCsvFile} productos={productos} />
       )}
 
       {/* SALES SUMMARY (solo aplica a modo manual) */}
