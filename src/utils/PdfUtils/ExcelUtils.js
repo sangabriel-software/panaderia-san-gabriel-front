@@ -244,3 +244,37 @@ export const generateOrderExcel = (ordenId, detalleOrden = [], detalleConsumo = 
     return false;
   }
 };
+
+export const descargarPlantillaOrden = (productos) => {
+  if (!productos || productos.length === 0) return;
+
+// ✅ Correcto — filtra por categoría Y por tipoProduccion
+const bandejas = productos.filter(
+  (p) => (p.idCategoria === 1 || p.idCategoria === 8) && p.tipoProduccion === "bandejas"
+);
+const harina = productos.filter(
+  (p) => (p.idCategoria === 1 || p.idCategoria === 8) && p.tipoProduccion === "harina"
+);
+
+  const filas = [
+    ["Codigo", "Producto", "Bandejas"],
+    ...bandejas.map((p) => [p.idProducto, p.nombreProducto, ""]),
+    ["", "", ""],
+    ["", "", ""],
+    ["Codigo", "Producto", "Harina"],
+    ...harina.map((p) => [p.idProducto, p.nombreProducto, ""]),
+  ];
+
+  // ✅ sep=; fuerza a Excel a usar punto y coma como separador
+  const contenido = "sep=;\n" + filas.map((f) => f.join(";")).join("\n");
+
+  const blob = new Blob(["\uFEFF" + contenido], { type: "text/csv;charset=utf-8;" });
+  const url  = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href  = url;
+  link.setAttribute("download", "plantilla_orden_produccion.csv");
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+};

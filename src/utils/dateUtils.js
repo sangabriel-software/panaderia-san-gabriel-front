@@ -23,6 +23,5 @@ export const getCurrentDateTimeWithSecondsFiles = () => {
 };
 
 export const currentDateToFormat = (fecha) => {
-    console.log(fecha)
     return dayjs(fecha).format("YYYY-MM-DD");
 }

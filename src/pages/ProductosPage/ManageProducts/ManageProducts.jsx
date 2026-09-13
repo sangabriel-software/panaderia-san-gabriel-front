@@ -16,6 +16,7 @@ import useGetCategorias from "../../../hooks/categorias/UseGetCategorias";
 import "./ManageProducts.css";
 import AddButton from "../../../components/AddButton/AddButton";
 import DotsMove from "../../../components/Spinners/DotsMove";
+import { descargarPlantillaOrden } from "../../../utils/PdfUtils/ExcelUtils";
 
 const ManageProducts = () => {
   const { productos, loadigProducts, showErrorProductos, showInfoProductos, setProductos, } = useGetProductosYPrecios();
@@ -72,41 +73,60 @@ const ManageProducts = () => {
         title="Productos"
         description="Administración de productos existentes"
       />
-      <div className="row mb-4">
-        <AddButton
-          buttonText="Ingresar Producto"
-          onRedirect={() => navigate("ingresar-producto")}
-        />
-        <div className="col-12 col-md-6">
-          <SearchInput
-            id="searchInput"
-            aria-label="Buscar Producto"
-            searchQuery={searchQuery}
-            handleSearch={handleSearch}
-            placeholder={
-              showErrorProductos || showInfoProductos
-                ? "No se pueden realizar búsquedas"
-                : "Buscar Producto"
-            }
-            readOnly={showErrorProductos || showInfoProductos}
-          />
-        </div>
-        <div className="col-12 col-md-3">
-          <select
-            id="selectedCategory"
-            name="selectedCategory"
-            className="form-control input-data"
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-          >
-            {categorias.map((categoria) => (
-              <option key={categoria} value={categoria}>
-                {categoria}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
+<div className="row mb-4">
+  <AddButton
+    buttonText="Ingresar Producto"
+    onRedirect={() => navigate("ingresar-producto")}
+  />
+  <div className="col-12 col-md-6">
+    <SearchInput
+      id="searchInput"
+      aria-label="Buscar Producto"
+      searchQuery={searchQuery}
+      handleSearch={handleSearch}
+      placeholder={
+        showErrorProductos || showInfoProductos
+          ? "No se pueden realizar búsquedas"
+          : "Buscar Producto"
+      }
+      readOnly={showErrorProductos || showInfoProductos}
+    />
+  </div>
+  <div className="col-12 col-md-3">
+    <select
+      id="selectedCategory"
+      name="selectedCategory"
+      className="form-control input-data"
+      value={selectedCategory}
+      onChange={(e) => setSelectedCategory(e.target.value)}
+    >
+      {categorias.map((categoria) => (
+        <option key={categoria} value={categoria}>
+          {categoria}
+        </option>
+      ))}
+    </select>
+  </div>
+
+  {/* ✅ Botón descargar plantilla */}
+  <div className="col-12 col-md-auto mt-2 mt-md-0 d-flex align-items-end">
+    {/*<button
+      type="button"
+      className="csv-plantilla-btn w-100"
+      onClick={() => descargarPlantillaOrden(productos)}
+      disabled={!productos || productos.length === 0}
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="7 10 12 15 17 10"/>
+        <line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>
+      Descargar plantilla
+    </button>
+        />*/}
+  </div>
+
+</div>
       <div className="container mt-4">
         <div className="row">
           {filteredByCategory.map((producto) => (

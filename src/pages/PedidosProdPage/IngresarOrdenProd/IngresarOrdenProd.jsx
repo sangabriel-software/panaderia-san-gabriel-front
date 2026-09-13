@@ -18,6 +18,7 @@ import "./ordenes.css";
 import useGetFechaProduccion from "../../../hooks/fecha-produccion/useGetFechaProduccion";
 import { ingresarOrdenProduccionBatchService } from "../../../services/ordenesproduccion/ordenesProduccion.service";
 import { getCurrentDateTimeWithSeconds } from "../../../utils/dateUtils";
+import { descargarPlantillaOrden } from "../../../utils/PdfUtils/ExcelUtils";
 
 // ─── Utilidades countdown ──────────────────────────────────────────────────────
 
@@ -233,7 +234,6 @@ const handleCsvUpload = async () => {
 
     const res = await ingresarOrdenProduccionBatchService(formData);
     if(res.status === 200){
-      console.log(res);
       descargarPdfDuranteIngresoOrden(res.idOrdenProduccion.idOrdenGenerada);
     }
 
@@ -649,7 +649,8 @@ const handleCsvUpload = async () => {
                 <button
                   type="button"
                   className="csv-plantilla-btn"
-                  onClick={handleDescargarPlantilla}
+                  onClick={() => descargarPlantillaOrden(productos)}
+                  disabled={!productos || productos.length === 0}
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
                     stroke="currentColor" strokeWidth="2" strokeLinecap="round">
