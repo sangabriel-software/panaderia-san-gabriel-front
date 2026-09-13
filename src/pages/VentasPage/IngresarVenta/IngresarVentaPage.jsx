@@ -347,7 +347,7 @@ const productosConStock = stockUnificado.filter(
         <CargaArchivoVenta
         csvFile={csvFile}
         setCsvFile={setCsvFile}
-        productos={productos}
+        productos={productosConStock}
         idSucursal={sucursalValue}  // ✅
         turno={turnoValue}      // ✅
       />
