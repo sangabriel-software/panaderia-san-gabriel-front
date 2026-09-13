@@ -199,3 +199,49 @@
   transform: translateX(20px); /* Mover hacia la derecha */
   box-shadow: none; /* Elimina sombra cuando está encendido */
 }
+
+/* ── Botón descargar plantilla en gestión de productos ── */
+.csv-plantilla-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 15px;
+  border-radius: 9px;
+  border: none;
+  background: #2563eb;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  letter-spacing: 0.01em;
+  transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+  height: 38px;
+}
+
+.csv-plantilla-btn:hover:not(:disabled) {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+}
+
+.csv-plantilla-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.csv-plantilla-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Alineación responsive con el select de categorías */
+@media (max-width: 767px) {
+  .csv-plantilla-btn {
+    width: 100%;
+    margin-top: 8px;
+  }
+}
