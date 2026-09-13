@@ -3,7 +3,7 @@ import { BsCloudUpload, BsFileEarmarkSpreadsheet, BsXCircle } from "react-icons/
 import { descargarPlantillaVentas } from "../../../utils/PdfUtils/ExcelUtils";
 import "./CargaArchivoVenta.css";
 
-const CargaArchivoVenta = ({ csvFile, setCsvFile, productos }) => {
+const CargaArchivoVenta = ({ csvFile, setCsvFile, productos, idSucursal, turno }) => {
   const inputRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
 
@@ -47,7 +47,7 @@ const CargaArchivoVenta = ({ csvFile, setCsvFile, productos }) => {
         <button
           type="button"
           className="carga-csv-plantilla-btn"
-          onClick={() => descargarPlantillaVentas(productos)}
+          onClick={() => descargarPlantillaVentas(productos, turno, idSucursal)}
           disabled={!productos || productos.length === 0}
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none"

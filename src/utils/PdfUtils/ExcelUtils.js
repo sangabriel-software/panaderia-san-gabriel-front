@@ -280,13 +280,23 @@ export const descargarPlantillaOrden = (productos) => {
   URL.revokeObjectURL(url);
 };
 
-export const descargarPlantillaVentas = (productos) => {
+export const descargarPlantillaVentas = (productos, turno, idSucural) => {
   if (!productos || productos.length === 0) return;
+  let nombreSucursal = "";
+
+  console.log(idSucural)
+
+  
+  if(idSucural == 1){
+    nombreSucursal = "SM_Dueñas"
+  }else{
+    nombreSucursal = "S_Antonio"
+  }
 
 
   const filas = [
-    ["Codigo", "Producto", "Cantidad"],
-    ...productos.map((p) => [p.idProducto, p.nombreProducto, ""]),
+    ["Codigo", "Producto", "Stock Actual", "Cantidad"],
+    ...productos.map((p) => [p.idProducto, p.nombreProducto, p.cantidadExistente, ""]),
   ];
 
   const contenido = "sep=;\n" + filas.map((f) => f.join(";")).join("\n");
@@ -297,7 +307,7 @@ export const descargarPlantillaVentas = (productos) => {
   const url  = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href  = url;
-  link.setAttribute("download", "ventas_" + getCurrentDateTimeWithSecondsFilesVentas() + ".csv");
+  link.setAttribute("download", "venta_"+ nombreSucursal + "_"+ turno + "_" + getCurrentDateTimeWithSecondsFilesVentas() + ".csv");
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
