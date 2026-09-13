@@ -1,6 +1,7 @@
 import { utils, writeFile } from 'xlsx-js-style';
-import { getCurrentDateTimeWithSeconds, getCurrentDateTimeWithSecondsFiles } from '../dateUtils';
+import { getCurrentDateTimeWithSeconds, getCurrentDateTimeWithSecondsFiles, getCurrentDateTimeWithSecondsFilesVentas } from '../dateUtils';
 import { redondearASiguienteMultiploDe5 } from '../utils';
+import { isToday } from 'date-fns';
 
 // Función para formatear fecha
 const formatDate = (dateString) => {
@@ -273,6 +274,30 @@ export const descargarPlantillaOrden = (productos) => {
   const link = document.createElement("a");
   link.href  = url;
   link.setAttribute("download", "plantilla_orden_produccion.csv");
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+};
+
+export const descargarPlantillaVentas = (productos) => {
+  if (!productos || productos.length === 0) return;
+
+
+  const filas = [
+    ["Codigo", "Producto", "Cantidad"],
+    ...productos.map((p) => [p.idProducto, p.nombreProducto, ""]),
+  ];
+
+  const contenido = "sep=;\n" + filas.map((f) => f.join(";")).join("\n");
+
+  // ✅ BOM como Uint8Array para forzar UTF-8 con BOM en Excel
+  const bom  = new Uint8Array([0xEF, 0xBB, 0xBF]);
+  const blob = new Blob([bom, contenido], { type: "text/csv;charset=utf-8;" });
+  const url  = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href  = url;
+  link.setAttribute("download", "ventas_" + getCurrentDateTimeWithSecondsFilesVentas() + ".csv");
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
