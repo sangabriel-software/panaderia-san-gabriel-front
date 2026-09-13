@@ -283,9 +283,6 @@ export const descargarPlantillaOrden = (productos) => {
 export const descargarPlantillaVentas = (productos, turno, idSucural) => {
   if (!productos || productos.length === 0) return;
   let nombreSucursal = "";
-
-  console.log(idSucural)
-
   
   if(idSucural == 1){
     nombreSucursal = "SM_Dueñas"
