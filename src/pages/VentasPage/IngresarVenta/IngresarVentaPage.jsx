@@ -105,11 +105,23 @@ const IngresarVentaPage = () => {
   const stockGeneralArray = Array.isArray(stockGeneral) ? stockGeneral : [];
   const stockDelDiaArray = Array.isArray(stockDelDia) ? stockDelDia : [];
 
-  const productosConStock = ordenYProductos.filter(producto => {
-    const hasGeneralStock = stockGeneralArray.some(item => item.idProducto === producto.idProducto && item.cantidadExistente > 0);
-    const hasDailyStock = stockDelDiaArray.some(item => item.idProducto === producto?.idProducto && item?.cantidadExistente > 0);
-    return hasGeneralStock || hasDailyStock;
-  });
+  const stockUnificado = [
+    ...stockGeneralArray,
+    ...stockDelDiaArray,
+  ].reduce((acc, item) => {
+    const existing = acc.find((i) => i.idProducto === item.idProducto);
+    if (existing) {
+      existing.cantidadExistente += item.cantidadExistente;
+    } else {
+      acc.push({ ...item });
+    }
+    return acc;
+  }, []);
+
+  // Solo los que tienen stock > 0
+const productosConStock = stockUnificado.filter(
+  (item) => item.cantidadExistente > 0
+);
 
 
   // ============================================
@@ -332,7 +344,13 @@ const IngresarVentaPage = () => {
 
       {/* CARGA DE ARCHIVO - MODO CSV */}
       {!showModal && modoIngreso === "csv" && (
-        <CargaArchivoVenta csvFile={csvFile} setCsvFile={setCsvFile} productos={productosConStock} />
+        <CargaArchivoVenta
+        csvFile={csvFile}
+        setCsvFile={setCsvFile}
+        productos={productos}
+        idSucursal={sucursalValue}  // ✅
+        turno={turnoValue}      // ✅
+      />
       )}
 
       {/* SALES SUMMARY (solo aplica a modo manual) */}
