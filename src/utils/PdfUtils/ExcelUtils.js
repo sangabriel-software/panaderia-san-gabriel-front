@@ -249,7 +249,7 @@ export const descargarPlantillaOrden = (productos) => {
   if (!productos || productos.length === 0) return;
 
   const bandejas = productos.filter(
-    (p) => (p.idCategoria === 1 || p.idCategoria === 8) && (p.tipoProduccion === "bandejas" || p.tipoProduccion === "Otros")
+    (p) => (p.idCategoria === 1 || p.idCategoria === 8) && (p.tipoProduccion === "bandejas" )
   );
   const harina = productos.filter(
     (p) => (p.idCategoria === 1 || p.idCategoria === 8) && (p.tipoProduccion === "harina" || p.tipoProduccion === "Otros")
