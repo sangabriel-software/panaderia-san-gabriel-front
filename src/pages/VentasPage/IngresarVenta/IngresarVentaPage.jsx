@@ -119,9 +119,9 @@ const IngresarVentaPage = () => {
   }, []);
 
   // Solo los que tienen stock > 0
-const productosConStock = stockUnificado.filter(
-  (item) => item.cantidadExistente > 0
-);
+  const productosConStock = stockUnificado
+  .filter((item) => item.cantidadExistente > 0)
+  .sort((a, b) => a.idProducto - b.idProducto);
 
 
   // ============================================
