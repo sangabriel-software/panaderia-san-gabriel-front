@@ -248,13 +248,12 @@ export const generateOrderExcel = (ordenId, detalleOrden = [], detalleConsumo = 
 export const descargarPlantillaOrden = (productos) => {
   if (!productos || productos.length === 0) return;
 
-// ✅ Correcto — filtra por categoría Y por tipoProduccion
-const bandejas = productos.filter(
-  (p) => (p.idCategoria === 1 || p.idCategoria === 8) && (p.tipoProduccion === "bandejas" || p.tipoProduccion === "Otros")
-);
-const harina = productos.filter(
-  (p) => (p.idCategoria === 1 || p.idCategoria === 8) && (p.tipoProduccion === "harina" || p.tipoProduccion === "Otros")
-);
+  const bandejas = productos.filter(
+    (p) => (p.idCategoria === 1 || p.idCategoria === 8) && (p.tipoProduccion === "bandejas" || p.tipoProduccion === "Otros")
+  );
+  const harina = productos.filter(
+    (p) => (p.idCategoria === 1 || p.idCategoria === 8) && (p.tipoProduccion === "harina" || p.tipoProduccion === "Otros")
+  );
 
   const filas = [
     ["Codigo", "Producto", "Bandejas"],
@@ -265,10 +264,11 @@ const harina = productos.filter(
     ...harina.map((p) => [p.idProducto, p.nombreProducto, ""]),
   ];
 
-  // ✅ sep=; fuerza a Excel a usar punto y coma como separador
   const contenido = "sep=;\n" + filas.map((f) => f.join(";")).join("\n");
 
-  const blob = new Blob(["\uFEFF" + contenido], { type: "text/csv;charset=utf-8;" });
+  // ✅ BOM como Uint8Array para forzar UTF-8 con BOM en Excel
+  const bom  = new Uint8Array([0xEF, 0xBB, 0xBF]);
+  const blob = new Blob([bom, contenido], { type: "text/csv;charset=utf-8;" });
   const url  = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href  = url;
