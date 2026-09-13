@@ -250,10 +250,10 @@ export const descargarPlantillaOrden = (productos) => {
 
 // ✅ Correcto — filtra por categoría Y por tipoProduccion
 const bandejas = productos.filter(
-  (p) => (p.idCategoria === 1 || p.idCategoria === 8) && p.tipoProduccion === "bandejas"
+  (p) => (p.idCategoria === 1 || p.idCategoria === 8) && (p.tipoProduccion === "bandejas" || p.tipoProduccion === "Otros")
 );
 const harina = productos.filter(
-  (p) => (p.idCategoria === 1 || p.idCategoria === 8) && p.tipoProduccion === "harina"
+  (p) => (p.idCategoria === 1 || p.idCategoria === 8) && (p.tipoProduccion === "harina" || p.tipoProduccion === "Otros")
 );
 
   const filas = [
