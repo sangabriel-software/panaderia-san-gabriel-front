@@ -13,7 +13,7 @@ const formatDate = (dateString) => {
 export const generateOrderExcel = (ordenId, detalleOrden = [], detalleConsumo = [], encabezadoOrden = {}) => {
   try {
     const workbook = utils.book_new();
-    
+
     // ==================== CONFIGURACIÓN DE ESTILOS ====================
     const headerStyle = {
       fill: { fgColor: { rgb: "37474F" } },
@@ -95,10 +95,10 @@ export const generateOrderExcel = (ordenId, detalleOrden = [], detalleConsumo = 
 
     // ==================== LÓGICA DE DATOS ====================
     // Filtrar productos con validación
-    const prodBandejas = (detalleOrden || []).filter(item => 
+    const prodBandejas = (detalleOrden || []).filter(item =>
       item && item.tipoProduccion === "bandejas"
     );
-    const prodHarina = (detalleOrden || []).filter(item => 
+    const prodHarina = (detalleOrden || []).filter(item =>
       item && item.tipoProduccion === "harina"
     );
 
@@ -112,10 +112,10 @@ export const generateOrderExcel = (ordenId, detalleOrden = [], detalleConsumo = 
     const calcularTotalHarina = () => {
       try {
         // Harina de consumo
-        const harinasConsumo = (detalleConsumo || []).filter(item => 
+        const harinasConsumo = (detalleConsumo || []).filter(item =>
           item && item.Ingrediente && item.Ingrediente.toLowerCase().includes('harina')
         );
-        
+
         const totalConsumo = harinasConsumo.reduce((sum, item) => {
           return sum + safeParseNumber(item.CantidadUsada);
         }, 0);
@@ -133,7 +133,7 @@ export const generateOrderExcel = (ordenId, detalleOrden = [], detalleConsumo = 
     };
 
     const totalHarina = calcularTotalHarina();
-    const unidadMedida = (detalleConsumo || []).find(item => 
+    const unidadMedida = (detalleConsumo || []).find(item =>
       item && item.Ingrediente && item.Ingrediente.toLowerCase().includes('harina')
     )?.UnidadMedida || 'Lb';
 
@@ -153,11 +153,13 @@ export const generateOrderExcel = (ordenId, detalleOrden = [], detalleConsumo = 
       // Detalles (sucursal, turno, etc.)
       [
         { v: `Sucursal: ${encabezadoOrden.nombreSucursal || ''}`, s: detailBoxStyle },
-        { v: `Turno: ${encabezadoOrden.ordenTurno || ''}`, s: { 
-          ...detailBoxStyle,
-          font: { ...detailBoxStyle.font, color: { rgb: "FFFFFF" } },
-          fill: { fgColor: { rgb: encabezadoOrden.ordenTurno === 'AM' ? 'FF6F00' : '2E7D32' } }
-        }},
+        {
+          v: `Turno: ${encabezadoOrden.ordenTurno || ''}`, s: {
+            ...detailBoxStyle,
+            font: { ...detailBoxStyle.font, color: { rgb: "FFFFFF" } },
+            fill: { fgColor: { rgb: encabezadoOrden.ordenTurno === 'AM' ? 'FF6F00' : '2E7D32' } }
+          }
+        },
         { v: `Solicitado por: ${encabezadoOrden.nombreUsuario || ''}`, s: detailBoxStyle },
         { v: `Panadero: ${encabezadoOrden.nombrePanadero || ''}`, s: detailBoxStyle }
       ],
@@ -214,7 +216,7 @@ export const generateOrderExcel = (ordenId, detalleOrden = [], detalleConsumo = 
 
     // ==================== CONFIGURACIÓN DE LA HOJA ====================
     const worksheet = utils.aoa_to_sheet(worksheetData);
-    
+
     // Ajustar anchos de columnas
     worksheet['!cols'] = [
       { wch: 4 },   // Columna # - Más estrecha
@@ -250,10 +252,15 @@ export const descargarPlantillaOrden = (productos) => {
   if (!productos || productos.length === 0) return;
 
   const bandejas = productos.filter(
-    (p) => (p.idCategoria === 1 || p.idCategoria === 8) && (p.tipoProduccion === "bandejas" )
+    (p) =>
+      (p.idCategoria === 1 || p.idCategoria === 8) &&
+      p.tipoProduccion === "bandejas"
   );
+
   const harina = productos.filter(
-    (p) => (p.idCategoria === 1 || p.idCategoria === 8) && (p.tipoProduccion === "harina" || p.tipoProduccion === "Otros")
+    (p) =>
+      (p.idCategoria === 1 || p.idCategoria === 8) &&
+      (p.tipoProduccion === "harina" || p.tipoProduccion === "Otros")
   );
 
   const filas = [
@@ -265,15 +272,19 @@ export const descargarPlantillaOrden = (productos) => {
     ...harina.map((p) => [p.idProducto, p.nombreProducto, ""]),
   ];
 
-  const contenido = "sep=;\n" + filas.map((f) => f.join(";")).join("\n");
+  // ✅ sep=; para Excel — sin comillas para que el backend parsee limpio
+  const contenido =
+    "sep=;\n" +
+    filas.map((fila) => fila.join(";")).join("\n");
 
-  // ✅ BOM como Uint8Array para forzar UTF-8 con BOM en Excel
-  const bom  = new Uint8Array([0xEF, 0xBB, 0xBF]);
-  const blob = new Blob([bom, contenido], { type: "text/csv;charset=utf-8;" });
+  // ✅ BOM UTF-8 correcto como Uint8Array
+  const bom  = new Uint8Array([0xef, 0xbb, 0xbf]);
+  const blob = new Blob([bom, contenido], { type: "text/csv;charset=utf-8" });
+
   const url  = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href  = url;
-  link.setAttribute("download", "plantilla_orden_produccion.csv");
+  link.download = "plantilla_orden_produccion.csv";
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
@@ -283,10 +294,10 @@ export const descargarPlantillaOrden = (productos) => {
 export const descargarPlantillaVentas = (productos, turno, idSucural) => {
   if (!productos || productos.length === 0) return;
   let nombreSucursal = "";
-  
-  if(idSucural == 1){
+
+  if (idSucural == 1) {
     nombreSucursal = "SM_Dueñas"
-  }else{
+  } else {
     nombreSucursal = "S_Antonio"
   }
 
@@ -299,12 +310,12 @@ export const descargarPlantillaVentas = (productos, turno, idSucural) => {
   const contenido = "sep=;\n" + filas.map((f) => f.join(";")).join("\n");
 
   // ✅ BOM como Uint8Array para forzar UTF-8 con BOM en Excel
-  const bom  = new Uint8Array([0xEF, 0xBB, 0xBF]);
+  const bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
   const blob = new Blob([bom, contenido], { type: "text/csv;charset=utf-8;" });
-  const url  = URL.createObjectURL(blob);
+  const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
-  link.href  = url;
-  link.setAttribute("download", "venta_"+ nombreSucursal + "_"+ turno + "_" + getCurrentDateTimeWithSecondsFilesVentas() + ".csv");
+  link.href = url;
+  link.setAttribute("download", "venta_" + nombreSucursal + "_" + turno + "_" + getCurrentDateTimeWithSecondsFilesVentas() + ".csv");
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
