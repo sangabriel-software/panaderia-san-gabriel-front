@@ -18,7 +18,7 @@ import "./ordenes.css";
 import useGetFechaProduccion from "../../../hooks/fecha-produccion/useGetFechaProduccion";
 import { ingresarOrdenProduccionBatchService } from "../../../services/ordenesproduccion/ordenesProduccion.service";
 import { getCurrentDateTimeWithSeconds } from "../../../utils/dateUtils";
-import { descargarPlantillaOrden } from "../../../utils/PdfUtils/ExcelUtils";
+import { descargarPlantillaOrden, limpiarCSV } from "../../../utils/PdfUtils/ExcelUtils";
 
 // ─── Utilidades countdown ──────────────────────────────────────────────────────
 
@@ -99,6 +99,8 @@ const IngresarOrdenProd = () => {
   const tomorrow = dayjs().add(1, "day").format("YYYY-MM-DD");
   const today    = dayjs().format("YYYY-MM-DD");
   const userData = getUserData();
+
+  console.log("Carga inicial")
 
   const registroActivo    = Array.isArray(diaProduccion) && diaProduccion.length > 0 ? diaProduccion[0] : null;
   const ventanaActiva     = registroActivo?.fecha_produccion_a_setear === "today";
@@ -195,69 +197,68 @@ const IngresarOrdenProd = () => {
     }
   };
 
-const handleCsvUpload = async () => {
-  if (!csvFile) return;
-
-  const { idUsuario } = getUserData();
-  const data = getValues();
-
-  if (!data.sucursal || !data.fechaAProducir || !data.turno || !data.nombrePanadero) {
-    setErrorPopupMessage("Ingresa el turno, la sucursal y/o el nombre del panadero.");
-    setIsPopupErrorOpen(true);
-    return;
-  }
-
-  setCsvLoading(true);
-  setCsvResult(null);
-
-  try {
-    const ordenHaader = JSON.stringify({
-      idSucursal: data.sucursal,
-      ordenTurno: data.turno,
-      nombrePanadero: data.nombrePanadero,
-      fechaAProducir: data.fechaAProducir,
-      idUsuario: idUsuario,
-      fechaCreacion: getCurrentDateTimeWithSeconds(),
-    });
-
-    const formData = new FormData();
-
-    const fechaArchivo = dayjs().format("YYYYMMDD-HHmmss");
-
-    formData.append(
-      "ordenProduccionBatch",
-      csvFile,
-      `orden-produccion-${fechaArchivo}.csv`
-    );
-
-    formData.append("ordenHaader", ordenHaader);
-
-    const res = await ingresarOrdenProduccionBatchService(formData);
-    if(res.status === 200){
-      descargarPdfDuranteIngresoOrden(res.ordenProduccion.idOrdenGenerada);
+  const handleCsvUpload = async () => {
+    console.log("Entra")
+    if (!csvFile) return;
+  
+    const { idUsuario } = getUserData();
+    const data = getValues();
+  
+    if (!data.sucursal || !data.fechaAProducir || !data.turno || !data.nombrePanadero) {
+      setErrorPopupMessage("Ingresa el turno, la sucursal y/o el nombre del panadero.");
+      setIsPopupErrorOpen(true);
+      return;
     }
-
-    setCsvResult({
-      insertados: res.idOrdenProduccion ? 1 : 0,
-    });
-
-    setIsPopupOpen(true);
-
-  } catch (error) {
-    if (error.status === 409) {
-      setErrorPopupMessage(error.response.data.error.message);
-    } else {
-      setErrorPopupMessage(
-        "Hubo un error al ingresar la orden. Inténtelo más tarde."
+  
+    setCsvLoading(true);
+    setCsvResult(null);
+  
+    try {
+      // ✅ Limpiar encoding antes de enviar
+      console.log("limpiar")
+      const csvLimpio = await limpiarCSV(csvFile);
+      console.log(csvLimpio)
+  
+      const ordenHaader = JSON.stringify({
+        idSucursal:     data.sucursal,
+        ordenTurno:     data.turno,
+        nombrePanadero: data.nombrePanadero,
+        fechaAProducir: data.fechaAProducir,
+        idUsuario:      idUsuario,
+        fechaCreacion:  getCurrentDateTimeWithSeconds(),
+      });
+  
+      const formData      = new FormData();
+      const fechaArchivo  = dayjs().format("YYYYMMDD-HHmmss");
+  
+      // ✅ Usa csvLimpio en lugar de csvFile
+      formData.append(
+        "ordenProduccionBatch",
+        csvLimpio,
+        `orden-produccion-${fechaArchivo}.csv`
       );
+      formData.append("ordenHaader", ordenHaader);
+  
+      const res = await ingresarOrdenProduccionBatchService(formData);
+  
+      if (res.status === 200) {
+        descargarPdfDuranteIngresoOrden(res.ordenProduccion.idOrdenGenerada);
+      }
+  
+      setCsvResult({ insertados: res.idOrdenProduccion ? 1 : 0 });
+      setIsPopupOpen(true);
+  
+    } catch (error) {
+      if (error.status === 409) {
+        setErrorPopupMessage(error.response.data.error.message);
+      } else {
+        setErrorPopupMessage("Hubo un error al ingresar la orden. Inténtelo más tarde.");
+      }
+      setIsPopupErrorOpen(true);
+    } finally {
+      setCsvLoading(false);
     }
-
-    setIsPopupErrorOpen(true);
-
-  } finally {
-    setCsvLoading(false);
-  }
-};
+  };
 
   const handleRemoveCsv = (e) => {
     e.stopPropagation();

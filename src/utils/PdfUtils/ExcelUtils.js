@@ -248,6 +248,60 @@ export const generateOrderExcel = (ordenId, detalleOrden = [], detalleConsumo = 
   }
 };
 
+export const limpiarCSV = async (file) => {
+  const buffer = await file.arrayBuffer();
+  const uint8  = new Uint8Array(buffer);
+
+  // ── Detectar encoding ────────────────────────────────────────────────────
+  const hasUtf8Bom    = uint8[0] === 0xef && uint8[1] === 0xbb && uint8[2] === 0xbf;
+  const hasUtf16LeBom = uint8[0] === 0xff && uint8[1] === 0xfe;
+  const hasUtf16BeBom = uint8[0] === 0xfe && uint8[1] === 0xff;
+
+  // Detectar BOM doble-codificado: EF BB BF codificado como UTF-8 = C3 AF C2 BB C2 BF
+  const hasDoubleBom =
+    uint8[0] === 0xc3 && uint8[1] === 0xaf &&
+    uint8[2] === 0xc2 && uint8[3] === 0xbb &&
+    uint8[4] === 0xc2 && uint8[5] === 0xbf;
+
+  let texto;
+
+  if (hasDoubleBom) {
+    // ✅ BOM doble-codificado — decodificar como UTF-8 y luego reparar
+    const raw = new TextDecoder("utf-8").decode(uint8);
+    // Reparar texto latin1 reinterpretado como UTF-8
+    // Cada carácter se convierte a su byte y luego se redecodifica como latin1
+    const bytes = Uint8Array.from(raw, (c) => c.charCodeAt(0) & 0xff);
+    texto = new TextDecoder("windows-1252").decode(bytes);
+  } else if (hasUtf8Bom) {
+    texto = new TextDecoder("utf-8").decode(uint8);
+  } else if (hasUtf16LeBom) {
+    texto = new TextDecoder("utf-16le").decode(uint8);
+  } else if (hasUtf16BeBom) {
+    texto = new TextDecoder("utf-16be").decode(uint8);
+  } else {
+    const hasBytesOver127 = uint8.some((b) => b > 127);
+    texto = new TextDecoder(hasBytesOver127 ? "windows-1252" : "utf-8").decode(uint8);
+  }
+
+  // ── Normalizar contenido ─────────────────────────────────────────────────
+  const limpio = texto
+    .replace(/^\uFEFF/, "")                                          // BOM como carácter
+    .replace(/^ï»¿/, "")                                             // BOM doble-codificado como texto
+    .replace(/^sep=.*\n/im, "")                                      // línea sep=
+    .replace(/\r\n/g, "\n")                                          // CRLF → LF
+    .replace(/\r/g, "\n")                                            // CR → LF
+    .replace(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/g, ";")                  // comas → punto y coma
+    .replace(/"([^";\n]*)"/g, "$1")                                  // quitar comillas simples
+    .trim();
+
+  // ── Reconstruir como UTF-8 limpio con BOM ────────────────────────────────
+  const bom       = new Uint8Array([0xef, 0xbb, 0xbf]);
+  const encoded   = new TextEncoder().encode(limpio);
+  const cleanBlob = new Blob([bom, encoded], { type: "text/csv;charset=utf-8" });
+
+  return new File([cleanBlob], file.name, { type: "text/csv" });
+};
+
 export const descargarPlantillaOrden = (productos) => {
   if (!productos || productos.length === 0) return;
 
@@ -278,12 +332,12 @@ export const descargarPlantillaOrden = (productos) => {
     filas.map((fila) => fila.join(";")).join("\n");
 
   // ✅ BOM UTF-8 correcto como Uint8Array
-  const bom  = new Uint8Array([0xef, 0xbb, 0xbf]);
+  const bom = new Uint8Array([0xef, 0xbb, 0xbf]);
   const blob = new Blob([bom, contenido], { type: "text/csv;charset=utf-8" });
 
-  const url  = URL.createObjectURL(blob);
+  const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
-  link.href  = url;
+  link.href = url;
   link.download = "plantilla_orden_produccion.csv";
   document.body.appendChild(link);
   link.click();
