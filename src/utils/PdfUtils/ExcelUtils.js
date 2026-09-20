@@ -13,7 +13,7 @@ const formatDate = (dateString) => {
 export const generateOrderExcel = (ordenId, detalleOrden = [], detalleConsumo = [], encabezadoOrden = {}) => {
   try {
     const workbook = utils.book_new();
-    
+
     // ==================== CONFIGURACIÓN DE ESTILOS ====================
     const headerStyle = {
       fill: { fgColor: { rgb: "37474F" } },
@@ -95,10 +95,10 @@ export const generateOrderExcel = (ordenId, detalleOrden = [], detalleConsumo = 
 
     // ==================== LÓGICA DE DATOS ====================
     // Filtrar productos con validación
-    const prodBandejas = (detalleOrden || []).filter(item => 
+    const prodBandejas = (detalleOrden || []).filter(item =>
       item && item.tipoProduccion === "bandejas"
     );
-    const prodHarina = (detalleOrden || []).filter(item => 
+    const prodHarina = (detalleOrden || []).filter(item =>
       item && item.tipoProduccion === "harina"
     );
 
@@ -112,10 +112,10 @@ export const generateOrderExcel = (ordenId, detalleOrden = [], detalleConsumo = 
     const calcularTotalHarina = () => {
       try {
         // Harina de consumo
-        const harinasConsumo = (detalleConsumo || []).filter(item => 
+        const harinasConsumo = (detalleConsumo || []).filter(item =>
           item && item.Ingrediente && item.Ingrediente.toLowerCase().includes('harina')
         );
-        
+
         const totalConsumo = harinasConsumo.reduce((sum, item) => {
           return sum + safeParseNumber(item.CantidadUsada);
         }, 0);
@@ -133,7 +133,7 @@ export const generateOrderExcel = (ordenId, detalleOrden = [], detalleConsumo = 
     };
 
     const totalHarina = calcularTotalHarina();
-    const unidadMedida = (detalleConsumo || []).find(item => 
+    const unidadMedida = (detalleConsumo || []).find(item =>
       item && item.Ingrediente && item.Ingrediente.toLowerCase().includes('harina')
     )?.UnidadMedida || 'Lb';
 
@@ -153,11 +153,13 @@ export const generateOrderExcel = (ordenId, detalleOrden = [], detalleConsumo = 
       // Detalles (sucursal, turno, etc.)
       [
         { v: `Sucursal: ${encabezadoOrden.nombreSucursal || ''}`, s: detailBoxStyle },
-        { v: `Turno: ${encabezadoOrden.ordenTurno || ''}`, s: { 
-          ...detailBoxStyle,
-          font: { ...detailBoxStyle.font, color: { rgb: "FFFFFF" } },
-          fill: { fgColor: { rgb: encabezadoOrden.ordenTurno === 'AM' ? 'FF6F00' : '2E7D32' } }
-        }},
+        {
+          v: `Turno: ${encabezadoOrden.ordenTurno || ''}`, s: {
+            ...detailBoxStyle,
+            font: { ...detailBoxStyle.font, color: { rgb: "FFFFFF" } },
+            fill: { fgColor: { rgb: encabezadoOrden.ordenTurno === 'AM' ? 'FF6F00' : '2E7D32' } }
+          }
+        },
         { v: `Solicitado por: ${encabezadoOrden.nombreUsuario || ''}`, s: detailBoxStyle },
         { v: `Panadero: ${encabezadoOrden.nombrePanadero || ''}`, s: detailBoxStyle }
       ],
@@ -214,7 +216,7 @@ export const generateOrderExcel = (ordenId, detalleOrden = [], detalleConsumo = 
 
     // ==================== CONFIGURACIÓN DE LA HOJA ====================
     const worksheet = utils.aoa_to_sheet(worksheetData);
-    
+
     // Ajustar anchos de columnas
     worksheet['!cols'] = [
       { wch: 4 },   // Columna # - Más estrecha
@@ -246,14 +248,73 @@ export const generateOrderExcel = (ordenId, detalleOrden = [], detalleConsumo = 
   }
 };
 
+export const limpiarCSV = async (file) => {
+  const buffer = await file.arrayBuffer();
+  const uint8  = new Uint8Array(buffer);
+
+  // ── Detectar encoding ────────────────────────────────────────────────────
+  const hasUtf8Bom    = uint8[0] === 0xef && uint8[1] === 0xbb && uint8[2] === 0xbf;
+  const hasUtf16LeBom = uint8[0] === 0xff && uint8[1] === 0xfe;
+  const hasUtf16BeBom = uint8[0] === 0xfe && uint8[1] === 0xff;
+
+  // Detectar BOM doble-codificado: EF BB BF codificado como UTF-8 = C3 AF C2 BB C2 BF
+  const hasDoubleBom =
+    uint8[0] === 0xc3 && uint8[1] === 0xaf &&
+    uint8[2] === 0xc2 && uint8[3] === 0xbb &&
+    uint8[4] === 0xc2 && uint8[5] === 0xbf;
+
+  let texto;
+
+  if (hasDoubleBom) {
+    // ✅ BOM doble-codificado — decodificar como UTF-8 y luego reparar
+    const raw = new TextDecoder("utf-8").decode(uint8);
+    // Reparar texto latin1 reinterpretado como UTF-8
+    // Cada carácter se convierte a su byte y luego se redecodifica como latin1
+    const bytes = Uint8Array.from(raw, (c) => c.charCodeAt(0) & 0xff);
+    texto = new TextDecoder("windows-1252").decode(bytes);
+  } else if (hasUtf8Bom) {
+    texto = new TextDecoder("utf-8").decode(uint8);
+  } else if (hasUtf16LeBom) {
+    texto = new TextDecoder("utf-16le").decode(uint8);
+  } else if (hasUtf16BeBom) {
+    texto = new TextDecoder("utf-16be").decode(uint8);
+  } else {
+    const hasBytesOver127 = uint8.some((b) => b > 127);
+    texto = new TextDecoder(hasBytesOver127 ? "windows-1252" : "utf-8").decode(uint8);
+  }
+
+  // ── Normalizar contenido ─────────────────────────────────────────────────
+  const limpio = texto
+    .replace(/^\uFEFF/, "")                                          // BOM como carácter
+    .replace(/^ï»¿/, "")                                             // BOM doble-codificado como texto
+    .replace(/^sep=.*\n/im, "")                                      // línea sep=
+    .replace(/\r\n/g, "\n")                                          // CRLF → LF
+    .replace(/\r/g, "\n")                                            // CR → LF
+    .replace(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/g, ";")                  // comas → punto y coma
+    .replace(/"([^";\n]*)"/g, "$1")                                  // quitar comillas simples
+    .trim();
+
+  // ── Reconstruir como UTF-8 limpio con BOM ────────────────────────────────
+  const bom       = new Uint8Array([0xef, 0xbb, 0xbf]);
+  const encoded   = new TextEncoder().encode(limpio);
+  const cleanBlob = new Blob([bom, encoded], { type: "text/csv;charset=utf-8" });
+
+  return new File([cleanBlob], file.name, { type: "text/csv" });
+};
+
 export const descargarPlantillaOrden = (productos) => {
   if (!productos || productos.length === 0) return;
 
   const bandejas = productos.filter(
-    (p) => (p.idCategoria === 1 || p.idCategoria === 8) && (p.tipoProduccion === "bandejas" )
+    (p) =>
+      (p.idCategoria === 1 || p.idCategoria === 8) &&
+      p.tipoProduccion === "bandejas"
   );
+
   const harina = productos.filter(
-    (p) => (p.idCategoria === 1 || p.idCategoria === 8) && (p.tipoProduccion === "harina" || p.tipoProduccion === "Otros")
+    (p) =>
+      (p.idCategoria === 1 || p.idCategoria === 8) &&
+      (p.tipoProduccion === "harina" || p.tipoProduccion === "Otros")
   );
 
   const filas = [
@@ -265,15 +326,19 @@ export const descargarPlantillaOrden = (productos) => {
     ...harina.map((p) => [p.idProducto, p.nombreProducto, ""]),
   ];
 
-  const contenido = "sep=;\n" + filas.map((f) => f.join(";")).join("\n");
+  // ✅ sep=; para Excel — sin comillas para que el backend parsee limpio
+  const contenido =
+    "sep=;\n" +
+    filas.map((fila) => fila.join(";")).join("\n");
 
-  // ✅ BOM como Uint8Array para forzar UTF-8 con BOM en Excel
-  const bom  = new Uint8Array([0xEF, 0xBB, 0xBF]);
-  const blob = new Blob([bom, contenido], { type: "text/csv;charset=utf-8;" });
-  const url  = URL.createObjectURL(blob);
+  // ✅ BOM UTF-8 correcto como Uint8Array
+  const bom = new Uint8Array([0xef, 0xbb, 0xbf]);
+  const blob = new Blob([bom, contenido], { type: "text/csv;charset=utf-8" });
+
+  const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
-  link.href  = url;
-  link.setAttribute("download", "plantilla_orden_produccion.csv");
+  link.href = url;
+  link.download = "plantilla_orden_produccion.csv";
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
@@ -283,10 +348,10 @@ export const descargarPlantillaOrden = (productos) => {
 export const descargarPlantillaVentas = (productos, turno, idSucural) => {
   if (!productos || productos.length === 0) return;
   let nombreSucursal = "";
-  
-  if(idSucural == 1){
+
+  if (idSucural == 1) {
     nombreSucursal = "SM_Dueñas"
-  }else{
+  } else {
     nombreSucursal = "S_Antonio"
   }
 
@@ -299,12 +364,12 @@ export const descargarPlantillaVentas = (productos, turno, idSucural) => {
   const contenido = "sep=;\n" + filas.map((f) => f.join(";")).join("\n");
 
   // ✅ BOM como Uint8Array para forzar UTF-8 con BOM en Excel
-  const bom  = new Uint8Array([0xEF, 0xBB, 0xBF]);
+  const bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
   const blob = new Blob([bom, contenido], { type: "text/csv;charset=utf-8;" });
-  const url  = URL.createObjectURL(blob);
+  const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
-  link.href  = url;
-  link.setAttribute("download", "venta_"+ nombreSucursal + "_"+ turno + "_" + getCurrentDateTimeWithSecondsFilesVentas() + ".csv");
+  link.href = url;
+  link.setAttribute("download", "venta_" + nombreSucursal + "_" + turno + "_" + getCurrentDateTimeWithSecondsFilesVentas() + ".csv");
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
