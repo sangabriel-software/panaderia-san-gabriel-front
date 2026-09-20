@@ -97,22 +97,22 @@ const IngresarOrdenProd = () => {
   const [isDraggingOver, setIsDraggingOver] = useState(false);
 
   const tomorrow = dayjs().add(1, "day").format("YYYY-MM-DD");
-  const today    = dayjs().format("YYYY-MM-DD");
+  const today = dayjs().format("YYYY-MM-DD");
   const userData = getUserData();
 
   console.log("Carga inicial")
 
-  const registroActivo    = Array.isArray(diaProduccion) && diaProduccion.length > 0 ? diaProduccion[0] : null;
-  const ventanaActiva     = registroActivo?.fecha_produccion_a_setear === "today";
+  const registroActivo = Array.isArray(diaProduccion) && diaProduccion.length > 0 ? diaProduccion[0] : null;
+  const ventanaActiva = registroActivo?.fecha_produccion_a_setear === "today";
   const segundosRestantes = registroActivo?.segundos_restantes ?? 0;
-  const expiraEn          = registroActivo?.expira_en ?? null;
-  const fechaMinima       = ventanaActiva ? today : tomorrow;
-  const fechaDefault      = ventanaActiva ? today : tomorrow;
+  const expiraEn = registroActivo?.expira_en ?? null;
+  const fechaMinima = ventanaActiva ? today : tomorrow;
+  const fechaDefault = ventanaActiva ? today : tomorrow;
 
   const { register, handleSubmit, formState: { errors }, setValue, watch, reset, getValues } = useForm({
     defaultValues: {
-      sucursal:       userData.idRol === 1 ? "" : userData.idSucursal.toString(),
-      turno:          "AM",
+      sucursal: userData.idRol === 1 ? "" : userData.idSucursal.toString(),
+      turno: "AM",
       fechaAProducir: fechaDefault,
       nombrePanadero: "",
     },
@@ -132,27 +132,27 @@ const IngresarOrdenProd = () => {
 
   const turnoValue = watch("turno");
 
-  const [activeCategory,       setActiveCategory]       = useState("Panaderia");
-  const [trayQuantities,       setTrayQuantities]       = useState({});
-  const [isPopupOpen,          setIsPopupOpen]          = useState(false);
-  const [isPopupErrorOpen,     setIsPopupErrorOpen]     = useState(false);
-  const [errorPopupMessage,    setErrorPopupMessage]    = useState("");
-  const [isLoading,            setIsLoading]            = useState(false);
-  const [showOrderSummary,     setShowOrderSummary]     = useState(false);
-  const [searchTerm,           setSearchTerm]           = useState("");
+  const [activeCategory, setActiveCategory] = useState("Panaderia");
+  const [trayQuantities, setTrayQuantities] = useState({});
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [isPopupErrorOpen, setIsPopupErrorOpen] = useState(false);
+  const [errorPopupMessage, setErrorPopupMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [showOrderSummary, setShowOrderSummary] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const [productionTypeFilter, setProductionTypeFilter] = useState("todos");
-  const [showScrollButton,     setShowScrollButton]     = useState(false);
+  const [showScrollButton, setShowScrollButton] = useState(false);
 
   // CSV
   const [modoIngreso, setModoIngreso] = useState("csv");
-  const [csvFile,     setCsvFile]     = useState(null);
-  const [csvLoading,  setCsvLoading]  = useState(false);
-  const [csvResult,   setCsvResult]   = useState(null);
+  const [csvFile, setCsvFile] = useState(null);
+  const [csvLoading, setCsvLoading] = useState(false);
+  const [csvResult, setCsvResult] = useState(null);
 
   const handleCloseOrderSummary = () => setShowOrderSummary(false);
 
   const filteredProducts = productos.filter((p) => p.idCategoria === 1 || p.idCategoria === 2);
-  const productsToShow   = getFilteredProductsByCategory(productos, searchTerm, activeCategory, usuario)
+  const productsToShow = getFilteredProductsByCategory(productos, searchTerm, activeCategory, usuario)
     .filter((p) => productionTypeFilter === "todos" || p.tipoProduccion === productionTypeFilter);
 
   const onSubmit = async () => setShowOrderSummary(true);
@@ -180,8 +180,8 @@ const IngresarOrdenProd = () => {
   const getFilterLabel = () => {
     switch (productionTypeFilter) {
       case "bandejas": return "Bandejas";
-      case "harina":   return "Harina";
-      default:         return "Todos los productos";
+      case "harina": return "Harina";
+      default: return "Todos los productos";
     }
   };
 
@@ -198,39 +198,36 @@ const IngresarOrdenProd = () => {
   };
 
   const handleCsvUpload = async () => {
-    console.log("Entra")
     if (!csvFile) return;
-  
+
     const { idUsuario } = getUserData();
     const data = getValues();
-  
+
     if (!data.sucursal || !data.fechaAProducir || !data.turno || !data.nombrePanadero) {
       setErrorPopupMessage("Ingresa el turno, la sucursal y/o el nombre del panadero.");
       setIsPopupErrorOpen(true);
       return;
     }
-  
+
     setCsvLoading(true);
     setCsvResult(null);
-  
+
     try {
       // ✅ Limpiar encoding antes de enviar
-      console.log("limpiar")
       const csvLimpio = await limpiarCSV(csvFile);
-      console.log(csvLimpio)
-  
+
       const ordenHaader = JSON.stringify({
-        idSucursal:     data.sucursal,
-        ordenTurno:     data.turno,
+        idSucursal: data.sucursal,
+        ordenTurno: data.turno,
         nombrePanadero: data.nombrePanadero,
         fechaAProducir: data.fechaAProducir,
-        idUsuario:      idUsuario,
-        fechaCreacion:  getCurrentDateTimeWithSeconds(),
+        idUsuario: idUsuario,
+        fechaCreacion: getCurrentDateTimeWithSeconds(),
       });
-  
-      const formData      = new FormData();
-      const fechaArchivo  = dayjs().format("YYYYMMDD-HHmmss");
-  
+
+      const formData = new FormData();
+      const fechaArchivo = dayjs().format("YYYYMMDD-HHmmss");
+
       // ✅ Usa csvLimpio en lugar de csvFile
       formData.append(
         "ordenProduccionBatch",
@@ -238,16 +235,16 @@ const IngresarOrdenProd = () => {
         `orden-produccion-${fechaArchivo}.csv`
       );
       formData.append("ordenHaader", ordenHaader);
-  
+
       const res = await ingresarOrdenProduccionBatchService(formData);
-  
+
       if (res.status === 200) {
         descargarPdfDuranteIngresoOrden(res.ordenProduccion.idOrdenGenerada);
       }
-  
+
       setCsvResult({ insertados: res.idOrdenProduccion ? 1 : 0 });
       setIsPopupOpen(true);
-  
+
     } catch (error) {
       if (error.status === 409) {
         setErrorPopupMessage(error.response.data.error.message);
@@ -517,10 +514,10 @@ const IngresarOrdenProd = () => {
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                <polyline points="14 2 14 8 20 8"/>
-                <line x1="12" y1="18" x2="12" y2="12"/>
-                <line x1="9" y1="15" x2="15" y2="15"/>
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+                <line x1="12" y1="18" x2="12" y2="12" />
+                <line x1="9" y1="15" x2="15" y2="15" />
               </svg>
               Cargar archivo CSV
             </button>
@@ -641,9 +638,9 @@ const IngresarOrdenProd = () => {
                 <div className="csv-format-info">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
                     stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                    <circle cx="12" cy="12" r="10"/>
-                    <line x1="12" y1="8" x2="12" y2="12"/>
-                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="8" x2="12" y2="12" />
+                    <line x1="12" y1="16" x2="12.01" y2="16" />
                   </svg>
                   <span>El archivo debe tener las columnas: <strong>idProducto, cantidad, tipoProduccion</strong></span>
                 </div>
@@ -655,9 +652,9 @@ const IngresarOrdenProd = () => {
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
                     stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                    <polyline points="7 10 12 15 17 10"/>
-                    <line x1="12" y1="15" x2="12" y2="3"/>
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="7 10 12 15 17 10" />
+                    <line x1="12" y1="15" x2="12" y2="3" />
                   </svg>
                   Descargar plantilla
                 </button>
@@ -682,9 +679,9 @@ const IngresarOrdenProd = () => {
                   <div className="csv-drag-overlay">
                     <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
                       stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
-                      <polyline points="16 16 12 12 8 16"/>
-                      <line x1="12" y1="12" x2="12" y2="21"/>
-                      <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/>
+                      <polyline points="16 16 12 12 8 16" />
+                      <line x1="12" y1="12" x2="12" y2="21" />
+                      <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3" />
                     </svg>
                     <p className="csv-drag-text">Suelta el archivo aquí</p>
                   </div>
@@ -692,8 +689,8 @@ const IngresarOrdenProd = () => {
                   <div className="csv-file-selected">
                     <svg width="28" height="28" viewBox="0 0 24 24" fill="none"
                       stroke="#6a01ac" strokeWidth="1.8" strokeLinecap="round">
-                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                      <polyline points="14 2 14 8 20 8"/>
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                      <polyline points="14 2 14 8 20 8" />
                     </svg>
                     <div>
                       <p className="csv-filename">{csvFile.name}</p>
@@ -707,8 +704,8 @@ const IngresarOrdenProd = () => {
                     >
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                        <line x1="18" y1="6" x2="6" y2="18"/>
-                        <line x1="6" y1="6" x2="18" y2="18"/>
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
                       </svg>
                     </button>
                   </div>
@@ -716,9 +713,9 @@ const IngresarOrdenProd = () => {
                   <div className="csv-empty">
                     <svg width="32" height="32" viewBox="0 0 24 24" fill="none"
                       stroke="#9e9e9e" strokeWidth="1.5" strokeLinecap="round">
-                      <polyline points="16 16 12 12 8 16"/>
-                      <line x1="12" y1="12" x2="12" y2="21"/>
-                      <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/>
+                      <polyline points="16 16 12 12 8 16" />
+                      <line x1="12" y1="12" x2="12" y2="21" />
+                      <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3" />
                     </svg>
                     <p className="csv-empty-text">Haz clic para seleccionar un archivo <strong>.csv</strong></p>
                     <p className="csv-empty-text">O arrastra y suelta un archivo aquí</p>
@@ -732,7 +729,7 @@ const IngresarOrdenProd = () => {
                   <div className="csv-result-item success">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
                       stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
-                      <polyline points="20 6 9 17 4 12"/>
+                      <polyline points="20 6 9 17 4 12" />
                     </svg>
                     {csvResult.insertados} producto{csvResult.insertados !== 1 ? "s" : ""} insertado{csvResult.insertados !== 1 ? "s" : ""}
                   </div>
@@ -740,9 +737,9 @@ const IngresarOrdenProd = () => {
                     <div className="csv-result-item error">
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                        <circle cx="12" cy="12" r="10"/>
-                        <line x1="12" y1="8" x2="12" y2="12"/>
-                        <line x1="12" y1="16" x2="12.01" y2="16"/>
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="12" y1="8" x2="12" y2="12" />
+                        <line x1="12" y1="16" x2="12.01" y2="16" />
                       </svg>
                       {csvResult.errores.length} fila{csvResult.errores.length !== 1 ? "s" : ""} con error
                     </div>
@@ -766,8 +763,8 @@ const IngresarOrdenProd = () => {
                   <>
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
                       stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                      <line x1="22" y1="2" x2="11" y2="13"/>
-                      <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                      <line x1="22" y1="2" x2="11" y2="13" />
+                      <polygon points="22 2 15 22 11 13 2 9 22 2" />
                     </svg>
                     Enviar archivo
                   </>
