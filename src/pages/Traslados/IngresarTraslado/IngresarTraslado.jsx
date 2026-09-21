@@ -80,14 +80,8 @@ const IngresarTraslado = () => {
         return producto.cantidadExistente;
     };
 
-    const convertirValorAUnidades = (valor, esFrances) => {
-        if (!esFrances) return Math.floor(valor);
-
-        const partes = valor.toString().split('.');
-        const filas = partes.length > 0 ? parseInt(partes[0]) : 0;
-        const unidadesExtra = partes.length > 1 ? parseInt(partes[1].substring(0, 1)) : 0;
-
-        return (filas * 6) + unidadesExtra;
+    const convertirValorAUnidades = (valor) => {
+        return Math.floor(valor);
     };
 
     const combinedStock = useMemo(() => {
@@ -235,8 +229,7 @@ const IngresarTraslado = () => {
 
             const productosCompletos = productosConStock.map(item => {
                 const producto = combinedStock.find(p => p.idProducto === item.idProducto);
-                const esFrances = producto.nombreProducto === "Frances";
-                const cantidadATrasladar = convertirValorAUnidades(item.value, esFrances);
+                const cantidadATrasladar = convertirValorAUnidades(item.value);
 
                 return {
                     ...producto,
@@ -527,9 +520,7 @@ const IngresarTraslado = () => {
                                                     </div>
                                                 </td>
                                                 <td className="text-center align-middle" style={{ fontWeight: "bold" }}>
-                                                    {esFrances ?
-                                                        `${Math.floor(producto.cantidadMostrada)}.${Math.round((producto.cantidadMostrada % 1) * 6)}` :
-                                                        producto.cantidadExistente}
+                                                    { producto.cantidadExistente}
                                                 </td>
                                                 <td className="text-center align-middle">
                                                     <Form.Control
