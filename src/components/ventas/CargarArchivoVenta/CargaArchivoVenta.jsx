@@ -10,9 +10,9 @@ const CargaArchivoVenta = ({ csvFile, setCsvFile, productos, idSucursal, turno }
   const handleFile = (file) => {
     if (!file) return;
     const esValido =
-      file.type === "text/csv" || file.name.toLowerCase().endsWith(".csv");
+      file.type === "text/xlsx" || file.name.toLowerCase().endsWith(".xlsx");
     if (!esValido) {
-      alert("Solo se permiten archivos CSV");
+      alert("Solo se permiten archivos XLSX");
       return;
     }
     setCsvFile(file);
@@ -70,12 +70,12 @@ const CargaArchivoVenta = ({ csvFile, setCsvFile, productos, idSucursal, turno }
             onClick={() => inputRef.current?.click()}
           >
             <BsCloudUpload size={42} className="carga-csv-icon" />
-            <p className="carga-csv-texto-principal">Arrastra tu archivo CSV aquí</p>
+            <p className="carga-csv-texto-principal">Arrastra tu archivo XLSX aquí</p>
             <p className="carga-csv-texto-secundario">o haz clic para seleccionar un archivo</p>
             <input
               ref={inputRef}
               type="file"
-              accept=".csv,text/csv"
+              accept=".xlsx,text/xlsx"
               className="d-none"
               onChange={handleInputChange}
             />

@@ -1,4 +1,5 @@
 import { utils, writeFile } from 'xlsx-js-style';
+import * as XLSX from "xlsx";
 import { getCurrentDateTimeWithSeconds, getCurrentDateTimeWithSecondsFiles, getCurrentDateTimeWithSecondsFilesVentas } from '../dateUtils';
 import { redondearASiguienteMultiploDe5 } from '../utils';
 import { isToday } from 'date-fns';
@@ -326,52 +327,69 @@ export const descargarPlantillaOrden = (productos) => {
     ...harina.map((p) => [p.idProducto, p.nombreProducto, ""]),
   ];
 
-  // ✅ sep=; para Excel — sin comillas para que el backend parsee limpio
-  const contenido =
-    "sep=;\n" +
-    filas.map((fila) => fila.join(";")).join("\n");
+  // ── Crear hoja ────────────────────────────────────────────────────────────
+  const ws = XLSX.utils.aoa_to_sheet(filas);
 
-  // ✅ BOM UTF-8 correcto como Uint8Array
-  const bom = new Uint8Array([0xef, 0xbb, 0xbf]);
-  const blob = new Blob([bom, contenido], { type: "text/csv;charset=utf-8" });
+  // ── Ancho de columnas ─────────────────────────────────────────────────────
+  ws["!cols"] = [
+    { wch: 10 },  // Codigo
+    { wch: 30 },  // Producto
+    { wch: 14 },  // Bandejas / Harina
+  ];
 
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = "plantilla_orden_produccion.csv";
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
+  // ── Crear libro ───────────────────────────────────────────────────────────
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Orden");
+
+  // ── Descargar ─────────────────────────────────────────────────────────────
+  XLSX.writeFile(wb, "plantilla_orden_produccion.xlsx");
 };
 
 export const descargarPlantillaVentas = (productos, turno, idSucural) => {
   if (!productos || productos.length === 0) return;
-  let nombreSucursal = "";
 
+  let nombreSucursal = "";
   if (idSucural == 1) {
-    nombreSucursal = "SM_Dueñas"
+    nombreSucursal = "SM_Dueñas";
   } else {
-    nombreSucursal = "S_Antonio"
+    nombreSucursal = "S_Antonio";
   }
 
-
+  // ── Datos ─────────────────────────────────────────────────────────────────
   const filas = [
     ["Codigo", "Producto", "Stock Actual", "Cantidad"],
-    ...productos.map((p) => [p.idProducto, p.nombreProducto, p.cantidadExistente, ""]),
+    ...productos.map((p) => [
+      p.idProducto,
+      p.nombreProducto,
+      p.cantidadExistente,
+      "",
+    ]),
   ];
 
-  const contenido = "sep=;\n" + filas.map((f) => f.join(";")).join("\n");
+  // ── Crear hoja ────────────────────────────────────────────────────────────
+  const ws = XLSX.utils.aoa_to_sheet(filas);
 
-  // ✅ BOM como Uint8Array para forzar UTF-8 con BOM en Excel
-  const bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
-  const blob = new Blob([bom, contenido], { type: "text/csv;charset=utf-8;" });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.setAttribute("download", "venta_" + nombreSucursal + "_" + turno + "_" + getCurrentDateTimeWithSecondsFilesVentas() + ".csv");
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
+  // ── Ancho de columnas ─────────────────────────────────────────────────────
+  ws["!cols"] = [
+    { wch: 10 },  // Codigo
+    { wch: 30 },  // Producto
+    { wch: 14 },  // Stock Actual
+    { wch: 12 },  // Cantidad
+  ];
+
+  // ── Crear libro ───────────────────────────────────────────────────────────
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Ventas");
+
+  // ── Descargar ─────────────────────────────────────────────────────────────
+  const nombreArchivo =
+    "venta_" +
+    nombreSucursal +
+    "_" +
+    turno +
+    "_" +
+    getCurrentDateTimeWithSecondsFilesVentas() +
+    ".xlsx";
+
+  XLSX.writeFile(wb, nombreArchivo);
 };
