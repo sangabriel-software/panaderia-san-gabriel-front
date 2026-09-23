@@ -187,11 +187,11 @@ const IngresarOrdenProd = () => {
 
   const handleCsvFileChange = (e) => {
     const file = e.target.files[0];
-    if (file && file.name.endsWith(".csv")) {
+    if (file && file.name.endsWith(".xlsx")) {
       setCsvFile(file);
       setCsvResult(null);
     } else {
-      setErrorPopupMessage("Solo se permiten archivos .csv");
+      setErrorPopupMessage("Solo se permiten archivos .xlsx");
       setIsPopupErrorOpen(true);
       e.target.value = "";
     }
@@ -214,8 +214,6 @@ const IngresarOrdenProd = () => {
 
     try {
       // ✅ Limpiar encoding antes de enviar
-      const csvLimpio = await limpiarCSV(csvFile);
-
       const ordenHaader = JSON.stringify({
         idSucursal: data.sucursal,
         ordenTurno: data.turno,
@@ -231,8 +229,8 @@ const IngresarOrdenProd = () => {
       // ✅ Usa csvLimpio en lugar de csvFile
       formData.append(
         "ordenProduccionBatch",
-        csvLimpio,
-        `orden-produccion-${fechaArchivo}.csv`
+        csvFile,
+        `orden-produccion-${fechaArchivo}.xlsx`
       );
       formData.append("ordenHaader", ordenHaader);
 
@@ -266,8 +264,8 @@ const IngresarOrdenProd = () => {
 
   const handleDescargarPlantilla = () => {
     const link = document.createElement("a");
-    link.href = "/plantillas/plantilla_produccion.csv";
-    link.download = "plantilla_produccion.csv";
+    link.href = "/plantillas/plantilla_produccion.xlsxs";
+    link.download = "plantilla_produccion.xlsx";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -292,11 +290,11 @@ const IngresarOrdenProd = () => {
     setIsDraggingOver(false);
 
     const file = e.dataTransfer.files[0];
-    if (file && file.name.endsWith(".csv")) {
+    if (file && file.name.endsWith(".xlsx")) {
       setCsvFile(file);
       setCsvResult(null);
     } else {
-      setErrorPopupMessage("Solo se permiten archivos .csv");
+      setErrorPopupMessage("Solo se permiten archivos .xlsx");
       setIsPopupErrorOpen(true);
     }
   };
@@ -519,7 +517,7 @@ const IngresarOrdenProd = () => {
                 <line x1="12" y1="18" x2="12" y2="12" />
                 <line x1="9" y1="15" x2="15" y2="15" />
               </svg>
-              Cargar archivo CSV
+              Cargar archivo XLSX
             </button>
           </div>
 
@@ -671,7 +669,7 @@ const IngresarOrdenProd = () => {
                 <input
                   ref={csvInputRef}
                   type="file"
-                  accept=".csv"
+                  accept=".xlsx"
                   onChange={handleCsvFileChange}
                   style={{ display: "none" }}
                 />
@@ -717,7 +715,7 @@ const IngresarOrdenProd = () => {
                       <line x1="12" y1="12" x2="12" y2="21" />
                       <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3" />
                     </svg>
-                    <p className="csv-empty-text">Haz clic para seleccionar un archivo <strong>.csv</strong></p>
+                    <p className="csv-empty-text">Haz clic para seleccionar un archivo <strong>.xlsx</strong></p>
                     <p className="csv-empty-text">O arrastra y suelta un archivo aquí</p>
                   </div>
                 )}
