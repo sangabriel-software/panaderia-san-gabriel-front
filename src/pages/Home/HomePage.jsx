@@ -373,7 +373,7 @@ function HomePage() {
                     <button
                       type="button"
                       onClick={closeDrawer}
-                      className="w-full rounded-xl border-0 bg-danger-600 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-danger-500/70"
+                      className="w-full rounded-xl border-0 bg-surface-2 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-surface-2/70"
                     >
                       Cerrar
                     </button>
