@@ -28,14 +28,15 @@ export const handleLogin = async (data, navigate, setIsLoading) => {
         if (userData?.idUsuario) {
           betterstack("user", {
             user_id: String(userData.idUsuario),
-            username: userData.usuario|| undefined,
-            email: userData.correo || undefined,
+            name: (userData.usuario + " " + userData.apellido ) || undefined,
+            userName: userData.usuario || undefined,
+            email: userData.correo || undefined
           });
       
           // Registrar explícitamente el login
           betterstack("track", "login", {
             user_id: String(userData.idUsuario),
-            rol: String(userData.rol),
+            userName: userData.usuario || undefined,
           });
         }
 

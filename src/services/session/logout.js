@@ -15,6 +15,8 @@ const useLogout = () => {
       // Limpiar datos
       removeLocalStorage("userData");
       removeLocalStorage("token");
+
+      betterstack("user", null);
       
       // Redirigir con parámetro
       window.location.href = "/login?logout=success";
