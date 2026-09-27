@@ -100,7 +100,6 @@ function HomePage() {
 
   const closeDrawer = () => setDrawerOpen(false);
 
-  // Bloquear scroll del body mientras el panel está abierto
   useEffect(() => {
     document.body.style.overflow = drawerOpen ? "hidden" : "";
     return () => {
@@ -235,9 +234,12 @@ function HomePage() {
         </div>
       </div>
 
-      {/* ── Panel lateral de detalle (drawer) ──────────────────────────
-          Desktop: entra desde la derecha, ancho fijo 420px.
-          Móvil: ocupa todo el ancho, se siente como una vista "push". ── */}
+      {/* ── Panel lateral de detalle ────────────────────────────────────
+          Móvil: pantalla completa (inset-0), UN SOLO contenedor con scroll
+          (el propio <aside>), crece según el contenido. Botón "Cerrar"
+          vive dentro del flujo normal, después de los productos.
+          Desktop (sm+): panel de 420px, header fijo + contenido con su
+          propio scroll interno, como antes. ──────────────────────────── */}
       {drawerOpen && (
         <>
           <div
@@ -247,12 +249,14 @@ function HomePage() {
           />
 
           <aside
-            className="fixed inset-y-0 right-0 z-50 flex w-full flex-col bg-surface shadow-modal animate-slide-in sm:w-[420px]"
+            className="fixed inset-0 z-50 flex flex-col overflow-y-auto bg-surface shadow-modal animate-slide-in sm:inset-y-0 sm:left-auto sm:right-0 sm:w-[420px] sm:overflow-hidden"
             role="dialog"
             aria-modal="true"
           >
-            {/* Header del panel */}
-            <div className="flex items-center gap-3 border-b border-line bg-brand-600 px-5 py-4 text-white">
+            {/* Header — sticky en móvil (queda fijo mientras el panel entero
+                hace scroll); en desktop simplemente no se mueve porque el
+                <aside> ahí no tiene scroll propio. */}
+            <div className="sticky top-0 z-10 flex items-center gap-3 border-b border-line bg-brand-600 px-5 py-4 text-white">
               <button
                 type="button"
                 onClick={closeDrawer}
@@ -277,8 +281,9 @@ function HomePage() {
               </button>
             </div>
 
-            {/* Contenido, scrolleable */}
-            <div className="flex-1 overflow-y-auto p-5">
+            {/* Contenido — en móvil sin overflow propio (el <aside> es quien
+                scrollea); en desktop sí tiene su propio scroll interno. */}
+            <div className="flex-1 p-5 sm:overflow-y-auto">
               {loadingDetails ? (
                 <div className="flex items-center justify-center py-16">
                   <span className="h-8 w-8 animate-spin-smooth rounded-full border-4 border-brand-200 border-t-brand-600" />
@@ -286,7 +291,6 @@ function HomePage() {
               ) : (
                 selectedOrder && (
                   <div className="flex flex-col gap-6">
-                    {/* Estado + color de sucursal */}
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <span className="h-3 w-3 rounded-full" style={{ backgroundColor: selectedOrder.color }} />
@@ -299,7 +303,6 @@ function HomePage() {
                       )}
                     </div>
 
-                    {/* Datos principales — una sola columna, fácil de escanear */}
                     <dl className="flex flex-col divide-y divide-line rounded-xl border border-line">
                       <div className="flex items-center gap-3 px-4 py-3">
                         <FiCalendar size={16} className="shrink-0 text-brand-600" />
@@ -364,20 +367,19 @@ function HomePage() {
                         {selectedOrder.orderData?.ordenIngresadaPor || "N/A"}
                       </p>
                     </div>
+
+                    {/* Cerrar — dentro del flujo, justo después del contenido
+                        (productos + ingresado por), no un footer fijo aparte */}
+                    <button
+                      type="button"
+                      onClick={closeDrawer}
+                      className="w-full rounded-xl border-0 bg-danger-600 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-danger-500/70"
+                    >
+                      Cerrar
+                    </button>
                   </div>
                 )
               )}
-            </div>
-
-            {/* Footer fijo */}
-            <div className="border-t border-line p-4">
-              <button
-                type="button"
-                onClick={closeDrawer}
-                className="w-full rounded-xl border-0 bg-surface-2 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-surface-2/70"
-              >
-                Cerrar
-              </button>
             </div>
           </aside>
         </>
