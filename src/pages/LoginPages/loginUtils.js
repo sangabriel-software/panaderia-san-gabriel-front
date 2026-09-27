@@ -21,7 +21,6 @@ export const handleLogin = async (data, navigate, setIsLoading) => {
       // Obtener información del usuario desde el token
       const userData = getUserData();
     
-      toast.success("Inicio de sesión exitoso", { autoClose: 1000 });
     
       setTimeout(() => {
 
