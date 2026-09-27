@@ -20,24 +20,25 @@ export const handleLogin = async (data, navigate, setIsLoading) => {
       // Obtener información del usuario desde el token
       const userData = getUserData();
     
-      // Identificar usuario en Better Stack
-      if (userData?.idUsuario) {
-        betterstack("user", {
-          user_id: String(userData.idUsuario),
-          username: userData.usuario|| undefined,
-          email: userData.correo || undefined,
-        });
-    
-        // Registrar explícitamente el login
-        betterstack("track", "login", {
-          user_id: String(userData.idUsuario),
-          rol: String(userData.rol),
-        });
-      }
-    
       toast.success("Inicio de sesión exitoso", { autoClose: 1000 });
     
       setTimeout(() => {
+
+        // Identificar usuario en Better Stack
+        if (userData?.idUsuario) {
+          betterstack("user", {
+            user_id: String(userData.idUsuario),
+            username: userData.usuario|| undefined,
+            email: userData.correo || undefined,
+          });
+      
+          // Registrar explícitamente el login
+          betterstack("track", "login", {
+            user_id: String(userData.idUsuario),
+            rol: String(userData.rol),
+          });
+        }
+
         if (userData?.cambioContrasenia === 1) {
           navigate("/cambiar-password");
         } else {
