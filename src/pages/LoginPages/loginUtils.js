@@ -1,6 +1,7 @@
+import { identifyUser } from "../../observability/betterStack";
 import { iniciarSesion } from "../../services/authServices/auth.service";
 import { getUserData } from "../../utils/Auth/decodedata";
-import { setLocalStorage } from "../../utils/Auth/localstorage";
+import { getLocalStorage, setLocalStorage } from "../../utils/Auth/localstorage";
 import { toast } from "react-toastify";
 
 /**
@@ -24,19 +25,15 @@ export const handleLogin = async (data, navigate, setIsLoading) => {
     
       setTimeout(() => {
 
-        // Identificar usuario en Better Stack
+        // Identificar usuario en Better Stack (no-op si está deshabilitado)
         if (userData?.idUsuario) {
-          betterstack("user", {
-            user_id: String(userData.idUsuario),
-            name: (userData.usuario + " " + userData.apellido ) || undefined,
+          identifyUser({
+            userId: userData.idUsuario,
+            name: userData.usuario && userData.apellido
+              ? `${userData.usuario} ${userData.apellido}`
+              : undefined,
             userName: userData.usuario || undefined,
-            email: userData.correo || undefined
-          });
-      
-          // Registrar explícitamente el login
-          betterstack("track", "login", {
-            user_id: String(userData.idUsuario),
-            userName: userData.usuario || undefined,
+            email: userData.correo || undefined,
           });
         }
 

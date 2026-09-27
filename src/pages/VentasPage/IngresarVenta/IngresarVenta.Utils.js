@@ -285,13 +285,6 @@ export const handleGuardarVenta = async (setIsLoading, orden, sucursalValue, usu
   try {
     const resIngrearVenta = await ingresarVentaService(payload);
     if(resIngrearVenta.status === 200){
-
-      betterstack("track", "ingresoVenta", {
-        user_id: String(userData.idUsuario),
-        userName: userData.usuario || undefined,
-        payload: payload
-      });
-
       setTrayQuantities([])
       reset();
       setIsPopupSuccessOpen(true);
