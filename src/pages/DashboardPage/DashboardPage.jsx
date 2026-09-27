@@ -14,6 +14,8 @@ function DashboardPage() {
     const { dashboardData, loadingDashboardData, showErrorDashboardData, setDashboardData,
         cantidadEmpleados, cantidadSucursales, ingresosMensuales, ingresosAnuales, resumenMensual, topVentas } = useGetDashboardData();
 
+        console.log(dashboardData)
+
     // Función para sumar los ingresos mensuales de todas las sucursales
     const calcularTotalIngresosMensuales = () => {
         if (!ingresosMensuales || ingresosMensuales.length === 0) return "0.00";

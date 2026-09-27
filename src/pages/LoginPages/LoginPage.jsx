@@ -17,7 +17,7 @@ function LoginPage() {
   } = useForm();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
+  const [theme, setTheme] = useState(localStorage.getItem("theme") || "dark");
   const [isChangingTheme, setIsChangingTheme] = useState(false);
 
   useEffect(() => {

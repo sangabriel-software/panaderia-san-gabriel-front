@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import {
   FiShoppingCart,
   FiTrendingUp,
@@ -11,71 +11,25 @@ import {
   FiPhone,
   FiMapPin,
   FiCalendar,
+  FiChevronRight,
+  FiInbox,
+  FiArrowLeft,
 } from "react-icons/fi";
 import { getUserData } from "../../utils/Auth/decodedata";
 import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
-import { Calendar, dateFnsLocalizer } from "react-big-calendar";
-import { format, parse, startOfWeek, getDay } from "date-fns";
-import { es } from "date-fns/locale";
-import "react-big-calendar/lib/css/react-big-calendar.css";
 import useGetOrdenEHeader from "../../hooks/orenesEspeciales/useGetOrdenEHeader";
 import { consultarOrdenEspecialByIdService } from "../../services/ordenesEspeciales/ordenesEspeciales.service";
 import { getUniqueColor } from "../../utils/utils";
 import { getColorFromName } from "../../components/Sidebar/Sidebar.uitils";
 
-const localizer = dateFnsLocalizer({
-  format,
-  parse,
-  startOfWeek: (date) => startOfWeek(date, { weekStartsOn: 1 }),
-  getDay,
-  locales: { es },
-});
-
-const calendarMessages = {
-  allDay: "Todo el día",
-  previous: "‹",
-  next: "›",
-  today: "Hoy",
-  month: "Mes",
-  week: "Semana",
-  day: "Día",
-  agenda: "Agenda",
-  date: "Fecha",
-  time: "Hora",
-  event: "Evento",
-  noEventsInRange: "No hay órdenes programadas",
-  showMore: (total) => `+ Ver más (${total})`,
-};
-
 const QUICK_ACTIONS = [
-  {
-    title: "Nueva Venta",
-    icon: FiShoppingCart,
-    tone: "brand",
-    path: "/ventas/ingresar-venta",
-  },
-  {
-    title: "Orden Especial",
-    icon: FiTrendingUp,
-    tone: "accent",
-    path: "/pedido-especial/ingresar-orden-especial",
-  },
-  {
-    title: "Agregar Stock",
-    icon: FiPlus,
-    tone: "warning",
-    path: "/stock-productos",
-  },
-  {
-    title: "Ingresar Orden",
-    icon: FiFileText,
-    tone: "danger",
-    path: "/ordenes-produccion/ingresar-orden",
-  },
+  { title: "Nueva Venta", icon: FiShoppingCart, tone: "brand", path: "/ventas/ingresar-venta" },
+  { title: "Orden Especial", icon: FiTrendingUp, tone: "accent", path: "/pedido-especial/ingresar-orden-especial" },
+  { title: "Agregar Stock", icon: FiPlus, tone: "warning", path: "/stock-productos" },
+  { title: "Ingresar Orden", icon: FiFileText, tone: "danger", path: "/ordenes-produccion/ingresar-orden" },
 ];
 
-// Clases por tono — centralizado para no repetir strings largos por acción
 const TONE_CLASSES = {
   brand: "bg-brand-50 text-brand-700 hover:bg-brand-100",
   accent: "bg-accent-50 text-accent-700 hover:bg-accent-100",
@@ -101,31 +55,26 @@ function HomePage() {
   const currentHour = dayjs().hour();
 
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const [showModal, setShowModal] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [orderDetails, setOrderDetails] = useState(null);
   const [loadingDetails, setLoadingDetails] = useState(false);
   const { ordenesEspeciales, loadingOrdenEspecial } = useGetOrdenEHeader();
-  const [calendarEvents, setCalendarEvents] = useState([]);
 
-  useEffect(() => {
-    if (ordenesEspeciales && ordenesEspeciales.length > 0) {
-      const events = ordenesEspeciales.map((orden) => {
-        const fechaEntrega = dayjs(orden.fechaEntrega);
-        return {
-          id: orden.idOrdenEspecial,
-          title: `Orden #${orden.idOrdenEspecial}`,
-          start: fechaEntrega.startOf("day").toDate(),
-          end: fechaEntrega.endOf("day").toDate(),
-          client: orden.nombreCliente,
-          phone: orden.telefonoCliente,
-          branch: orden.sucursalEntrega,
-          status: orden.estado === "A" ? "Activo" : "Inactivo",
-          color: getUniqueColor(orden.sucursalEntrega + "orden1256"),
-          orderData: orden,
-        };
-      });
-      setCalendarEvents(events);
-    }
+  const proximasEntregas = useMemo(() => {
+    if (!ordenesEspeciales) return [];
+    return ordenesEspeciales
+      .map((orden) => ({
+        id: orden.idOrdenEspecial,
+        fecha: dayjs(orden.fechaEntrega),
+        client: orden.nombreCliente,
+        phone: orden.telefonoCliente,
+        branch: orden.sucursalEntrega,
+        color: getUniqueColor(orden.sucursalEntrega + "orden1256"),
+        orderData: orden,
+      }))
+      .filter((o) => o.fecha.isSame(dayjs(), "day") || o.fecha.isAfter(dayjs(), "day"))
+      .sort((a, b) => a.fecha.valueOf() - b.fecha.valueOf())
+      .slice(0, 6);
   }, [ordenesEspeciales]);
 
   const greeting =
@@ -135,12 +84,12 @@ function HomePage() {
       ? "Buenas tardes"
       : "Buenas noches";
 
-  const handleSelectEvent = async (event) => {
-    setSelectedOrder(event);
-    setShowModal(true);
+  const handleSelectOrder = async (item) => {
+    setSelectedOrder(item);
+    setDrawerOpen(true);
     setLoadingDetails(true);
     try {
-      const response = await consultarOrdenEspecialByIdService(event.id);
+      const response = await consultarOrdenEspecialByIdService(item.id);
       setOrderDetails(response.ordenEspecial);
     } catch (error) {
       console.error("Error al cargar los detalles de la orden:", error);
@@ -149,31 +98,27 @@ function HomePage() {
     }
   };
 
-  const eventStyleGetter = (event) => ({
-    style: {
-      backgroundColor: event.color,
-      borderRadius: "8px",
-      border: "0px",
-      opacity: 0.9,
-      color: "white",
-      fontSize: "12px",
-      fontWeight: 500,
-    },
-  });
+  const closeDrawer = () => setDrawerOpen(false);
 
-  const formatDate = (date) =>
-    date.toLocaleDateString("es-ES", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+  // Bloquear scroll del body mientras el panel está abierto
+  useEffect(() => {
+    document.body.style.overflow = drawerOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [drawerOpen]);
+
+  const formatDate = (d) => d.format("dddd D [de] MMMM, h:mm A");
+
+  const relativeLabel = (d) => {
+    if (d.isSame(dayjs(), "day")) return "Hoy";
+    if (d.isSame(dayjs().add(1, "day"), "day")) return "Mañana";
+    return d.format("D MMM");
+  };
 
   return (
     <div className="flex flex-col gap-6">
-      {/* ── Header: saludo + usuario ──────────────────────────────────── */}
+      {/* ── Header ───────────────────────────────────────────────────── */}
       <header className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <p className="text-sm font-medium text-brand-600">{greeting}</p>
@@ -207,34 +152,59 @@ function HomePage() {
       </section>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        {/* ── Calendario ─────────────────────────────────────────────── */}
+        {/* ── Próximas entregas ────────────────────────────────────────── */}
         <div className="rounded-2xl border border-line bg-surface p-4 shadow-card lg:col-span-2">
-          <div className="mb-4 flex items-center gap-2">
-            <FiCalendar size={17} className="text-brand-600" />
-            <h2 className="text-sm font-semibold text-ink">Calendario de Órdenes Especiales</h2>
+          <div className="mb-4 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <FiCalendar size={17} className="text-brand-600" />
+              <h2 className="text-sm font-semibold text-ink">Próximas entregas</h2>
+            </div>
+            <button
+              type="button"
+              onClick={() => navigate("/pedido-especial")}
+              className="flex items-center gap-1 border-0 bg-transparent text-xs font-medium text-brand-600 hover:text-brand-700"
+            >
+              Ver todas <FiChevronRight size={13} />
+            </button>
           </div>
 
-          <div className="h-[520px]">
-            {loadingOrdenEspecial ? (
-              <div className="flex h-full items-center justify-center">
-                <span className="h-8 w-8 animate-spin-smooth rounded-full border-4 border-brand-200 border-t-brand-600" />
-              </div>
-            ) : (
-              <Calendar
-                localizer={localizer}
-                events={calendarEvents}
-                startAccessor="start"
-                endAccessor="end"
-                style={{ height: "100%" }}
-                onSelectEvent={handleSelectEvent}
-                eventPropGetter={eventStyleGetter}
-                messages={calendarMessages}
-                defaultView="month"
-                views={["month", "week", "day"]}
-                culture="es"
-              />
-            )}
-          </div>
+          {loadingOrdenEspecial ? (
+            <div className="flex items-center justify-center py-12">
+              <span className="h-8 w-8 animate-spin-smooth rounded-full border-4 border-brand-200 border-t-brand-600" />
+            </div>
+          ) : proximasEntregas.length === 0 ? (
+            <div className="flex flex-col items-center justify-center gap-2 py-12 text-center">
+              <span className="flex h-11 w-11 items-center justify-center rounded-full bg-surface-2 text-muted">
+                <FiInbox size={18} />
+              </span>
+              <p className="text-sm text-muted">No hay entregas próximas programadas.</p>
+            </div>
+          ) : (
+            <ul className="flex flex-col gap-1.5">
+              {proximasEntregas.map((item) => (
+                <li key={item.id}>
+                  <button
+                    type="button"
+                    onClick={() => handleSelectOrder(item)}
+                    className={`flex w-full items-center gap-3 rounded-xl border-0 p-3 text-left transition-colors ${
+                      selectedOrder?.id === item.id && drawerOpen
+                        ? "bg-brand-50 ring-1 ring-brand-200"
+                        : "bg-surface-2/50 hover:bg-brand-50"
+                    }`}
+                  >
+                    <span className="h-9 w-1.5 shrink-0 rounded-full" style={{ backgroundColor: item.color }} />
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-medium text-ink">{item.client}</p>
+                      <p className="truncate text-xs text-muted">{item.branch}</p>
+                    </div>
+                    <span className="shrink-0 rounded-full bg-surface px-2.5 py-1 text-xs font-semibold text-brand-700">
+                      {relativeLabel(item.fecha)}
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
 
         {/* ── Actividad reciente ─────────────────────────────────────── */}
@@ -247,7 +217,6 @@ function HomePage() {
           <ul className="flex flex-col gap-1">
             {RECENT_ACTIVITIES.map(({ id, action, time, user, icon: Icon }, i) => (
               <li key={id} className="relative flex gap-3 pb-5 last:pb-0">
-                {/* Línea del timeline */}
                 {i < RECENT_ACTIVITIES.length - 1 && (
                   <span className="absolute left-[15px] top-8 h-full w-px bg-line" />
                 )}
@@ -266,140 +235,152 @@ function HomePage() {
         </div>
       </div>
 
-      {/* ── Modal de detalle de orden — 100% Tailwind, sin react-bootstrap ── */}
-      {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      {/* ── Panel lateral de detalle (drawer) ──────────────────────────
+          Desktop: entra desde la derecha, ancho fijo 420px.
+          Móvil: ocupa todo el ancho, se siente como una vista "push". ── */}
+      {drawerOpen && (
+        <>
           <div
-            className="absolute inset-0 bg-slate-950/50 backdrop-blur-sm animate-fade-in"
-            onClick={() => setShowModal(false)}
+            className="fixed inset-0 z-40 bg-slate-950/40 backdrop-blur-[2px] animate-fade-in"
+            onClick={closeDrawer}
+            aria-hidden="true"
           />
-          <div className="relative w-full max-w-2xl animate-slide-up overflow-hidden rounded-2xl bg-surface shadow-modal">
-            {/* Header */}
-            <div className="flex items-center justify-between border-b border-line bg-brand-600 px-5 py-4 text-white">
-              <h3 className="text-base font-semibold">Detalles del Pedido Especial</h3>
+
+          <aside
+            className="fixed inset-y-0 right-0 z-50 flex w-full flex-col bg-surface shadow-modal animate-slide-in sm:w-[420px]"
+            role="dialog"
+            aria-modal="true"
+          >
+            {/* Header del panel */}
+            <div className="flex items-center gap-3 border-b border-line bg-brand-600 px-5 py-4 text-white">
               <button
                 type="button"
-                onClick={() => setShowModal(false)}
+                onClick={closeDrawer}
                 aria-label="Cerrar"
-                className="flex h-8 w-8 items-center justify-center rounded-full border-0 bg-white/10 text-white transition-colors hover:bg-white/20"
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-0 bg-white/10 text-white transition-colors hover:bg-white/20 sm:hidden"
+              >
+                <FiArrowLeft size={16} />
+              </button>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-medium text-white/70">Pedido especial</p>
+                <h3 className="truncate text-base font-semibold">
+                  Orden #{selectedOrder?.id}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={closeDrawer}
+                aria-label="Cerrar"
+                className="hidden h-8 w-8 shrink-0 items-center justify-center rounded-full border-0 bg-white/10 text-white transition-colors hover:bg-white/20 sm:flex"
               >
                 <FiX size={16} />
               </button>
             </div>
 
-            {/* Body */}
-            <div className="max-h-[70vh] overflow-y-auto p-5">
+            {/* Contenido, scrolleable */}
+            <div className="flex-1 overflow-y-auto p-5">
               {loadingDetails ? (
-                <div className="flex items-center justify-center py-12">
+                <div className="flex items-center justify-center py-16">
                   <span className="h-8 w-8 animate-spin-smooth rounded-full border-4 border-brand-200 border-t-brand-600" />
                 </div>
               ) : (
                 selectedOrder && (
-                  <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                    {/* Columna izquierda: datos de la orden */}
-                    <div>
-                      <div className="mb-4 flex items-center gap-2.5">
-                        <span
-                          className="h-3.5 w-3.5 rounded-full"
-                          style={{ backgroundColor: selectedOrder.color }}
-                        />
-                        <h4 className="text-lg font-bold text-ink">
-                          Orden Especial #{selectedOrder.id}
-                        </h4>
+                  <div className="flex flex-col gap-6">
+                    {/* Estado + color de sucursal */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="h-3 w-3 rounded-full" style={{ backgroundColor: selectedOrder.color }} />
+                        <span className="text-sm font-medium text-ink">{selectedOrder.branch}</span>
                       </div>
-
-                      <dl className="flex flex-col gap-3.5">
-                        <div>
-                          <dt className="mb-1 text-xs font-medium uppercase tracking-wide text-muted">
-                            Fecha de entrega
-                          </dt>
-                          <dd className="flex items-center gap-1.5 text-sm text-ink">
-                            <FiCalendar size={14} className="text-muted" />
-                            {formatDate(selectedOrder.start)}
-                          </dd>
-                        </div>
-                        <div>
-                          <dt className="mb-1 text-xs font-medium uppercase tracking-wide text-muted">Cliente</dt>
-                          <dd className="flex items-center gap-1.5 text-sm text-ink">
-                            <FiUser size={14} className="text-muted" />
-                            {selectedOrder.client}
-                          </dd>
-                        </div>
-                        <div>
-                          <dt className="mb-1 text-xs font-medium uppercase tracking-wide text-muted">Teléfono</dt>
-                          <dd className="flex items-center gap-1.5 text-sm text-ink">
-                            <FiPhone size={14} className="text-muted" />
-                            {selectedOrder.phone}
-                          </dd>
-                        </div>
-                        <div>
-                          <dt className="mb-1 text-xs font-medium uppercase tracking-wide text-muted">
-                            Sucursal de entrega
-                          </dt>
-                          <dd className="flex items-center gap-1.5 text-sm text-ink">
-                            <FiMapPin size={14} className="text-muted" />
-                            {selectedOrder.branch}
-                          </dd>
-                        </div>
-                        <div>
-                          <dt className="mb-1 text-xs font-medium uppercase tracking-wide text-muted">Estado</dt>
-                          <dd>
-                            {dayjs(selectedOrder.orderData.fechaEntrega).isBefore(dayjs(), "day") ? (
-                              <span className="badge bg-brand-100 text-brand-700">Entregado</span>
-                            ) : (
-                              <span className="badge bg-danger-100 text-danger-700">Sin entregar</span>
-                            )}
-                          </dd>
-                        </div>
-                      </dl>
+                      {selectedOrder.fecha.isBefore(dayjs(), "day") ? (
+                        <span className="badge bg-brand-100 text-brand-700">Entregado</span>
+                      ) : (
+                        <span className="badge bg-danger-100 text-danger-700">Sin entregar</span>
+                      )}
                     </div>
 
-                    {/* Columna derecha: productos */}
-                    <div className="rounded-xl border border-line bg-surface-2/50 p-4">
-                      <h5 className="mb-3 text-sm font-semibold text-ink">Productos</h5>
+                    {/* Datos principales — una sola columna, fácil de escanear */}
+                    <dl className="flex flex-col divide-y divide-line rounded-xl border border-line">
+                      <div className="flex items-center gap-3 px-4 py-3">
+                        <FiCalendar size={16} className="shrink-0 text-brand-600" />
+                        <div className="min-w-0">
+                          <dt className="text-xs text-muted">Fecha de entrega</dt>
+                          <dd className="truncate text-sm font-medium capitalize text-ink">
+                            {formatDate(selectedOrder.fecha)}
+                          </dd>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3 px-4 py-3">
+                        <FiUser size={16} className="shrink-0 text-brand-600" />
+                        <div className="min-w-0">
+                          <dt className="text-xs text-muted">Cliente</dt>
+                          <dd className="truncate text-sm font-medium text-ink">{selectedOrder.client}</dd>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3 px-4 py-3">
+                        <FiPhone size={16} className="shrink-0 text-brand-600" />
+                        <div className="min-w-0">
+                          <dt className="text-xs text-muted">Teléfono</dt>
+                          <dd className="truncate text-sm font-medium text-ink">{selectedOrder.phone}</dd>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3 px-4 py-3">
+                        <FiMapPin size={16} className="shrink-0 text-brand-600" />
+                        <div className="min-w-0">
+                          <dt className="text-xs text-muted">Sucursal de entrega</dt>
+                          <dd className="truncate text-sm font-medium text-ink">{selectedOrder.branch}</dd>
+                        </div>
+                      </div>
+                    </dl>
+
+                    {/* Productos */}
+                    <div>
+                      <h4 className="mb-2.5 text-sm font-semibold text-ink">Productos</h4>
                       {orderDetails && orderDetails?.ordenDetalle?.length > 0 ? (
-                        <>
-                          <ul className="flex flex-col gap-2">
-                            {orderDetails.ordenDetalle.map((producto, index) => (
-                              <li
-                                key={index}
-                                className="flex items-center justify-between rounded-lg bg-surface px-3 py-2 text-sm"
-                              >
-                                <span className="text-ink">{producto.nombreProducto}</span>
-                                <span className="font-semibold text-brand-700">
-                                  {producto.cantidadUnidades} u.
-                                </span>
-                              </li>
-                            ))}
-                          </ul>
-                          <div className="mt-4 border-t border-line pt-3">
-                            <p className="text-xs font-medium uppercase tracking-wide text-muted">Ingresado por</p>
-                            <p className="mt-1 text-sm text-ink">
-                              {selectedOrder.orderData?.ordenIngresadaPor || "N/A"}
-                            </p>
-                          </div>
-                        </>
+                        <ul className="flex flex-col gap-2">
+                          {orderDetails.ordenDetalle.map((producto, index) => (
+                            <li
+                              key={index}
+                              className="flex items-center justify-between rounded-lg border border-line bg-surface-2/40 px-3 py-2.5 text-sm"
+                            >
+                              <span className="text-ink">{producto.nombreProducto}</span>
+                              <span className="font-semibold text-brand-700">
+                                {producto.cantidadUnidades} u.
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
                       ) : (
-                        <p className="text-sm text-muted">No hay detalles de productos para esta orden.</p>
+                        <p className="rounded-lg border border-dashed border-line px-3 py-4 text-center text-sm text-muted">
+                          No hay detalles de productos para esta orden.
+                        </p>
                       )}
+                    </div>
+
+                    {/* Ingresado por */}
+                    <div className="border-t border-line pt-4">
+                      <p className="text-xs text-muted">Ingresado por</p>
+                      <p className="mt-0.5 text-sm font-medium text-ink">
+                        {selectedOrder.orderData?.ordenIngresadaPor || "N/A"}
+                      </p>
                     </div>
                   </div>
                 )
               )}
             </div>
 
-            {/* Footer */}
-            <div className="flex justify-end border-t border-line px-5 py-3.5">
+            {/* Footer fijo */}
+            <div className="border-t border-line p-4">
               <button
                 type="button"
-                onClick={() => setShowModal(false)}
-                className="rounded-xl border-0 bg-danger-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-danger-500"
+                onClick={closeDrawer}
+                className="w-full rounded-xl border-0 bg-surface-2 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-surface-2/70"
               >
                 Cerrar
               </button>
             </div>
-          </div>
-        </div>
+          </aside>
+        </>
       )}
     </div>
   );

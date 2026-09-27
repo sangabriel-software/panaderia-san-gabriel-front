@@ -42,7 +42,7 @@ const NAV_GROUPS = [
 ];
 
 function Sidebar({ expanded, onToggle, mobileOpen, onCloseMobile }) {
-  const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
+  const [theme, setTheme] = useState(localStorage.getItem("theme") || "dark");
   const [isChangingTheme, setIsChangingTheme] = useState(false);
   const permisosUsuario = getUserPermissions();
   const userData = getUserData();
