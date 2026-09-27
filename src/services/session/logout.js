@@ -1,3 +1,4 @@
+import { clearbetterUser } from "../../observability/betterStack";
 import { removeLocalStorage } from "../../utils/Auth/localstorage";
 import { toast } from "react-toastify";
 
@@ -15,6 +16,8 @@ const useLogout = () => {
       // Limpiar datos
       removeLocalStorage("userData");
       removeLocalStorage("token");
+
+      clearbetterUser();
       
       // Redirigir con parámetro
       window.location.href = "/login?logout=success";

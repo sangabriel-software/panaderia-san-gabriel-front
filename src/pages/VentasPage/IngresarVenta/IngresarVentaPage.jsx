@@ -320,7 +320,7 @@ const IngresarVentaPage = () => {
             onClick={() => setModoIngreso("csv")}
           >
             <BsFileEarmarkSpreadsheet size={18} />
-            Cargar CSV
+            Cargar XLSX
           </button>
         </div>
       )}
