@@ -1,374 +1,246 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Nav, Collapse } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
-import { FaHome, FaUsers, FaCalendar, FaFolder, FaUserPlus, FaUsersCog, FaChevronRight, FaCog, FaSun, FaMoon, FaShoppingBag, FaStore, FaLayerGroup, FaThLarge, } from "react-icons/fa";
-import { MdDashboard, MdOutlineBakeryDining } from "react-icons/md";
+import { MdOutlineBakeryDining } from "react-icons/md";
+import { FaSun, FaMoon, FaChevronLeft, FaSignOutAlt } from "react-icons/fa";
 import * as DarkReader from "darkreader";
-import "./Sidebar.css";
 import { getUserData, getUserPermissions } from "../../utils/Auth/decodedata";
 import { getColorFromName } from "./Sidebar.uitils";
-import { FiAlertCircle, FiBarChart2, FiBox, FiCalendar, FiClipboard, FiHome, FiMapPin, FiPackage, FiPieChart, FiSettings, FiShoppingBag, FiShoppingCart, FiTruck, FiUsers } from "react-icons/fi";
+import {
+  FiHome,
+  FiPieChart,
+  FiBox,
+  FiCalendar,
+  FiShoppingBag,
+  FiShoppingCart,
+  FiBarChart2,
+  FiSettings,
+} from "react-icons/fi";
 
-function Sidebar({ show, onClose }) {
-  const [usersOpen, setUsersOpen] = useState(false);
-  const [configOpen, setConfigOpen] = useState(false);
-  const [inventarioOpen, setInvetarioOpen] = useState(false);
+const NAV_GROUPS = [
+  {
+    label: "General",
+    items: [
+      { to: "/home", icon: FiHome, label: "Inicio", route: null },
+      { to: "/dashboard", icon: FiPieChart, label: "Dashboard", route: "/dashboard" },
+    ],
+  },
+  {
+    label: "Operación",
+    items: [
+      { to: "/stock-productos", icon: FiBox, label: "Inventario", route: "/stock-productos" },
+      { to: "/ordenes-produccion", icon: FiCalendar, label: "Producción", route: "/ordenes-produccion" },
+      { to: "/pedido-especial", icon: FiShoppingBag, label: "Pedido especial", route: "/pedido-especial" },
+      { to: "/ventas", icon: FiShoppingCart, label: "Ventas", route: "/ventas" },
+    ],
+  },
+  {
+    label: "Análisis",
+    items: [
+      { to: "/reportes", icon: FiBarChart2, label: "Reportes", route: "/reportes" },
+    ],
+  },
+];
+
+function Sidebar({ expanded, onToggle, mobileOpen, onCloseMobile }) {
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
   const [isChangingTheme, setIsChangingTheme] = useState(false);
   const permisosUsuario = getUserPermissions();
   const userData = getUserData();
 
-  // Convertir los permisos en un objeto para facilitar la búsqueda
   const permissionsMap = permisosUsuario.reduce((acc, perm) => {
     acc[perm.rutaAcceso] = true;
     return acc;
   }, {});
+  const isRouteAllowed = (route) => !route || permissionsMap[route];
 
-  // Función para verificar si una ruta está permitida
-  const isRouteAllowed = (route) => {
-    return permissionsMap[route];
-  };
-
-  // Efecto para aplicar el tema al cargar el componente
   useEffect(() => {
     if (theme === "dark") {
-      DarkReader.enable({
-        brightness: 100,
-        contrast: 100,
-        sepia: 0,
-      });
+      DarkReader.enable({ brightness: 100, contrast: 100, sepia: 0 });
     } else {
       DarkReader.disable();
     }
   }, [theme]);
 
-  // Función para cambiar el tema
   const toggleTheme = useCallback(() => {
-    if (isChangingTheme) return; // Evitar múltiples clics
+    if (isChangingTheme) return;
     setIsChangingTheme(true);
-
     const newTheme = theme === "light" ? "dark" : "light";
     setTheme(newTheme);
     localStorage.setItem("theme", newTheme);
 
-    // Usar requestIdleCallback para diferir la ejecución de DarkReader
-    const applyDarkReader = () => {
+    const apply = () => {
       if (newTheme === "dark") {
-        DarkReader.enable({
-          brightness: 99,
-          contrast: 90,
-          sepia: 10,
-        });
+        DarkReader.enable({ brightness: 99, contrast: 90, sepia: 10 });
       } else {
         DarkReader.disable();
       }
-      setIsChangingTheme(false); // Habilitar el interruptor después de aplicar el tema
+      setIsChangingTheme(false);
     };
-
-    if ("requestIdleCallback" in window) {
-      requestIdleCallback(applyDarkReader);
-    } else {
-      setTimeout(applyDarkReader, 0); // Fallback para navegadores que no soportan requestIdleCallback
-    }
+    if ("requestIdleCallback" in window) requestIdleCallback(apply);
+    else setTimeout(apply, 0);
   }, [theme, isChangingTheme]);
 
-  const handleNavLinkClick = useCallback(() => {
-    if (window.innerWidth <= 768) {
-      onClose();
-    }
-  }, [onClose]);
+  const handleNavClick = useCallback(() => {
+    if (window.innerWidth <= 768) onCloseMobile();
+  }, [onCloseMobile]);
+
+  const handleLogout = useCallback(() => {
+    // TODO: reemplazar por tu lógica real de logout
+    localStorage.removeItem("token");
+    window.location.href = "/login";
+  }, []);
 
   return (
-    <div
-      className={`sidebar bg-dark ${show ? "show" : "hide"} ${isChangingTheme ? "disable-selection" : ""
-        }`}
-    >
-      {/* Avatar y nombre de usuario */}
-      <div className="user-panel mt-3 pb-3 mb-3 d-flex align-items-center">
-        <div className="image">
+    <>
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 z-30 bg-slate-950/40 backdrop-blur-[2px] md:hidden"
+          onClick={onCloseMobile}
+          aria-hidden="true"
+        />
+      )}
+
+      <aside
+        className={`fixed z-40 flex flex-col rounded-2xl border border-line bg-surface shadow-modal transition-all duration-200 ease-in-out
+          inset-y-3 left-3
+          ${expanded ? "w-72" : "w-[4.5rem]"}
+          ${mobileOpen ? "translate-x-0" : "-translate-x-[120%] md:translate-x-0"}
+        `}
+      >
+        {/* Botón colapsar */}
+        <button
+          type="button"
+          onClick={onToggle}
+          aria-label={expanded ? "Colapsar menú" : "Expandir menú"}
+          className="absolute -right-3 top-9 hidden h-6 w-6 items-center justify-center rounded-full border-0 bg-surface text-muted shadow-card transition-transform duration-200 hover:text-brand-700 md:flex"
+        >
+          <FaChevronLeft size={10} className={`transition-transform duration-200 ${expanded ? "" : "rotate-180"}`} />
+        </button>
+
+        {/* Logo */}
+        <div className={`flex items-center gap-2.5 px-4 pt-5 pb-3 ${expanded ? "" : "justify-center px-0"}`}>
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-600 text-white shadow-brand">
+            <MdOutlineBakeryDining size={19} />
+          </span>
+          {expanded && (
+            <span className="truncate text-sm font-semibold text-ink">
+              Panadería San Gabriel
+            </span>
+          )}
+        </div>
+
+        {/* Usuario: avatar + nombre + tema + logout, todo en una fila, todo a 1 clic */}
+        <div className={`flex items-center gap-2 px-3 pb-3 ${expanded ? "" : "flex-col"}`}>
           {userData?.avatar ? (
-            <img
-              src={userData.avatar}
-              className="img-circle elevation-2"
-              alt="User Image"
-            />
+            <img src={userData.avatar} className="h-9 w-9 shrink-0 rounded-full object-cover ring-2 ring-brand-100" alt="User" />
           ) : (
             <div
-              className="avatar-circle"
-              style={{
-                backgroundColor: getColorFromName(userData?.nombre || "A"),
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                width: "40px",
-                height: "40px",
-                borderRadius: "50%",
-                color: "#fff",
-                fontSize: "18px",
-                fontWeight: "bold",
-              }}
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white"
+              style={{ backgroundColor: getColorFromName(userData?.nombre || "A") }}
             >
               {userData?.nombre?.charAt(0).toUpperCase() || "A"}
             </div>
           )}
-        </div>
-        <div className="info">
-          <a href="#" className="d-block text-light">
-            {`${userData?.nombre} ${userData.apellido}`}{" "}
-            {/* Nombre de usuario dinámico */}
-          </a>
-        </div>
-      </div>
 
-      <Nav className="flex-column">
-        <Nav.Link
-          as={NavLink}
-          to="/home"
-          className="text-light"
-          onClick={handleNavLinkClick}
-        >
-          <FiHome size={25} className="me-2" /> Inicio
-        </Nav.Link>
-        {isRouteAllowed("/dashboard") && (
-          <Nav.Link
-            as={NavLink}
-            to="/dashboard"
-            className="text-light"
-            onClick={handleNavLinkClick}
+          {expanded && (
+            <p className="min-w-0 flex-1 truncate text-xs font-semibold text-ink">
+              {`${userData?.nombre ?? ""} ${userData?.apellido ?? ""}`}
+            </p>
+          )}
+
+          <button
+            type="button"
+            onClick={toggleTheme}
+            disabled={isChangingTheme}
+            aria-label="Cambiar tema"
+            title="Cambiar tema"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-0 bg-transparent text-muted transition-colors hover:bg-surface-2 hover:text-brand-700"
           >
-            <FiPieChart size={25} className="me-2" /> Dashboard
-          </Nav.Link>
-        )}
-
-        {/* Inventadio Dropdown */}
-        <>
-          {/* <Nav.Link
-            className="text-light d-flex justify-content-between align-items-center"
-            onClick={() => setInvetarioOpen(!inventarioOpen)}
-            style={{ cursor: "pointer" }}
-          >
-            <span>
-              <FiBox size={25} className="me-2" /> Inventario
-            </span>
-            <FaChevronRight
-              className={`dropdown-arrow ${inventarioOpen ? "open" : ""}`}
-            />
-          </Nav.Link> */}
-
-          <Collapse in={inventarioOpen}>
-            <div>
-              {isRouteAllowed("/stock-productos") && (
-                <Nav.Link
-                  as={NavLink}
-                  to="/stock-productos"
-                  className="text-light ps-4 submenu-item"
-                  onClick={handleNavLinkClick}
-                >
-                  <FiClipboard className="me-2" /> Control de stock
-                </Nav.Link>
-              )}
-            </div>
-          </Collapse>
-          <Collapse in={inventarioOpen}>
-            <div>
-              {isRouteAllowed("/descuento-stock") && (
-                <Nav.Link
-                  as={NavLink}
-                  to="/descuento-stock"
-                  className="text-light ps-4 submenu-item"
-                  onClick={handleNavLinkClick}
-                >
-                  <FiAlertCircle className="me-2" /> Descontar Stock
-                </Nav.Link>
-              )}
-            </div>
-          </Collapse>
-
-          <Collapse in={inventarioOpen}>
-            <div>
-              {isRouteAllowed("/traslados-productos") && (
-                <Nav.Link
-                  as={NavLink}
-                  to="/traslados-productos"
-                  className="text-light ps-4 submenu-item"
-                  onClick={handleNavLinkClick}
-                >
-                  <FiTruck className="me-2" /> Traslados
-                </Nav.Link>
-              )}
-            </div>
-          </Collapse>
-        </>
-
-        {/* {isRouteAllowed("/stock-productos") && (
-          <Nav.Link
-            as={NavLink}
-            to="/stock-productos"
-            className="text-light"
-            onClick={handleNavLinkClick}
-          >
-            <FiBox size={25} className="me-2" /> Inventario
-          </Nav.Link>
-        )} */}
-
-        {isRouteAllowed("/stock-productos") && (
-          <Nav.Link
-            as={NavLink}
-            to="/stock-productos"
-            className="text-light"
-            onClick={handleNavLinkClick}
-          >
-            <FiBox size={25} className="me-2" /> Inventario
-          </Nav.Link>
-        )}
-
-        {isRouteAllowed("/ordenes-produccion") && (
-          <Nav.Link
-            as={NavLink}
-            to="/ordenes-produccion"
-            className="text-light"
-            onClick={handleNavLinkClick}
-          >
-            <FiCalendar size={25} className="me-2" /> Ordenes de producción
-          </Nav.Link>
-        )}
-
-        {isRouteAllowed("/pedido-especial") && (
-          <Nav.Link
-            as={NavLink}
-            to="/pedido-especial"
-            className="text-light"
-            onClick={handleNavLinkClick}
-          >
-            <FiShoppingBag size={25} className="me-2" /> Pedido Especial
-          </Nav.Link>
-        )}
-
-        {isRouteAllowed("/ventas") && (
-          <Nav.Link
-            as={NavLink}
-            to="/ventas"
-            className="text-light"
-            onClick={handleNavLinkClick}
-          >
-            <FiShoppingCart size={25} className="me-2" /> Ventas
-          </Nav.Link>
-        )}
-
-        {isRouteAllowed("/reportes") && (
-          <Nav.Link
-            as={NavLink}
-            to="/reportes"
-            className="text-light"
-            onClick={handleNavLinkClick}
-          >
-            <FiBarChart2 size={25} className="me-2" /> Reportes
-          </Nav.Link>
-        )}
-
-        {/* {isRouteAllowed("/productos") && (
-          <Nav.Link
-            as={NavLink}
-            to="/productos"
-            className="text-light"
-            onClick={handleNavLinkClick}
-          >
-            <MdOutlineBakeryDining size={25} className="me-2" /> Productos
-          </Nav.Link>
-        )} */}
-
-        {/* Users Dropdown */}
-        {/* {(isRouteAllowed("/users") || isRouteAllowed("/users/roles")) && (
-          <>
-            <Nav.Link
-              className="text-light d-flex justify-content-between align-items-center"
-              onClick={() => setUsersOpen(!usersOpen)}
-              style={{ cursor: "pointer" }}
-            >
-              <span>
-                <FiUsers size={25} className="me-2" /> Usuarios
-              </span>
-              <FaChevronRight
-                className={`dropdown-arrow ${usersOpen ? "open" : ""}`}
-              />
-            </Nav.Link>
-
-            <Collapse in={usersOpen}>
-              <div>
-                {isRouteAllowed("/users") && (
-                  <Nav.Link
-                    as={NavLink}
-                    to="/users"
-                    className="text-light ps-4 submenu-item"
-                    onClick={handleNavLinkClick}
-                  >
-                    <FaUserPlus className="me-2" /> Gestión de usuarios
-                  </Nav.Link>
-                )}
-                {isRouteAllowed("/users/roles") && (
-                  <Nav.Link
-                    as={NavLink}
-                    to="/users/roles"
-                    className="text-light ps-4 submenu-item"
-                    onClick={handleNavLinkClick}
-                  >
-                    <FaUsersCog className="me-2" /> Control de Roles
-                  </Nav.Link>
-                )}
-              </div>
-            </Collapse>
-          </>
-        )} */}
-
-        {/* {isRouteAllowed("/sucursales") && (
-          <Nav.Link
-            as={NavLink}
-            to="/sucursales"
-            className="text-light"
-            onClick={handleNavLinkClick}
-          >
-            <FiMapPin size={25} className="me-2" /> Sucursales
-          </Nav.Link>
-        )} */}
-
-        {isRouteAllowed("/config") && (
-          <Nav.Link
-            as={NavLink}
-            to="/config"
-            className="text-light"
-            onClick={handleNavLinkClick}
-          >
-            <FiSettings size={25} className="me-2" /> Configuraciones
-          </Nav.Link>
-        )}
-      </Nav>
-
-      {/* Toggle Switch para el tema */}
-      <div className="theme-toggle-container">
-        <label className="theme-switch">
-          <input
-            type="checkbox"
-            checked={theme === "dark"}
-            onChange={toggleTheme}
-            disabled={isChangingTheme} // Deshabilitar durante el cambio
-          />
-          <span className="slider round">
             {isChangingTheme ? (
-              <div
-                className="spinner-border spinner-border-sm text-light"
-                role="status"
-              >
-                <span className="visually-hidden">Loading...</span>
-              </div>
+              <span className="h-3.5 w-3.5 animate-spin-smooth rounded-full border-2 border-brand-300 border-t-transparent" />
             ) : theme === "dark" ? (
-              <FaMoon size={14} />
+              <FaMoon size={13} />
             ) : (
-              <FaSun size={14} />
+              <FaSun size={13} />
             )}
-          </span>
-        </label>
-      </div>
-    </div>
+          </button>
+
+          <button
+            type="button"
+            onClick={handleLogout}
+            aria-label="Cerrar sesión"
+            title="Cerrar sesión"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-0 bg-transparent text-muted transition-colors hover:bg-danger-50 hover:text-danger-600"
+          >
+            <FaSignOutAlt size={14} />
+          </button>
+        </div>
+
+        <div className="mx-3 mb-2 border-t border-line" />
+
+        {/* Navegación agrupada */}
+        <nav className="flex-1 overflow-y-auto px-3 py-2">
+          {NAV_GROUPS.map((group) => {
+            const visibleItems = group.items.filter((item) => isRouteAllowed(item.route));
+            if (visibleItems.length === 0) return null;
+            return (
+              <div key={group.label} className="mb-4">
+                {expanded && (
+                  <p className="mb-1.5 px-2 text-2xs font-semibold uppercase tracking-wider text-muted">
+                    {group.label}
+                  </p>
+                )}
+                <div className="flex flex-col gap-0.5">
+                  {visibleItems.map(({ to, icon: Icon, label }) => (
+                    <NavLink
+                      key={to}
+                      to={to}
+                      onClick={handleNavClick}
+                      title={!expanded ? label : undefined}
+                      className={({ isActive }) =>
+                        `flex items-center gap-3 rounded-xl px-2.5 py-2.5 text-sm font-medium no-underline transition-colors duration-150 ${
+                          expanded ? "" : "justify-center"
+                        } ${
+                          isActive
+                            ? "bg-brand-600 text-white shadow-brand"
+                            : "text-muted hover:bg-surface-2 hover:text-ink"
+                        }`
+                      }
+                    >
+                      <Icon size={18} className="shrink-0" />
+                      {expanded && <span className="truncate">{label}</span>}
+                    </NavLink>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </nav>
+
+        {/* Configuraciones — al fondo, como única acción secundaria */}
+        {isRouteAllowed("/config") && (
+          <div className="border-t border-line px-3 py-3">
+            <NavLink
+              to="/config"
+              onClick={handleNavClick}
+              title={!expanded ? "Configuraciones" : undefined}
+              className={({ isActive }) =>
+                `flex items-center gap-3 rounded-xl px-2.5 py-2.5 text-sm font-medium no-underline transition-colors duration-150 ${
+                  expanded ? "" : "justify-center"
+                } ${
+                  isActive
+                    ? "bg-brand-600 text-white shadow-brand"
+                    : "text-muted hover:bg-surface-2 hover:text-ink"
+                }`
+              }
+            >
+              <FiSettings size={18} className="shrink-0" />
+              {expanded && <span className="truncate">Configuraciones</span>}
+            </NavLink>
+          </div>
+        )}
+      </aside>
+    </>
   );
 }
 

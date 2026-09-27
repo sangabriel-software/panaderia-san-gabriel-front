@@ -1,9 +1,10 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
-import ErrorBoundary from "./components/ErrorBoundary/ErrorBoundary.jsx";
 import App from "./App.jsx";
 import { initBetterStack } from "./observability/betterStack.js";
+import './styles/globals.css';
+
 
 initBetterStack();
 
