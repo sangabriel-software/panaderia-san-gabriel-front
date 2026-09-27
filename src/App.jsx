@@ -1,10 +1,8 @@
 import React, { lazy, Suspense } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
-import "bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-// import StockHub from "./pages/StockProductos/StockHub/StockHub";
+import PageLoader from "./components/PageLoader/PageLoader";
 
 /* AI routes */
 const IngresarVentasAI = lazy(() => import("./pages/VentasAI/IngresarVentasAI"));
@@ -19,11 +17,9 @@ const BalanceStockPage = lazy(() => import("./pages/reportes/BalanceStock/Balanc
 const SobrantesReport = lazy(() => import("./pages/reportes/reporteSobrantes/SobrantesReport"));
 const Gastos = lazy(() => import("./pages/reportes/Gastos/Gastos"));
 const ProductosVendidos = lazy(() => import("./pages/reportes/ProductosVendidos/ProductosVendidos"));
-  
-const LoadingSpinner = lazy(() => import("./components/LoadingSpinner/LoadingSpinner"));
+
 const AccessDeniedPage = lazy(() => import("./components/AccesoDenegado/AccessDeniedPage"));
 
-// Lazy-loaded components
 const MainLayout = lazy(() => import("./layouts/MainLayout"));
 const LoginPage = lazy(() => import("./pages/LoginPages/LoginPage"));
 const DashboardPage = lazy(() => import("./pages/DashboardPage/DashboardPage"));
@@ -54,7 +50,7 @@ const IngresarOrdenEspecialPage = lazy(() => import("./pages/OrdenesEspeciales/i
 const OrdenEspecialDetail = lazy(() => import("./pages/OrdenesEspeciales/DetalleOrdenEspecial/OrdenEspecialDetalle"));
 const HomePage = lazy(() => import("./pages/Home/HomePage"));
 const GestionarDecuentos = lazy(() => import("./pages/StockProductos/DescontarStock/GestionDescuentos/GestionarDecuentos"));
-const StockDescuentosList = lazy(() => import("./pages/StockProductos/DescontarStock/StockDescuentosList/StockDescuentosList"));  
+const StockDescuentosList = lazy(() => import("./pages/StockProductos/DescontarStock/StockDescuentosList/StockDescuentosList"));
 const DescontarStock = lazy(() => import("./pages/StockProductos/DescontarStock/DescontarStock/DescontarStock"));
 const DetalleDescuento = lazy(() => import("./pages/StockProductos/DescontarStock/DetalleDescuento/DetalleDescuento"));
 const GestionarTraslados = lazy(() => import("./pages/Traslados/GestionarTraslados/GestionarTraslados"));
@@ -68,39 +64,37 @@ const CreateSurvey = lazy(() => import("./pages/Encuestas/CreateSurvey/CreateSur
 const ResetPassPage = lazy(() => import("./pages/Reset-Pass/ResetPassPage"));
 import CambiarPasswordPage from "./pages/CambiarPassword/CambiarPasswordPage";
 
-// Importar el componente PWA Install Prompt
 const PWAInstallPrompt = lazy(() => import("./components/PWAInstallPrompt/PWAInstallPrompt"));
 
 function App() {
   return (
+    <Suspense fallback={<PageLoader />}>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        newestOnTop
+        theme="light"
+        toastClassName="!rounded-xl !border !border-line !bg-surface !text-ink !shadow-modal !font-sans"
+        progressClassName="!bg-brand-600"
+      />
+      <PWAInstallPrompt />
 
-    <Suspense fallback={<LoadingSpinner />}>
-      <ToastContainer /> {/* Contenedor para las notificaciones */}
-      <PWAInstallPrompt /> {/* Componente para instalar PWA */}
-      
       <Routes>
-
-        {/* Rutas publicas */}
+        {/* Rutas públicas */}
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/acceso-denegado" element={<AccessDeniedPage />} /> {/* Ruta de acceso denegado */}
+        <Route path="/acceso-denegado" element={<AccessDeniedPage />} />
         <Route path="/" element={<Navigate to="/login" />} />
-
 
         <Route path="/surveys">
           <Route path="customer-responses" element={<CustomerResponses />} />
-
         </Route>
 
         <Route path="/cambiar-password" element={<CambiarPasswordPage />} />
-
-        {/* Rutas publicas */}
-
 
         {/* Rutas protegidas */}
         <Route element={<PrivateRoute />}>
           <Route element={<MainLayout />}>
             <Route path="/home" element={<HomePage />} />
-
             <Route path="/dashboard" element={<DashboardPage />} />
 
             <Route path="/users">
@@ -124,83 +118,81 @@ function App() {
 
             <Route path="/ventas">
               <Route index element={<GestionVentasPage />} />
-              {/* <Route path="ingresar-venta" element={<IngresarVentasAI />} /> */}
               <Route path="ingresar-venta" element={<IngresarVentaPage />} />
               <Route path="detalle-venta/:idVenta" element={<DetalleVentaPage />} />
             </Route>
 
             <Route path="/sucursales">
-              <Route index element={<GestionDeSucursalesPAge/>} />
+              <Route index element={<GestionDeSucursalesPAge />} />
             </Route>
 
             <Route path="/config">
-              <Route index element={<PanelConfig/>} />
-              <Route path="gestionar-materia-prima" element={<GestionDeRecetasPage/>} />
-              <Route path="configuracion-perfil" element={<PerfilPage/>} />
+              <Route index element={<PanelConfig />} />
+              <Route path="gestionar-materia-prima" element={<GestionDeRecetasPage />} />
+              <Route path="configuracion-perfil" element={<PerfilPage />} />
             </Route>
 
             <Route path="/stock-productos">
-              <Route index element={<GestionarStockPage/>} />
-              <Route path="venta-diaria/:idSucursal" element={<StockDiarioPage/>} />
-              <Route path="ingresar-stock/:idSucursal" element={<IngresarStockGeneralPage/>} />
-              {/* <Route path="stock-general/:idSucursal" element={<StockGeneralPage/>} /> */}
-              <Route path="stock-general/:idSucursal" element={<StockUnificado/>} />
+              <Route index element={<GestionarStockPage />} />
+              <Route path="venta-diaria/:idSucursal" element={<StockDiarioPage />} />
+              <Route path="ingresar-stock/:idSucursal" element={<IngresarStockGeneralPage />} />
+              <Route path="stock-general/:idSucursal" element={<StockUnificado />} />
             </Route>
 
             <Route path="/pedido-especial">
-              <Route index element={<OrdenesEspecialesList/>} />
-              <Route path="ingresar-orden-especial" element={<IngresarOrdenEspecialPage/>} />
-              <Route path="detalle-orden-especial/:idOrdenEspecial" element={<OrdenEspecialDetail/>} />
+              <Route index element={<OrdenesEspecialesList />} />
+              <Route path="ingresar-orden-especial" element={<IngresarOrdenEspecialPage />} />
+              <Route path="detalle-orden-especial/:idOrdenEspecial" element={<OrdenEspecialDetail />} />
             </Route>
 
-            <Route path="/descuento-stock">ñ
-              <Route index element={<GestionarDecuentos/>} />
-              <Route path="stock-descuentos-lista/:idSucursal" element={<StockDescuentosList/>} />
-              <Route path="descontar-stock/:idSucursal" element={<DescontarStock/>} />
-              <Route path="detalle-descuento/:idDescuento" element={<DetalleDescuento/>} />
+            {/* Nota: se removió la "ñ" suelta que quedó pegada al final de este path,
+                era texto sin uso dentro del JSX y no debería estar ahí. */}
+            <Route path="/descuento-stock">
+              <Route index element={<GestionarDecuentos />} />
+              <Route path="stock-descuentos-lista/:idSucursal" element={<StockDescuentosList />} />
+              <Route path="descontar-stock/:idSucursal" element={<DescontarStock />} />
+              <Route path="detalle-descuento/:idDescuento" element={<DetalleDescuento />} />
             </Route>
 
             <Route path="/reportes">
-              <Route index element={<ReportesPanel/>} />
-              <Route path="ingreso-stock" element={<HistorialStock/>} />    
-              <Route path="ventas" element={<VentasReportPage/>} />
-              <Route path="perdidas" element={<ReportePerdidasPage/>} />
-              <Route path="ventas-eliminadas" element={<VentasEliminadasPage/>} />
-              <Route path="balance-stock" element={<BalanceStockPage/>} />
-              <Route path="sobrantes-stock" element={<SobrantesReport/>} />
-              <Route path="gastos" element={<Gastos/>} />
-              <Route path="productos-vendidos" element={<ProductosVendidos/>} />
+              <Route index element={<ReportesPanel />} />
+              <Route path="ingreso-stock" element={<HistorialStock />} />
+              <Route path="ventas" element={<VentasReportPage />} />
+              <Route path="perdidas" element={<ReportePerdidasPage />} />
+              <Route path="ventas-eliminadas" element={<VentasEliminadasPage />} />
+              <Route path="balance-stock" element={<BalanceStockPage />} />
+              <Route path="sobrantes-stock" element={<SobrantesReport />} />
+              <Route path="gastos" element={<Gastos />} />
+              <Route path="productos-vendidos" element={<ProductosVendidos />} />
             </Route>
 
             <Route path="/traslados-productos">
-              <Route index element={<GestionarTraslados/>} />
-              <Route path="detalles-traslado/:idTraslado" element={<DetalleTraslados/>} />
-              <Route path="ingresar-traslado" element={<IngresarTraslado/>} />
+              <Route index element={<GestionarTraslados />} />
+              <Route path="detalles-traslado/:idTraslado" element={<DetalleTraslados />} />
+              <Route path="ingresar-traslado" element={<IngresarTraslado />} />
             </Route>
 
             <Route path="/encuestas-config">
-              <Route index element={<CreateSurvey/>} />
+              <Route index element={<CreateSurvey />} />
             </Route>
 
             <Route path="/activar-fecha-produccion">
-              <Route index element={<ActivarFechaProduccion/>} />
+              <Route index element={<ActivarFechaProduccion />} />
             </Route>
 
-              <Route path="/habilitar-notificaciones">
-                <Route index element={<NotificacionesEspeciales/>} />
-              </Route>
+            <Route path="/habilitar-notificaciones">
+              <Route index element={<NotificacionesEspeciales />} />
+            </Route>
 
-              <Route path="/categorias">
-                <Route index element={<CategoriasPage/>} />
-              </Route>
+            <Route path="/categorias">
+              <Route index element={<CategoriasPage />} />
+            </Route>
 
-              <Route path="/reset-pass">
-                <Route index element={<ResetPassPage/>} />
-              </Route>
-
+            <Route path="/reset-pass">
+              <Route index element={<ResetPassPage />} />
+            </Route>
           </Route>
         </Route>
-        {/* Rutas protegidas */}
       </Routes>
     </Suspense>
   );
