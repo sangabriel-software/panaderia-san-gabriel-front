@@ -7,12 +7,10 @@ import {
   FiFilter,
   FiChevronDown,
   FiBox,
-  FiPackage,
   FiSave,
 } from "react-icons/fi";
 
-import useGetProductosYPrecios from "../../../hooks/productosprecios/useGetProductosYprecios";
-import { getInitials, getUniqueColor, handleStockChange, handleSubmitGuardarStock } from "./IngresarStock.utils";
+import { getInitials, getUniqueColor, handleNavigate, handleStockChange, handleSubmitGuardarStock } from "./IngresarStock.utils";
 import useGetSucursales from "../../../hooks/sucursales/useGetSucursales";
 import { decryptId } from "../../../utils/CryptoParams";
 import useGetStockGeneral from "../../../hooks/stock/useGetStockGeneral";
@@ -31,7 +29,6 @@ function IngresarStockGeneralPage() {
   const [categoriaActiva, setCategoriaActiva] = useState("Todas");
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Reemplazan los antiguos popups modales — ahora son banners inline, no bloqueantes.
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [isPopupErrorOpen, setIsPopupErrorOpen] = useState(false);
   const [errorPopupMessage, setErrorPopupMessage] = useState("");
@@ -90,6 +87,7 @@ function IngresarStockGeneralPage() {
   const clearSearch = () => setSearchTerm("");
 
   const cantidadesIngresadas = Object.values(stockValues).filter((val) => val !== null && val !== "" && !isNaN(val)).length;
+  const guardarDeshabilitado = isLoading || cantidadesIngresadas === 0;
 
   const handleSubmit = async () => {
     await handleSubmitGuardarStock(
@@ -119,7 +117,7 @@ function IngresarStockGeneralPage() {
       <header className="flex items-center gap-3">
         <button
           type="button"
-          onClick={() => navigate("/stock-productos")}
+          onClick={() => handleNavigate(navigate, sucursal.idSucursal, "stock-general")}
           aria-label="Volver"
           className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-line bg-surface text-muted shadow-card transition-colors hover:bg-brand-50 hover:text-brand-700"
         >
@@ -136,7 +134,7 @@ function IngresarStockGeneralPage() {
         </div>
       </header>
 
-      {/* ── Banners inline (reemplazan modales) ─────────────────────── */}
+      {/* ── Banners inline ───────────────────────────────────────────── */}
       {showErrorProductos && productosFiltrados?.length === 0 && (
         <Alert type="danger" title="No se pudieron cargar los productos" message="Intenta recargar la página." />
       )}
@@ -185,7 +183,7 @@ function IngresarStockGeneralPage() {
               placeholder="Buscar por nombre..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="box-border w-full rounded-xl border border-line bg-surface py-2.5 pl-10 pr-9 text-sm text-ink placeholder:text-muted transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/25"
+              className="w-full rounded-xl border border-line bg-surface py-2.5 pl-10 pr-9 text-sm text-ink placeholder:text-muted transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/25"
             />
             {searchTerm && (
               <button
@@ -205,7 +203,7 @@ function IngresarStockGeneralPage() {
               <select
                 value={categoriaActiva}
                 onChange={(e) => setCategoriaActiva(e.target.value)}
-                className="box-border w-full appearance-none rounded-xl border border-line bg-surface py-2.5 pl-10 pr-9 text-sm font-medium text-ink transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/25"
+                className="w-full appearance-none rounded-xl border border-line bg-surface py-2.5 pl-10 pr-9 text-sm font-medium text-ink transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/25"
               >
                 {categorias.map((categoria) => (
                   <option key={categoria} value={categoria}>
@@ -239,57 +237,67 @@ function IngresarStockGeneralPage() {
       </div>
 
       {/* ── Tabla de productos ───────────────────────────────────────── */}
+      {/* table-fixed: los anchos los mandan las clases w-*, no el contenido.
+          Desktop: 3 columnas iguales. Móvil: 38% / 22% / 40%, encabezados cortos. */}
       <div className="overflow-hidden rounded-2xl border border-line bg-surface shadow-card">
-        <table className="w-full border-collapse text-sm">
+        <table className="w-full table-fixed border-collapse text-sm">
           <thead className="bg-surface-2/95">
             <tr>
-              <th className="border-b border-line px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted">
+              <th className="w-[38%] border-b border-line px-2 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted sm:w-1/3 sm:px-4">
                 Producto
               </th>
-              <th className="border-b border-line px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-muted">
-                Stock actual
+              <th className="w-[22%] border-b border-line px-1 py-3 text-center text-xs font-semibold uppercase tracking-wide text-muted sm:w-1/3 sm:px-4">
+                <span className="sm:hidden">Stock</span>
+                <span className="hidden sm:inline">Stock actual</span>
               </th>
-              <th className="border-b border-line px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-muted">
-                Unidades / Filas a ingresar
+              <th className="w-[40%] border-b border-line px-2 py-3 text-center text-xs font-semibold uppercase tracking-wide text-muted sm:w-1/3 sm:px-4">
+                <span className="sm:hidden">Ingresar</span>
+                <span className="hidden sm:inline">Unidades / Filas a ingresar</span>
               </th>
             </tr>
           </thead>
           <tbody>
             {productosFiltrados?.length > 0 ? (
-              productosFiltrados.map((producto, i) => (
-                <tr
-                  key={producto.idProducto}
-                  className={`border-b border-line last:border-0 transition-colors hover:bg-brand-50/50 ${i % 2 === 1 ? "bg-surface-2/30" : ""}`}
-                >
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-3">
-                      <span
-                        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
-                        style={{ backgroundColor: getUniqueColor(producto.nombreProducto) }}
-                      >
-                        {getInitials(producto.nombreProducto)}
+              productosFiltrados.map((producto, i) => {
+                const esFrances = producto.nombreProducto === "Frances";
+                return (
+                  <tr
+                    key={producto.idProducto}
+                    className={`border-b border-line last:border-0 transition-colors hover:bg-brand-50/50 ${i % 2 === 1 ? "bg-surface-2/30" : ""}`}
+                  >
+                    <td className="px-2 py-3 sm:px-4">
+                      <div className="flex items-center gap-2 sm:gap-3">
+                        <span
+                          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[10px] font-bold text-white sm:h-8 sm:w-8 sm:text-xs"
+                          style={{ backgroundColor: getUniqueColor(producto.nombreProducto) }}
+                        >
+                          {getInitials(producto.nombreProducto)}
+                        </span>
+                        <span className="min-w-0 break-words font-medium text-ink">{producto.nombreProducto}</span>
+                      </div>
+                    </td>
+
+                    <td className="px-1 py-3 text-center sm:px-4">
+                      <span className="inline-flex min-w-[2.25rem] justify-center rounded-full bg-teal-50 px-2 py-1 text-sm font-bold text-teal-700 sm:min-w-[3rem] sm:px-2.5">
+                        {currentStock[producto.idProducto] || 0}
                       </span>
-                      <span className="font-medium text-ink">{producto.nombreProducto}</span>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    <span className="inline-flex min-w-[3rem] justify-center rounded-full bg-surface-2 px-2.5 py-1 text-sm font-bold text-ink">
-                      {currentStock[producto.idProducto] || 0}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <input
-                      type="number"
-                      min="0"
-                      value={stockValues[producto.idProducto] || ""}
-                      onChange={(e) => handleStockChange(producto.idProducto, e.target.value, setStockValues)}
-                      onWheel={(e) => e.target.blur()}
-                      placeholder="0"
-                      className="box-border mx-auto block w-24 rounded-lg border border-line bg-surface px-3 py-2 text-center text-sm font-semibold text-ink transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/25"
-                    />
-                  </td>
-                </tr>
-              ))
+                    </td>
+
+                    <td className="px-2 py-3 sm:px-4">
+                      <input
+                        type="number"
+                        min="0"
+                        value={stockValues[producto.idProducto] || ""}
+                        onChange={(e) => handleStockChange(producto.idProducto, e.target.value, setStockValues)}
+                        onWheel={(e) => e.target.blur()}
+                        placeholder="0"
+                        className="mx-auto block w-full max-w-[5.5rem] rounded-lg border border-line bg-surface px-2 py-2 text-center text-sm font-semibold text-ink transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/25"
+                      />
+                      <p className="mt-1 text-center text-2xs text-muted">{esFrances ? "Filas" : "Unidades"}</p>
+                    </td>
+                  </tr>
+                );
+              })
             ) : (
               <tr>
                 <td colSpan="3" className="px-4 py-10 text-center text-sm text-muted">
@@ -306,8 +314,12 @@ function IngresarStockGeneralPage() {
         <button
           type="button"
           onClick={handleSubmit}
-          disabled={isLoading || cantidadesIngresadas === 0}
-          className="flex w-full max-w-md items-center justify-center gap-2 rounded-xl border-0 bg-brand-600 py-3.5 text-sm font-semibold text-white shadow-modal transition-colors hover:bg-brand-500 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:px-10"
+          disabled={guardarDeshabilitado}
+          className={`flex w-full max-w-md items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-semibold transition-colors sm:w-auto sm:px-10 ${
+            guardarDeshabilitado
+              ? "cursor-not-allowed border border-line bg-surface-2 text-muted"
+              : "border-0 bg-brand-600 text-white shadow-modal hover:bg-brand-500"
+          }`}
         >
           {isLoading ? (
             <>
