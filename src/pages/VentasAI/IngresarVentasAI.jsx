@@ -10,7 +10,6 @@ import {
   FiPackage,
   FiSave,
 } from "react-icons/fi";
-import useGetProductosYPrecios from "../../../hooks/productosprecios/useGetProductosYprecios";
 import { getInitials, getUniqueColor, handleStockChange, handleSubmitGuardarStock } from "./IngresarStock.utils";
 import useGetSucursales from "../../../hooks/sucursales/useGetSucursales";
 import { decryptId } from "../../../utils/CryptoParams";
