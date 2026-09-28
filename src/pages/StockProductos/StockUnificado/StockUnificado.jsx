@@ -228,8 +228,6 @@ function StockUnificado() {
       {/* ── Filtros ──────────────────────────────────────────────────── */}
       <div className="rounded-2xl border border-line bg-surface p-4 shadow-card">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-          {/* Buscador — box-border explícito como refuerzo, independiente
-              de si el fix global de box-sizing ya está aplicado o no */}
           <div className="relative min-w-0 flex-1">
             <FiSearch size={15} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" />
             <input
@@ -237,7 +235,7 @@ function StockUnificado() {
               placeholder="Buscar producto..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="box-border w-full rounded-xl border border-line bg-surface py-2.5 pl-10 pr-9 text-sm text-ink placeholder:text-muted transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/25"
+              className="w-full rounded-xl border border-line bg-surface py-2.5 pl-10 pr-9 text-sm text-ink placeholder:text-muted transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/25"
             />
             {searchTerm && (
               <button
@@ -251,14 +249,14 @@ function StockUnificado() {
             )}
           </div>
 
-          {/* Dropdown de categorías en móvil — <select> nativo, sin librería */}
+          {/* Dropdown de categorías en móvil — <select> nativo */}
           {categorias.length > 1 && (
             <div className="relative shrink-0 sm:hidden">
               <FiFilter size={14} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" />
               <select
                 value={categoriaActiva}
                 onChange={(e) => setCategoriaActiva(e.target.value)}
-                className="box-border w-full appearance-none rounded-xl border border-line bg-surface py-2.5 pl-10 pr-9 text-sm font-medium text-ink transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/25"
+                className="w-full appearance-none rounded-xl border border-line bg-surface py-2.5 pl-10 pr-9 text-sm font-medium text-ink transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/25"
               >
                 {categorias.map((categoria) => (
                   <option key={categoria} value={categoria}>
@@ -305,12 +303,15 @@ function StockUnificado() {
         </div>
       ) : (
         <div className="overflow-hidden rounded-2xl border border-line bg-surface shadow-card">
-          <table className="w-full border-collapse text-sm">
+          {/* table-fixed: los anchos de columna los mandan las clases w-*, no el contenido.
+              Desktop: 3 columnas iguales (1/3 c/u). Móvil: "Unidad" se oculta y
+              Producto/Cantidad se reparten 60% / 40%. */}
+          <table className="w-full table-fixed border-collapse text-sm">
             <thead className="bg-surface-2/95">
               <tr>
                 <th
                   onClick={() => requestSort("nombreProducto")}
-                  className="cursor-pointer select-none border-b border-line px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted"
+                  className="w-3/5 cursor-pointer select-none border-b border-line px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted sm:w-1/3"
                 >
                   <div className="flex items-center gap-1.5">
                     Producto <SortIndicator column="nombreProducto" />
@@ -318,13 +319,13 @@ function StockUnificado() {
                 </th>
                 <th
                   onClick={() => requestSort("cantidadExistente")}
-                  className="cursor-pointer select-none border-b border-line px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-muted"
+                  className="w-2/5 cursor-pointer select-none border-b border-line px-2 py-3 text-center text-xs font-semibold uppercase tracking-wide text-muted sm:w-1/3 sm:px-4"
                 >
                   <div className="flex items-center justify-center gap-1.5">
                     Cantidad <SortIndicator column="cantidadExistente" />
                   </div>
                 </th>
-                <th className="border-b border-line px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-muted">
+                <th className="hidden border-b border-line px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-muted sm:table-cell sm:w-1/3">
                   Unidad
                 </th>
               </tr>
@@ -333,6 +334,7 @@ function StockUnificado() {
               {filteredProducts.length > 0 ? (
                 filteredProducts.map((producto, i) => {
                   const esFrances = producto.nombreProducto === "Frances";
+                  const unidad = esFrances ? "Filas" : "Unidades";
                   return (
                     <tr
                       key={`${producto.idProducto}-${producto.esStockDiario ? "dia" : "gen"}`}
@@ -348,20 +350,31 @@ function StockUnificado() {
                           >
                             {getInitials(producto.nombreProducto)}
                           </span>
-                          <span className="font-medium text-ink">{producto.nombreProducto}</span>
-                          {producto.esStockDiario && (
-                            <span className="flex shrink-0 items-center gap-1 rounded-full bg-warning-50 px-2 py-0.5 text-2xs font-semibold text-warning-700">
-                              <FiClock size={10} /> Hoy
-                            </span>
-                          )}
+                          {/* Nombre + badge "Hoy" en un mismo bloque: si no caben
+                              en una línea, el badge baja debajo del nombre */}
+                          <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
+                            <span className="font-medium text-ink">{producto.nombreProducto}</span>
+                            {producto.esStockDiario && (
+                              <span className="flex shrink-0 items-center gap-1 rounded-full bg-warning-50 px-2 py-0.5 text-2xs font-semibold text-warning-700">
+                                <FiClock size={10} /> Hoy
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-center">
-                        <span className="inline-flex min-w-[3rem] justify-center rounded-full bg-brand-50 px-2.5 py-1 text-sm font-bold text-brand-700">
-                          {producto.cantidadExistente}
-                        </span>
+
+                      <td className="px-2 py-3 sm:px-4">
+                        <div className="flex flex-wrap items-center justify-center gap-x-1.5 gap-y-0.5">
+                          <span className="inline-flex min-w-[2.75rem] justify-center rounded-full bg-brand-50 px-2.5 py-1 text-sm font-bold text-brand-700">
+                            {producto.cantidadExistente}
+                          </span>
+                          {/* Unidad al lado del número solo en móvil (la columna
+                              "Unidad" está oculta ahí) */}
+                          <span className="text-xs text-muted sm:hidden">{unidad}</span>
+                        </div>
                       </td>
-                      <td className="px-4 py-3 text-center text-muted">{esFrances ? "Filas" : "Unidades"}</td>
+
+                      <td className="hidden px-4 py-3 text-center text-muted sm:table-cell">{unidad}</td>
                     </tr>
                   );
                 })

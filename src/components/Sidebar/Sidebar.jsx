@@ -119,7 +119,7 @@ function Sidebar({ expanded, onToggle, mobileOpen, onCloseMobile }) {
 
         {/* Logo */}
         <div className={`flex items-center gap-2.5 px-4 pt-5 pb-3 ${expanded ? "" : "justify-center px-0"}`}>
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-600 text-white shadow-brand">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-warning-400 text-white shadow-brand">
             <MdOutlineBakeryDining size={19} />
           </span>
           {expanded && (
