@@ -10,13 +10,13 @@ import {
   FiPackage,
   FiSave,
 } from "react-icons/fi";
-import { getInitials, getUniqueColor, handleStockChange, handleSubmitGuardarStock } from "../StockProductos/IngresarStock/IngresarStock.utils";
-import useGetSucursales from "../../../hooks/sucursales/useGetSucursales";
-import { decryptId } from "../../../utils/CryptoParams";
-import useGetStockGeneral from "../../../hooks/stock/useGetStockGeneral";
-import useGetStockDelDia from "../../../hooks/stock/useGetStockDelDia";
-import useGetProductosInventario from "../../../hooks/productosprecios/useGetProductosInventario";
 import Alert from "../../components/Alerts/Alert";
+import { getInitials, getUniqueColor, handleStockChange, handleSubmitGuardarStock } from "../StockProductos/IngresarStock/IngresarStock.utils";
+import useGetSucursales from "../../useGetSucursaleshooks/sucursales/useGetSucursales";
+import { decryptId } from "../../utils/CryptoParams";
+import useGetStockGeneral from "../../hooks/stock/useGetStockGeneral";
+import useGetStockDelDia from "../../hooks/stock/useGetStockDelDia";
+import useGetProductosInventario from "../../hooks/productosprecios/useGetProductosInventario";
 
 function IngresarStockGeneralPage() {
   const { idSucursal } = useParams();
