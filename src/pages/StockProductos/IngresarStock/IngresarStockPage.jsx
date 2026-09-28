@@ -142,22 +142,29 @@ function IngresarStockGeneralPage() {
       {productos?.length === 0 && (
         <Alert type="info" title="Sin productos registrados" message="No se han ingresado productos todavía." />
       )}
-
       {isPopupErrorOpen && (
         <Alert
+          floating
+          position="top-right"
           type="danger"
           title="Ocurrió un error"
           message={errorPopupMessage}
           onDismiss={() => setIsPopupErrorOpen(false)}
+          autoClose 
+          duration={3000}
         />
       )}
 
       {isPopupOpen && (
         <Alert
+          floating
+          position="top-right"
           type="success"
           title="¡Inventario actualizado!"
           message="Se agregó el stock de productos correctamente."
           onDismiss={() => setIsPopupOpen(false)}
+          autoClose 
+          duration={3000}
           actions={[
             {
               label: "Ver stock",
