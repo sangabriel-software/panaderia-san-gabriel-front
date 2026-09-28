@@ -1,580 +1,331 @@
-import React, { useState, useRef, useEffect } from "react";
-import dayjs from "dayjs";
-import { useNavigate } from "react-router-dom";
-import { useMediaQuery } from "react-responsive";
-import useGetSucursales from "../../hooks/sucursales/useGetSucursales";
-import { getUserData } from "../../utils/Auth/decodedata";
-import { ingresarVentaAIService } from "../../services/vetnasAI/ventasAI.service";
-import "./IngresarVentas.styles.css";
-import { getCurrentDateTimeWithSeconds } from "../../utils/dateUtils";
+import { useState, useMemo, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import {
+  FiArrowLeft,
+  FiSearch,
+  FiX,
+  FiFilter,
+  FiChevronDown,
+  FiBox,
+  FiPackage,
+  FiSave,
+} from "react-icons/fi";
+import Alert from "../../../components/Alerts/Alert";
+import useGetProductosYPrecios from "../../../hooks/productosprecios/useGetProductosYprecios";
+import { getInitials, getUniqueColor, handleStockChange, handleSubmitGuardarStock } from "./IngresarStock.utils";
+import useGetSucursales from "../../../hooks/sucursales/useGetSucursales";
+import { decryptId } from "../../../utils/CryptoParams";
+import useGetStockGeneral from "../../../hooks/stock/useGetStockGeneral";
+import useGetStockDelDia from "../../../hooks/stock/useGetStockDelDia";
+import useGetProductosInventario from "../../../hooks/productosprecios/useGetProductosInventario";
 
-const STEPS = ["turno", "foto", "monto", "gastos"];
-
-const IngresarVentasAI = () => {
-  const { sucursales, loadingSucursales } = useGetSucursales();
-  const usuario = getUserData();
+function IngresarStockGeneralPage() {
+  const { idSucursal } = useParams();
   const navigate = useNavigate();
-  const today = dayjs().format("DD [de] MMMM [de] YYYY");
-  const isDesktop = useMediaQuery({ minWidth: 768 });
+  const { productos, loadigProducts, showErrorProductos } = useGetProductosInventario();
+  const { sucursales, loadingSucursales } = useGetSucursales();
+  const [stockValues, setStockValues] = useState({});
+  const [currentStock, setCurrentStock] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [categoriaActiva, setCategoriaActiva] = useState("Todas");
+  const [searchTerm, setSearchTerm] = useState("");
 
-  const [turno,        setTurno]        = useState("");
-  const [sucursal,     setSucursal]     = useState("");
-  const [imagen,       setImagen]       = useState(null);
-  const [preview,      setPreview]      = useState(null);
-  const [ventaReal,    setVentaReal]    = useState("");
-  const [gastos,       setGastos]       = useState([]);
-  const [nuevoGasto,   setNuevoGasto]   = useState({ detalle: "", subtotal: "" });
-  const [step,         setStep]         = useState(0);
-  const [loadingPhase, setLoadingPhase] = useState(null);
-  const [success,      setSuccess]      = useState(false);
-  const [error,        setError]        = useState(null);
-  const [sobrantes,    setSobrantes]    = useState([]);
-  const [gastoPendienteError, setGastoPendienteError] = useState(false);
+  // Reemplazan los antiguos popups modales — ahora son banners inline, no bloqueantes.
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [isPopupErrorOpen, setIsPopupErrorOpen] = useState(false);
+  const [errorPopupMessage, setErrorPopupMessage] = useState("");
 
-  const inputCamaraRef  = useRef(null);
-  const inputGaleriaRef = useRef(null);
+  const decryptedIdSucursal = decryptId(decodeURIComponent(idSucursal));
+  const sucursal = sucursales?.find((item) => Number(item.idSucursal) === Number(decryptedIdSucursal));
 
-  const stepsComplete = [
-    turno && sucursal,
-    !!imagen,
-    ventaReal && parseFloat(ventaReal) > 0,
-    true,
-  ];
-
-  const hayGastoPendiente =
-    nuevoGasto.detalle.trim() !== "" || nuevoGasto.subtotal !== "";
-
-  const formularioCompleto =
-    stepsComplete.slice(0, 3).every(Boolean) && !hayGastoPendiente;
+  const { stockGeneral: initialStockGeneral, loadingStockGeneral } = useGetStockGeneral(idSucursal);
+  const { stockDelDia: initialStockDelDia, loadingStockDiario } = useGetStockDelDia(idSucursal);
 
   useEffect(() => {
-    if (turno && sucursal && step === 0) setStep(1);
-  }, [turno, sucursal]);
-
-  useEffect(() => {
-    if (imagen && step === 1) setStep(2);
-  }, [imagen]);
-
-  useEffect(() => {
-    if (ventaReal && parseFloat(ventaReal) > 0 && step === 2) setStep(3);
-  }, [ventaReal]);
-
-  // Limpiar error de gasto pendiente al limpiar inputs
-  useEffect(() => {
-    if (!hayGastoPendiente) setGastoPendienteError(false);
-  }, [hayGastoPendiente]);
-
-  const handleImagen = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    setImagen(file);
-    setPreview(URL.createObjectURL(file));
-  };
-
-  const agregarGasto = () => {
-    if (!nuevoGasto.detalle.trim() || !nuevoGasto.subtotal) return;
-    setGastos((prev) => [...prev, {
-      detalleGasto: nuevoGasto.detalle.trim(),
-      subtotal: parseFloat(nuevoGasto.subtotal),
-    }]);
-    setNuevoGasto({ detalle: "", subtotal: "" });
-    setGastoPendienteError(false);
-  };
-
-  const eliminarGasto = (index) =>
-    setGastos((prev) => prev.filter((_, i) => i !== index));
-
-  const totalGastos = gastos.reduce((a, g) => a + g.subtotal, 0);
-
-  const handleEnviar = async () => {
-    // Validar gasto pendiente
-    if (hayGastoPendiente) {
-      setGastoPendienteError(true);
-      // Scroll al paso de gastos
-      document.getElementById("paso-gastos")?.scrollIntoView({ behavior: "smooth", block: "center" });
-      return;
-    }
-
-    if (!stepsComplete.slice(0, 3).every(Boolean)) return;
-
-    setError(null);
-    setLoadingPhase("imagen");
-
-    const timer = setTimeout(() => setLoadingPhase("venta"), 7000);
-
-    try {
-      const fechaActual = dayjs().format("YYYY-MM-DD");
-
-      const payload = {
-        encabezadoVenta: {
-          idOrdenProduccion: null,
-          idUsuario: usuario.idUsuario,
-          idSucursal: sucursal,
-          ventaTurno: turno,
-          fechaVenta: fechaActual,
-          fechaCreacion: fechaActual,
-          fechaYHoraVenta: getCurrentDateTimeWithSeconds(),
-        },
-        detalleIngreso: {
-          montoTotalIngresado: parseFloat(ventaReal),
-          fechaIngreso: fechaActual,
-        },
-        gastosDiarios: gastos.length > 0 ? {
-          encabezadoGastosDiarios: {
-            idUsuario: usuario.idUsuario,
-            montoTotalGasto: totalGastos,
-            fechaIngreso: fechaActual,
-          },
-          detalleGastosDiarios: gastos.map((g) => ({
-            detalleGasto: g.detalleGasto,
-            subTotal: g.subtotal,
-          })),
-        } : {},
-      };
-
-      const formData = new FormData();
-      formData.append("image", imagen);
-      formData.append("venta", JSON.stringify(payload));
-
-      const response = await ingresarVentaAIService(formData);
-      clearTimeout(timer);
-      if (response.status === 200){
-        setSobrantes(response.productos?.detallesVenta || []);
-        setSuccess(true);
-      } 
-      } catch (error) {
-        clearTimeout(timer);
-        const status = error.response?.status;
-        const mensaje = error.response?.data?.error?.message;
-
-        if (status === 422 && mensaje) {
-          setError(mensaje);
-        } else {
-          setError("Hubo un error al procesar la venta. Intenta de nuevo.");
+    if (productos && (initialStockGeneral || initialStockDelDia)) {
+      const initialCurrentStock = {};
+      productos?.forEach((producto) => {
+        if (producto?.controlarStock === 1) {
+          const stockGen = Array.isArray(initialStockGeneral)
+            ? initialStockGeneral.find((item) => item.idProducto === producto.idProducto)
+            : null;
+          initialCurrentStock[producto.idProducto] = stockGen?.cantidadExistente || 0;
         }
-      } finally {
-        setLoadingPhase(null);
-      }
+        if (producto?.controlarStockDiario === 1) {
+          const stockDia = Array.isArray(initialStockDelDia)
+            ? initialStockDelDia.find((item) => item.idProducto === producto.idProducto)
+            : null;
+          initialCurrentStock[producto.idProducto] = stockDia?.cantidadExistente || 0;
+        }
+      });
+      setCurrentStock(initialCurrentStock);
+    }
+  }, [productos, initialStockGeneral, initialStockDelDia]);
+
+  const updateCurrentStock = (newStockValues) => {
+    setCurrentStock((prev) => {
+      const updated = { ...prev };
+      Object.entries(newStockValues).forEach(([idProducto, cantidad]) => {
+        if (cantidad !== null && !isNaN(cantidad)) {
+          const producto = productos.find((p) => p.idProducto === parseInt(idProducto));
+          const cantidadReal = producto?.nombreProducto === "Frances" ? parseInt(cantidad) * 6 : parseInt(cantidad);
+          updated[idProducto] = (updated[idProducto] || 0) + cantidadReal;
+        }
+      });
+      return updated;
+    });
   };
 
-  const resetForm = () => {
-    setTurno(""); setSucursal(""); setImagen(null); setPreview(null);
-    setVentaReal(""); setGastos([]); setStep(0); setSuccess(false);
-    setError(null); setNuevoGasto({ detalle: "", subtotal: "" });
-    setGastoPendienteError(false);
-  };
+  const categorias = ["Todas", ...new Set(productos?.map((item) => item.nombreCategoria) || [])];
 
-  // ── Loading screen ──
-  if (loadingPhase) {
-    return (
-      <div className="wv-page">
-        <div className="wv-loading-screen">
-          <div className="wv-loading-spinner" />
-          <p className="wv-loading-title">
-            {loadingPhase === "imagen" ? "Procesando imagen" : "Ingresando venta"}
-          </p>
-          <p className="wv-loading-sub">
-            {loadingPhase === "imagen"
-              ? "Analizando imagen con IA..."
-              : "Guardando los datos en el sistema..."}
-          </p>
-        </div>
-      </div>
+  const productosFiltrados = useMemo(() => {
+    let filtered = categoriaActiva === "Todas" ? productos : productos?.filter((item) => item.nombreCategoria === categoriaActiva);
+    if (searchTerm) {
+      filtered = filtered?.filter((producto) => producto.nombreProducto.toLowerCase().includes(searchTerm.toLowerCase()));
+    }
+    return filtered;
+  }, [productos, categoriaActiva, searchTerm]);
+
+  const clearSearch = () => setSearchTerm("");
+
+  const cantidadesIngresadas = Object.values(stockValues).filter((val) => val !== null && val !== "" && !isNaN(val)).length;
+
+  const handleSubmit = async () => {
+    await handleSubmitGuardarStock(
+      stockValues,
+      productos,
+      idSucursal,
+      setIsLoading,
+      setIsPopupOpen,
+      setStockValues,
+      setErrorPopupMessage,
+      setIsPopupErrorOpen,
+      updateCurrentStock
     );
-  }
+  };
 
-  // ── Success screen ──
-  if (success) {
+  if (loadigProducts || loadingSucursales || loadingStockGeneral || loadingStockDiario) {
     return (
-      <div className="wv-page">
-        <div className="wv-success-screen">
-          <div className="wv-success-icon">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none"
-              stroke="#0F6E56" strokeWidth="2.2" strokeLinecap="round">
-              <polyline points="20 6 9 17 4 12"/>
-            </svg>
-          </div>
-          <p className="wv-success-title">Venta registrada</p>
-          <p className="wv-success-sub">Los datos fueron procesados y guardados correctamente.</p>
-
-          <div className="wv-success-summary">
-            <div className="wv-summary-row">
-              <span>Turno</span><span>{turno}</span>
-            </div>
-            <div className="wv-summary-row">
-              <span>Venta</span>
-              <span style={{ color: "#0F6E56", fontWeight: 500 }}>
-                Q {parseFloat(ventaReal).toFixed(2)}
-              </span>
-            </div>
-            {sobrantes.length > 0 && (
-              <div className="wv-sobrantes-card">
-
-                <div className="wv-sobrantes-header">
-                  <span>📦 Sobrantes ingresados</span>
-                  <span>{sobrantes.length}</span>
-                </div>
-
-                <div className="wv-sobrantes-list">
-                  {sobrantes.map((producto) => (
-                    <div className="wv-sobrante-item" key={producto.idProducto}>
-
-                      <span className="wv-sobrante-nombre">
-                        {producto.nombreProducto}
-                      </span>
-
-                      <span className="wv-sobrante-cantidad">
-                        {producto.unidadesNoVendidas}
-                      </span>
-
-                    </div>
-                  ))}
-                </div>
-
-              </div>
-            )}
-            {gastos.length > 0 && (
-              <div className="wv-summary-row">
-                <span>Gastos</span>
-                <span>Q {totalGastos.toFixed(2)}</span>
-              </div>
-            )}
-          </div>
-
-          <div className="wv-success-actions">
-            <button className="wv-btn-primary" onClick={() => navigate("/ventas")}>
-              Ver ventas
-            </button>
-            <button className="wv-btn-ghost" onClick={resetForm}>
-              Ingresar otra venta
-            </button>
-          </div>
-        </div>
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <span className="h-10 w-10 animate-spin-smooth rounded-full border-4 border-brand-200 border-t-brand-600" />
       </div>
     );
   }
 
   return (
-    <div className="wv-page">
-
-      {/* HEADER */}
-      <div className="wv-header">
-        <button className="wv-back-btn" onClick={() => navigate("/ventas")} aria-label="Volver">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-            <line x1="19" y1="12" x2="5" y2="12"/>
-            <polyline points="12 19 5 12 12 5"/>
-          </svg>
+    <div className="flex flex-col gap-6 pb-24">
+      {/* ── Header ───────────────────────────────────────────────────── */}
+      <header className="flex items-center gap-3">
+        <button
+          type="button"
+          onClick={() => navigate("/stock-productos")}
+          aria-label="Volver"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-line bg-surface text-muted shadow-card transition-colors hover:bg-brand-50 hover:text-brand-700"
+        >
+          <FiArrowLeft size={17} />
         </button>
-        <div>
-          <p className="wv-header-title">Venta por foto</p>
-          <p className="wv-header-date">{today}</p>
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-600 text-white shadow-brand">
+          <FiBox size={19} />
+        </span>
+        <div className="min-w-0">
+          <h1 className="truncate text-xl font-bold text-ink sm:text-2xl">
+            Inventario {sucursal?.nombreSucursal}
+          </h1>
+          <p className="text-sm text-muted">Ingresa las unidades que vas a agregar al stock</p>
         </div>
-        <div className="wv-user-chip">
-          <div className="wv-user-avatar">
-            {usuario?.usuario?.charAt(0).toUpperCase()}
-          </div>
-          <span>{usuario?.usuario}</span>
-        </div>
-      </div>
+      </header>
 
-      {/* PROGRESS */}
-      <div className="wv-progress-bar">
-        {STEPS.map((_, i) => (
-          <div
-            key={i}
-            className={`wv-progress-dot ${i < step ? "done" : i === step ? "active" : ""}`}
-          />
-        ))}
-      </div>
-
-      {/* LAYOUT DESKTOP */}
-      <div className={isDesktop ? "wv-desktop-layout" : ""}>
-
-        {/* Columna izquierda en desktop (pasos 1 y 2) */}
-        <div className={isDesktop ? "wv-col" : ""}>
-
-          <div className="wv-body" style={isDesktop ? { padding: "16px 16px 16px 0" } : {}}>
-
-            {/* PASO 1 — Turno y sucursal */}
-            <div className="wv-card">
-              <div className="wv-step-label">
-                <div className={`wv-step-num ${stepsComplete[0] ? "done" : ""}`}>
-                  {stepsComplete[0] ? (
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none"
-                      stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-                      <polyline points="20 6 9 17 4 12"/>
-                    </svg>
-                  ) : "1"}
-                </div>
-                Turno y sucursal
-              </div>
-
-              <div className="wv-shift-row">
-                {["AM", "PM"].map((t) => (
-                  <button
-                    key={t}
-                    className={`wv-shift-btn ${turno === t ? "active" : ""}`}
-                    onClick={() => setTurno(t)}
-                    type="button"
-                  >
-                    <span className="wv-shift-emoji">{t === "AM" ? "🌅" : "🌇"}</span>
-                    <span className="wv-shift-name">{t}</span>
-                    <span className="wv-shift-time">{t === "AM" ? "6:00 – 14:00" : "14:00 – 22:00"}</span>
-                  </button>
-                ))}
-              </div>
-
-              <select
-                className="wv-select"
-                value={sucursal}
-                onChange={(e) => setSucursal(e.target.value)}
-                disabled={loadingSucursales}
-              >
-                <option value="">{loadingSucursales ? "Cargando..." : "Selecciona una sucursal"}</option>
-                {sucursales.map((s) => (
-                  <option key={s.idSucursal} value={s.idSucursal}>{s.nombreSucursal}</option>
-                ))}
-              </select>
-            </div>
-
-            {/* PASO 2 — Foto */}
-            {step >= 1 && (
-              <div className="wv-card wv-card-animated">
-                <div className="wv-step-label">
-                  <div className={`wv-step-num ${stepsComplete[1] ? "done" : ""}`}>
-                    {stepsComplete[1] ? (
-                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-                        <polyline points="20 6 9 17 4 12"/>
-                      </svg>
-                    ) : "2"}
-                  </div>
-                  Foto de la hoja
-                </div>
-
-                {!preview ? (
-                  <div className="wv-dropzone">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none"
-                      stroke="#9e9e9e" strokeWidth="1.5" strokeLinecap="round">
-                      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-                      <circle cx="12" cy="13" r="4"/>
-                    </svg>
-                    <p className="wv-drop-text">Toma o carga una foto de la hoja de producción</p>
-                    <div className="wv-drop-actions">
-                      <button className="wv-btn-sm wv-btn-primary-sm"
-                        onClick={() => inputCamaraRef.current.click()} type="button">
-                        Tomar foto
-                      </button>
-                      <button className="wv-btn-sm wv-btn-outline-sm"
-                        onClick={() => inputGaleriaRef.current.click()} type="button">
-                        Galería
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="wv-preview-wrap">
-                    <img src={preview} alt="Vista previa" className="wv-preview-img" />
-                    <button
-                      className="wv-preview-remove"
-                      onClick={() => { setImagen(null); setPreview(null); }}
-                      type="button"
-                    >
-                      Quitar foto
-                    </button>
-                  </div>
-                )}
-
-                <input ref={inputCamaraRef} type="file" accept="image/*"
-                  capture="environment" onChange={handleImagen} style={{ display: "none" }} />
-                <input ref={inputGaleriaRef} type="file" accept="image/*"
-                  onChange={handleImagen} style={{ display: "none" }} />
-              </div>
-            )}
-
-          </div>
-        </div>
-
-        {/* Columna derecha en desktop (pasos 3 y 4) */}
-        <div className={isDesktop ? "wv-col" : ""}>
-
-          <div className="wv-body" style={isDesktop ? { padding: "16px 0 16px 16px" } : { paddingTop: 0 }}>
-
-            {/* PASO 3 — Monto */}
-            {step >= 2 && (
-              <div className="wv-card wv-card-animated">
-                <div className="wv-step-label">
-                  <div className={`wv-step-num ${stepsComplete[2] ? "done" : ""}`}>
-                    {stepsComplete[2] ? (
-                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-                        <polyline points="20 6 9 17 4 12"/>
-                      </svg>
-                    ) : "3"}
-                  </div>
-                  Monto de la venta
-                </div>
-                <div className="wv-amount-display">
-                  Q <span style={{ color: "#0F6E56" }}>
-                    {ventaReal && !isNaN(parseFloat(ventaReal))
-                      ? parseFloat(ventaReal).toFixed(2) : "0.00"}
-                  </span>
-                </div>
-                <input
-                  type="number"
-                  className="wv-input"
-                  placeholder="0.00"
-                  value={ventaReal}
-                  onChange={(e) => setVentaReal(e.target.value)}
-                  onWheel={(e) => e.target.blur()}
-                  step="0.01"
-                />
-              </div>
-            )}
-
-            {/* PASO 4 — Gastos */}
-            {step >= 3 && (
-              <div className="wv-card wv-card-animated" id="paso-gastos">
-                <div className="wv-step-label">
-                  <div className="wv-step-num">4</div>
-                  Gastos del turno
-                  <span className="wv-optional">opcional</span>
-                </div>
-
-                <div className="wv-gasto-row">
-                  <input
-                    type="text"
-                    className={`wv-input-sm ${gastoPendienteError ? "wv-input-error" : ""}`}
-                    placeholder="Detalle"
-                    value={nuevoGasto.detalle}
-                    onChange={(e) => {
-                      setNuevoGasto((p) => ({ ...p, detalle: e.target.value }));
-                      setGastoPendienteError(false);
-                    }}
-                  />
-                  <input
-                    type="number"
-                    className={`wv-input-sm wv-input-right ${gastoPendienteError ? "wv-input-error" : ""}`}
-                    placeholder="Q 0.00"
-                    value={nuevoGasto.subtotal}
-                    onChange={(e) => {
-                      setNuevoGasto((p) => ({ ...p, subtotal: e.target.value }));
-                      setGastoPendienteError(false);
-                    }}
-                    onWheel={(e) => e.target.blur()}
-                    step="0.01"
-                  />
-                  <button
-                    className="wv-add-btn"
-                    onClick={agregarGasto}
-                    disabled={!nuevoGasto.detalle || !nuevoGasto.subtotal}
-                    type="button"
-                    aria-label="Agregar gasto"
-                  >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                      stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
-                      <line x1="12" y1="5" x2="12" y2="19"/>
-                      <line x1="5" y1="12" x2="19" y2="12"/>
-                    </svg>
-                  </button>
-                </div>
-
-                {/* Alerta gasto pendiente */}
-                {gastoPendienteError && (
-                  <div className="wv-gasto-pendiente-alert">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
-                      stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                      <circle cx="12" cy="12" r="10"/>
-                      <line x1="12" y1="8" x2="12" y2="12"/>
-                      <line x1="12" y1="16" x2="12.01" y2="16"/>
-                    </svg>
-                    Agrega el gasto con el botón + antes de enviar, o limpia los campos.
-                  </div>
-                )}
-
-                {gastos.length > 0 && (
-                  <div className="wv-gastos-list">
-                    {gastos.map((g, i) => (
-                      <div className="wv-gasto-item" key={i}>
-                        <span className="wv-gasto-label">{g.detalleGasto}</span>
-                        <div className="wv-gasto-right">
-                          <span className="wv-gasto-amount">Q {g.subtotal.toFixed(2)}</span>
-                          <button className="wv-del-btn" onClick={() => eliminarGasto(i)}
-                            type="button" aria-label="Eliminar">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
-                              stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                              <polyline points="3 6 5 6 21 6"/>
-                              <path d="M19 6l-1 14H6L5 6"/>
-                              <path d="M10 11v6M14 11v6"/>
-                            </svg>
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                    <div className="wv-total-bar">
-                      <span>Total gastos</span>
-                      <span style={{ color: "#0F6E56", fontWeight: 500, fontSize: 18 }}>
-                        Q {totalGastos.toFixed(2)}
-                      </span>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {error && <div className="wv-error">{error}</div>}
-
-            {/* Botón en desktop va inline */}
-            {isDesktop && (
-              <div className="wv-desktop-footer">
-                <button
-                  className={`wv-btn-send ${(!stepsComplete.slice(0,3).every(Boolean)) ? "disabled" : ""}`}
-                  onClick={handleEnviar}
-                  disabled={!stepsComplete.slice(0, 3).every(Boolean)}
-                  type="button"
-                >
-                  Enviar venta
-                </button>
-                {hayGastoPendiente && (
-                  <p className="wv-footer-hint" style={{ color: "#E24B4A" }}>
-                    Tienes un gasto sin agregar. Agrégalo o limpia los campos.
-                  </p>
-                )}
-                {!stepsComplete.slice(0, 3).every(Boolean) && (
-                  <p className="wv-footer-hint">Completa turno, sucursal, foto y monto para continuar.</p>
-                )}
-              </div>
-            )}
-
-          </div>
-        </div>
-
-      </div>
-
-      {/* FOOTER fijo solo en mobile */}
-      {!isDesktop && (
-        <div className="wv-footer">
-          <button
-            className={`wv-btn-send ${!stepsComplete.slice(0,3).every(Boolean) ? "disabled" : ""}`}
-            onClick={handleEnviar}
-            disabled={!stepsComplete.slice(0, 3).every(Boolean)}
-            type="button"
-          >
-            Enviar venta
-          </button>
-          {hayGastoPendiente && (
-            <p className="wv-footer-hint" style={{ color: "#E24B4A" }}>
-              Tienes un gasto sin agregar. Agrégalo o limpia los campos.
-            </p>
-          )}
-          {!hayGastoPendiente && !stepsComplete.slice(0, 3).every(Boolean) && (
-            <p className="wv-footer-hint">Completa turno, sucursal, foto y monto para continuar.</p>
-          )}
-        </div>
+      {/* ── Banners inline (reemplazan modales) ─────────────────────── */}
+      {showErrorProductos && productosFiltrados?.length === 0 && (
+        <Alert type="danger" title="No se pudieron cargar los productos" message="Intenta recargar la página." />
       )}
 
+      {productos?.length === 0 && (
+        <Alert type="info" title="Sin productos registrados" message="No se han ingresado productos todavía." />
+      )}
+
+      {isPopupErrorOpen && (
+        <Alert
+          type="danger"
+          title="Ocurrió un error"
+          message={errorPopupMessage}
+          onDismiss={() => setIsPopupErrorOpen(false)}
+        />
+      )}
+
+      {isPopupOpen && (
+        <Alert
+          type="success"
+          title="¡Inventario actualizado!"
+          message="Se agregó el stock de productos correctamente."
+          onDismiss={() => setIsPopupOpen(false)}
+          actions={[
+            {
+              label: "Ver stock",
+              variant: "primary",
+              onClick: () => navigate(`/stock-productos/stock-general/${encodeURIComponent(idSucursal)}`),
+            },
+            {
+              label: "Ingresar más",
+              variant: "secondary",
+              onClick: () => setIsPopupOpen(false),
+            },
+          ]}
+        />
+      )}
+
+      {/* ── Filtros ──────────────────────────────────────────────────── */}
+      <div className="rounded-2xl border border-line bg-surface p-4 shadow-card">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <div className="relative min-w-0 flex-1">
+            <FiSearch size={15} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" />
+            <input
+              type="text"
+              placeholder="Buscar por nombre..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="box-border w-full rounded-xl border border-line bg-surface py-2.5 pl-10 pr-9 text-sm text-ink placeholder:text-muted transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/25"
+            />
+            {searchTerm && (
+              <button
+                type="button"
+                onClick={clearSearch}
+                aria-label="Limpiar búsqueda"
+                className="absolute right-2.5 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-md border-0 bg-transparent text-muted transition-colors hover:text-ink"
+              >
+                <FiX size={16} />
+              </button>
+            )}
+          </div>
+
+          {categorias.length > 1 && (
+            <div className="relative shrink-0 sm:hidden">
+              <FiFilter size={14} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" />
+              <select
+                value={categoriaActiva}
+                onChange={(e) => setCategoriaActiva(e.target.value)}
+                className="box-border w-full appearance-none rounded-xl border border-line bg-surface py-2.5 pl-10 pr-9 text-sm font-medium text-ink transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/25"
+              >
+                {categorias.map((categoria) => (
+                  <option key={categoria} value={categoria}>
+                    {categoria}
+                  </option>
+                ))}
+              </select>
+              <FiChevronDown size={14} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-muted" />
+            </div>
+          )}
+        </div>
+
+        {categorias.length > 1 && (
+          <div className="mt-3 hidden flex-wrap gap-2 sm:flex">
+            {categorias.map((categoria) => (
+              <button
+                key={categoria}
+                type="button"
+                onClick={() => setCategoriaActiva(categoria)}
+                className={`shrink-0 rounded-full border-0 px-3.5 py-1.5 text-xs font-medium transition-colors duration-150 ${
+                  categoriaActiva === categoria
+                    ? "bg-brand-600 text-white shadow-brand"
+                    : "bg-surface-2 text-muted hover:bg-brand-50 hover:text-brand-700"
+                }`}
+              >
+                {categoria}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* ── Tabla de productos ───────────────────────────────────────── */}
+      <div className="overflow-hidden rounded-2xl border border-line bg-surface shadow-card">
+        <table className="w-full border-collapse text-sm">
+          <thead className="bg-surface-2/95">
+            <tr>
+              <th className="border-b border-line px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted">
+                Producto
+              </th>
+              <th className="border-b border-line px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-muted">
+                Stock actual
+              </th>
+              <th className="border-b border-line px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-muted">
+                Unidades / Filas a ingresar
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {productosFiltrados?.length > 0 ? (
+              productosFiltrados.map((producto, i) => (
+                <tr
+                  key={producto.idProducto}
+                  className={`border-b border-line last:border-0 transition-colors hover:bg-brand-50/50 ${i % 2 === 1 ? "bg-surface-2/30" : ""}`}
+                >
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-3">
+                      <span
+                        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
+                        style={{ backgroundColor: getUniqueColor(producto.nombreProducto) }}
+                      >
+                        {getInitials(producto.nombreProducto)}
+                      </span>
+                      <span className="font-medium text-ink">{producto.nombreProducto}</span>
+                    </div>
+                  </td>
+                  <td className="px-4 py-3 text-center">
+                    <span className="inline-flex min-w-[3rem] justify-center rounded-full bg-surface-2 px-2.5 py-1 text-sm font-bold text-ink">
+                      {currentStock[producto.idProducto] || 0}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <input
+                      type="number"
+                      min="0"
+                      value={stockValues[producto.idProducto] || ""}
+                      onChange={(e) => handleStockChange(producto.idProducto, e.target.value, setStockValues)}
+                      onWheel={(e) => e.target.blur()}
+                      placeholder="0"
+                      className="box-border mx-auto block w-24 rounded-lg border border-line bg-surface px-3 py-2 text-center text-sm font-semibold text-ink transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/25"
+                    />
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="3" className="px-4 py-10 text-center text-sm text-muted">
+                  No hay productos disponibles en esta categoría.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* ── Barra de guardar, flotante al fondo ─────────────────────── */}
+      <div className="sticky bottom-4 z-10 flex justify-center">
+        <button
+          type="button"
+          onClick={handleSubmit}
+          disabled={isLoading || cantidadesIngresadas === 0}
+          className="flex w-full max-w-md items-center justify-center gap-2 rounded-xl border-0 bg-brand-600 py-3.5 text-sm font-semibold text-white shadow-modal transition-colors hover:bg-brand-500 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:px-10"
+        >
+          {isLoading ? (
+            <>
+              <span className="h-4 w-4 animate-spin-smooth rounded-full border-2 border-white/40 border-t-white" />
+              Guardando...
+            </>
+          ) : (
+            <>
+              <FiSave size={16} />
+              Guardar Inventario
+              {cantidadesIngresadas > 0 && (
+                <span className="rounded-full bg-white/20 px-2 py-0.5 text-xs">{cantidadesIngresadas}</span>
+              )}
+            </>
+          )}
+        </button>
+      </div>
     </div>
   );
-};
+}
 
-export default IngresarVentasAI;
+export default IngresarStockGeneralPage;

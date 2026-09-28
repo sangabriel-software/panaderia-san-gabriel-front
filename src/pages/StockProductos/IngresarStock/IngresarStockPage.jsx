@@ -1,25 +1,25 @@
 import { useState, useMemo, useEffect } from "react";
-import { Container, Table, Button, Form, Spinner, Dropdown } from "react-bootstrap";
-import DotsMove from "../../../components/Spinners/DotsMove";
-import useGetProductosYPrecios from "../../../hooks/productosprecios/useGetProductosYprecios";
-import SuccessPopup from "../../../components/Popup/SuccessPopup";
-import "./IngresarStockPage.styles.css";
-import { getInitials, getUniqueColor, handleStockChange, handleSubmitGuardarStock } from "./IngresarStock.utils";
-import { BsArrowLeft, BsExclamationTriangleFill, BsFillInfoCircleFill } from "react-icons/bs";
 import { useNavigate, useParams } from "react-router-dom";
+import {
+  FiArrowLeft,
+  FiSearch,
+  FiX,
+  FiFilter,
+  FiChevronDown,
+  FiBox,
+  FiPackage,
+  FiSave,
+} from "react-icons/fi";
 import Alert from "../../../components/Alerts/Alert";
-import Title from "../../../components/Title/Title";
-import ErrorPopup from "../../../components/Popup/ErrorPopUp";
+import useGetProductosYPrecios from "../../../hooks/productosprecios/useGetProductosYprecios";
+import { getInitials, getUniqueColor, handleStockChange, handleSubmitGuardarStock } from "./IngresarStock.utils";
 import useGetSucursales from "../../../hooks/sucursales/useGetSucursales";
 import { decryptId } from "../../../utils/CryptoParams";
 import useGetStockGeneral from "../../../hooks/stock/useGetStockGeneral";
 import useGetStockDelDia from "../../../hooks/stock/useGetStockDelDia";
-import { getUserData } from "../../../utils/Auth/decodedata";
-import { currentDate, getCurrentDateTimeWithSeconds } from "../../../utils/dateUtils";
-import { ingresarStockProductos } from "../../../services/stockservices/stock.service";
 import useGetProductosInventario from "../../../hooks/productosprecios/useGetProductosInventario";
 
-const IngresarStockGeneralPage = () => {
+function IngresarStockGeneralPage() {
   const { idSucursal } = useParams();
   const navigate = useNavigate();
   const { productos, loadigProducts, showErrorProductos } = useGetProductosInventario();
@@ -30,309 +30,302 @@ const IngresarStockGeneralPage = () => {
   const [categoriaActiva, setCategoriaActiva] = useState("Todas");
   const [searchTerm, setSearchTerm] = useState("");
 
-  /* Popups */
+  // Reemplazan los antiguos popups modales — ahora son banners inline, no bloqueantes.
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [isPopupErrorOpen, setIsPopupErrorOpen] = useState(false);
   const [errorPopupMessage, setErrorPopupMessage] = useState("");
 
   const decryptedIdSucursal = decryptId(decodeURIComponent(idSucursal));
-  const sucursal = sucursales?.find(item => 
-    Number(item.idSucursal) === Number(decryptedIdSucursal)
-  );
+  const sucursal = sucursales?.find((item) => Number(item.idSucursal) === Number(decryptedIdSucursal));
 
   const { stockGeneral: initialStockGeneral, loadingStockGeneral } = useGetStockGeneral(idSucursal);
   const { stockDelDia: initialStockDelDia, loadingStockDiario } = useGetStockDelDia(idSucursal);
 
-  // Efecto para inicializar los valores de stock actual
   useEffect(() => {
     if (productos && (initialStockGeneral || initialStockDelDia)) {
       const initialCurrentStock = {};
-      
-      productos?.forEach(producto => {
+      productos?.forEach((producto) => {
         if (producto?.controlarStock === 1) {
-          const stockGen = Array.isArray(initialStockGeneral) 
-            ? initialStockGeneral.find(item => item.idProducto === producto.idProducto)
+          const stockGen = Array.isArray(initialStockGeneral)
+            ? initialStockGeneral.find((item) => item.idProducto === producto.idProducto)
             : null;
           initialCurrentStock[producto.idProducto] = stockGen?.cantidadExistente || 0;
         }
-        
         if (producto?.controlarStockDiario === 1) {
-          const stockDia = Array.isArray(initialStockDelDia) 
-            ? initialStockDelDia.find(item => item.idProducto === producto.idProducto)
+          const stockDia = Array.isArray(initialStockDelDia)
+            ? initialStockDelDia.find((item) => item.idProducto === producto.idProducto)
             : null;
           initialCurrentStock[producto.idProducto] = stockDia?.cantidadExistente || 0;
         }
       });
-      
       setCurrentStock(initialCurrentStock);
     }
   }, [productos, initialStockGeneral, initialStockDelDia]);
 
-  // Función para actualizar el stock actual
-const updateCurrentStock = (newStockValues) => {
-  setCurrentStock(prev => {
-    const updated = {...prev};
-    Object.entries(newStockValues).forEach(([idProducto, cantidad]) => {
-      if (cantidad !== null && !isNaN(cantidad)) {
-        const producto = productos.find(p => p.idProducto === parseInt(idProducto));
-        // Si es Francés, convertir filas a unidades antes de sumar
-        const cantidadReal = producto?.nombreProducto === "Frances"
-          ? parseInt(cantidad) * 6
-          : parseInt(cantidad);
-        updated[idProducto] = (updated[idProducto] || 0) + cantidadReal;
-      }
+  const updateCurrentStock = (newStockValues) => {
+    setCurrentStock((prev) => {
+      const updated = { ...prev };
+      Object.entries(newStockValues).forEach(([idProducto, cantidad]) => {
+        if (cantidad !== null && !isNaN(cantidad)) {
+          const producto = productos.find((p) => p.idProducto === parseInt(idProducto));
+          const cantidadReal = producto?.nombreProducto === "Frances" ? parseInt(cantidad) * 6 : parseInt(cantidad);
+          updated[idProducto] = (updated[idProducto] || 0) + cantidadReal;
+        }
+      });
+      return updated;
     });
-    return updated;
-  });
-};
+  };
 
-  // const prodPorHarina = productos?.filter((item) => item.tipoProduccion !== "bandejas");
-  const categorias = [...new Set(productos?.map((item) => item.nombreCategoria) || [])];
+  const categorias = ["Todas", ...new Set(productos?.map((item) => item.nombreCategoria) || [])];
 
   const productosFiltrados = useMemo(() => {
-    let filtered = categoriaActiva === "Todas" ? productos : productos?.filter(
-      (item) => item.nombreCategoria === categoriaActiva
-    );
-
+    let filtered = categoriaActiva === "Todas" ? productos : productos?.filter((item) => item.nombreCategoria === categoriaActiva);
     if (searchTerm) {
-      filtered = filtered?.filter((producto) =>
-        producto.nombreProducto.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+      filtered = filtered?.filter((producto) => producto.nombreProducto.toLowerCase().includes(searchTerm.toLowerCase()));
     }
-
     return filtered;
   }, [productos, categoriaActiva, searchTerm]);
 
-  const clearSearch = () => {
-    setSearchTerm("");
-  };
+  const clearSearch = () => setSearchTerm("");
 
-  /* Guardar Stock */
+  const cantidadesIngresadas = Object.values(stockValues).filter((val) => val !== null && val !== "" && !isNaN(val)).length;
+
   const handleSubmit = async () => {
-    await handleSubmitGuardarStock(stockValues, productos, idSucursal, setIsLoading, setIsPopupOpen, setStockValues, setErrorPopupMessage, setIsPopupErrorOpen, updateCurrentStock);
+    await handleSubmitGuardarStock(
+      stockValues,
+      productos,
+      idSucursal,
+      setIsLoading,
+      setIsPopupOpen,
+      setStockValues,
+      setErrorPopupMessage,
+      setIsPopupErrorOpen,
+      updateCurrentStock
+    );
   };
 
   if (loadigProducts || loadingSucursales || loadingStockGeneral || loadingStockDiario) {
     return (
-      <Container
-        className="d-flex justify-content-center align-items-center"
-        style={{ minHeight: "70vh" }}
-      >
-        <DotsMove />
-      </Container>
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <span className="h-10 w-10 animate-spin-smooth rounded-full border-4 border-brand-200 border-t-brand-600" />
+      </div>
     );
   }
 
   return (
-    <Container className="">
-      {/* Alerta de error */}
-      {showErrorProductos && productosFiltrados?.length === 0 && (
-        <div className="row justify-content-center my-2">
-          <div className="col-md-6 text-center">
-            <Alert
-              type="danger"
-              message="Error al cargar los productos"
-              icon={<BsExclamationTriangleFill />}
-            />
-          </div>
+    <div className="flex flex-col gap-6 pb-24">
+      {/* ── Header ───────────────────────────────────────────────────── */}
+      <header className="flex items-center gap-3">
+        <button
+          type="button"
+          onClick={() => navigate("/stock-productos")}
+          aria-label="Volver"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-line bg-surface text-muted shadow-card transition-colors hover:bg-brand-50 hover:text-brand-700"
+        >
+          <FiArrowLeft size={17} />
+        </button>
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-600 text-white shadow-brand">
+          <FiBox size={19} />
+        </span>
+        <div className="min-w-0">
+          <h1 className="truncate text-xl font-bold text-ink sm:text-2xl">
+            Inventario {sucursal?.nombreSucursal}
+          </h1>
+          <p className="text-sm text-muted">Ingresa las unidades que vas a agregar al stock</p>
         </div>
+      </header>
+
+      {/* ── Banners inline (reemplazan modales) ─────────────────────── */}
+      {showErrorProductos && productosFiltrados?.length === 0 && (
+        <Alert type="danger" title="No se pudieron cargar los productos" message="Intenta recargar la página." />
       )}
 
-      {/* Encabezado */}
-      <div className="text-center">
-        <div className="row">
-          <div className="col-2">
-            <button
-              className="btn bt-return rounded-circle d-flex align-items-center justify-content-center shadow"
-              style={{ width: "40px", height: "40px" }}
-              onClick={() => navigate("/stock-productos")}
-            >
-              <BsArrowLeft size={20} />
-            </button>
-          </div>
-          <div className="col-8">
-            <Title
-              title={`Inventario ${sucursal.nombreSucursal}`}
-            />
-          </div>
-        </div>
-      </div>
+      {productos?.length === 0 && (
+        <Alert type="info" title="Sin productos registrados" message="No se han ingresado productos todavía." />
+      )}
 
-      {/* Filtros */}
-      <div className="d-flex flex-column flex-md-row justify-content-between gap-3 mb-4 my-3">
-        <div className="flex-grow-1">
-          <h6 className="mb-3">Buscar producto:</h6>
-          <div className="position-relative">
-            <Form.Control
+      {isPopupErrorOpen && (
+        <Alert
+          type="danger"
+          title="Ocurrió un error"
+          message={errorPopupMessage}
+          onDismiss={() => setIsPopupErrorOpen(false)}
+        />
+      )}
+
+      {isPopupOpen && (
+        <Alert
+          type="success"
+          title="¡Inventario actualizado!"
+          message="Se agregó el stock de productos correctamente."
+          onDismiss={() => setIsPopupOpen(false)}
+          actions={[
+            {
+              label: "Ver stock",
+              variant: "primary",
+              onClick: () => navigate(`/stock-productos/stock-general/${encodeURIComponent(idSucursal)}`),
+            },
+            {
+              label: "Ingresar más",
+              variant: "secondary",
+              onClick: () => setIsPopupOpen(false),
+            },
+          ]}
+        />
+      )}
+
+      {/* ── Filtros ──────────────────────────────────────────────────── */}
+      <div className="rounded-2xl border border-line bg-surface p-4 shadow-card">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <div className="relative min-w-0 flex-1">
+            <FiSearch size={15} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" />
+            <input
               type="text"
               placeholder="Buscar por nombre..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="search-input"
+              className="box-border w-full rounded-xl border border-line bg-surface py-2.5 pl-10 pr-9 text-sm text-ink placeholder:text-muted transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/25"
             />
             {searchTerm && (
               <button
+                type="button"
                 onClick={clearSearch}
-                className="btn btn-clear-search position-absolute end-0 top-50 translate-middle-y"
+                aria-label="Limpiar búsqueda"
+                className="absolute right-2.5 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-md border-0 bg-transparent text-muted transition-colors hover:text-ink"
               >
-                &times;
+                <FiX size={16} />
               </button>
             )}
           </div>
+
+          {categorias.length > 1 && (
+            <div className="relative shrink-0 sm:hidden">
+              <FiFilter size={14} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" />
+              <select
+                value={categoriaActiva}
+                onChange={(e) => setCategoriaActiva(e.target.value)}
+                className="box-border w-full appearance-none rounded-xl border border-line bg-surface py-2.5 pl-10 pr-9 text-sm font-medium text-ink transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/25"
+              >
+                {categorias.map((categoria) => (
+                  <option key={categoria} value={categoria}>
+                    {categoria}
+                  </option>
+                ))}
+              </select>
+              <FiChevronDown size={14} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-muted" />
+            </div>
+          )}
         </div>
 
-        <div>
-          <h6 className="mb-3">Filtrar por categoría:</h6>
-          <Dropdown>
-            <Dropdown.Toggle variant="primary" id="dropdown-categorias">
-              {categoriaActiva === "Todas"
-                ? "Todas las categorías"
-                : categoriaActiva}
-            </Dropdown.Toggle>
-            <Dropdown.Menu className="category-dropdown-menu">
-              <Dropdown.Item
-                active={categoriaActiva === "Todas"}
-                onClick={() => setCategoriaActiva("Todas")}
+        {categorias.length > 1 && (
+          <div className="mt-3 hidden flex-wrap gap-2 sm:flex">
+            {categorias.map((categoria) => (
+              <button
+                key={categoria}
+                type="button"
+                onClick={() => setCategoriaActiva(categoria)}
+                className={`shrink-0 rounded-full border-0 px-3.5 py-1.5 text-xs font-medium transition-colors duration-150 ${
+                  categoriaActiva === categoria
+                    ? "bg-brand-600 text-white shadow-brand"
+                    : "bg-surface-2 text-muted hover:bg-brand-50 hover:text-brand-700"
+                }`}
               >
-                Todas
-              </Dropdown.Item>
-              {categorias.map((categoria) => (
-                <Dropdown.Item
-                  className="category-dropdown-item"
-                  key={categoria}
-                  active={categoriaActiva === categoria}
-                  onClick={() => setCategoriaActiva(categoria)}
-                >
-                  {categoria}
-                </Dropdown.Item>
-              ))}
-            </Dropdown.Menu>
-          </Dropdown>
-        </div>
+                {categoria}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
-      {/* Tabla de productos */}
-      <div className="table-responsive excel-table-container mb-4">
-        <Table striped bordered hover className="excel-table">
-          <thead>
+      {/* ── Tabla de productos ───────────────────────────────────────── */}
+      <div className="overflow-hidden rounded-2xl border border-line bg-surface shadow-card">
+        <table className="w-full border-collapse text-sm">
+          <thead className="bg-surface-2/95">
             <tr>
-              <th className="dark-header text-center" style={{ width: "40%" }}>
+              <th className="border-b border-line px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted">
                 Producto
               </th>
-              <th className="dark-header text-center" style={{ width: "30%" }}>
-                Stock Actual
+              <th className="border-b border-line px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-muted">
+                Stock actual
               </th>
-              <th className="dark-header text-center" style={{ width: "30%" }}>
-                Cantidad de Unidades / Filas
+              <th className="border-b border-line px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-muted">
+                Unidades / Filas a ingresar
               </th>
             </tr>
           </thead>
           <tbody>
             {productosFiltrados?.length > 0 ? (
-              productosFiltrados.map((producto) => (
-                <tr key={producto.idProducto}>
-                  <td>
-                    <div className="product-info">
-                      <div
-                        className="product-badge-stock"
-                        style={{
-                          backgroundColor: getUniqueColor(
-                            producto.nombreProducto
-                          ),
-                        }}
+              productosFiltrados.map((producto, i) => (
+                <tr
+                  key={producto.idProducto}
+                  className={`border-b border-line last:border-0 transition-colors hover:bg-brand-50/50 ${i % 2 === 1 ? "bg-surface-2/30" : ""}`}
+                >
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-3">
+                      <span
+                        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
+                        style={{ backgroundColor: getUniqueColor(producto.nombreProducto) }}
                       >
                         {getInitials(producto.nombreProducto)}
-                      </div>
-                      <span className="product-name">
-                        {producto.nombreProducto}
                       </span>
+                      <span className="font-medium text-ink">{producto.nombreProducto}</span>
                     </div>
                   </td>
-                  <td className="text-center align-middle" style={{ fontWeight: "bold" }}>
-                    {currentStock[producto.idProducto] || 0}
+                  <td className="px-4 py-3 text-center">
+                    <span className="inline-flex min-w-[3rem] justify-center rounded-full bg-surface-2 px-2.5 py-1 text-sm font-bold text-ink">
+                      {currentStock[producto.idProducto] || 0}
+                    </span>
                   </td>
-                  <td className="text-center align-middle">
-                    <Form.Control
+                  <td className="px-4 py-3">
+                    <input
                       type="number"
                       min="0"
                       value={stockValues[producto.idProducto] || ""}
-                      onChange={(e) =>
-                        handleStockChange(producto.idProducto, e.target.value, setStockValues)
-                      }
-                      className="quantity-input"
+                      onChange={(e) => handleStockChange(producto.idProducto, e.target.value, setStockValues)}
+                      onWheel={(e) => e.target.blur()}
                       placeholder="0"
-                      onWheel={(e) => e.target.blur()} // ✅ suelta el foco al scrollear
+                      className="box-border mx-auto block w-24 rounded-lg border border-line bg-surface px-3 py-2 text-center text-sm font-semibold text-ink transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/25"
                     />
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan="3" className="text-center py-4">
-                  No hay productos disponibles en esta categoría
+                <td colSpan="3" className="px-4 py-10 text-center text-sm text-muted">
+                  No hay productos disponibles en esta categoría.
                 </td>
               </tr>
             )}
           </tbody>
-        </Table>
+        </table>
       </div>
 
-      {/* Botón de guardar */}
-      <div className="text-center">
-        <Button
-          className="btn-guardar-stock"
-          size="lg"
+      {/* ── Barra de guardar, flotante al fondo ─────────────────────── */}
+      <div className="sticky bottom-4 z-10 flex justify-center">
+        <button
+          type="button"
           onClick={handleSubmit}
-          disabled={
-            isLoading ||
-            Object.values(stockValues).every(
-              (val) => val === null || isNaN(val)
-            )
-          }
+          disabled={isLoading || cantidadesIngresadas === 0}
+          className="flex w-full max-w-md items-center justify-center gap-2 rounded-xl border-0 bg-brand-600 py-3.5 text-sm font-semibold text-white shadow-modal transition-colors hover:bg-brand-500 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:px-10"
         >
           {isLoading ? (
-            <Spinner animation="border" size="sm" />
+            <>
+              <span className="h-4 w-4 animate-spin-smooth rounded-full border-2 border-white/40 border-t-white" />
+              Guardando...
+            </>
           ) : (
-            "Guardar Inventario"
+            <>
+              <FiSave size={16} />
+              Guardar Inventario
+              {cantidadesIngresadas > 0 && (
+                <span className="rounded-full bg-white/20 px-2 py-0.5 text-xs">{cantidadesIngresadas}</span>
+              )}
+            </>
           )}
-        </Button>
+        </button>
       </div>
-
-      {productos.length === 0 && (
-        <div className="row justify-content-center my-3">
-          <div className="col-md-6 text-center">
-            <Alert
-              type="primary"
-              message="No se han ingresado Productos."
-              icon={<BsFillInfoCircleFill />}
-            />
-          </div>
-        </div>
-      )}
-
-      {/* Popup de Éxito */}
-      <SuccessPopup
-        isOpen={isPopupOpen}
-        onClose={() => setIsPopupOpen(false)}
-        title="¡Éxito!"
-        message="Se agregó el stock de productos"
-        nombreBotonVolver="Ver Stock"
-        nombreBotonNuevo="Ingreso nuevo"
-        onView={() => navigate(`/stock-productos/stock-general/${encodeURIComponent(idSucursal)}`)}
-        onNew={() => {
-          setIsPopupOpen(false);
-        }}
-      />
-
-      {/* Popup errores */}
-      <ErrorPopup
-        isOpen={isPopupErrorOpen}
-        onClose={() => setIsPopupErrorOpen(false)}
-        title="¡Error!"
-        message={errorPopupMessage}
-      />
-    </Container>
+    </div>
   );
-};
+}
 
 export default IngresarStockGeneralPage;
