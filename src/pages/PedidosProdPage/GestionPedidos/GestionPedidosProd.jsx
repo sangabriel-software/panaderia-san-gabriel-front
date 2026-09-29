@@ -238,6 +238,7 @@ function GestionPedidosProd() {
       {filteredOrders.length > 0 && (
         <>
           {/* Desktop */}
+          {/* Desktop */}
           <div className="hidden overflow-hidden rounded-2xl border border-line bg-surface shadow-card sm:block">
             <table className="w-full table-fixed border-collapse text-sm">
               <thead className="bg-surface-2/95">
@@ -262,17 +263,20 @@ function GestionPedidosProd() {
                   </th>
                 </tr>
               </thead>
-              <tbody>
-                {currentOrders.map((order, i) => {
-                  const noEliminable = isTodayOrPast(order.fechaAProducir);
-                  const esHoy = isToday(order.fechaAProducir);
-                  return (
+
+              {/* Un <tbody> por fila: permite insertar la fila de confirmación
+        justo debajo de la orden correspondiente, sin romper la tabla */}
+              {currentOrders.map((order, i) => {
+                const noEliminable = isTodayOrPast(order.fechaAProducir);
+                const esHoy = isToday(order.fechaAProducir);
+                const confirmando = confirmingId === order.idOrdenProduccion;
+
+                return (
+                  <tbody key={order.idOrdenProduccion}>
                     <tr
-                      key={order.idOrdenProduccion}
                       onClick={() => handleViewDetalle(order.idOrdenProduccion, navigate)}
-                      className={`cursor-pointer border-b border-line last:border-0 transition-colors hover:bg-brand-50/50 ${
-                        i % 2 === 1 ? "bg-surface-2/30" : ""
-                      }`}
+                      className={`cursor-pointer border-b border-line transition-colors hover:bg-brand-50/50 ${i % 2 === 1 ? "bg-surface-2/30" : ""
+                        } ${confirmando ? "border-b-0" : ""}`}
                     >
                       <td className="px-3 py-3 text-center text-muted">#{(currentPage - 1) * ITEMS_PER_PAGE + i + 1}</td>
                       <td className="px-3 py-3 text-center font-semibold text-ink">ORD-{order.idOrdenProduccion}</td>
@@ -312,10 +316,13 @@ function GestionPedidosProd() {
                           {!noEliminable && (
                             <button
                               type="button"
-                              onClick={() => setConfirmingId(confirmingId ? null : order.idOrdenProduccion)}
+                              onClick={() => setConfirmingId(confirmando ? null : order.idOrdenProduccion)}
                               aria-label="Eliminar orden"
                               title="Eliminar orden"
-                              className="flex h-8 w-8 items-center justify-center rounded-lg border-0 bg-transparent text-muted transition-colors hover:bg-danger-50 hover:text-danger-600"
+                              className={`flex h-8 w-8 items-center justify-center rounded-lg border-0 transition-colors ${confirmando
+                                  ? "bg-danger-50 text-danger-600"
+                                  : "bg-transparent text-muted hover:bg-danger-50 hover:text-danger-600"
+                                }`}
                             >
                               <FiTrash2 size={16} />
                             </button>
@@ -323,39 +330,49 @@ function GestionPedidosProd() {
                         </div>
                       </td>
                     </tr>
-                  );
-                })}
-              </tbody>
-            </table>
 
-            {confirmingId && currentOrders.some((o) => o.idOrdenProduccion === confirmingId) && (
-              <div className="animate-slide-up border-t border-danger-200 bg-danger-50 px-4 py-3">
-                <p className="text-sm font-semibold text-danger-800">¿Eliminar la orden ORD-{confirmingId}?</p>
-                <p className="mt-0.5 text-xs text-danger-700">Esta acción no se puede deshacer.</p>
-                <div className="mt-3 flex gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setConfirmingId(null)}
-                    disabled={isDeleting}
-                    className="rounded-lg border border-line bg-white px-3.5 py-1.5 text-xs font-semibold text-ink transition-colors hover:bg-surface-2 disabled:cursor-not-allowed"
-                  >
-                    Cancelar
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleConfirmDelete(confirmingId)}
-                    disabled={isDeleting}
-                    className="flex min-w-[5.5rem] items-center justify-center rounded-lg border-0 bg-danger-600 px-3.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-danger-500 disabled:cursor-not-allowed disabled:bg-danger-400"
-                  >
-                    {isDeleting ? (
-                      <span className="h-3.5 w-3.5 animate-spin-smooth rounded-full border-2 border-white/40 border-t-white" />
-                    ) : (
-                      "Eliminar"
+                    {/* Confirmación inline, justo debajo de ESTA fila — visible sin
+              importar la posición de la orden en la tabla */}
+                    {confirmando && (
+                      <tr className="border-b border-line">
+                        <td colSpan={6} className="animate-slide-up bg-danger-50 px-4 py-3">
+                          <div className="flex flex-wrap items-center justify-between gap-3">
+                            <div>
+                              <p className="text-sm font-semibold text-danger-800">
+                                ¿Eliminar la orden ORD-{order.idOrdenProduccion}?
+                              </p>
+                              <p className="mt-0.5 text-xs text-danger-700">Esta acción no se puede deshacer.</p>
+                            </div>
+                            <div className="flex shrink-0 gap-2">
+                              <button
+                                type="button"
+                                onClick={() => setConfirmingId(null)}
+                                disabled={isDeleting}
+                                className="rounded-lg border border-line bg-white px-3.5 py-1.5 text-xs font-semibold text-ink transition-colors hover:bg-surface-2 disabled:cursor-not-allowed"
+                              >
+                                Cancelar
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleConfirmDelete(order.idOrdenProduccion)}
+                                disabled={isDeleting}
+                                className="flex min-w-[5.5rem] items-center justify-center rounded-lg border-0 bg-danger-600 px-3.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-danger-500 disabled:cursor-not-allowed disabled:bg-danger-400"
+                              >
+                                {isDeleting ? (
+                                  <span className="h-3.5 w-3.5 animate-spin-smooth rounded-full border-2 border-white/40 border-t-white" />
+                                ) : (
+                                  "Eliminar"
+                                )}
+                              </button>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
                     )}
-                  </button>
-                </div>
-              </div>
-            )}
+                  </tbody>
+                );
+              })}
+            </table>
           </div>
 
           {/* Móvil */}
