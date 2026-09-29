@@ -318,12 +318,12 @@ function IngresarStockGeneralPage() {
 
       {/* ── Barra de guardar, flotante al fondo ─────────────────────── */}
       <div className="sticky bottom-4 z-10 flex justify-center">
-        <button
+      <button
           type="button"
           onClick={handleSubmit}
           disabled={guardarDeshabilitado}
           className={`flex w-full max-w-md items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-semibold transition-colors sm:w-auto sm:px-10 ${
-            guardarDeshabilitado
+            cantidadesIngresadas === 0 && !isLoading
               ? "cursor-not-allowed border border-line bg-surface-2 text-muted"
               : "border-0 bg-brand-600 text-white shadow-modal hover:bg-brand-500"
           }`}

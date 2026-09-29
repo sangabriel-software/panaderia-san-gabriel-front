@@ -1,604 +1,587 @@
 import { useState, useMemo, useEffect } from "react";
-import { Container, Table, Button, Form, Spinner, Dropdown, Alert } from "react-bootstrap";
-import { BsArrowLeft, BsExclamationTriangleFill, BsTruck, BsGeoAlt, BsGeo, BsArrowRight } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
-import DotsMove from "../../../components/Spinners/DotsMove";
-import SuccessPopup from "../../../components/Popup/SuccessPopup";
-import ErrorPopup from "../../../components/Popup/ErrorPopUp";
-import { getInitials, getUniqueColor } from "../../../utils/utils";
-import Title from "../../../components/Title/Title";
-import useGetSucursales from "../../../hooks/sucursales/useGetSucursales";
-import { getUserData } from "../../../utils/Auth/decodedata";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import "./IngresarTraslado.styles.css";
-import { consultarStockProductosDelDiaService, consultarStockProductosService } from "../../../services/stockservices/stock.service";
+import {
+  FiArrowLeft,
+  FiSearch,
+  FiX,
+  FiFilter,
+  FiChevronDown,
+  FiTruck,
+  FiMapPin,
+  FiArrowRight,
+  FiInbox,
+} from "react-icons/fi";
+import { getInitials, getUniqueColor } from "../../../utils/utils";
+import Alert from "../../../components/Alerts/Alert";
+import useGetSucursales from "../../../hooks/sucursales/useGetSucursales";
+import { getUserData } from "../../../utils/Auth/decodedata";
+import {
+  consultarStockProductosDelDiaService,
+  consultarStockProductosService,
+} from "../../../services/stockservices/stock.service";
 import { ingresarTrasladoService } from "../../../services/Traslados/traslados.service";
 
-const IngresarTraslado = () => {
-    const navigate = useNavigate();
-    const { sucursales, loadingSucursales } = useGetSucursales();
-    const [sucursalOrigen, setSucursalOrigen] = useState(null);
-    const [sucursalDestino, setSucursalDestino] = useState(null);
-    const [stockValues, setStockValues] = useState({});
-    const [isLoading, setIsLoading] = useState(false);
-    const [categoriaActiva, setCategoriaActiva] = useState("Todas");
-    const [searchTerm, setSearchTerm] = useState("");
-    const [localStock, setLocalStock] = useState({ general: [], dia: [] });
-    const [loadingStock, setLoadingStock] = useState(false);
-    const userData = getUserData();
+const selectClass =
+  "w-full appearance-none rounded-xl border border-line bg-surface py-2.5 pl-3.5 pr-9 text-sm font-medium text-ink transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/25 disabled:cursor-not-allowed disabled:bg-surface-2 disabled:text-muted";
 
-    /* Popups */
-    const [isPopupOpen, setIsPopupOpen] = useState(false);
-    const [isPopupErrorOpen, setIsPopupErrorOpen] = useState(false);
-    const [errorPopupMessage, setErrorPopupMessage] = useState("");
+function IngresarTraslado() {
+  const navigate = useNavigate();
+  const { sucursales, loadingSucursales } = useGetSucursales();
+  const [sucursalOrigen, setSucursalOrigen] = useState(null);
+  const [sucursalDestino, setSucursalDestino] = useState(null);
+  const [stockValues, setStockValues] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [categoriaActiva, setCategoriaActiva] = useState("Todas");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [localStock, setLocalStock] = useState({ general: [], dia: [] });
+  const [loadingStock, setLoadingStock] = useState(false);
+  const userData = getUserData();
 
-    // Establecer sucursal origen automáticamente si no es admin
-    useEffect(() => {
-        if (!loadingSucursales && sucursales.length > 0 && userData?.idRol !== 1) {
-            const sucursalUsuario = sucursales.find(s => s.idSucursal === userData.idSucursal);
-            if (sucursalUsuario) {
-                setSucursalOrigen(sucursalUsuario);
-            }
-        }
-    }, [loadingSucursales, sucursales, userData]);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [isPopupErrorOpen, setIsPopupErrorOpen] = useState(false);
+  const [errorPopupMessage, setErrorPopupMessage] = useState("");
 
-    // Fetch stock data when sucursalOrigen changes
-    useEffect(() => {
-        const fetchStockData = async () => {
-            if (!sucursalOrigen) return;
+  useEffect(() => {
+    if (!loadingSucursales && sucursales.length > 0 && userData?.idRol !== 1) {
+      const sucursalUsuario = sucursales.find((s) => s.idSucursal === userData.idSucursal);
+      if (sucursalUsuario) setSucursalOrigen(sucursalUsuario);
+    }
+  }, [loadingSucursales, sucursales, userData]);
 
-            setLoadingStock(true);
-            try {
-                const fechaDelDia = format(new Date(), "yyyy-MM-dd");
-
-                const [stockGeneral, stockDia] = await Promise.all([
-                    consultarStockProductosService(sucursalOrigen.idSucursal),
-                    consultarStockProductosDelDiaService(sucursalOrigen.idSucursal, fechaDelDia)
-                ]);
-
-                setLocalStock({
-                    general: stockGeneral?.stockProductos || [],
-                    dia: stockDia.stockDiario || []
-                });
-            } catch (error) {
-                console.error("Error fetching stock data:", error);
-                setErrorPopupMessage("Error al cargar el stock de la sucursal");
-                setIsPopupErrorOpen(true);
-            } finally {
-                setLoadingStock(false);
-            }
-        };
-
-        fetchStockData();
-    }, [sucursalOrigen]);
-
-    const calcularStockMostrado = (producto) => {
-        if (producto.nombreProducto === "Frances") {
-            return producto.cantidadExistente / 6;
-        }
-        return producto.cantidadExistente;
-    };
-
-    const convertirValorAUnidades = (valor) => {
-        return Math.floor(valor);
-    };
-
-    const combinedStock = useMemo(() => {
-        const productosDia = Array.isArray(localStock.dia)
-            ? localStock.dia
-                .filter(item => item?.idStockDiario && item.cantidadExistente > 0)
-                .map(item => ({
-                    ...item,
-                    esStockDiario: true,
-                    cantidadMostrada: calcularStockMostrado(item)
-                }))
-            : [];
-
-        const productosGenerales = Array.isArray(localStock.general)
-            ? localStock.general
-                .filter(genItem => genItem.cantidadExistente > 0)
-                .map(item => ({
-                    ...item,
-                    esStockDiario: false,
-                    cantidadMostrada: calcularStockMostrado(item)
-                }))
-            : [];
-
-        const combined = [...productosDia];
-        const diaProductIds = new Set(productosDia.map(p => p.idProducto));
-
-        for (const genProduct of productosGenerales) {
-            if (!diaProductIds.has(genProduct.idProducto)) {
-                combined.push(genProduct);
-            }
-        }
-
-        return combined;
-    }, [localStock]);
-
-    const categorias = useMemo(() => {
-        try {
-            if (combinedStock.length === 0) return ['Todas'];
-
-            const categoriasUnicas = [...new Set(
-                combinedStock
-                    .map(item => item?.nombreCategoria)
-                    .filter(cat => cat && typeof cat === 'string')
-            )];
-            return ['Todas', ...categoriasUnicas];
-        } catch (error) {
-            console.error('Error al obtener categorías:', error);
-            return ['Todas'];
-        }
-    }, [combinedStock]);
-
-    const productosFiltrados = useMemo(() => {
-        return combinedStock.filter((producto) => {
-            const matchesSearch = producto?.nombreProducto?.toLowerCase()?.includes(searchTerm.toLowerCase()) ?? false;
-            const matchesCategory = categoriaActiva === "Todas" || producto?.nombreCategoria === categoriaActiva;
-            return matchesSearch && matchesCategory;
+  useEffect(() => {
+    const fetchStockData = async () => {
+      if (!sucursalOrigen) return;
+      setLoadingStock(true);
+      try {
+        const fechaDelDia = format(new Date(), "yyyy-MM-dd");
+        const [stockGeneral, stockDia] = await Promise.all([
+          consultarStockProductosService(sucursalOrigen.idSucursal),
+          consultarStockProductosDelDiaService(sucursalOrigen.idSucursal, fechaDelDia),
+        ]);
+        setLocalStock({
+          general: stockGeneral?.stockProductos || [],
+          dia: stockDia.stockDiario || [],
         });
-    }, [combinedStock, searchTerm, categoriaActiva]);
-
-    const clearSearch = () => {
-        setSearchTerm("");
+      } catch (error) {
+        console.error("Error fetching stock data:", error);
+        setErrorPopupMessage("Error al cargar el stock de la sucursal");
+        setIsPopupErrorOpen(true);
+      } finally {
+        setLoadingStock(false);
+      }
     };
+    fetchStockData();
+  }, [sucursalOrigen]);
 
-    const handleStockChange = (idProducto, value) => {
-        const producto = combinedStock.find(p => p.idProducto === Number(idProducto));
-        const esFrances = producto?.nombreProducto === "Frances";
+  const calcularStockMostrado = (producto) =>
+    producto.nombreProducto === "Frances" ? producto.cantidadExistente / 6 : producto.cantidadExistente;
 
-        if (esFrances && value.includes('.') && value.split('.')[1]?.length > 1) {
-            value = parseFloat(value).toFixed(1);
-        }
+  const convertirValorAUnidades = (valor) => Math.floor(valor);
 
-        const nuevoValor = value === "" ? "" : parseFloat(value);
+  const combinedStock = useMemo(() => {
+    const productosDia = Array.isArray(localStock.dia)
+      ? localStock.dia
+          .filter((item) => item?.idStockDiario && item.cantidadExistente > 0)
+          .map((item) => ({ ...item, esStockDiario: true, cantidadMostrada: calcularStockMostrado(item) }))
+      : [];
 
-        if (!producto) return;
+    const productosGenerales = Array.isArray(localStock.general)
+      ? localStock.general
+          .filter((genItem) => genItem.cantidadExistente > 0)
+          .map((item) => ({ ...item, esStockDiario: false, cantidadMostrada: calcularStockMostrado(item) }))
+      : [];
 
-        const maxPermitido = producto.cantidadMostrada;
+    const combined = [...productosDia];
+    const diaProductIds = new Set(productosDia.map((p) => p.idProducto));
+    for (const genProduct of productosGenerales) {
+      if (!diaProductIds.has(genProduct.idProducto)) combined.push(genProduct);
+    }
+    return combined;
+  }, [localStock]);
 
-        if (nuevoValor > maxPermitido) {
-            setErrorPopupMessage(`No puedes trasladar más de ${maxPermitido} ${esFrances ? "filas" : "unidades"} de ${producto.nombreProducto}`);
-            setIsPopupErrorOpen(true);
-            return;
-        }
+  const categorias = useMemo(() => {
+    try {
+      if (combinedStock.length === 0) return ["Todas"];
+      const categoriasUnicas = [
+        ...new Set(combinedStock.map((item) => item?.nombreCategoria).filter((cat) => cat && typeof cat === "string")),
+      ];
+      return ["Todas", ...categoriasUnicas];
+    } catch (error) {
+      console.error("Error al obtener categorías:", error);
+      return ["Todas"];
+    }
+  }, [combinedStock]);
 
-        setStockValues(prev => ({
-            ...prev,
-            [idProducto]: value
-        }));
-    };
+  const productosFiltrados = useMemo(() => {
+    return combinedStock.filter((producto) => {
+      const matchesSearch = producto?.nombreProducto?.toLowerCase()?.includes(searchTerm.toLowerCase()) ?? false;
+      const matchesCategory = categoriaActiva === "Todas" || producto?.nombreCategoria === categoriaActiva;
+      return matchesSearch && matchesCategory;
+    });
+  }, [combinedStock, searchTerm, categoriaActiva]);
 
-    const actualizarStockLocal = (productosTrasladados) => {
-        setLocalStock(prev => {
-            const newStock = { ...prev };
+  const clearSearch = () => setSearchTerm("");
 
-            productosTrasladados.forEach(({ idProducto, stockATrasladar, esStockDiario }) => {
-                if (esStockDiario) {
-                    newStock.dia = newStock.dia.map(item =>
-                        item.idProducto === idProducto
-                            ? { ...item, cantidadExistente: item.cantidadExistente - stockATrasladar }
-                            : item
-                    );
-                } else {
-                    newStock.general = newStock.general.map(item =>
-                        item.idProducto === idProducto
-                            ? { ...item, cantidadExistente: item.cantidadExistente - stockATrasladar }
-                            : item
-                    );
-                }
-            });
+  const handleStockChange = (idProducto, value) => {
+    const producto = combinedStock.find((p) => p.idProducto === Number(idProducto));
+    const esFrances = producto?.nombreProducto === "Frances";
 
-            return newStock;
-        });
-    };
-
-    const handleSubmit = async () => {
-        try {
-            setIsLoading(true);
-
-            if (!sucursalOrigen || !sucursalDestino) {
-                setErrorPopupMessage("Debe seleccionar sucursal de origen y destino");
-                setIsPopupErrorOpen(true);
-                setIsLoading(false);
-                return;
-            }
-
-            if (sucursalOrigen.idSucursal === sucursalDestino.idSucursal) {
-                setErrorPopupMessage("No puedes trasladar a la misma sucursal");
-                setIsPopupErrorOpen(true);
-                setIsLoading(false);
-                return;
-            }
-
-            const productosConStock = Object.entries(stockValues)
-                .filter(([_, value]) => value > 0)
-                .map(([idProducto, value]) => ({
-                    idProducto: Number(idProducto),
-                    value: value
-                }));
-
-            if (productosConStock.length === 0) {
-                setErrorPopupMessage("Debe ingresar al menos un producto con cantidad a trasladar");
-                setIsPopupErrorOpen(true);
-                setIsLoading(false);
-                return;
-            }
-
-            const productosCompletos = productosConStock.map(item => {
-                const producto = combinedStock.find(p => p.idProducto === item.idProducto);
-                const cantidadATrasladar = convertirValorAUnidades(item.value);
-
-                return {
-                    ...producto,
-                    cantidadATrasladar: cantidadATrasladar
-                };
-            });
-
-            const now = new Date();
-            const fechaTraslado = format(now, "yyyy-MM-dd HH:mm:ss");
-
-            const payload = {
-                traladoHeader: {
-                    idSucursalOrigen: sucursalOrigen.idSucursal,
-                    idSucursalDestino: sucursalDestino.idSucursal,
-                    idUsuario: userData.idUsuario,
-                    fechaTraslado: fechaTraslado
-                },
-                trasladoDetalle: productosCompletos.map(producto => ({
-                    idProducto: producto.idProducto,
-                    tipoProduccion: producto.tipoProduccion || "bandejas",
-                    controlarStock: producto.controlarStock ? 1 : 0,
-                    controlarStockDiario: producto.esStockDiario ? 1 : 0,
-                    cantidadATrasladar: producto.cantidadATrasladar,
-                    fechaTraslado: fechaTraslado
-                }))
-            };
-
-            const response = await ingresarTrasladoService(payload);
-
-            if (response) {
-                actualizarStockLocal(productosCompletos.map(p => ({
-                    idProducto: p.idProducto,
-                    stockATrasladar: p.cantidadATrasladar,
-                    esStockDiario: p.esStockDiario
-                })));
-
-                setIsPopupOpen(true);
-                setStockValues({});
-            } else {
-                throw new Error("No se recibió respuesta del servidor");
-            }
-
-        } catch (error) {
-            console.error("Error al trasladar stock:", error);
-            setErrorPopupMessage(
-                error.response?.data?.message ||
-                error.message ||
-                "Ocurrió un error al trasladar el stock"
-            );
-            setIsPopupErrorOpen(true);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    if (loadingSucursales || loadingStock) {
-        return (
-            <Container
-                className="d-flex justify-content-center align-items-center"
-                style={{ minHeight: "70vh" }}
-            >
-                <DotsMove />
-            </Container>
-        );
+    if (esFrances && value.includes(".") && value.split(".")[1]?.length > 1) {
+      value = parseFloat(value).toFixed(1);
     }
 
+    const nuevoValor = value === "" ? "" : parseFloat(value);
+    if (!producto) return;
+
+    const maxPermitido = producto.cantidadMostrada;
+    if (nuevoValor > maxPermitido) {
+      setErrorPopupMessage(
+        `No puedes trasladar más de ${maxPermitido} ${esFrances ? "filas" : "unidades"} de ${producto.nombreProducto}`
+      );
+      setIsPopupErrorOpen(true);
+      return;
+    }
+
+    setStockValues((prev) => ({ ...prev, [idProducto]: value }));
+  };
+
+  const actualizarStockLocal = (productosTrasladados) => {
+    setLocalStock((prev) => {
+      const newStock = { ...prev };
+      productosTrasladados.forEach(({ idProducto, stockATrasladar, esStockDiario }) => {
+        if (esStockDiario) {
+          newStock.dia = newStock.dia.map((item) =>
+            item.idProducto === idProducto
+              ? { ...item, cantidadExistente: item.cantidadExistente - stockATrasladar }
+              : item
+          );
+        } else {
+          newStock.general = newStock.general.map((item) =>
+            item.idProducto === idProducto
+              ? { ...item, cantidadExistente: item.cantidadExistente - stockATrasladar }
+              : item
+          );
+        }
+      });
+      return newStock;
+    });
+  };
+
+  const productosConCantidad = Object.values(stockValues).filter((val) => val > 0).length;
+  const isFormValid = productosConCantidad > 0 && sucursalOrigen && sucursalDestino;
+
+  const handleSubmit = async () => {
+    try {
+      setIsLoading(true);
+
+      if (!sucursalOrigen || !sucursalDestino) {
+        setErrorPopupMessage("Debe seleccionar sucursal de origen y destino");
+        setIsPopupErrorOpen(true);
+        setIsLoading(false);
+        return;
+      }
+
+      if (sucursalOrigen.idSucursal === sucursalDestino.idSucursal) {
+        setErrorPopupMessage("No puedes trasladar a la misma sucursal");
+        setIsPopupErrorOpen(true);
+        setIsLoading(false);
+        return;
+      }
+
+      const productosConStock = Object.entries(stockValues)
+        .filter(([_, value]) => value > 0)
+        .map(([idProducto, value]) => ({ idProducto: Number(idProducto), value }));
+
+      if (productosConStock.length === 0) {
+        setErrorPopupMessage("Debe ingresar al menos un producto con cantidad a trasladar");
+        setIsPopupErrorOpen(true);
+        setIsLoading(false);
+        return;
+      }
+
+      const productosCompletos = productosConStock.map((item) => {
+        const producto = combinedStock.find((p) => p.idProducto === item.idProducto);
+        return { ...producto, cantidadATrasladar: convertirValorAUnidades(item.value) };
+      });
+
+      const now = new Date();
+      const fechaTraslado = format(now, "yyyy-MM-dd HH:mm:ss");
+
+      const payload = {
+        traladoHeader: {
+          idSucursalOrigen: sucursalOrigen.idSucursal,
+          idSucursalDestino: sucursalDestino.idSucursal,
+          idUsuario: userData.idUsuario,
+          fechaTraslado: fechaTraslado,
+        },
+        trasladoDetalle: productosCompletos.map((producto) => ({
+          idProducto: producto.idProducto,
+          tipoProduccion: producto.tipoProduccion || "bandejas",
+          controlarStock: producto.controlarStock ? 1 : 0,
+          controlarStockDiario: producto.esStockDiario ? 1 : 0,
+          cantidadATrasladar: producto.cantidadATrasladar,
+          fechaTraslado: fechaTraslado,
+        })),
+      };
+
+      const response = await ingresarTrasladoService(payload);
+
+      if (response) {
+        actualizarStockLocal(
+          productosCompletos.map((p) => ({
+            idProducto: p.idProducto,
+            stockATrasladar: p.cantidadATrasladar,
+            esStockDiario: p.esStockDiario,
+          }))
+        );
+        setIsPopupOpen(true);
+        setStockValues({});
+      } else {
+        throw new Error("No se recibió respuesta del servidor");
+      }
+    } catch (error) {
+      console.error("Error al trasladar stock:", error);
+      setErrorPopupMessage(error.response?.data?.message || error.message || "Ocurrió un error al trasladar el stock");
+      setIsPopupErrorOpen(true);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (loadingSucursales) {
     return (
-        <Container className="py-4">
-            {/* Alerta de error */}
-            {productosFiltrados?.length === 0 && sucursalOrigen && (
-                <Alert variant="primary" className="text-center my-3">
-                    <BsExclamationTriangleFill className="me-2" />
-                    No hay productos disponibles para trasladar
-                </Alert>
-            )}
-            <div className="text-center">
-                <div className="row">
-                    <div className="col-2">
-                        <button
-                            className="btn bt-return rounded-circle d-flex align-items-center justify-content-center shadow"
-                            style={{ width: "40px", height: "40px" }}
-                            onClick={() => navigate("/traslados-productos")}
-                        >
-                            <BsArrowLeft size={20} />
-                        </button>
-                    </div>
-                    <div className="col-8">
-                        <Title
-                            title={`Nuevo Traslado`}
-                        />
-                    </div>
-                </div>
-            </div>
-
-            {/* Nuevo encabezado moderno */}
-            <div className="traslado-header mb-4 p-4 rounded-4 shadow-sm">
-                <p className="text-muted">
-                    {format(new Date(), "EEEE d 'de' MMMM, yyyy", { locale: es })}
-                </p>
-                <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
-                    {/* Título con icono */}
-                    <div className="d-flex align-items-center gap-3">
-                        <div className="header-icon">
-                            <BsTruck />
-                        </div>
-                    </div>
-
-                    {/* Selectores en fila para desktop */}
-                    <div className="d-flex flex-column flex-md-row gap-3 w-100 w-md-auto">
-                        {/* Sucursal Origen */}
-                        <div className="flex-grow-1">
-                            <div className="form-floating">
-                                <Form.Select
-                                    id="sucursalOrigen"
-                                    value={sucursalOrigen?.idSucursal || ""}
-                                    onChange={(e) => {
-                                        const selectedId = e.target.value;
-                                        const selectedSucursal = sucursales.find(s => s.idSucursal === Number(selectedId));
-                                        setSucursalOrigen(selectedSucursal);
-                                        setSucursalDestino(null);
-                                        setStockValues({});
-                                    }}
-                                    className="border-0 shadow-sm"
-                                    disabled={userData.idRol !== 1} // Solo editable para admin
-                                >
-                                    <option value="">Seleccione origen</option>
-                                    {userData.idRol === 1 ? (
-                                        sucursales.map(sucursal => (
-                                            <option key={sucursal.idSucursal} value={sucursal.idSucursal}>
-                                                {sucursal.nombreSucursal}
-                                            </option>
-                                        ))
-                                    ) : (
-                                        <option value={userData.idSucursal}>
-                                            {sucursales.find(s => s.idSucursal === userData.idSucursal)?.nombreSucursal || "Tu sucursal"}
-                                        </option>
-                                    )}
-                                </Form.Select>
-                                <label htmlFor="sucursalOrigen" className="d-flex align-items-center gap-2">
-                                    <BsGeoAlt className="text-primary" />
-                                    <span>Sucursal Origen</span>
-                                </label>
-                            </div>
-                        </div>
-
-                        {/* Flecha de traslado */}
-                        <div className="d-none d-md-flex align-items-center justify-content-center px-2">
-                            <div className="arrow-circle">
-                                <BsArrowRight />
-                            </div>
-                        </div>
-
-                        {/* Sucursal Destino */}
-                        <div className="flex-grow-1">
-                            <div className="form-floating">
-                                <Form.Select
-                                    id="sucursalDestino"
-                                    value={sucursalDestino?.idSucursal || ""}
-                                    onChange={(e) => {
-                                        const selectedId = e.target.value;
-                                        const selectedSucursal = sucursales.find(s => s.idSucursal === Number(selectedId));
-                                        setSucursalDestino(selectedSucursal);
-                                    }}
-                                    disabled={!sucursalOrigen}
-                                    className="border-0 shadow-sm"
-                                >
-                                    <option value="">Seleccione destino</option>
-                                    {sucursales
-                                        .filter(s => s.idSucursal !== sucursalOrigen?.idSucursal)
-                                        .map(sucursal => (
-                                            <option key={sucursal.idSucursal} value={sucursal.idSucursal}>
-                                                {sucursal.nombreSucursal}
-                                            </option>
-                                        ))}
-                                </Form.Select>
-                                <label htmlFor="sucursalDestino" className="d-flex align-items-center gap-2">
-                                    <BsGeo className="text-info" />
-                                    <span>Sucursal Destino</span>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Indicador de estado */}
-                {sucursalOrigen && (
-                    <div className="mt-3 d-flex align-items-center gap-2">
-                        <div className="status-indicator"></div>
-                        <small className="text-muted">
-                            Listo para seleccionar productos de <strong>{sucursalOrigen.nombreSucursal}</strong>
-                        </small>
-                    </div>
-                )}
-            </div>
-
-            {/* Filtros */}
-            {sucursalOrigen && (
-                <>
-                    <div className="d-flex flex-column flex-md-row justify-content-between gap-3 mb-4 my-3">
-                        <div className="flex-grow-1">
-                            <h6 className="mb-3">Buscar producto:</h6>
-                            <div className="position-relative">
-                                <Form.Control
-                                    type="text"
-                                    placeholder="Buscar por nombre..."
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="search-input"
-                                />
-                                {searchTerm && (
-                                    <button
-                                        onClick={clearSearch}
-                                        className="btn btn-clear-search position-absolute end-0 top-50 translate-middle-y"
-                                    >
-                                        &times;
-                                    </button>
-                                )}
-                            </div>
-                        </div>
-
-                        <div>
-                            <h6 className="mb-3">Filtrar por categoría:</h6>
-                            <Dropdown>
-                                <Dropdown.Toggle variant="primary" id="dropdown-categorias">
-                                    {categoriaActiva === "Todas"
-                                        ? "Todas las categorías"
-                                        : categoriaActiva}
-                                </Dropdown.Toggle>
-                                <Dropdown.Menu className="category-dropdown-menu">
-                                    <Dropdown.Item
-                                        active={categoriaActiva === "Todas"}
-                                        onClick={() => setCategoriaActiva("Todas")}
-                                    >
-                                        Todas
-                                    </Dropdown.Item>
-                                    {categorias.map((categoria) => (
-                                        <Dropdown.Item
-                                            className="category-dropdown-item"
-                                            key={categoria}
-                                            active={categoriaActiva === categoria}
-                                            onClick={() => setCategoriaActiva(categoria)}
-                                        >
-                                            {categoria}
-                                        </Dropdown.Item>
-                                    ))}
-                                </Dropdown.Menu>
-                            </Dropdown>
-                        </div>
-                    </div>
-
-                    {/* Tabla de productos */}
-                    <div className="table-responsive excel-table-container mb-4">
-                        <Table striped bordered hover className="excel-table">
-                            <thead>
-                                <tr>
-                                    <th className="dark-header text-center" style={{ width: "50%" }}>
-                                        Producto
-                                    </th>
-                                    <th className="dark-header text-center" style={{ width: "20%" }}>
-                                        Stock Actual
-                                    </th>
-                                    <th className="dark-header text-center" style={{ width: "30%" }}>
-                                        Cantidad a Trasladar
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {productosFiltrados?.length > 0 ? (
-                                    productosFiltrados.map((producto) => {
-                                        const esFrances = producto.nombreProducto === "Frances";
-                                        return (
-                                            <tr key={`${producto.idProducto}-${producto.esStockDiario ? 'dia' : 'gen'}`}>
-                                                <td>
-                                                    <div className="product-info">
-                                                        <div
-                                                            className="product-badge-stock"
-                                                            style={{
-                                                                backgroundColor: getUniqueColor(
-                                                                    producto.nombreProducto
-                                                                ),
-                                                            }}
-                                                        >
-                                                            {getInitials(producto.nombreProducto)}
-                                                        </div>
-                                                        <span className="product-name">
-                                                            {producto.nombreProducto}
-                                                        </span>
-                                                    </div>
-                                                </td>
-                                                <td className="text-center align-middle" style={{ fontWeight: "bold" }}>
-                                                    { producto.cantidadExistente}
-                                                </td>
-                                                <td className="text-center align-middle">
-                                                    <Form.Control
-                                                        type="number"
-                                                        min="0"
-                                                        max={producto.cantidadMostrada}
-                                                        step={esFrances ? "0.1" : "any"}
-                                                        value={stockValues[producto.idProducto] || ""}
-                                                        onChange={(e) =>
-                                                            handleStockChange(producto.idProducto, e.target.value)
-                                                        }
-                                                        className="quantity-input"
-                                                        placeholder="0"
-                                                    />
-                                                </td>
-                                            </tr>
-                                        );
-                                    })
-                                ) : (
-                                    <tr>
-                                        <td colSpan="3" className="text-center py-4">
-                                            {sucursalOrigen ? "No hay productos disponibles en esta categoría" : "Seleccione una sucursal de origen"}
-                                        </td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </Table>
-                    </div>
-
-                    {/* Botón de guardar */}
-                    {sucursalDestino && (
-                        <div className="text-center">
-                            <Button
-                                className="btn-descontar-stock"
-                                variant="primary"
-                                size="lg"
-                                onClick={handleSubmit}
-                                disabled={
-                                    isLoading ||
-                                    Object.values(stockValues).every(
-                                        (val) => val === null || isNaN(val) || val <= 0
-                                    )
-                                }
-                            >
-                                {isLoading ? (
-                                    <Spinner animation="border" size="sm" />
-                                ) : (
-                                    "Trasladar Stock"
-                                )}
-                            </Button>
-                        </div>
-                    )}
-                </>
-            )}
-
-            {/* Popups */}
-            <SuccessPopup
-                isOpen={isPopupOpen}
-                onClose={() => setIsPopupOpen(false)}
-                title="¡Éxito!"
-                message="Se trasladó el stock correctamente"
-                nombreBotonVolver="Ver Traslados"
-                nombreBotonNuevo="Nuevo Traslado"
-                onView={() => navigate("/traslados-productos")}
-                onNew={() => {
-                    setIsPopupOpen(false);
-                    setStockValues({});
-                }}
-            />
-
-            <ErrorPopup
-                isOpen={isPopupErrorOpen}
-                onClose={() => setIsPopupErrorOpen(false)}
-                title="¡Error!"
-                message={errorPopupMessage}
-            />
-        </Container>
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <span className="h-10 w-10 animate-spin-smooth rounded-full border-4 border-brand-200 border-t-brand-600" />
+      </div>
     );
-};
+  }
+
+  return (
+    <div className="flex flex-col gap-6 pb-24">
+      {/* ── Alertas flotantes ────────────────────────────────────────── */}
+      {isPopupErrorOpen && (
+        <Alert
+          floating
+          position="top-right"
+          type="danger"
+          title="No se pudo completar"
+          message={errorPopupMessage}
+          onDismiss={() => setIsPopupErrorOpen(false)}
+        />
+      )}
+
+      {isPopupOpen && (
+        <Alert
+          floating
+          position="top-right"
+          type="success"
+          title="¡Traslado registrado!"
+          message="Se trasladó el stock correctamente."
+          onDismiss={() => setIsPopupOpen(false)}
+          actions={[
+            { label: "Ver traslados", variant: "primary", onClick: () => navigate("/traslados-productos") },
+            { label: "Nuevo traslado", variant: "secondary", onClick: () => setIsPopupOpen(false) },
+          ]}
+        />
+      )}
+
+      {/* ── Header ───────────────────────────────────────────────────── */}
+      <header className="flex items-center gap-3">
+        <button
+          type="button"
+          onClick={() => navigate("/traslados-productos")}
+          aria-label="Volver"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-line bg-surface text-muted shadow-card transition-colors hover:bg-brand-50 hover:text-brand-700"
+        >
+          <FiArrowLeft size={17} />
+        </button>
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-accent-600 text-white shadow-accent">
+          <FiTruck size={19} />
+        </span>
+        <div className="min-w-0">
+          <h1 className="truncate text-xl font-bold text-ink sm:text-2xl">Nuevo Traslado</h1>
+          <p className="text-sm capitalize text-muted">
+            {format(new Date(), "EEEE d 'de' MMMM, yyyy", { locale: es })}
+          </p>
+        </div>
+      </header>
+
+      {/* ── Origen → Destino ─────────────────────────────────────────── */}
+      <div className="rounded-2xl border border-line bg-surface p-4 shadow-card">
+        <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-end">
+          <div className="flex-1">
+            <label htmlFor="sucursalOrigen" className="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-muted">
+              <FiMapPin size={13} className="text-brand-600" /> Sucursal origen
+            </label>
+            <div className="relative">
+              <select
+                id="sucursalOrigen"
+                value={sucursalOrigen?.idSucursal || ""}
+                onChange={(e) => {
+                  const selectedSucursal = sucursales.find((s) => s.idSucursal === Number(e.target.value));
+                  setSucursalOrigen(selectedSucursal);
+                  setSucursalDestino(null);
+                  setStockValues({});
+                }}
+                disabled={userData.idRol !== 1}
+                className={selectClass}
+              >
+                <option value="">Seleccione origen</option>
+                {userData.idRol === 1 ? (
+                  sucursales.map((s) => (
+                    <option key={s.idSucursal} value={s.idSucursal}>
+                      {s.nombreSucursal}
+                    </option>
+                  ))
+                ) : (
+                  <option value={userData.idSucursal}>
+                    {sucursales.find((s) => s.idSucursal === userData.idSucursal)?.nombreSucursal || "Tu sucursal"}
+                  </option>
+                )}
+              </select>
+              <FiChevronDown size={14} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-muted" />
+            </div>
+          </div>
+
+          <span className="hidden shrink-0 items-center justify-center pb-2.5 text-muted sm:flex">
+            <FiArrowRight size={18} />
+          </span>
+
+          <div className="flex-1">
+            <label htmlFor="sucursalDestino" className="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-muted">
+              <FiMapPin size={13} className="text-accent-600" /> Sucursal destino
+            </label>
+            <div className="relative">
+              <select
+                id="sucursalDestino"
+                value={sucursalDestino?.idSucursal || ""}
+                onChange={(e) => {
+                  const selectedSucursal = sucursales.find((s) => s.idSucursal === Number(e.target.value));
+                  setSucursalDestino(selectedSucursal);
+                }}
+                disabled={!sucursalOrigen}
+                className={selectClass}
+              >
+                <option value="">Seleccione destino</option>
+                {sucursales
+                  .filter((s) => s.idSucursal !== sucursalOrigen?.idSucursal)
+                  .map((s) => (
+                    <option key={s.idSucursal} value={s.idSucursal}>
+                      {s.nombreSucursal}
+                    </option>
+                  ))}
+              </select>
+              <FiChevronDown size={14} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-muted" />
+            </div>
+          </div>
+        </div>
+
+        {sucursalOrigen && (
+          <div className="mt-3 flex items-center gap-2 border-t border-line pt-3">
+            <span className="h-2 w-2 shrink-0 rounded-full bg-brand-500" />
+            <p className="text-xs text-muted">
+              Listo para seleccionar productos de <span className="font-medium text-ink">{sucursalOrigen.nombreSucursal}</span>
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* ── Sin sucursal de origen: nada más que mostrar todavía ────────── */}
+      {!sucursalOrigen ? (
+        <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-line bg-surface py-16 text-center">
+          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-surface-2 text-muted">
+            <FiMapPin size={20} />
+          </span>
+          <p className="text-sm text-muted">Selecciona una sucursal de origen para ver su inventario.</p>
+        </div>
+      ) : loadingStock ? (
+        <div className="flex items-center justify-center py-16">
+          <span className="h-10 w-10 animate-spin-smooth rounded-full border-4 border-brand-200 border-t-brand-600" />
+        </div>
+      ) : (
+        <>
+          {combinedStock.length === 0 && (
+            <Alert
+              type="info"
+              title="Sin productos con stock"
+              message="Esta sucursal no tiene productos disponibles para trasladar."
+            />
+          )}
+
+          {/* ── Filtros ────────────────────────────────────────────────── */}
+          <div className="rounded-2xl border border-line bg-surface p-4 shadow-card">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+              <div className="relative min-w-0 flex-1">
+                <FiSearch size={15} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" />
+                <input
+                  type="text"
+                  placeholder="Buscar por nombre..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full rounded-xl border border-line bg-surface py-2.5 pl-10 pr-9 text-sm text-ink placeholder:text-muted transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/25"
+                />
+                {searchTerm && (
+                  <button
+                    type="button"
+                    onClick={clearSearch}
+                    aria-label="Limpiar búsqueda"
+                    className="absolute right-2.5 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-md border-0 bg-transparent text-muted transition-colors hover:text-ink"
+                  >
+                    <FiX size={16} />
+                  </button>
+                )}
+              </div>
+
+              {categorias.length > 1 && (
+                <div className="relative shrink-0 sm:hidden">
+                  <FiFilter size={14} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" />
+                  <select
+                    value={categoriaActiva}
+                    onChange={(e) => setCategoriaActiva(e.target.value)}
+                    className="w-full appearance-none rounded-xl border border-line bg-surface py-2.5 pl-10 pr-9 text-sm font-medium text-ink transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/25"
+                  >
+                    {categorias.map((categoria) => (
+                      <option key={categoria} value={categoria}>
+                        {categoria}
+                      </option>
+                    ))}
+                  </select>
+                  <FiChevronDown size={14} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-muted" />
+                </div>
+              )}
+            </div>
+
+            {categorias.length > 1 && (
+              <div className="mt-3 hidden flex-wrap gap-2 sm:flex">
+                {categorias.map((categoria) => (
+                  <button
+                    key={categoria}
+                    type="button"
+                    onClick={() => setCategoriaActiva(categoria)}
+                    className={`shrink-0 rounded-full border-0 px-3.5 py-1.5 text-xs font-medium transition-colors duration-150 ${
+                      categoriaActiva === categoria
+                        ? "bg-brand-600 text-white shadow-brand"
+                        : "bg-surface-2 text-muted hover:bg-brand-50 hover:text-brand-700"
+                    }`}
+                  >
+                    {categoria}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* ── Tabla de productos ───────────────────────────────────────── */}
+          <div className="overflow-hidden rounded-2xl border border-line bg-surface shadow-card">
+            <table className="w-full table-fixed border-collapse text-sm">
+              <thead className="bg-surface-2/95">
+                <tr>
+                  <th className="w-[38%] border-b border-line px-2 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted sm:w-1/3 sm:px-4">
+                    Producto
+                  </th>
+                  <th className="w-[22%] border-b border-line px-1 py-3 text-center text-xs font-semibold uppercase tracking-wide text-muted sm:w-1/3 sm:px-4">
+                    <span className="sm:hidden">Stock</span>
+                    <span className="hidden sm:inline">Stock actual</span>
+                  </th>
+                  <th className="w-[40%] border-b border-line px-2 py-3 text-center text-xs font-semibold uppercase tracking-wide text-muted sm:w-1/3 sm:px-4">
+                    <span className="sm:hidden">Trasladar</span>
+                    <span className="hidden sm:inline">Cantidad a trasladar</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {productosFiltrados?.length > 0 ? (
+                  productosFiltrados.map((producto, i) => {
+                    const esFrances = producto.nombreProducto === "Frances";
+                    return (
+                      <tr
+                        key={`${producto.idProducto}-${producto.esStockDiario ? "dia" : "gen"}`}
+                        className={`border-b border-line last:border-0 transition-colors hover:bg-brand-50/50 ${
+                          i % 2 === 1 ? "bg-surface-2/30" : ""
+                        }`}
+                      >
+                        <td className="px-2 py-3 sm:px-4">
+                          <div className="flex items-center gap-2 sm:gap-3">
+                            <span
+                              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[10px] font-bold text-white sm:h-8 sm:w-8 sm:text-xs"
+                              style={{ backgroundColor: getUniqueColor(producto.nombreProducto) }}
+                            >
+                              {getInitials(producto.nombreProducto)}
+                            </span>
+                            <span className="min-w-0 break-words font-medium text-ink">{producto.nombreProducto}</span>
+                          </div>
+                        </td>
+
+                        <td className="px-1 py-3 text-center sm:px-4">
+                          <span className="inline-flex min-w-[2.25rem] justify-center rounded-full bg-teal-50 px-2 py-1 text-sm font-bold text-teal-700 sm:min-w-[3rem] sm:px-2.5">
+                            {producto.cantidadExistente}
+                          </span>
+                        </td>
+
+                        <td className="px-2 py-3 sm:px-4">
+                          <input
+                            type="number"
+                            min="0"
+                            max={producto.cantidadMostrada}
+                            step={esFrances ? "0.1" : "any"}
+                            value={stockValues[producto.idProducto] || ""}
+                            onChange={(e) => handleStockChange(producto.idProducto, e.target.value)}
+                            onWheel={(e) => e.target.blur()}
+                            placeholder="0"
+                            className="mx-auto block w-full max-w-[5.5rem] rounded-lg border border-line bg-surface px-2 py-2 text-center text-sm font-semibold text-ink transition-colors focus:border-accent-500 focus:outline-none focus:ring-2 focus:ring-accent-500/25"
+                          />
+                          <p className="mt-1 text-center text-2xs text-muted">{esFrances ? "Filas" : "Unidades"}</p>
+                        </td>
+                      </tr>
+                    );
+                  })
+                ) : (
+                  <tr>
+                    <td colSpan="3" className="px-4 py-10 text-center text-sm text-muted">
+                      No hay productos disponibles en esta categoría.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {/* ── Barra de acción, fija al fondo — solo cuando hay destino ──── */}
+          {sucursalDestino && (
+            <div className="sticky bottom-4 z-10 flex justify-center">
+              <button
+                type="button"
+                onClick={handleSubmit}
+                disabled={isLoading || !isFormValid}
+                className={`flex w-full max-w-md items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-semibold transition-colors sm:w-auto sm:px-10 ${
+                  productosConCantidad === 0 && !isLoading
+                    ? "cursor-not-allowed border border-line bg-surface-2 text-muted"
+                    : "border-0 bg-accent-600 text-white shadow-accent hover:bg-accent-500"
+                }`}
+              >
+                {isLoading ? (
+                  <>
+                    <span className="h-4 w-4 animate-spin-smooth rounded-full border-2 border-white/40 border-t-white" />
+                    Trasladando...
+                  </>
+                ) : (
+                  <>
+                    <FiTruck size={16} />
+                    Trasladar Stock
+                    {productosConCantidad > 0 && (
+                      <span className="rounded-full bg-white/20 px-2 py-0.5 text-xs">{productosConCantidad}</span>
+                    )}
+                  </>
+                )}
+              </button>
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
 
 export default IngresarTraslado;

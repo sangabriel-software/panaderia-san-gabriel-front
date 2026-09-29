@@ -1,364 +1,428 @@
-import { useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
+import { useState, useMemo } from "react";
+import {
+  FiArrowLeft,
+  FiTruck,
+  FiTrash2,
+  FiPlus,
+  FiSearch,
+  FiX,
+  FiChevronDown,
+  FiChevronRight,
+  FiClock,
+  FiUser,
+  FiMapPin,
+  FiInbox,
+} from "react-icons/fi";
 import useGetTraslados from "../../../hooks/Traslados/UseGetTraslados";
-import { useState, useMemo, useEffect } from "react";
-import { useMediaQuery } from "react-responsive";
-import { FiTruck, FiCheck, FiX, FiTrash2, FiEye, FiXCircle, FiFilter, FiUser, FiPlus, FiChevronRight, FiClock, FiMapPin } from "react-icons/fi";
-import 'bootstrap/dist/css/bootstrap.min.css';
-import './GestionarTraslados.styles.css';
 import { encryptId } from "../../../utils/CryptoParams";
 import { eliminarTrasladoService } from "../../../services/Traslados/traslados.service";
-import { formatFecha, formatFechaCompleta, formatFechaRelativa, extraerOpcionesFiltros, filtrarTraslados, validarEliminacionTraslado, handleDeleteClick, handleDeleteConfirm, handleViewDetails, handleAddTraslado, toggleFiltros, handleFiltroChange} from "./GestionarTraslados.utils";
+import {
+  formatFecha,
+  formatFechaCompleta,
+  formatFechaRelativa,
+  extraerOpcionesFiltros,
+  filtrarTraslados,
+  validarEliminacionTraslado,
+} from "./GestionarTraslados.utils";
+import Alert from "../../../components/Alerts/Alert";
 
-const GestionarTraslados = () => {
-    const navigate = useNavigate();
-    const { traslados, loadingTraslados, showErrorTraslados, setTraslados } = useGetTraslados();
-    const [selectedTraslado, setSelectedTraslado] = useState(null);
-    const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [isDeleting, setIsDeleting] = useState(false);
-    const [errorMessage, setErrorMessage] = useState("");
-    const [showFiltros, setShowFiltros] = useState(false);
-    const [filtros, setFiltros] = useState({
-        sucursalOrigen: "",
-        sucursalDestino: "",
-        usuario: ""
-    });
-    
-    // Extraer opciones para los filtros
-    const { sucursalesOrigen: sucursalesOrigenOptions, sucursalesDestino: sucursalesDestinoOptions, usuarios: usuariosOptions } = useMemo(() => extraerOpcionesFiltros(traslados), [traslados]);
-
-    // Filtrar traslados
-    const trasladosFiltrados = useMemo(() => filtrarTraslados(traslados, filtros), [traslados, filtros]);
-
-
-
-    const clearFiltros = () => {
-        setFiltros({
-            sucursalOrigen: "",
-            sucursalDestino: "",
-            usuario: ""
-        });
-    };
-
-    const hasFiltrosActivos = filtros.sucursalOrigen || filtros.sucursalDestino || filtros.usuario;
-
-    // Renderizado condicional
-    if (loadingTraslados) {
-        return (
-            <div className="gtl-loading-screen">
-                <div className="gtl-loading-spinner"></div>
-                <p>Cargando historial de traslados...</p>
-            </div>
-        );
-    }
-
-    if (showErrorTraslados) {
-        return (
-            <div className="gtl-error-screen">
-                <div className="gtl-error-icon">!</div>
-                <p>Error al cargar el historial de traslados</p>
-            </div>
-        );
-    }
-
-    if (!trasladosFiltrados || trasladosFiltrados.length === 0) {
-        return (
-            <div className="gtl-empty-screen">
-                <div className="gtl-empty-icon">
-                    <FiTruck />
-                </div>
-                <p>
-                    {hasFiltrosActivos 
-                        ? "No hay traslados que coincidan con los filtros" 
-                        : "No hay traslados registrados"
-                    }
-                </p>
-                {hasFiltrosActivos && (
-                    <button 
-                        className="gtl-clear-filter"
-                        onClick={clearFiltros}
-                    >
-                        Limpiar filtros
-                    </button>
-                )}
-                <button 
-                    className="gtl-add-traslado-btn gtl-empty-btn"
-                    onClick={() => handleAddTraslado(navigate)}
-                >
-                    <FiPlus /> Crear nuevo traslado
-                </button>
-            </div>
-        );
-    }
-
-    return (
-        <div className="gtl-container">
-            {/* Header y Filtros */}
-            <header className="gtl-header">
-                <div className="gtl-header-top row">
-                    <div className="col-12 col-md-6">
-                        <h1>Historial de Traslados</h1>
-                        <p className="d-none d-md-block">Registro histórico de todos los traslados realizados</p>
-                    </div>
-                    <div className="col-12 col-md-6">
-                        <div className="d-flex flex-column flex-md-row justify-content-md-end gap-2">
-                            <button 
-                                className="gtl-filter-toggle"
-                                onClick={() => toggleFiltros(setShowFiltros, showFiltros)}
-                            >
-                                <FiFilter />
-                                {showFiltros ? 'Ocultar filtros' : 'Filtrar'}
-                            </button>
-                            
-                            <button 
-                                className="gtl-add-traslado-btn"
-                                onClick={() => handleAddTraslado(navigate)}
-                            >
-                                <FiPlus /> Crear traslado
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                
-                <p className="d-md-none mt-2">Registro histórico de todos los traslados realizados</p>
-                
-                {showFiltros && (
-                    <div className="gtl-filtros-container mt-2">
-                        <div className="row">
-                            <div className="col-12 col-md-4">
-                                <div className="gtl-filtro-group">
-                                    <label>Sucursal Origen:</label>
-                                    <div className="gtl-select-container">
-                                        <select
-                                            name="sucursalOrigen"
-                                            value={filtros.sucursalOrigen}
-                                            onChange={(e) => handleFiltroChange(e, setFiltros)}
-                                            className="gtl-select"
-                                        >
-                                            <option value="">Todas las sucursales</option>
-                                            {sucursalesOrigenOptions.map((sucursal, index) => (
-                                                <option key={`origen-${index}`} value={sucursal}>
-                                                    {sucursal}
-                                                </option>
-                                            ))}
-                                        </select>
-                                        <FiMapPin className="gtl-select-icon" />
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="col-12 col-md-4">
-                                <div className="gtl-filtro-group">
-                                    <label>Sucursal Destino:</label>
-                                    <div className="gtl-select-container">
-                                        <select
-                                            name="sucursalDestino"
-                                            value={filtros.sucursalDestino}
-                                            onChange={(e) => handleFiltroChange(e, setFiltros)}
-                                            className="gtl-select"
-                                        >
-                                            <option value="">Todas las sucursales</option>
-                                            {sucursalesDestinoOptions.map((sucursal, index) => (
-                                                <option key={`destino-${index}`} value={sucursal}>
-                                                    {sucursal}
-                                                </option>
-                                            ))}
-                                        </select>
-                                        <FiMapPin className="gtl-select-icon" />
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="col-12 col-md-4">
-                                <div className="gtl-filtro-group">
-                                    <label>Usuario Responsable:</label>
-                                    <div className="gtl-select-container">
-                                        <select
-                                            name="usuario"
-                                            value={filtros.usuario}
-                                            onChange={(e) => handleFiltroChange(e, setFiltros)}
-                                            className="gtl-select"
-                                        >
-                                            <option value="">Todos los usuarios</option>
-                                            {usuariosOptions.map((usuario, index) => (
-                                                <option key={`usuario-${index}`} value={usuario}>
-                                                    {usuario}
-                                                </option>
-                                            ))}
-                                        </select>
-                                        <FiUser className="gtl-select-icon" />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="row mt-2">
-                            <div className="col-12">
-                                <button 
-                                    className="gtl-clear-filters-btn"
-                                    onClick={clearFiltros}
-                                    disabled={!hasFiltrosActivos}
-                                >
-                                    Limpiar todos los filtros
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                )}
-            </header>
-
-            {/* Lista de Traslados */}
-            <div className="gtl-list">
-                {trasladosFiltrados.map(traslado => (
-                    <div key={traslado.idTraslado} className="gtl-item">
-                        <div className="gtl-item-icon">
-                            <FiTruck />
-                        </div>
-                        
-                        <div className="gtl-item-content">
-                            <div className="gtl-item-header">
-                                <span className={`gtl-estado-badge ${traslado.estado?.toLowerCase()}`}>
-                                    {traslado.estado || "PENDIENTE"}
-                                </span>
-                                <span className="gtl-id">ID: #{traslado.idTraslado}</span>
-                            </div>
-                            
-                            <div className="gtl-route-info">
-                                <div className="gtl-route-point">
-                                    <FiMapPin className="gtl-route-icon gtl-origin" />
-                                    <div className="gtl-route-text">
-                                        <span className="gtl-route-label">Origen:</span>
-                                        <span className="gtl-route-value">{traslado.sucursalOrigen}</span>
-                                    </div>
-                                </div>
-                                
-                                <div className="gtl-route-line"></div>
-                                
-                                <div className="gtl-route-point">
-                                    <FiMapPin className="gtl-route-icon gtl-destination" />
-                                    <div className="gtl-route-text">
-                                        <span className="gtl-route-label">Destino:</span>
-                                        <span className="gtl-route-value">{traslado.sucursalDestino}</span>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div className="gtl-item-footer">
-                                <div className="gtl-user-info">
-                                    <FiUser className="gtl-user-icon" />
-                                    <span className="gtl-username">Responsable: {traslado.usuarioResponsable}</span>
-                                </div>
-                                <div className="gtl-time-info">
-                                    <FiClock className="gtl-time-icon" />
-                                    <span className="gtl-time-text" title={formatFechaCompleta(traslado.fechaTraslado)}>
-                                        {formatFecha(traslado.fechaTraslado)} · {formatFechaRelativa(traslado.fechaTraslado)}
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div className="gtl-item-actions">
-                            <button 
-                                className="gtl-action-btn gtl-view-btn"
-                                onClick={() => handleViewDetails(traslado.idTraslado, navigate)}
-                                title="Ver detalles"
-                            >
-                                <FiEye />
-                            </button>
-                            <button 
-                                className={`gtl-action-btn gtl-delete-btn ${!validarEliminacionTraslado(traslado) ? 'disabled' : ''}`}
-                                onClick={() => handleDeleteClick(traslado, setErrorMessage, setSelectedTraslado, setShowDeleteModal)}
-                                title={!validarEliminacionTraslado(traslado) ? "No se pueden eliminar traslados completados o cancelados" : "Eliminar traslado"}
-                                disabled={!validarEliminacionTraslado(traslado)}
-                            >
-                                <FiTrash2 />
-                            </button>
-                            <div className="gtl-item-arrow">
-                                <FiChevronRight />
-                            </div>
-                        </div>
-                    </div>
-                ))}
-            </div>
-
-            {/* Modal de Eliminación */}
-            {showDeleteModal && (
-                <div className="gtl-modal-overlay">
-                    <div className="gtl-modal">
-                        <div className="gtl-modal-header">
-                            <h3>Confirmar eliminación</h3>
-                            <button 
-                                className="gtl-modal-close"
-                                onClick={() => setShowDeleteModal(false)}
-                                disabled={isDeleting}
-                            >
-                                <FiXCircle />
-                            </button>
-                        </div>
-                        <div className="gtl-modal-body">
-                            <p>¿Estás seguro que deseas eliminar el traslado #{selectedTraslado?.idTraslado}?</p>
-                            <p className="gtl-modal-warning">Esta acción no se puede deshacer.</p>
-                            {selectedTraslado?.usuarioResponsable && (
-                                <p className="gtl-modal-user">
-                                    <FiUser /> Responsable: {selectedTraslado.usuarioResponsable}
-                                </p>
-                            )}
-                            <div className="gtl-modal-route">
-                                <div className="gtl-modal-route-point">
-                                    <FiMapPin className="gtl-modal-origin" />
-                                    <span>{selectedTraslado?.sucursalOrigen}</span>
-                                </div>
-                                <div className="gtl-modal-route-line"></div>
-                                <div className="gtl-modal-route-point">
-                                    <FiMapPin className="gtl-modal-destination" />
-                                    <span>{selectedTraslado?.sucursalDestino}</span>
-                                </div>
-                            </div>
-                            <div className="gtl-modal-date">
-                                <FiClock className="me-2" />
-                                <span>{formatFechaCompleta(selectedTraslado?.fechaTraslado)}</span>
-                            </div>
-                        </div>
-                        <div className="gtl-modal-footer">
-                            <button
-                                className="gtl-modal-btn gtl-modal-cancel"
-                                onClick={() => setShowDeleteModal(false)}
-                                disabled={isDeleting}
-                            >
-                                Cancelar
-                            </button>
-                            <button
-                                className="gtl-modal-btn gtl-modal-confirm"
-                                onClick={() => handleDeleteConfirm(selectedTraslado, traslados, setTraslados, setShowDeleteModal, setSelectedTraslado, setIsDeleting, setErrorMessage)}
-                                disabled={isDeleting}
-                            >
-                                {isDeleting ? (
-                                    <span className="gtl-spinner-small"></span>
-                                ) : (
-                                    "Eliminar"
-                                )}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Mensaje de Error */}
-            {errorMessage && (
-                <div className="gtl-error-message">
-                    <div className="gtl-error-content">
-                        <FiXCircle className="gtl-error-icon" />
-                        <div>
-                            <p className="gtl-error-title">Error al eliminar traslado</p>
-                            <p className="gtl-error-detail">{errorMessage}</p>
-                        </div>
-                        <button 
-                            className="gtl-error-close"
-                            onClick={() => setErrorMessage("")}
-                        >
-                            <FiX />
-                        </button>
-                    </div>
-                </div>
-            )}
-        </div>
-    );
+const ESTADO_TONES = {
+  COMPLETADO: "bg-brand-50 text-brand-700",
+  CANCELADO: "bg-danger-50 text-danger-700",
+  PENDIENTE: "bg-warning-50 text-warning-700",
 };
+const DEFAULT_ESTADO_TONE = "bg-surface-2 text-muted";
+
+const selectClass =
+  "w-full appearance-none rounded-xl border border-line bg-surface py-2.5 pl-9 pr-9 text-sm font-medium text-ink transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/25";
+
+const sameDay = (a, b) =>
+  a.getDate() === b.getDate() && a.getMonth() === b.getMonth() && a.getFullYear() === b.getFullYear();
+
+// Un traslado solo se puede eliminar si ocurrió hoy — más allá de su estado
+const esFechaDeHoy = (fecha) => sameDay(new Date(fecha), new Date());
+
+const toDayKey = (fecha) => {
+  const d = new Date(fecha);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+};
+
+const dayLabel = (fecha) => {
+  const d = new Date(fecha);
+  const hoy = new Date();
+  const ayer = new Date();
+  ayer.setDate(hoy.getDate() - 1);
+  if (sameDay(d, hoy)) return "Hoy";
+  if (sameDay(d, ayer)) return "Ayer";
+  return d.toLocaleDateString("es-GT", { weekday: "long", day: "numeric", month: "long" });
+};
+
+function GestionarTraslados() {
+  const navigate = useNavigate();
+  const { traslados, loadingTraslados, showErrorTraslados, setTraslados } = useGetTraslados();
+  const [confirmingId, setConfirmingId] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filtros, setFiltros] = useState({ sucursalOrigen: "", sucursalDestino: "", usuario: "" });
+  const { idSucursal } = useParams();
+
+  const { sucursalesOrigen, sucursalesDestino, usuarios } = useMemo(
+    () => extraerOpcionesFiltros(traslados),
+    [traslados]
+  );
+
+  const porFiltros = useMemo(() => filtrarTraslados(traslados, filtros), [traslados, filtros]);
+
+  const trasladosFiltrados = useMemo(() => {
+    const term = searchTerm.trim().toLowerCase();
+    if (!term) return porFiltros;
+    return porFiltros.filter((t) => {
+      const haystack = `${t.idTraslado} ${t.sucursalOrigen} ${t.sucursalDestino} ${t.usuarioResponsable}`.toLowerCase();
+      return haystack.includes(term);
+    });
+  }, [porFiltros, searchTerm]);
+
+  const grupos = useMemo(() => {
+    const ordenados = [...trasladosFiltrados].sort((a, b) => new Date(b.fechaTraslado) - new Date(a.fechaTraslado));
+    const result = [];
+    ordenados.forEach((t) => {
+      const key = toDayKey(t.fechaTraslado);
+      const last = result[result.length - 1];
+      if (last && last.key === key) last.items.push(t);
+      else result.push({ key, label: dayLabel(t.fechaTraslado), items: [t] });
+    });
+    return result;
+  }, [trasladosFiltrados]);
+
+  const handleFiltroChange = (e) => {
+    setFiltros((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const clearFiltros = () => {
+    setFiltros({ sucursalOrigen: "", sucursalDestino: "", usuario: "" });
+    setSearchTerm("");
+  };
+
+  const hayFiltros = filtros.sucursalOrigen || filtros.sucursalDestino || filtros.usuario || searchTerm.trim();
+
+  const handleViewDetails = (idTraslado) => {
+    const encryptedId = encryptId(idTraslado.toString());
+    navigate(`/traslados-productos/detalles-traslado/${encodeURIComponent(encryptedId)}`);
+  };
+
+  const handleAddTraslado = () => navigate("/traslados-productos/ingresar-traslado");
+
+  const handleDeleteConfirm = async (traslado) => {
+    setIsDeleting(true);
+    try {
+      await eliminarTrasladoService(traslado.idTraslado);
+      setTraslados(traslados.filter((t) => t.idTraslado !== traslado.idTraslado));
+      setConfirmingId(null);
+      setSuccessMessage(`Se eliminó el traslado #${traslado.idTraslado}.`);
+    } catch (error) {
+      setConfirmingId(null);
+      setErrorMessage(error.message || "Error al eliminar el traslado");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  if (loadingTraslados) {
+    return (
+      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-3">
+        <span className="h-10 w-10 animate-spin-smooth rounded-full border-4 border-brand-200 border-t-brand-600" />
+        <p className="text-sm text-muted">Cargando historial de traslados...</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-6">
+      {/* ── Alertas flotantes ────────────────────────────────────────── */}
+      {errorMessage && (
+        <Alert
+          floating
+          position="top-right"
+          type="danger"
+          title="No se pudo eliminar"
+          message={errorMessage}
+          onDismiss={() => setErrorMessage("")}
+        />
+      )}
+      {successMessage && (
+        <Alert
+          floating
+          position="top-right"
+          type="success"
+          title="Traslado eliminado"
+          message={successMessage}
+          duration={3000}
+          onDismiss={() => setSuccessMessage("")}
+        />
+      )}
+
+      {/* ── Header ───────────────────────────────────────────────────── */}
+      <header className="flex flex-wrap items-center gap-3">
+        <button
+          type="button"
+          onClick={() => navigate(`/stock-productos/stock-general/${encodeURIComponent(idSucursal)}`)}
+          aria-label="Volver"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-line bg-surface text-muted shadow-card transition-colors hover:bg-brand-50 hover:text-brand-700"
+        >
+          <FiArrowLeft size={17} />
+        </button>
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-accent-600 text-white shadow-accent">
+          <FiTruck size={19} />
+        </span>
+        <div className="min-w-0 flex-1">
+          <h1 className="truncate text-xl font-bold text-ink sm:text-2xl">Historial de Traslados</h1>
+          <p className="text-sm text-muted">{traslados?.length || 0} traslados registrados</p>
+        </div>
+        <button
+          type="button"
+          onClick={handleAddTraslado}
+          className="flex w-full items-center justify-center gap-2 rounded-xl border-0 bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white shadow-brand transition-colors hover:bg-brand-500 sm:w-auto"
+        >
+          <FiPlus size={15} /> Crear traslado
+        </button>
+      </header>
+
+      {showErrorTraslados && (
+        <Alert type="danger" title="No se pudo cargar el historial" message="Intenta recargar la página." />
+      )}
+
+      {/* ── Filtros ──────────────────────────────────────────────────── */}
+      <div className="rounded-2xl border border-line bg-surface p-4 shadow-card">
+        <div className="relative">
+          <FiSearch size={15} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" />
+          <input
+            type="text"
+            placeholder="Buscar por sucursal, responsable o ID..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full rounded-xl border border-line bg-surface py-2.5 pl-10 pr-9 text-sm text-ink placeholder:text-muted transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/25"
+          />
+          {searchTerm && (
+            <button
+              type="button"
+              onClick={() => setSearchTerm("")}
+              aria-label="Limpiar búsqueda"
+              className="absolute right-2.5 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-md border-0 bg-transparent text-muted transition-colors hover:text-ink"
+            >
+              <FiX size={16} />
+            </button>
+          )}
+        </div>
+
+        <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-3">
+          <div className="relative">
+            <FiMapPin size={14} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" />
+            <select name="sucursalOrigen" value={filtros.sucursalOrigen} onChange={handleFiltroChange} className={selectClass}>
+              <option value="">Todos los orígenes</option>
+              {sucursalesOrigen.map((s, i) => (
+                <option key={`origen-${i}`} value={s}>
+                  {s}
+                </option>
+              ))}
+            </select>
+            <FiChevronDown size={14} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-muted" />
+          </div>
+
+          <div className="relative">
+            <FiMapPin size={14} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" />
+            <select name="sucursalDestino" value={filtros.sucursalDestino} onChange={handleFiltroChange} className={selectClass}>
+              <option value="">Todos los destinos</option>
+              {sucursalesDestino.map((s, i) => (
+                <option key={`destino-${i}`} value={s}>
+                  {s}
+                </option>
+              ))}
+            </select>
+            <FiChevronDown size={14} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-muted" />
+          </div>
+
+          <div className="relative">
+            <FiUser size={14} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" />
+            <select name="usuario" value={filtros.usuario} onChange={handleFiltroChange} className={selectClass}>
+              <option value="">Todos los responsables</option>
+              {usuarios.map((u, i) => (
+                <option key={`usuario-${i}`} value={u}>
+                  {u}
+                </option>
+              ))}
+            </select>
+            <FiChevronDown size={14} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-muted" />
+          </div>
+        </div>
+
+        {hayFiltros && (
+          <button
+            type="button"
+            onClick={clearFiltros}
+            className="mt-3 border-0 bg-transparent text-xs font-medium text-brand-600 hover:text-brand-700"
+          >
+            Limpiar filtros
+          </button>
+        )}
+      </div>
+
+      {/* ── Lista agrupada por día ───────────────────────────────────── */}
+      {grupos.length === 0 ? (
+        <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-line bg-surface py-16 text-center">
+          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-surface-2 text-muted">
+            <FiInbox size={20} />
+          </span>
+          <p className="text-sm text-muted">
+            {hayFiltros ? "Ningún traslado coincide con los filtros." : "Aún no hay traslados registrados."}
+          </p>
+          {hayFiltros ? (
+            <button
+              type="button"
+              onClick={clearFiltros}
+              className="rounded-lg border-0 bg-surface-2 px-3.5 py-1.5 text-xs font-semibold text-ink transition-colors hover:bg-brand-50 hover:text-brand-700"
+            >
+              Limpiar filtros
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={handleAddTraslado}
+              className="flex items-center gap-2 rounded-xl border-0 bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-brand transition-colors hover:bg-brand-500"
+            >
+              <FiPlus size={15} /> Crear nuevo traslado
+            </button>
+          )}
+        </div>
+      ) : (
+        <div className="flex flex-col gap-6">
+          {grupos.map((grupo) => (
+            <section key={grupo.key}>
+              <div className="mb-2 flex items-center gap-2 px-1">
+                <h2 className="text-sm font-semibold text-ink first-letter:uppercase">{grupo.label}</h2>
+                <span className="rounded-full bg-surface-2 px-2 py-0.5 text-2xs font-semibold text-muted">
+                  {grupo.items.length}
+                </span>
+              </div>
+
+              <ul className="overflow-hidden rounded-2xl border border-line bg-surface shadow-card">
+                {grupo.items.map((traslado) => {
+                  const estado = (traslado.estado || "PENDIENTE").toUpperCase();
+                  const estadoTone = ESTADO_TONES[estado] || DEFAULT_ESTADO_TONE;
+                  const puedeEliminar =
+                    validarEliminacionTraslado(traslado) && esFechaDeHoy(traslado.fechaTraslado);
+                  const confirmando = confirmingId === traslado.idTraslado;
+
+                  return (
+                    <li key={traslado.idTraslado} className="border-b border-line last:border-0">
+                      <div className="flex items-stretch">
+                        <button
+                          type="button"
+                          onClick={() => handleViewDetails(traslado.idTraslado)}
+                          className="flex min-w-0 flex-1 flex-col gap-2 border-0 bg-transparent p-4 text-left transition-colors hover:bg-brand-50/50 sm:flex-row sm:items-center sm:gap-3"
+                        >
+                          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent-50 text-accent-700">
+                            <FiTruck size={17} />
+                          </span>
+
+                          <div className="min-w-0 flex-1">
+                            <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                              <span className="text-sm font-semibold text-ink">Traslado #{traslado.idTraslado}</span>
+                              <span className={`rounded-full px-2 py-0.5 text-2xs font-semibold ${estadoTone}`}>
+                                {estado}
+                              </span>
+                            </div>
+
+                            {/* Ruta: origen → destino */}
+                            <div className="mt-1.5 flex flex-wrap items-center gap-1.5 text-xs">
+                              <span className="flex items-center gap-1 rounded-full bg-surface-2 px-2 py-1 text-ink">
+                                <FiMapPin size={11} className="text-brand-600" /> {traslado.sucursalOrigen}
+                              </span>
+                              <FiChevronRight size={12} className="shrink-0 text-muted" />
+                              <span className="flex items-center gap-1 rounded-full bg-surface-2 px-2 py-1 text-ink">
+                                <FiMapPin size={11} className="text-accent-600" /> {traslado.sucursalDestino}
+                              </span>
+                            </div>
+
+                            <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-muted">
+                              <span className="flex items-center gap-1">
+                                <FiUser size={12} /> {traslado.usuarioResponsable}
+                              </span>
+                              <span
+                                className="flex items-center gap-1"
+                                title={formatFechaCompleta(traslado.fechaTraslado)}
+                              >
+                                <FiClock size={12} /> {formatFecha(traslado.fechaTraslado)} ·{" "}
+                                {formatFechaRelativa(traslado.fechaTraslado)}
+                              </span>
+                            </div>
+                          </div>
+
+                          <FiChevronRight size={16} className="hidden shrink-0 text-muted sm:block" />
+                        </button>
+
+                        {puedeEliminar && (
+                          <button
+                            type="button"
+                            onClick={() => setConfirmingId(confirmando ? null : traslado.idTraslado)}
+                            aria-label="Eliminar traslado"
+                            title="Eliminar traslado"
+                            className={`flex w-14 shrink-0 items-center justify-center border-0 border-l border-line transition-colors ${
+                              confirmando
+                                ? "bg-danger-50 text-danger-600"
+                                : "bg-transparent text-muted hover:bg-danger-50 hover:text-danger-600"
+                            }`}
+                          >
+                            <FiTrash2 size={16} />
+                          </button>
+                        )}
+                      </div>
+
+                      {confirmando && (
+                        <div className="animate-slide-up border-t border-danger-200 bg-danger-50 px-4 py-3">
+                          <p className="text-sm font-semibold text-danger-800">
+                            ¿Eliminar el traslado #{traslado.idTraslado}?
+                          </p>
+                          <p className="mt-0.5 text-xs text-danger-700">
+                            Esta acción no se puede deshacer. {traslado.sucursalOrigen} → {traslado.sucursalDestino},
+                            responsable {traslado.usuarioResponsable}.
+                          </p>
+                          <div className="mt-3 flex gap-2">
+                            <button
+                              type="button"
+                              onClick={() => setConfirmingId(null)}
+                              disabled={isDeleting}
+                              className="rounded-lg border border-line bg-white px-3.5 py-1.5 text-xs font-semibold text-ink transition-colors hover:bg-surface-2 disabled:cursor-not-allowed disabled:bg-surface-2 disabled:text-muted"
+                            >
+                              Cancelar
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteConfirm(traslado)}
+                              disabled={isDeleting}
+                              className="flex min-w-[5.5rem] items-center justify-center rounded-lg border-0 bg-danger-600 px-3.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-danger-500 disabled:cursor-not-allowed disabled:bg-danger-400"
+                            >
+                              {isDeleting ? (
+                                <span className="h-3.5 w-3.5 animate-spin-smooth rounded-full border-2 border-white/40 border-t-white" />
+                              ) : (
+                                "Eliminar"
+                              )}
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            </section>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default GestionarTraslados;

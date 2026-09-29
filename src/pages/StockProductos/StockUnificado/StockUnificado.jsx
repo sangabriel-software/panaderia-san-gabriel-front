@@ -42,7 +42,7 @@ function StockUnificado() {
 
   const handleIngresarStock = () => navigate(`/stock-productos/ingresar-stock/${encodeURIComponent(idSucursal)}`);
   const handleDescontarStock = () => navigate(`/descuento-stock/stock-descuentos-lista/${encodeURIComponent(idSucursal)}`);
-  const handleTraslados = () => navigate("/traslados-productos");
+  const handleTraslados = () => navigate(`/traslados-productos/traslados-lista/${encodeURIComponent(idSucursal)}`);
 
   const isStockDiarioEmpty = useMemo(() => {
     return (

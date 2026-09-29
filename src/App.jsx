@@ -167,7 +167,7 @@ function App() {
             </Route>
 
             <Route path="/traslados-productos">
-              <Route index element={<GestionarTraslados />} />
+              <Route path="traslados-lista/:idSucursal" element={<GestionarTraslados />} />
               <Route path="detalles-traslado/:idTraslado" element={<DetalleTraslados />} />
               <Route path="ingresar-traslado" element={<IngresarTraslado />} />
             </Route>

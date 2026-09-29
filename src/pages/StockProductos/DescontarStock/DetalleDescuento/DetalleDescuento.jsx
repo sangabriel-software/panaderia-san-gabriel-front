@@ -1,151 +1,219 @@
 import { useParams, useNavigate } from "react-router";
+import {
+  FiArrowLeft,
+  FiTag,
+  FiUser,
+  FiClock,
+  FiMapPin,
+  FiMinus,
+  FiInbox,
+} from "react-icons/fi";
 import useGetDetalleDescuento from "../../../../hooks/DescuentoDeStock/useGetDetalleDescuento";
-import { FiArrowLeft, FiTag, FiUser, FiClock, FiPackage, FiMinus, FiCheck, FiX } from "react-icons/fi";
-import './DetalleDescuento.styles.css';
 import { encryptId } from "../../../../utils/CryptoParams";
-import { currentDate, currentDateToFormat } from "../../../../utils/dateUtils";
+import { currentDateToFormat } from "../../../../utils/dateUtils";
+import Alert from "../../../../components/Alerts/Alert";
 
-const DetalleDescuento = () => {
-    const { idDescuento } = useParams();
-    const navigate = useNavigate();
-    const {descuentoDetalle, loadingDescuentoDetalle, showErrorDescuentoDetalle,showInfoDescuentoDetalle, setDescuentoDetalle } = useGetDetalleDescuento(idDescuento);
-
-    const handleGoBack = () => {
-        const encryptedId = encryptId(descuentoDetalle.encabezadoDescuento.idSucursal.toString());
-        navigate(`/descuento-stock/stock-descuentos-lista/${encodeURIComponent(encryptedId)}`);
-    };
-
-    if (loadingDescuentoDetalle) {
-        return (
-            <div className="dd-loading-screen">
-                <div className="dd-loading-spinner"></div>
-                <p>Cargando detalles del descuento...</p>
-            </div>
-        );
-    }
-
-    if (showErrorDescuentoDetalle) {
-        return (
-            <div className="dd-error-screen">
-                <div className="dd-error-icon">!</div>
-                <p>Error al cargar los detalles del descuento</p>
-                <button className="dd-back-btn" onClick={handleGoBack}>
-                    <FiArrowLeft /> Volver
-                </button>
-            </div>
-        );
-    }
-
-    if (!descuentoDetalle || !descuentoDetalle.encabezadoDescuento) {
-        return (
-            <div className="dd-empty-screen">
-                <div className="dd-empty-icon">
-                    <FiTag />
-                </div>
-                <p>No se encontraron detalles para este descuento</p>
-                <button className="dd-back-btn" onClick={handleGoBack}>
-                    <FiArrowLeft /> Volver
-                </button>
-            </div>
-        );
-    }
-
-    const { encabezadoDescuento, detalleDescuento } = descuentoDetalle;
-    const tipoDescuento = encabezadoDescuento.tipoDescuento.toLowerCase().replace(' ', '-');
-
-    const formatFecha = (fecha) => {
-        const date = new Date(fecha);
-        return date.toLocaleDateString('es-ES', {
-            day: '2-digit',
-            month: 'short',
-            hour: '2-digit',
-            minute: '2-digit'
-        }).replace(',', ' ·');
-    };
-
-    return (
-        <div className="dd-container">
-            <header className="dd-header">
-                <button className="dd-back-btn" onClick={handleGoBack}>
-                    <FiArrowLeft /> Volver
-                </button>
-                
-                <div className="dd-header-content">
-                    <div className="dd-header-icon">
-                        <FiTag />
-                    </div>
-                    <div>
-                        <h1>Descuento #{encabezadoDescuento.idDescuento}</h1>
-                        <p>Detalle completo de la modificación de stock</p>
-                    </div>
-                </div>
-            </header>
-
-            <div className="dd-card">
-                <div className="dd-card-header">
-                    <span className={`dd-tipo-badge ${tipoDescuento}`}>
-                        {encabezadoDescuento.tipoDescuento}
-                    </span>
-                    <span className={`dd-estado ${encabezadoDescuento.estado === 'A' ? 'active' : 'inactive'}`}>
-                        {encabezadoDescuento.estado === 'A' ? <FiCheck /> : <FiX />}
-                    </span>
-                </div>
-
-                <div className="dd-card-body">
-                    <div className="dd-info-group">
-                        <div className="dd-info-item">
-                            <FiUser className="dd-info-icon" />
-                            <div>
-                                <span className="dd-info-label">Registrado por:</span>
-                                <span className="dd-info-value">{encabezadoDescuento.nombreUsuario}</span>
-                            </div>
-                        </div>
-
-                        <div className="dd-info-item">
-                            <FiClock className="dd-info-icon" />
-                            <div>
-                                <span className="dd-info-label">Fecha:</span>
-                                <span className="dd-info-value">{formatFecha(encabezadoDescuento.fechaDescuento)}</span>
-                            </div>
-                        </div>
-
-                        <div className="dd-info-item">
-                            <FiPackage className="dd-info-icon" />
-                            <div>
-                                <span className="dd-info-label">Sucursal:</span>
-                                <div className="dd-sucursal-info">
-                                    <span className="dd-info-value">{encabezadoDescuento.nombreSucursal}</span>
-                                    {encabezadoDescuento.descuentoTurno && (
-                                        <span className="dd-turno-badge">
-                                            {encabezadoDescuento.descuentoTurno}
-                                        </span>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="dd-products-section">
-                        <h3>Productos descontados</h3>
-                        <div className="dd-products-list">
-                            {detalleDescuento.map((producto) => (
-                                <div key={producto.idDetalleDescuento} className="dd-product-item">
-                                    <div className="dd-product-info">
-                                        <span className="dd-product-name">{producto.nombreProducto}</span>
-                                        <span className="dd-product-id">ID: {producto.idProducto}</span>
-                                    </div>
-                                    <div className="dd-product-quantity">
-                                        <FiMinus className="dd-minus-icon" />
-                                        <span>{producto.unidadesDescontadas} {producto.nombreProducto === "Frances" ? (currentDateToFormat(encabezadoDescuento.fechaDescuento) < "2026-08-15" ? 'Unidades' : 'Filas') : 'Unidades'}</span>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
+const TIPO_TONES = {
+  MAYOREO: "bg-accent-50 text-accent-700",
+  "MAL ESTADO": "bg-danger-50 text-danger-700",
 };
+const DEFAULT_TIPO_TONE = "bg-brand-50 text-brand-700";
+
+function DetalleDescuento() {
+  const { idDescuento } = useParams();
+  const navigate = useNavigate();
+  const { descuentoDetalle, loadingDescuentoDetalle, showErrorDescuentoDetalle } =
+    useGetDetalleDescuento(idDescuento);
+
+  const handleGoBack = () => {
+    if (descuentoDetalle?.encabezadoDescuento?.idSucursal) {
+      const encryptedId = encryptId(descuentoDetalle.encabezadoDescuento.idSucursal.toString());
+      navigate(`/descuento-stock/stock-descuentos-lista/${encodeURIComponent(encryptedId)}`);
+    } else {
+      navigate("/descuento-stock");
+    }
+  };
+
+  const formatFecha = (fecha) =>
+    new Date(fecha)
+      .toLocaleDateString("es-ES", {
+        day: "2-digit",
+        month: "short",
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+      .replace(",", " ·");
+
+  const BackButton = () => (
+    <button
+      type="button"
+      onClick={handleGoBack}
+      aria-label="Volver"
+      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-line bg-surface text-muted shadow-card transition-colors hover:bg-brand-50 hover:text-brand-700"
+    >
+      <FiArrowLeft size={17} />
+    </button>
+  );
+
+  if (loadingDescuentoDetalle) {
+    return (
+      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-3">
+        <span className="h-10 w-10 animate-spin-smooth rounded-full border-4 border-brand-200 border-t-brand-600" />
+        <p className="text-sm text-muted">Cargando detalles del descuento...</p>
+      </div>
+    );
+  }
+
+  if (showErrorDescuentoDetalle) {
+    return (
+      <div className="flex flex-col gap-6">
+        <header className="flex items-center gap-3">
+          <BackButton />
+          <h1 className="text-xl font-bold text-ink sm:text-2xl">Detalle del descuento</h1>
+        </header>
+        <Alert
+          type="danger"
+          title="No se pudo cargar el descuento"
+          message="Intenta volver a la lista e ingresar de nuevo."
+        />
+      </div>
+    );
+  }
+
+  if (!descuentoDetalle || !descuentoDetalle.encabezadoDescuento) {
+    return (
+      <div className="flex flex-col gap-6">
+        <header className="flex items-center gap-3">
+          <BackButton />
+          <h1 className="text-xl font-bold text-ink sm:text-2xl">Detalle del descuento</h1>
+        </header>
+        <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-line bg-surface py-16 text-center">
+          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-surface-2 text-muted">
+            <FiInbox size={20} />
+          </span>
+          <p className="text-sm text-muted">No se encontraron detalles para este descuento.</p>
+        </div>
+      </div>
+    );
+  }
+
+  const { encabezadoDescuento, detalleDescuento } = descuentoDetalle;
+  const tipoTone = TIPO_TONES[(encabezadoDescuento.tipoDescuento || "").toUpperCase()] || DEFAULT_TIPO_TONE;
+  const activo = encabezadoDescuento.estado === "A";
+
+  return (
+    <div className="flex flex-col gap-6">
+      {/* ── Header ───────────────────────────────────────────────────── */}
+      <header className="flex items-center gap-3">
+        <BackButton />
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-warning-500 text-white">
+          <FiTag size={19} />
+        </span>
+        <div className="min-w-0">
+          <h1 className="truncate text-xl font-bold text-ink sm:text-2xl">
+            Descuento #{encabezadoDescuento.idDescuento}
+          </h1>
+          <p className="text-sm text-muted">Detalle completo de la modificación de stock</p>
+        </div>
+      </header>
+
+      {/* ── Tarjeta principal ────────────────────────────────────────── */}
+      <div className="overflow-hidden rounded-2xl border border-line bg-surface shadow-card">
+        {/* Barra superior: tipo + estado */}
+        <div className="flex items-center justify-between border-b border-line bg-surface-2/60 px-5 py-3">
+          <span className={`rounded-full px-3 py-1 text-xs font-semibold ${tipoTone}`}>
+            {encabezadoDescuento.tipoDescuento}
+          </span>
+          <span
+            className={`rounded-full px-2.5 py-1 text-2xs font-semibold ${
+              activo ? "bg-brand-50 text-brand-700" : "bg-surface-2 text-muted"
+            }`}
+          >
+            {activo ? "Activo" : "Inactivo"}
+          </span>
+        </div>
+
+        {/* Datos generales */}
+        <dl className="grid grid-cols-1 gap-4 border-b border-line px-5 py-5 sm:grid-cols-3">
+          <div className="flex items-start gap-2.5">
+            <FiUser size={16} className="mt-0.5 shrink-0 text-brand-600" />
+            <div className="min-w-0">
+              <dt className="text-xs text-muted">Registrado por</dt>
+              <dd className="truncate text-sm font-medium text-ink">{encabezadoDescuento.nombreUsuario}</dd>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-2.5">
+            <FiClock size={16} className="mt-0.5 shrink-0 text-brand-600" />
+            <div className="min-w-0">
+              <dt className="text-xs text-muted">Fecha</dt>
+              <dd className="truncate text-sm font-medium text-ink">
+                {formatFecha(encabezadoDescuento.fechaDescuento)}
+              </dd>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-2.5">
+            <FiMapPin size={16} className="mt-0.5 shrink-0 text-brand-600" />
+            <div className="min-w-0 flex-1">
+              <dt className="text-xs text-muted">Sucursal</dt>
+              <dd className="flex flex-wrap items-center gap-2">
+                <span className="truncate text-sm font-medium text-ink">{encabezadoDescuento.nombreSucursal}</span>
+                {encabezadoDescuento.descuentoTurno && (
+                  <span className="rounded-full bg-accent-50 px-2 py-0.5 text-2xs font-semibold text-accent-700">
+                    {encabezadoDescuento.descuentoTurno}
+                  </span>
+                )}
+              </dd>
+            </div>
+          </div>
+        </dl>
+
+        {/* Productos descontados */}
+        <div className="px-5 py-5">
+          <h2 className="mb-3 text-sm font-semibold text-ink">
+            Productos descontados
+            <span className="ml-2 rounded-full bg-surface-2 px-2 py-0.5 text-2xs font-semibold text-muted">
+              {detalleDescuento?.length || 0}
+            </span>
+          </h2>
+
+          {detalleDescuento?.length > 0 ? (
+            <ul className="flex flex-col gap-2">
+              {detalleDescuento.map((producto) => {
+                const unidad =
+                  producto.nombreProducto === "Frances"
+                    ? currentDateToFormat(encabezadoDescuento.fechaDescuento) < "2026-08-15"
+                      ? "Unidades"
+                      : "Filas"
+                    : "Unidades";
+
+                return (
+                  <li
+                    key={producto.idDetalleDescuento}
+                    className="flex items-center justify-between gap-3 rounded-xl border border-line bg-surface-2/40 px-4 py-3"
+                  >
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-medium text-ink">{producto.nombreProducto}</p>
+                      <p className="text-xs text-muted">ID: {producto.idProducto}</p>
+                    </div>
+                    <span className="flex shrink-0 items-center gap-1 rounded-full bg-danger-50 px-2.5 py-1 text-sm font-bold text-danger-700">
+                      <FiMinus size={12} />
+                      {producto.unidadesDescontadas} {unidad}
+                    </span>
+                  </li>
+                );
+              })}
+            </ul>
+          ) : (
+            <p className="rounded-lg border border-dashed border-line px-3 py-4 text-center text-sm text-muted">
+              No hay productos registrados en este descuento.
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default DetalleDescuento;
