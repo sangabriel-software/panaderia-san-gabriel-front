@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import {
@@ -42,6 +42,7 @@ function IngresarTraslado() {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [isPopupErrorOpen, setIsPopupErrorOpen] = useState(false);
   const [errorPopupMessage, setErrorPopupMessage] = useState("");
+  const { idSucursal } = useParams();
 
   useEffect(() => {
     if (!loadingSucursales && sucursales.length > 0 && userData?.idRol !== 1) {
@@ -281,7 +282,7 @@ function IngresarTraslado() {
           message="Se trasladó el stock correctamente."
           onDismiss={() => setIsPopupOpen(false)}
           actions={[
-            { label: "Ver traslados", variant: "primary", onClick: () => navigate("/traslados-productos") },
+            { label: "Ver traslados", variant: "primary", onClick: () => navigate(`/traslados-productos/traslados-lista/${encodeURIComponent(idSucursal)}`) },
             { label: "Nuevo traslado", variant: "secondary", onClick: () => setIsPopupOpen(false) },
           ]}
         />
@@ -291,7 +292,7 @@ function IngresarTraslado() {
       <header className="flex items-center gap-3">
         <button
           type="button"
-          onClick={() => navigate("/traslados-productos")}
+          onClick={() => navigate(`/traslados-productos/traslados-lista/${encodeURIComponent(idSucursal)}`)}
           aria-label="Volver"
           className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-line bg-surface text-muted shadow-card transition-colors hover:bg-brand-50 hover:text-brand-700"
         >

@@ -110,10 +110,10 @@ function GestionarTraslados() {
 
   const handleViewDetails = (idTraslado) => {
     const encryptedId = encryptId(idTraslado.toString());
-    navigate(`/traslados-productos/detalles-traslado/${encodeURIComponent(encryptedId)}`);
+    navigate(`/traslados-productos/detalles-traslado/${encodeURIComponent(encryptedId)}/detalle/${encodeURIComponent(idSucursal)}`);
   };
 
-  const handleAddTraslado = () => navigate("/traslados-productos/ingresar-traslado");
+  const handleAddTraslado = () => navigate(`/traslados-productos/ingresar-traslado/${encodeURIComponent(idSucursal)}`);
 
   const handleDeleteConfirm = async (traslado) => {
     setIsDeleting(true);

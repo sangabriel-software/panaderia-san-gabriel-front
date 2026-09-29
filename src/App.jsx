@@ -168,8 +168,8 @@ function App() {
 
             <Route path="/traslados-productos">
               <Route path="traslados-lista/:idSucursal" element={<GestionarTraslados />} />
-              <Route path="detalles-traslado/:idTraslado" element={<DetalleTraslados />} />
-              <Route path="ingresar-traslado" element={<IngresarTraslado />} />
+              <Route path="detalles-traslado/:idTraslado/detalle/:idSucursal" element={<DetalleTraslados />} />
+              <Route path="ingresar-traslado/:idSucursal" element={<IngresarTraslado />} />
             </Route>
 
             <Route path="/encuestas-config">

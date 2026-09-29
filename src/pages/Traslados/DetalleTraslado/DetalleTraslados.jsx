@@ -13,8 +13,9 @@ function DetalleTraslados() {
   const { idTraslado } = useParams();
   const navigate = useNavigate();
   const { detalleTraslado, loadingDetalleTraslado, showErrorDetalleTraslado } = useGetDetalleTraslado(idTraslado);
+  const { idSucursal } = useParams();
 
-  const handleGoBack = () => navigate("/traslados-productos");
+  const handleGoBack = () => navigate(`/traslados-productos/traslados-lista/${encodeURIComponent(idSucursal)}`);
 
   const BackButton = () => (
     <button
