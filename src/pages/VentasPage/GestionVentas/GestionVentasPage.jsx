@@ -29,6 +29,7 @@ const GestionVentasPage = () => {
 
   // ── Datos ──────────────────────────────────
   const { ventas, loadingVentas, showErrorVentas, showInfoVentas, setVentas } = useGetVentas();
+  console.log(ventas)
   const filteredVentas = useFilterVentas(ventas, filters);
   const activeFilters = hasActiveFilters(filters);
 
