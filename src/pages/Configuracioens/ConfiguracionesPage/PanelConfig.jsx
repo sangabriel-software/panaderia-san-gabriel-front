@@ -1,264 +1,189 @@
-import React from "react";
 import { useNavigate } from "react-router-dom";
-import { MdStorage, MdKitchen, MdSettings, MdOutlineSettings, MdPoll, MdOutlineCalendarToday, MdNotificationsActive, MdCategory, } from "react-icons/md"; // Importar el ícono
-import { Container, Row, Col } from "react-bootstrap";
-import Title from "../../../components/Title/Title";
+import {
+  FiUsers,
+  FiUserPlus,
+  FiMapPin,
+  FiClipboard,
+  FiLock,
+  FiArrowRight,
+  FiSettings,
+  FiLayers,
+} from "react-icons/fi";
+import { MdStorage, MdKitchen, MdPoll, MdOutlineCalendarToday, MdNotificationsActive, MdCategory } from "react-icons/md";
 import useValidarPermisos from "../../../hooks/configuraciones/useValidarPermisos";
 import { rutas } from "./config.routes";
 import { handleNavigate } from "./PanelConfig.utils";
-import "./PanelConfig.css";
 import { getUserData } from "../../../utils/Auth/decodedata";
-import { FiClipboard, FiLock, FiMapPin, FiUsers } from "react-icons/fi";
-import { FaUserPlus } from "react-icons/fa";
 
-const PanelConfig = () => {
+function PanelConfig() {
   const navigate = useNavigate();
-  const permisos = useValidarPermisos(rutas); // Usar el custom hook para obtener los permisos
+  const permisos = useValidarPermisos(rutas);
   const usuario = getUserData();
+  const esAdmin = usuario?.usuario === "admin" || usuario?.usuario === "aagarcia";
+
+  const CONFIG_GROUPS = [
+    {
+      label: "Usuarios y accesos",
+      items: [
+        {
+          title: "Creación de Usuarios",
+          description: "Gestiona los usuarios que tienen acceso al sistema",
+          icon: FiUsers,
+          route: "/users",
+          allowed: permisos.usuarios,
+        },
+        {
+          title: "Gestión de Roles y Permisos",
+          description: "Gestiona los roles y permisos para los usuarios",
+          icon: FiUserPlus,
+          route: "/users/roles",
+          allowed: permisos.usuarios,
+        },
+        {
+          title: "Reseteo de contraseñas",
+          description: "Realiza el reseteo de contraseña de un usuario",
+          icon: FiLock,
+          route: "/reset-pass",
+          allowed: permisos.resetPass,
+        },
+      ],
+    },
+    {
+      label: "Operación",
+      items: [
+        {
+          title: "Sucursales",
+          description: "Creación de nuevas sucursales",
+          icon: FiMapPin,
+          route: "/sucursales",
+          allowed: permisos.sucursales,
+        },
+        {
+          title: "Productos",
+          description: "Creación de nuevos productos",
+          icon: FiClipboard,
+          route: "/productos",
+          allowed: permisos.productos,
+        },
+        {
+          title: "Categorías",
+          description: "Configura las categorías de productos",
+          icon: MdCategory,
+          route: "/categorias",
+          allowed: permisos.categorias,
+        },
+        {
+          title: "Gestionar Materia Prima",
+          description: "Gestiona la cantidad de materia prima por producto producido",
+          icon: MdStorage,
+          route: "/config/gestionar-materia-prima",
+          allowed: permisos.gestionarMateriaPrima,
+        },
+      ],
+    },
+    {
+      label: "Sistema",
+      items: [
+        {
+          title: "Configuración del Perfil",
+          description: "Gestiona tus credenciales de acceso y nombre de usuario",
+          icon: MdKitchen,
+          route: "/config/configuracion-perfil",
+          allowed: permisos.configuracionPerfil,
+        },
+        {
+          title: "Configurar Encuestas",
+          description: "Configura encuestas de satisfacción de servicios",
+          icon: MdPoll,
+          route: "/encuestas-config",
+          allowed: permisos.encuestas,
+        },
+        {
+          title: "Habilitar Notificaciones",
+          description: "Habilita notificaciones especiales para usuarios",
+          icon: MdNotificationsActive,
+          route: "/habilitar-notificaciones",
+          allowed: permisos.notificaciones,
+        },
+        ...(esAdmin
+          ? [
+              {
+                title: "Activar Fecha en curso",
+                description: "Activa el día en curso para ingreso de orden de producción",
+                icon: MdOutlineCalendarToday,
+                route: "/activar-fecha-produccion",
+                allowed: permisos.activarFechaProduccion,
+              },
+            ]
+          : []),
+      ],
+    },
+  ];
+
   return (
-    <Container className="panel-config-container">
-      {/* Contenedor centrado para el ícono y el título */}
-      <div className="config-title-container d-flex justify-content-center align-items-center mb-4">
-        <div className="d-flex align-items-center">
-          <MdOutlineSettings className="config-title-icon" size={30} />
-          <Title title="Configuraciones" />
+    <div className="flex flex-col gap-6">
+      {/* ── Header ───────────────────────────────────────────────────── */}
+      <header className="flex items-center gap-3">
+        <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-600 text-white shadow-brand">
+          <FiSettings size={19} />
+        </span>
+        <div>
+          <h1 className="text-2xl font-bold text-ink">Configuraciones</h1>
+          <p className="text-sm text-muted">Administra usuarios, operación y ajustes del sistema</p>
         </div>
-      </div>
+      </header>
 
-      <Row className="my-4">
-        {/* Sección: Usuarios */}
-        <Col xs={12} md={6} className="config-col">
-          <div
-            className={`config-section ${
-              permisos.usuarios ? "clickable" : "disabled"
-            }`}
-            onClick={() =>
-              permisos.usuarios &&
-              handleNavigate("/users", navigate)
-            }
-          >
-            <h2 className="section-title">
-              <FiUsers className="section-icon icon-usuarios" />{" "}
-              Creacion de Usuarios
+      {/* ── Secciones agrupadas por categoría ───────────────────────────── */}
+      <div className="flex flex-col gap-6">
+        {CONFIG_GROUPS.map((group) => (
+          <section key={group.label}>
+            <h2 className="mb-2 flex items-center gap-1.5 px-1 text-xs font-semibold uppercase tracking-wide text-muted">
+              <FiLayers size={12} /> {group.label}
             </h2>
-            <p className="section-description">
-              Gestiona la cantidad de materia prima por producto producido.
-            </p>
-          </div>
-        </Col>
 
-        <Col xs={12} md={6} className="config-col">
-          <div
-            className={`config-section ${
-              permisos.usuarios ? "clickable" : "disabled"
-            }`}
-            onClick={() =>
-              permisos.usuarios &&
-              handleNavigate("/users/roles", navigate)
-            }
-          >
-            <h2 className="section-title">
-              <FaUserPlus className="section-icon icon-roles" />{" "}
-              Gestion de Roles y Permisos
-            </h2>
-            <p className="section-description">
-              Gestiona los roles  y permisos para los usuarios.
-            </p>
-          </div>
-        </Col>
+            <div className="overflow-hidden rounded-2xl border border-line bg-surface shadow-card">
+              {group.items.map(({ title, description, icon: Icon, route, allowed }, i) => (
+                <button
+                  key={title}
+                  type="button"
+                  onClick={() => allowed && handleNavigate(route, navigate)}
+                  disabled={!allowed}
+                  title={!allowed ? "No tienes permiso para acceder a esta sección" : undefined}
+                  className={`group flex w-full items-center gap-4 border-0 bg-transparent p-4 text-left transition-colors ${
+                    i > 0 ? "border-t border-line" : ""
+                  } ${allowed ? "hover:bg-brand-50/50" : "cursor-not-allowed"}`}
+                >
+                  <span
+                    className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition-colors ${
+                      allowed
+                        ? "bg-brand-50 text-brand-600 group-hover:bg-brand-600 group-hover:text-white"
+                        : "bg-surface-2 text-muted"
+                    }`}
+                  >
+                    <Icon size={19} />
+                  </span>
 
-        <Col xs={12} md={6} className="config-col">
-          <div
-            className={`config-section ${
-              permisos.sucursales ? "clickable" : "disabled"
-            }`}
-            onClick={() =>
-              permisos.sucursales &&
-              handleNavigate("/sucursales", navigate)
-            }
-          >
-            <h2 className="section-title">
-              <FiMapPin className="section-icon icon-sucursales" />{" "}
-              Sucursales
-            </h2>
-            <p className="section-description">
-              Creacion de nuevas sucursales.
-            </p>
-          </div>
-        </Col>
+                  <div className="min-w-0 flex-1">
+                    <p className={`truncate text-sm font-semibold ${allowed ? "text-ink" : "text-muted"}`}>{title}</p>
+                    <p className="truncate text-xs text-muted">{description}</p>
+                  </div>
 
-        <Col xs={12} md={6} className="config-col">
-          <div
-            className={`config-section ${
-              permisos.productos ? "clickable" : "disabled"
-            }`}
-            onClick={() =>
-              permisos.productos &&
-              handleNavigate("/productos", navigate)
-            }
-          >
-            <h2 className="section-title">
-              <FiClipboard className="section-icon icon-productos" />{" "}
-              Productos
-            </h2>
-            <p className="section-description">
-              Creacion de nuevos productos.
-            </p>
-          </div>
-        </Col>
-
-        {/* Sección: Materia Prima */}
-        <Col xs={12} md={6} className="config-col">
-          <div
-            className={`config-section ${
-              permisos.gestionarMateriaPrima ? "clickable" : "disabled"
-            }`}
-            onClick={() =>
-              permisos.gestionarMateriaPrima &&
-              handleNavigate("/config/gestionar-materia-prima", navigate)
-            }
-          >
-            <h2 className="section-title">
-              <MdStorage className="section-icon icon-materia-prima" />{" "}
-              Gestionar Materia Prima
-            </h2>
-            <p className="section-description">
-              Gestiona la cantidad de materia prima por producto producido.
-            </p>
-          </div>
-        </Col>
-
-        {/* Sección: Configuración del Perfil */}
-        <Col xs={12} md={6} className="config-col">
-          <div
-            className={`config-section ${
-              permisos.configuracionPerfil ? "clickable" : "disabled"
-            }`}
-            onClick={() =>
-              permisos.configuracionPerfil &&
-              handleNavigate("/config/configuracion-perfil", navigate)
-            }
-          >
-            <h2 className="section-title">
-              <MdKitchen className="section-icon icon-recetas" />
-              Configuración del Perfil
-            </h2>
-            <p className="section-description">
-              Gestiona tus credenciales de acceso y nombre de usuario.
-            </p>
-          </div>
-        </Col>
-
-        {/* Sección: configuracion de encuestas */}
-        <Col xs={12} md={6} className="config-col">
-          <div
-            className={`config-section ${
-              permisos.encuestas ? "clickable" : "disabled"
-            }`}
-            onClick={() =>
-              permisos.encuestas &&
-              handleNavigate("/encuestas-config", navigate)
-            }
-          >
-            <h2 className="section-title">
-             <MdPoll className="section-icon icon-encuestas" />
-              Configurar Encuestas
-            </h2>
-            <p className="section-description">
-              Configura encuestas de satisfaccion de servicios.
-            </p>
-          </div>
-        </Col>
-
-        {/* Sección: activacion de fecha de produccion */}
-        {(usuario?.usuario === "admin" || usuario?.usuario === "aagarcia") && (
-          <Col xs={12} md={6} className="config-col">
-            <div
-              className={`config-section ${
-                permisos.activarFechaProduccion ? "clickable" : "disabled"
-              }`}
-              onClick={() =>
-                permisos.activarFechaProduccion &&
-                handleNavigate("/activar-fecha-produccion", navigate)
-              }
-            >
-              <h2 className="section-title">
-                <MdOutlineCalendarToday className="section-icon icon-fecha-produc" />
-                Activar Fecha en curso
-              </h2>
-              <p className="section-description">
-                Activa dia en curso para ingreso de orden de Produccion.
-              </p>
+                  {allowed ? (
+                    <FiArrowRight
+                      size={16}
+                      className="shrink-0 text-muted transition-all duration-150 group-hover:translate-x-1 group-hover:text-brand-600"
+                    />
+                  ) : (
+                    <FiLock size={14} className="shrink-0 text-muted" />
+                  )}
+                </button>
+              ))}
             </div>
-          </Col>
-        )}
-
-        {/* Sección: activacion de notificaciones especiales */}
-        <Col xs={12} md={6} className="config-col">
-          <div
-            className={`config-section ${
-              permisos.notificaciones ? "clickable" : "disabled"
-            }`}
-            onClick={() =>
-              permisos.notificaciones &&
-              handleNavigate("/habilitar-notificaciones", navigate)
-            }
-          >
-            <h2 className="section-title">
-             <MdNotificationsActive className="section-icon icon-noti-activos" />
-              Habilitar Notificaciones
-            </h2>
-            <p className="section-description">
-              Habilita notificaciones especiales para usuarios.
-            </p>
-          </div>
-        </Col>
-
-        {/* Sección: Confirguracion de categorigas */}
-        <Col xs={12} md={6} className="config-col">
-          <div
-            className={`config-section ${
-              permisos.categorias ? "clickable" : "disabled"
-            }`}
-            onClick={() =>
-              permisos.categorias &&
-              handleNavigate("/categorias", navigate)
-            }
-          >
-            <h2 className="section-title">
-             <MdCategory className="section-icon icon-categorias" />
-              Categorias
-            </h2>
-            <p className="section-description">
-              Configura las categorias de productos.
-            </p>
-          </div>
-        </Col>
-
-        {/* Sección: Reseteo de contraseña */}
-        <Col xs={12} md={6} className="config-col">
-          <div
-            className={`config-section ${
-              permisos.resetPass ? "clickable" : "disabled"
-            }`}
-            onClick={() =>
-              permisos.resetPass &&
-              handleNavigate("/reset-pass", navigate)
-            }
-          >
-            <h2 className="section-title">
-             <FiLock className="section-icon icon-reset-pass" />
-              Reseto de contraseñas
-            </h2>
-            <p className="section-description">
-              Realiza el reseteo de contraseña.
-            </p>
-          </div>
-        </Col>
-
-      </Row>
-    </Container>
+          </section>
+        ))}
+      </div>
+    </div>
   );
-};
+}
 
 export default PanelConfig;
