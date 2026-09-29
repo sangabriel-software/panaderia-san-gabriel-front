@@ -49,7 +49,6 @@ const OrdenesEspecialesList = lazy(() => import("./pages/OrdenesEspeciales/Orden
 const IngresarOrdenEspecialPage = lazy(() => import("./pages/OrdenesEspeciales/ingresar-orden-especial/IngresarIOrdenEspecial"));
 const OrdenEspecialDetail = lazy(() => import("./pages/OrdenesEspeciales/DetalleOrdenEspecial/OrdenEspecialDetalle"));
 const HomePage = lazy(() => import("./pages/Home/HomePage"));
-const GestionarDecuentos = lazy(() => import("./pages/StockProductos/DescontarStock/GestionDescuentos/GestionarDecuentos"));
 const StockDescuentosList = lazy(() => import("./pages/StockProductos/DescontarStock/StockDescuentosList/StockDescuentosList"));
 const DescontarStock = lazy(() => import("./pages/StockProductos/DescontarStock/DescontarStock/DescontarStock"));
 const DetalleDescuento = lazy(() => import("./pages/StockProductos/DescontarStock/DetalleDescuento/DetalleDescuento"));
@@ -148,7 +147,6 @@ function App() {
             {/* Nota: se removió la "ñ" suelta que quedó pegada al final de este path,
                 era texto sin uso dentro del JSX y no debería estar ahí. */}
             <Route path="/descuento-stock">
-              <Route index element={<GestionarDecuentos />} />
               <Route path="stock-descuentos-lista/:idSucursal" element={<StockDescuentosList />} />
               <Route path="descontar-stock/:idSucursal" element={<DescontarStock />} />
               <Route path="detalle-descuento/:idDescuento" element={<DetalleDescuento />} />
