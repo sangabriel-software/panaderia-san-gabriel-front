@@ -1,514 +1,490 @@
-import useGetOrdenEHeader from "../../../hooks/orenesEspeciales/useGetOrdenEHeader";
-import { useState, useMemo } from 'react';
-import { useMediaQuery } from 'react-responsive';
-import { useNavigate } from 'react-router-dom';
-import './OrdenesEspecialesList.styles.css';
-import Title from "../../../components/Title/Title";
-import { FiPlusCircle, FiEye, FiTrash2, FiUser, FiPhone, FiCalendar, FiShoppingBag, FiX, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
-import { eliminarOrdenEspecialService } from "../../../services/ordenesEspeciales/ordenesEspeciales.service";
-import Alert from "../../../components/Alerts/Alert";
-import ErrorPopup from "../../../components/Popup/ErrorPopUp";
-import { Spinner, Form } from "react-bootstrap";
-import { BsExclamationTriangleFill, BsInfoCircleFill } from 'react-icons/bs';
-import { formatDateToDisplay } from "../../../utils/dateUtils";
+import { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
+import {
+  FiPlusCircle,
+  FiEye,
+  FiTrash2,
+  FiUser,
+  FiPhone,
+  FiCalendar,
+  FiSearch,
+  FiX,
+  FiFilter,
+  FiChevronDown,
+  FiInbox,
+  FiTag,
+} from "react-icons/fi";
+import useGetOrdenEHeader from "../../../hooks/orenesEspeciales/useGetOrdenEHeader";
+import { eliminarOrdenEspecialService } from "../../../services/ordenesEspeciales/ordenesEspeciales.service";
+import { formatDateToDisplay } from "../../../utils/dateUtils";
+import Alert from "../../../components/Alerts/Alert";
+import Pagination from "../../../components/Pagination/Pagination";
 
-const OrdenesEspecialesList = () => {
+const RECORDS_PER_PAGE = 8;
+
+function OrdenesEspecialesList() {
   const { ordenesEspeciales, loadingOrdenEspecial, showErrorOrdenEspecial, setOrdenesEspeciales } = useGetOrdenEHeader();
-  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-  const [selectedOrder, setSelectedOrder] = useState(null);
+  const navigate = useNavigate();
+
+  const [confirmingId, setConfirmingId] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const [isPopupErrorOpen, setIsPopupErrorOpen] = useState(false);
-  const [errorPopupMessage, setErrorPopupMessage] = useState("");
-  
-  
-  // Filtros
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+
+  const [searchTerm, setSearchTerm] = useState("");
   const [sucursalFilter, setSucursalFilter] = useState("");
   const [fechaFilter, setFechaFilter] = useState("");
-  
-  // Paginación
   const [currentPage, setCurrentPage] = useState(1);
-  const recordsPerPage = 5;
-  
-  const navigate = useNavigate();
-  
-  // Definición de breakpoints
-  const isMobile = useMediaQuery({ maxWidth: 767 });
-  const isTablet = useMediaQuery({ minWidth: 768, maxWidth: 991 });
 
-  // Obtener lista única de sucursales para el filtro
   const sucursalesUnicas = useMemo(() => {
-    const sucursales = ordenesEspeciales.map(o => o.sucursalEntrega);
-    return [...new Set(sucursales)].sort();
+    const sucursales = (ordenesEspeciales || []).map((o) => o.sucursalEntrega);
+    return [...new Set(sucursales)].filter(Boolean).sort();
   }, [ordenesEspeciales]);
 
-  // Filtrar órdenes
   const filteredOrdenes = useMemo(() => {
-    return ordenesEspeciales.filter(orden => {
-      // Filtro por sucursal
-      const matchesSucursal = sucursalFilter === "" || 
-        orden.sucursalEntrega.toLowerCase().includes(sucursalFilter.toLowerCase());
-      
-      // Filtro por fecha
-      const matchesFecha = fechaFilter === "" || 
-        orden.fechaEntrega === fechaFilter;
-      
-      return matchesSucursal && matchesFecha;
+    const term = searchTerm.trim().toLowerCase();
+    return (ordenesEspeciales || []).filter((orden) => {
+      const matchesSearch =
+        !term ||
+        `${orden.idOrdenEspecial} ${orden.nombreCliente} ${orden.telefonoCliente}`.toLowerCase().includes(term);
+      const matchesSucursal = sucursalFilter === "" || orden.sucursalEntrega === sucursalFilter;
+      const matchesFecha = fechaFilter === "" || orden.fechaEntrega === fechaFilter;
+      return matchesSearch && matchesSucursal && matchesFecha;
     });
-  }, [ordenesEspeciales, sucursalFilter, fechaFilter]);
+  }, [ordenesEspeciales, searchTerm, sucursalFilter, fechaFilter]);
 
-  // Lógica de paginación
-  const indexOfLastRecord = currentPage * recordsPerPage;
-  const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
-  const currentRecords = filteredOrdenes.slice(indexOfFirstRecord, indexOfLastRecord);
-  const totalPages = Math.ceil(filteredOrdenes.length / recordsPerPage);
+  const hayFiltros = searchTerm.trim() || sucursalFilter || fechaFilter;
 
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  const totalPages = Math.ceil(filteredOrdenes.length / RECORDS_PER_PAGE);
+  const currentRecords = useMemo(() => {
+    const start = (currentPage - 1) * RECORDS_PER_PAGE;
+    return filteredOrdenes.slice(start, start + RECORDS_PER_PAGE);
+  }, [filteredOrdenes, currentPage]);
 
-  const handleDeleteClick = (order) => {
-    setSelectedOrder(order);
-    setOpenDeleteDialog(true);
+  const clearFilters = () => {
+    setSearchTerm("");
+    setSucursalFilter("");
+    setFechaFilter("");
+    setCurrentPage(1);
   };
 
-  const handleDeleteConfirm = async () => {
+  const handleNewOrder = () => navigate("/pedido-especial/ingresar-orden-especial");
+  const handleViewDetails = (id) => navigate(`/pedido-especial/detalle-orden-especial/${id}`);
+
+  const handleDeleteConfirm = async (orden) => {
     setIsDeleting(true);
     try {
-      await eliminarOrdenEspecialService(selectedOrder.idOrdenEspecial);
-      setOrdenesEspeciales(ordenesEspeciales.filter(o => o.idOrdenEspecial !== selectedOrder.idOrdenEspecial));
-      setIsPopupOpen(true);
-      // Resetear a la primera página si quedan pocos registros
+      await eliminarOrdenEspecialService(orden.idOrdenEspecial);
+      setOrdenesEspeciales(ordenesEspeciales.filter((o) => o.idOrdenEspecial !== orden.idOrdenEspecial));
+      setConfirmingId(null);
+      setSuccessMessage(`Se eliminó la orden #${orden.idOrdenEspecial}.`);
+      // Si la página se quedó sin registros tras eliminar, retrocede una página
       if (currentRecords.length === 1 && currentPage > 1) {
         setCurrentPage(currentPage - 1);
       }
     } catch (error) {
-      setErrorPopupMessage(error.message || "Error al eliminar la orden especial");
-      setIsPopupErrorOpen(true);
+      setConfirmingId(null);
+      setErrorMessage(error.message || "Error al eliminar la orden especial");
     } finally {
       setIsDeleting(false);
-      setOpenDeleteDialog(false);
-      setSelectedOrder(null);
     }
   };
 
-  const handleDeleteCancel = () => {
-    setOpenDeleteDialog(false);
-    setSelectedOrder(null);
-  };
-
-  const handleNewOrder = () => {
-    navigate('/pedido-especial/ingresar-orden-especial');
-  };
-
-  // En el componente OrdenesEspecialesList, modificar los botones de "Ver detalles"
-const handleViewDetails = (idOrdenEspecial) => {
-  navigate(`/pedido-especial/detalle-orden-especial/${idOrdenEspecial}`);
-};
-
-  const clearFilters = () => {
-    setSucursalFilter("");
-    setFechaFilter("");
-    setCurrentPage(1); // Resetear a la primera página al limpiar filtros
+  const estadoInfo = (orden) => {
+    const entregado = dayjs(orden.fechaEntrega).isBefore(dayjs(), "day");
+    return entregado
+      ? { label: "Entregado", tone: "bg-brand-50 text-brand-700" }
+      : { label: "Sin entregar", tone: "bg-warning-50 text-warning-700" };
   };
 
   if (loadingOrdenEspecial) {
     return (
-      <div className="oel-loading-container">
-        <div className="oel-spinner"></div>
-      </div>
-    );
-  }
-
-  if (showErrorOrdenEspecial) {
-    return (
-      <div className="row">
-        <div className="col-lg-3"></div>
-        <div className="col-lg-6">
-          <Alert
-            type="danger"
-            message="Error al cargar las órdenes especiales"
-            icon={<BsExclamationTriangleFill />}
-          />
-        </div>
+      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-3">
+        <span className="h-10 w-10 animate-spin-smooth rounded-full border-4 border-brand-200 border-t-brand-600" />
+        <p className="text-sm text-muted">Cargando órdenes especiales...</p>
       </div>
     );
   }
 
   return (
-    <div className="oel-container">
-      <div className="oel-header">
-        <Title
-          title="Órdenes Especiales"
-          description="Gestión de las ordenes especiales"
+    <div className="flex flex-col gap-6">
+      {/* ── Alertas flotantes ────────────────────────────────────────── */}
+      {errorMessage && (
+        <Alert
+          floating
+          position="top-right"
+          type="danger"
+          title="No se pudo eliminar"
+          message={errorMessage}
+          onDismiss={() => setErrorMessage("")}
         />
-        <button 
-          className="oel-new-order-button"
-          onClick={handleNewOrder}
-        >
-          <FiPlusCircle className="oel-icon" /> Ingresar Orden Especial
-        </button>
-      </div>
+      )}
+      {successMessage && (
+        <Alert
+          floating
+          position="top-right"
+          type="success"
+          title="Orden eliminada"
+          message={successMessage}
+          duration={3000}
+          onDismiss={() => setSuccessMessage("")}
+        />
+      )}
 
-      {/* Filtros */}
-      <div className="oel-filters-container">
-        <div className="oel-filters-row">
-          <div className="oel-filter-group">
-            <Form.Label>Sucursal:</Form.Label>
-            <Form.Select
+      {/* ── Header ───────────────────────────────────────────────────── */}
+      <header className="flex flex-wrap items-center gap-3">
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-600 text-white shadow-brand">
+          <FiTag size={19} />
+        </span>
+        <div className="min-w-0 flex-1">
+          <h1 className="truncate text-xl font-bold text-ink sm:text-2xl">Órdenes Especiales</h1>
+          <p className="text-sm text-muted">{filteredOrdenes.length} órdenes registradas</p>
+        </div>
+        <button
+          type="button"
+          onClick={handleNewOrder}
+          className="flex w-full items-center justify-center gap-2 rounded-xl border-0 bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white shadow-brand transition-colors hover:bg-brand-500 sm:w-auto"
+        >
+          <FiPlusCircle size={15} /> Ingresar Orden Especial
+        </button>
+      </header>
+
+      {showErrorOrdenEspecial && (
+        <Alert type="danger" title="No se pudieron cargar las órdenes" message="Intenta más tarde." />
+      )}
+
+      {/* ── Filtros ──────────────────────────────────────────────────── */}
+      <div className="rounded-2xl border border-line bg-surface p-4 shadow-card">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+          <div className="relative">
+            <FiSearch size={14} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" />
+            <input
+              type="text"
+              placeholder="Buscar cliente, teléfono o ID..."
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="w-full rounded-xl border border-line bg-surface py-2.5 pl-10 pr-9 text-sm text-ink placeholder:text-muted transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/25"
+            />
+            {searchTerm && (
+              <button
+                type="button"
+                onClick={() => setSearchTerm("")}
+                aria-label="Limpiar búsqueda"
+                className="absolute right-2.5 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-md border-0 bg-transparent text-muted transition-colors hover:text-ink"
+              >
+                <FiX size={16} />
+              </button>
+            )}
+          </div>
+
+          <div className="relative">
+            <FiFilter size={14} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" />
+            <select
               value={sucursalFilter}
               onChange={(e) => {
                 setSucursalFilter(e.target.value);
-                setCurrentPage(1); // Resetear a la primera página al cambiar filtro
+                setCurrentPage(1);
               }}
-              className="oel-filter-select"
+              className="w-full appearance-none rounded-xl border border-line bg-surface py-2.5 pl-10 pr-9 text-sm font-medium text-ink transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/25"
             >
               <option value="">Todas las sucursales</option>
-              {sucursalesUnicas.map((sucursal) => (
-                <option key={sucursal} value={sucursal}>
-                  {sucursal}
+              {sucursalesUnicas.map((s) => (
+                <option key={s} value={s}>
+                  {s}
                 </option>
               ))}
-            </Form.Select>
+            </select>
+            <FiChevronDown size={14} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-muted" />
           </div>
-          
-          <div className="oel-filter-group">
-            <Form.Label>Fecha de Entrega:</Form.Label>
-            <Form.Control
+
+          <div className="relative">
+            <FiCalendar size={14} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" />
+            <input
               type="date"
               value={fechaFilter}
               onChange={(e) => {
                 setFechaFilter(e.target.value);
-                setCurrentPage(1); // Resetear a la primera página al cambiar filtro
+                setCurrentPage(1);
               }}
-              className="oel-filter-input"
+              className="w-full rounded-xl border border-line bg-surface py-2.5 pl-10 pr-9 text-sm text-ink transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/25"
             />
+            {fechaFilter && (
+              <button
+                type="button"
+                onClick={() => setFechaFilter("")}
+                aria-label="Limpiar fecha"
+                className="absolute right-2.5 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-md border-0 bg-transparent text-muted transition-colors hover:text-ink"
+              >
+                <FiX size={16} />
+              </button>
+            )}
           </div>
-          
-          <button 
-            className="oel-clear-filters"
+        </div>
+
+        {hayFiltros && (
+          <button
+            type="button"
             onClick={clearFilters}
-            disabled={!sucursalFilter && !fechaFilter}
+            className="mt-3 border-0 bg-transparent text-xs font-medium text-brand-600 hover:text-brand-700"
           >
             Limpiar filtros
           </button>
-        </div>
+        )}
       </div>
 
-      {/* Mostrar alerta si no hay órdenes */}
-      {filteredOrdenes.length === 0 && !loadingOrdenEspecial && !showErrorOrdenEspecial && (
-        <div className="row justify-content-center my-4">
-          <div className="col-md-8">
-            <Alert
-              type="info"
-              message={
-                sucursalFilter || fechaFilter 
-                  ? "No hay órdenes que coincidan con los filtros aplicados"
-                  : "No hay órdenes especiales registradas."
-              }
-              icon={<BsInfoCircleFill />}
-            />
-          </div>
+      {/* ── Estado vacío ─────────────────────────────────────────────── */}
+      {filteredOrdenes.length === 0 && (
+        <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-line bg-surface py-16 text-center">
+          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-surface-2 text-muted">
+            <FiInbox size={20} />
+          </span>
+          <p className="text-sm text-muted">
+            {hayFiltros ? "No hay órdenes que coincidan con los filtros aplicados." : "No hay órdenes especiales registradas."}
+          </p>
+          {hayFiltros && (
+            <button
+              type="button"
+              onClick={clearFilters}
+              className="rounded-lg border-0 bg-surface-2 px-3.5 py-1.5 text-xs font-semibold text-ink transition-colors hover:bg-brand-50 hover:text-brand-700"
+            >
+              Limpiar filtros
+            </button>
+          )}
         </div>
       )}
 
-      {/* Versión Desktop */}
-      {!isMobile && !isTablet && currentRecords.length > 0 && (
+      {/* ── Lista: tabla en desktop, tarjetas en móvil ──────────────────── */}
+      {filteredOrdenes.length > 0 && (
         <>
-          <div className="oel-table-container">
-            <table className="oel-table">
-              <thead>
+          {/* Desktop */}
+          <div className="hidden overflow-hidden rounded-2xl border border-line bg-surface shadow-card sm:block">
+            <table className="w-full table-fixed border-collapse text-sm">
+              <thead className="bg-surface-2/95">
                 <tr>
-                  <th>ID</th>
-                  <th>Cliente</th>
-                  <th>Teléfono</th>
-                  <th>Sucursal</th>
-                  <th>Fecha Entrega</th>
-                  <th>Estado</th>
-                  <th>Acciones</th>
+                  <th className="w-[8%] border-b border-line px-3 py-3 text-center text-xs font-semibold uppercase tracking-wide text-muted">
+                    ID
+                  </th>
+                  <th className="w-[22%] border-b border-line px-3 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted">
+                    Cliente
+                  </th>
+                  <th className="w-[15%] border-b border-line px-3 py-3 text-center text-xs font-semibold uppercase tracking-wide text-muted">
+                    Teléfono
+                  </th>
+                  <th className="w-[20%] border-b border-line px-3 py-3 text-center text-xs font-semibold uppercase tracking-wide text-muted">
+                    Sucursal
+                  </th>
+                  <th className="w-[15%] border-b border-line px-3 py-3 text-center text-xs font-semibold uppercase tracking-wide text-muted">
+                    Entrega
+                  </th>
+                  <th className="w-[10%] border-b border-line px-3 py-3 text-center text-xs font-semibold uppercase tracking-wide text-muted">
+                    Estado
+                  </th>
+                  <th className="w-[10%] border-b border-line px-3 py-3 text-center text-xs font-semibold uppercase tracking-wide text-muted">
+                    Acciones
+                  </th>
                 </tr>
               </thead>
-              <tbody>
-                {currentRecords.map((orden) => (
-                  <tr key={orden.idOrdenEspecial} className="oel-table-row">
-                    <td data-label="ID">{orden.idOrdenEspecial}</td>
-                    <td data-label="Cliente">{orden.nombreCliente}</td>
-                    <td data-label="Teléfono">{orden.telefonoCliente}</td>
-                    <td data-label="Sucursal">{orden.sucursalEntrega}</td>
-                    <td data-label="Fecha Entrega">{formatDateToDisplay(orden.fechaEntrega)}</td>
-                    <td data-label="Estado">
-                      <span className={`oel-status-badge ${dayjs(orden.fechaEntrega).isBefore(dayjs(), 'day') ? 'oel-active' : 'oel-inactive'}`}>
-                        {dayjs(orden.fechaEntrega).isBefore(dayjs(), 'day') ? 'Entregado' : 'Sin entregar'}
+
+              {currentRecords.map((orden, i) => {
+                const estado = estadoInfo(orden);
+                const confirmando = confirmingId === orden.idOrdenEspecial;
+
+                return (
+                  <tbody key={orden.idOrdenEspecial}>
+                    <tr
+                      onClick={() => handleViewDetails(orden.idOrdenEspecial)}
+                      className={`cursor-pointer border-b border-line transition-colors hover:bg-brand-50/50 ${
+                        i % 2 === 1 ? "bg-surface-2/30" : ""
+                      } ${confirmando ? "border-b-0" : ""}`}
+                    >
+                      <td className="px-3 py-3 text-center text-muted">#{orden.idOrdenEspecial}</td>
+                      <td className="px-3 py-3">
+                        <div className="flex items-center gap-2">
+                          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-50 text-brand-600">
+                            <FiUser size={12} />
+                          </span>
+                          <span className="truncate font-medium text-ink">{orden.nombreCliente}</span>
+                        </div>
+                      </td>
+                      <td className="px-3 py-3 text-center text-ink">{orden.telefonoCliente}</td>
+                      <td className="px-3 py-3 text-center">
+                        <span className="inline-flex max-w-full truncate rounded-full bg-surface-2 px-2.5 py-1 text-xs font-medium text-ink">
+                          {orden.sucursalEntrega}
+                        </span>
+                      </td>
+                      <td className="px-3 py-3 text-center text-ink">{formatDateToDisplay(orden.fechaEntrega)}</td>
+                      <td className="px-3 py-3 text-center">
+                        <span className={`rounded-full px-2.5 py-1 text-2xs font-semibold ${estado.tone}`}>{estado.label}</span>
+                      </td>
+                      <td className="px-3 py-3" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex items-center justify-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => handleViewDetails(orden.idOrdenEspecial)}
+                            aria-label="Ver detalles"
+                            title="Ver detalles"
+                            className="flex h-8 w-8 items-center justify-center rounded-lg border-0 bg-transparent text-brand-600 transition-colors hover:bg-brand-50"
+                          >
+                            <FiEye size={16} />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setConfirmingId(confirmando ? null : orden.idOrdenEspecial)}
+                            aria-label="Eliminar orden"
+                            title="Eliminar orden"
+                            className={`flex h-8 w-8 items-center justify-center rounded-lg border-0 transition-colors ${
+                              confirmando
+                                ? "bg-danger-50 text-danger-600"
+                                : "bg-transparent text-muted hover:bg-danger-50 hover:text-danger-600"
+                            }`}
+                          >
+                            <FiTrash2 size={16} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+
+                    {confirmando && (
+                      <tr className="border-b border-line">
+                        <td colSpan={7} className="animate-slide-up bg-danger-50 px-4 py-3">
+                          <div className="flex flex-wrap items-center justify-between gap-3">
+                            <div>
+                              <p className="text-sm font-semibold text-danger-800">
+                                ¿Eliminar la orden #{orden.idOrdenEspecial} de {orden.nombreCliente}?
+                              </p>
+                              <p className="mt-0.5 text-xs text-danger-700">Esta acción no se puede deshacer.</p>
+                            </div>
+                            <div className="flex shrink-0 gap-2">
+                              <button
+                                type="button"
+                                onClick={() => setConfirmingId(null)}
+                                disabled={isDeleting}
+                                className="rounded-lg border border-line bg-white px-3.5 py-1.5 text-xs font-semibold text-ink transition-colors hover:bg-surface-2 disabled:cursor-not-allowed"
+                              >
+                                Cancelar
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteConfirm(orden)}
+                                disabled={isDeleting}
+                                className="flex min-w-[5.5rem] items-center justify-center rounded-lg border-0 bg-danger-600 px-3.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-danger-500 disabled:cursor-not-allowed disabled:bg-danger-400"
+                              >
+                                {isDeleting ? (
+                                  <span className="h-3.5 w-3.5 animate-spin-smooth rounded-full border-2 border-white/40 border-t-white" />
+                                ) : (
+                                  "Eliminar"
+                                )}
+                              </button>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                );
+              })}
+            </table>
+          </div>
+
+          {/* Móvil */}
+          <ul className="flex flex-col gap-3 sm:hidden">
+            {currentRecords.map((orden) => {
+              const estado = estadoInfo(orden);
+              const confirmando = confirmingId === orden.idOrdenEspecial;
+
+              return (
+                <li key={orden.idOrdenEspecial} className="overflow-hidden rounded-2xl border border-line bg-surface shadow-card">
+                  <button
+                    type="button"
+                    onClick={() => handleViewDetails(orden.idOrdenEspecial)}
+                    className="flex w-full flex-col gap-2 border-0 bg-transparent p-4 text-left"
+                  >
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-50 text-brand-600">
+                        <FiUser size={14} />
                       </span>
-                    </td>
-                    <td data-label="Acciones">
-                      <div className="oel-actions">
-                        <button className="oel-action-button oel-view" title="Ver detalles" onClick={() => handleViewDetails(orden.idOrdenEspecial)}>
-                          <FiEye className="oel-icon" />
-                        </button>
-                        <button 
-                          className="oel-action-button oel-delete"
-                          onClick={() => handleDeleteClick(orden)}
-                          title="Eliminar orden"
+                      <span className="text-sm font-semibold text-ink">{orden.nombreCliente}</span>
+                      <span className="text-xs text-muted">#{orden.idOrdenEspecial}</span>
+                      <span className={`ml-auto rounded-full px-2 py-0.5 text-2xs font-semibold ${estado.tone}`}>{estado.label}</span>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted">
+                      <span className="flex items-center gap-1">
+                        <FiPhone size={12} /> {orden.telefonoCliente}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <FiCalendar size={12} /> {formatDateToDisplay(orden.fechaEntrega)}
+                      </span>
+                      <span className="text-ink">{orden.sucursalEntrega}</span>
+                    </div>
+                  </button>
+
+                  <div className="flex items-center gap-2 border-t border-line px-4 py-2.5">
+                    <button
+                      type="button"
+                      onClick={() => handleViewDetails(orden.idOrdenEspecial)}
+                      className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border-0 bg-brand-50 py-2 text-xs font-semibold text-brand-700 transition-colors hover:bg-brand-100"
+                    >
+                      <FiEye size={14} /> Ver
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setConfirmingId(confirmando ? null : orden.idOrdenEspecial)}
+                      className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border-0 bg-danger-50 py-2 text-xs font-semibold text-danger-700 transition-colors hover:bg-danger-100"
+                    >
+                      <FiTrash2 size={14} /> Eliminar
+                    </button>
+                  </div>
+
+                  {confirmando && (
+                    <div className="animate-slide-up border-t border-danger-200 bg-danger-50 px-4 py-3">
+                      <p className="text-sm font-semibold text-danger-800">
+                        ¿Eliminar la orden #{orden.idOrdenEspecial}?
+                      </p>
+                      <p className="mt-0.5 text-xs text-danger-700">Esta acción no se puede deshacer.</p>
+                      <div className="mt-3 flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setConfirmingId(null)}
                           disabled={isDeleting}
+                          className="flex-1 rounded-lg border border-line bg-white px-3.5 py-1.5 text-xs font-semibold text-ink transition-colors hover:bg-surface-2 disabled:cursor-not-allowed"
                         >
-                          {isDeleting && selectedOrder?.idOrdenEspecial === orden.idOrdenEspecial ? (
-                            <Spinner animation="border" size="sm" />
+                          Cancelar
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteConfirm(orden)}
+                          disabled={isDeleting}
+                          className="flex flex-1 items-center justify-center rounded-lg border-0 bg-danger-600 px-3.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-danger-500 disabled:cursor-not-allowed"
+                        >
+                          {isDeleting ? (
+                            <span className="h-3.5 w-3.5 animate-spin-smooth rounded-full border-2 border-white/40 border-t-white" />
                           ) : (
-                            <FiTrash2 className="oel-icon" />
+                            "Eliminar"
                           )}
                         </button>
                       </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          
-          {/* Paginación Desktop */}
-          <div className="oel-pagination">
-            <button
-              onClick={() => paginate(currentPage - 1)}
-              disabled={currentPage === 1}
-              className="oel-pagination-button"
-            >
-              <FiChevronLeft className="oel-icon" />
-            </button>
-            
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map(number => (
-              <button
-                key={number}
-                onClick={() => paginate(number)}
-                className={`oel-pagination-button ${currentPage === number ? 'active' : ''}`}
-              >
-                {number}
-              </button>
-            ))}
-            
-            <button
-              onClick={() => paginate(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              className="oel-pagination-button"
-            >
-              <FiChevronRight className="oel-icon" />
-            </button>
-          </div>
-        </>
-      )}
-
-      {/* Versión Tablet */}
-      {isTablet && currentRecords.length > 0 && (
-        <>
-          <div className="oel-grid-container">
-            {currentRecords.map((orden) => (
-              <div key={orden.idOrdenEspecial} className="oel-card">
-                <div className="oel-card-header">
-                  <div className="oel-client-info">
-                    <FiUser className="oel-icon" />
-                    <h3 className="oel-client-name">{orden.nombreCliente}</h3>
-                  </div>
-                  <span className={`oel-status-badge ${orden.estado === 'A' ? 'oel-active' : 'oel-inactive'}`}>
-                    {orden.estado === 'A' ? 'Activo' : 'Inactivo'}
-                  </span>
-                </div>
-                <div className="oel-card-details">
-                  <div className="oel-detail">
-                    <FiPhone className="oel-icon" />
-                    <span>{orden.telefonoCliente}</span>
-                  </div>
-                  <div className="oel-detail">
-                    <FiShoppingBag className="oel-icon" />
-                    <span>{orden.sucursalEntrega}</span>
-                  </div>
-                  <div className="oel-detail">
-                    <FiCalendar className="oel-icon" />
-                    <span>{formatDateToDisplay(orden.fechaEntrega)}</span>
-                  </div>
-                </div>
-                <div className="oel-card-actions">
-                  <button className="oel-card-action-button oel-view" title="Ver detalles" onClick={() => handleViewDetails(orden.idOrdenEspecial)}>
-                    <FiEye className="oel-icon" /> Ver
-                  </button>
-                  <button 
-                    className="oel-card-action-button oel-delete"
-                    onClick={() => handleDeleteClick(orden)}
-                    title="Eliminar orden"
-                    disabled={isDeleting}
-                  >
-                    {isDeleting && selectedOrder?.idOrdenEspecial === orden.idOrdenEspecial ? (
-                      <Spinner animation="border" size="sm" />
-                    ) : (
-                      <>
-                        <FiTrash2 className="oel-icon" /> Eliminar
-                      </>
-                    )}
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-          
-          {/* Paginación Tablet */}
-          <div className="oel-pagination">
-            <button
-              onClick={() => paginate(currentPage - 1)}
-              disabled={currentPage === 1}
-              className="oel-pagination-button"
-            >
-              <FiChevronLeft className="oel-icon" />
-            </button>
-            
-            <span className="oel-pagination-info">
-              Página {currentPage} de {totalPages}
-            </span>
-            
-            <button
-              onClick={() => paginate(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              className="oel-pagination-button"
-            >
-              <FiChevronRight className="oel-icon" />
-            </button>
-          </div>
-        </>
-      )}
-
-      {/* Versión Mobile */}
-      {isMobile && currentRecords.length > 0 && (
-        <>
-          <div className="oel-mobile-container">
-            {currentRecords.map((orden) => (
-              <div key={orden.idOrdenEspecial} className="oel-mobile-card">
-                <div className="oel-mobile-header">
-                  <div className="oel-client-info">
-                    <FiUser className="oel-icon oel-profile-icon" />
-                    <div>
-                      <h4 className="oel-client-name">{orden.nombreCliente}</h4>
-                      <div className="oel-client-meta">
-                        <span className={`oel-status-badge ${orden.estado === 'A' ? 'oel-active' : 'oel-inactive'}`}>
-                          {orden.estado === 'A' ? 'Activo' : 'Inactivo'}
-                        </span>
-                        <span className="oel-order-id">#{orden.idOrdenEspecial}</span>
-                      </div>
                     </div>
-                  </div>
-                </div>
-                
-                <div className="oel-mobile-details">
-                  <div className="oel-detail-row">
-                    <FiPhone className="oel-icon" />
-                    <span>{orden.telefonoCliente}</span>
-                  </div>
-                  <div className="oel-detail-row">
-                    <FiShoppingBag className="oel-icon" />
-                    <span>{orden.sucursalEntrega}</span>
-                  </div>
-                  <div className="oel-detail-row">
-                    <FiCalendar className="oel-icon" />
-                    <span>{formatDateToDisplay(orden.fechaEntrega)}</span>
-                  </div>
-                </div>
-                
-                <div className="oel-mobile-actions">
-                  <button className="oel-mobile-action-button oel-view" title="Ver detalles" onClick={() => handleViewDetails(orden.idOrdenEspecial)}>
-                    <FiEye className="oel-icon" />
-                    <span>Ver</span>
-                  </button>
-                  <button 
-                    className="oel-mobile-action-button oel-delete"
-                    onClick={() => handleDeleteClick(orden)}
-                    title="Eliminar orden"
-                    disabled={isDeleting}
-                  >
-                    {isDeleting && selectedOrder?.idOrdenEspecial === orden.idOrdenEspecial ? (
-                      <Spinner animation="border" size="sm" />
-                    ) : (
-                      <>
-                        <FiTrash2 className="oel-icon" />
-                        <span>Eliminar</span>
-                      </>
-                    )}
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-          
-          {/* Paginación Mobile */}
-          <div className="oel-pagination-mobile">
-            <button
-              onClick={() => paginate(currentPage - 1)}
-              disabled={currentPage === 1}
-              className="oel-pagination-button"
-            >
-              <FiChevronLeft className="oel-icon" /> Anterior
-            </button>
-            
-            <span className="oel-pagination-info">
-              {currentPage}/{totalPages}
-            </span>
-            
-            <button
-              onClick={() => paginate(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              className="oel-pagination-button"
-            >
-              Siguiente <FiChevronRight className="oel-icon" />
-            </button>
-          </div>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+
+          <Pagination
+            totalItems={filteredOrdenes.length}
+            itemsPerPage={RECORDS_PER_PAGE}
+            currentPage={currentPage}
+            onPageChange={setCurrentPage}
+          />
         </>
       )}
-
-      {/* Modal de confirmación */}
-      {openDeleteDialog && (
-        <div className="oel-modal-overlay">
-          <div className="oel-modal-content">
-            <div className="oel-modal-header">
-              <h3>Confirmar eliminación</h3>
-              <button 
-                className="oel-modal-close"
-                onClick={handleDeleteCancel}
-                disabled={isDeleting}
-              >
-                <FiX className="oel-icon" />
-              </button>
-            </div>
-            <div className="oel-modal-body">
-              <p>¿Estás seguro que deseas eliminar la orden especial #{selectedOrder?.idOrdenEspecial} a nombre de {selectedOrder?.nombreCliente}?</p>
-            </div>
-            <div className="oel-modal-footer">
-              <button 
-                className="oel-modal-button oel-cancel"
-                onClick={handleDeleteCancel}
-                disabled={isDeleting}
-              >
-                Cancelar
-              </button>
-              <button 
-                className="oel-modal-button oel-confirm"
-                onClick={handleDeleteConfirm}
-                disabled={isDeleting}
-              >
-                {isDeleting ? (
-                  <Spinner animation="border" size="sm" />
-                ) : (
-                  "Eliminar"
-                )}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Popup errores */}
-      <ErrorPopup
-        isOpen={isPopupErrorOpen}
-        onClose={() => setIsPopupErrorOpen(false)}
-        title="¡Error!"
-        message={errorPopupMessage}
-      />
     </div>
   );
-};
+}
 
 export default OrdenesEspecialesList;

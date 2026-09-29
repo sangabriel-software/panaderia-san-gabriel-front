@@ -1,183 +1,155 @@
 import { useState, useEffect, useMemo } from "react";
-import { Container, Table, Button, Form, Spinner, Dropdown, Row, Col } from "react-bootstrap";
-import DotsMove from "../../../components/Spinners/DotsMove";
-import useGetProductosYPrecios from "../../../hooks/productosprecios/useGetProductosYprecios";
-import SuccessPopup from "../../../components/Popup/SuccessPopup";
-import ErrorPopup from "../../../components/Popup/ErrorPopUp";
-import { BsArrowLeft, BsExclamationTriangleFill, BsFillInfoCircleFill } from "react-icons/bs";
 import { useNavigate, useParams } from "react-router-dom";
-import Alert from "../../../components/Alerts/Alert";
-import Title from "../../../components/Title/Title";
+import dayjs from "dayjs";
+import {
+  FiArrowLeft,
+  FiEdit,
+  FiSave,
+  FiX,
+  FiSearch,
+  FiFilter,
+  FiChevronDown,
+  FiUser,
+  FiPhone,
+  FiCalendar,
+  FiMapPin,
+  FiPackage,
+  FiInbox,
+} from "react-icons/fi";
+import useGetProductosYPrecios from "../../../hooks/productosprecios/useGetProductosYprecios";
 import { getInitials } from "../../PedidosProdPage/IngresarOrdenProd/IngresarOrdenProdUtils";
 import { getUniqueColor } from "../../../utils/utils";
-import "./OrdenEspecialDetalle.css";
 import useGetSucursales from "../../../hooks/sucursales/useGetSucursales";
-import dayjs from "dayjs";
 import { actualizarOrdenEspecialService } from "../../../services/ordenesEspeciales/ordenesEspeciales.service";
-import { FiEdit, FiSave, FiX } from "react-icons/fi";
 import useGetOrdenEDetalle from "../../../hooks/orenesEspeciales/useGetOrenEDetalle";
 import { getUserData } from "../../../utils/Auth/decodedata";
+import Alert from "../../../components/Alerts/Alert";
 
-const OrdenEspecialDetail = () => {
+const inputClass =
+  "w-full rounded-xl border border-line bg-surface px-3.5 py-2.5 text-sm text-ink placeholder:text-muted transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/25";
+
+const selectClass =
+  "w-full appearance-none rounded-xl border border-line bg-surface py-2.5 pl-10 pr-9 text-sm font-medium text-ink transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/25";
+
+function OrdenEspecialDetail() {
   const { idOrdenEspecial } = useParams();
   const userData = getUserData();
   const navigate = useNavigate();
-  
-  // Custom hook para cargar los datos de la orden
-  const { 
-    detalleOrdenEspecial, 
-    loadingDetalleOrdenEspecial, 
+
+  const {
+    detalleOrdenEspecial,
+    loadingDetalleOrdenEspecial,
     showErrorDetalleOrdenEspecial,
     errorMessage: errorDetalleMessage,
-    setDetalleOrdenEspecial
+    setDetalleOrdenEspecial,
   } = useGetOrdenEDetalle(idOrdenEspecial);
 
-  // Hooks para productos y sucursales
   const { productos, loadigProducts, showErrorProductos } = useGetProductosYPrecios();
   const { sucursales, loadingSucursales, showErrorSucursales } = useGetSucursales();
-  
-  // Estados locales
+
   const [cantidadValues, setCantidadValues] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [categoriaActiva, setCategoriaActiva] = useState("Todas");
   const [searchTerm, setSearchTerm] = useState("");
-  
-  // Estados para popups
+
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [isPopupErrorOpen, setIsPopupErrorOpen] = useState(false);
   const [errorPopupMessage, setErrorPopupMessage] = useState("");
 
-  // Obtener IDs de productos que existen en la orden (aunque tengan cantidad 0)
   const productosEnOrdenIds = useMemo(() => {
-    return detalleOrdenEspecial?.ordenDetalle?.map(p => p.idProducto) || [];
+    return detalleOrdenEspecial?.ordenDetalle?.map((p) => p.idProducto) || [];
   }, [detalleOrdenEspecial]);
 
-  // Efecto para inicializar las cantidades de productos cuando se cargan los datos
   useEffect(() => {
     if (detalleOrdenEspecial?.ordenDetalle && productos) {
       const cantidades = {};
-      detalleOrdenEspecial.ordenDetalle.forEach(producto => {
+      detalleOrdenEspecial.ordenDetalle.forEach((producto) => {
         cantidades[producto.idProducto] = producto.cantidadUnidades;
       });
       setCantidadValues(cantidades);
     }
   }, [detalleOrdenEspecial, productos]);
 
-  // Obtener categorías únicas de productos que existen en la orden
   const categorias = useMemo(() => {
     if (!productos || !detalleOrdenEspecial?.ordenDetalle) return ["Todas"];
-    
-    const productosEnOrden = productos.filter(p => 
-      productosEnOrdenIds.includes(p.idProducto)
-    );
-    
-    return [
-      "Todas",
-      ...new Set(productosEnOrden.map(p => p.nombreCategoria))
-    ];
+    const productosEnOrden = productos.filter((p) => productosEnOrdenIds.includes(p.idProducto));
+    return ["Todas", ...new Set(productosEnOrden.map((p) => p.nombreCategoria))];
   }, [productos, detalleOrdenEspecial, productosEnOrdenIds]);
 
-  // Filtrar productos
   const productosFiltrados = useMemo(() => {
     if (!productos || !detalleOrdenEspecial?.ordenDetalle) return [];
-    
-    // Primero filtramos solo productos que están en la orden
-    let filtered = productos.filter(p => productosEnOrdenIds.includes(p.idProducto));
+    let filtered = productos.filter((p) => productosEnOrdenIds.includes(p.idProducto));
 
-    // Aplicar filtro de categoría
     if (categoriaActiva !== "Todas") {
-      filtered = filtered.filter(p => p.nombreCategoria === categoriaActiva);
+      filtered = filtered.filter((p) => p.nombreCategoria === categoriaActiva);
     }
-
-    // Aplicar filtro de búsqueda
     if (searchTerm) {
-      filtered = filtered.filter(p =>
-        p.nombreProducto.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+      filtered = filtered.filter((p) => p.nombreProducto.toLowerCase().includes(searchTerm.toLowerCase()));
     }
-
-    // En modo visualización, solo mostramos productos con cantidad > 0
     if (!isEditing) {
-      filtered = filtered.filter(p => (cantidadValues[p.idProducto] || 0) > 0);
+      filtered = filtered.filter((p) => (cantidadValues[p.idProducto] || 0) > 0);
     }
-
     return filtered;
   }, [productos, detalleOrdenEspecial, categoriaActiva, searchTerm, cantidadValues, isEditing, productosEnOrdenIds]);
 
-  // Limpiar búsqueda
-  const clearSearch = () => {
-    setSearchTerm("");
-  };
+  const clearSearch = () => setSearchTerm("");
 
-  // Manejar cambio en cantidad de productos
   const handleCantidadChange = (idProducto, value) => {
-    setCantidadValues(prev => ({
+    setCantidadValues((prev) => ({
       ...prev,
-      [idProducto]: value === "" ? "" : parseInt(value)
+      [idProducto]: value === "" ? "" : parseInt(value),
     }));
   };
 
-  // Función para cancelar la edición y resetear los filtros
   const handleCancelEdit = () => {
     setIsEditing(false);
     setCategoriaActiva("Todas");
     setSearchTerm("");
-    
-    // Restaurar las cantidades originales al cancelar
     if (detalleOrdenEspecial?.ordenDetalle) {
       const cantidades = {};
-      detalleOrdenEspecial.ordenDetalle.forEach(producto => {
+      detalleOrdenEspecial.ordenDetalle.forEach((producto) => {
         cantidades[producto.idProducto] = producto.cantidadUnidades;
       });
       setCantidadValues(cantidades);
     }
   };
 
-  // Enviar datos actualizados al servidor
   const handleSubmit = async () => {
     setIsLoading(true);
-    
     try {
-      // Validaciones
       if (!detalleOrdenEspecial?.ordenEncabezado?.nombreCliente?.trim()) {
         throw new Error("El nombre del cliente es requerido");
       }
-      
       if (!detalleOrdenEspecial?.ordenEncabezado?.telefonoCliente?.trim()) {
         throw new Error("El teléfono del cliente es requerido");
       }
-      
       if (!detalleOrdenEspecial?.ordenEncabezado?.idSucursal) {
         throw new Error("Debe seleccionar una sucursal de entrega");
       }
-      
       if (!detalleOrdenEspecial?.ordenEncabezado?.fechaEntrega) {
         throw new Error("La fecha de entrega es requerida");
       }
-      
-      // Preparar productos seleccionados (solo los con cantidad > 0)
+
       const productosSeleccionados = Object.entries(cantidadValues)
         .filter(([_, cantidad]) => cantidad > 0)
         .map(([idProducto, cantidad]) => {
           const productoOriginal = detalleOrdenEspecial.ordenDetalle.find(
-            p => p.idProducto === parseInt(idProducto)
+            (p) => p.idProducto === parseInt(idProducto)
           );
-          
           return {
             idDetalleOrdenEspecial: productoOriginal?.idDetalleOrdenEspecial || null,
             idProducto: parseInt(idProducto),
             cantidadUnidades: cantidad,
-            nombreProducto: productos.find(p => p.idProducto === parseInt(idProducto))?.nombreProducto || "",
-            precioUnitario: productos.find(p => p.idProducto === parseInt(idProducto))?.precioVenta || 0
+            nombreProducto: productos.find((p) => p.idProducto === parseInt(idProducto))?.nombreProducto || "",
+            precioUnitario: productos.find((p) => p.idProducto === parseInt(idProducto))?.precioVenta || 0,
           };
         });
-      
+
       if (productosSeleccionados.length === 0) {
         throw new Error("Debe seleccionar al menos un producto");
       }
-      
-      // Crear payload para actualización
+
       const payload = {
         ordenEncabezado: {
           idOrdenEspecial: parseInt(idOrdenEspecial),
@@ -188,18 +160,16 @@ const OrdenEspecialDetail = () => {
           fechaAProducir: dayjs(detalleOrdenEspecial.ordenEncabezado.fechaEntrega).format("YYYY-MM-DD"),
           idUsuario: userData.idUsuario,
         },
-        ordenDetalle: productosSeleccionados
+        ordenDetalle: productosSeleccionados,
       };
-      
-      // Enviar a la API
+
       await actualizarOrdenEspecialService(payload);
-      
-      // Actualizar el estado local con los cambios
+
       setDetalleOrdenEspecial({
         ...detalleOrdenEspecial,
-        ordenDetalle: productosSeleccionados
+        ordenDetalle: productosSeleccionados,
       });
-      
+
       setIsPopupOpen(true);
       setIsEditing(false);
       setCategoriaActiva("Todas");
@@ -212,350 +182,394 @@ const OrdenEspecialDetail = () => {
     }
   };
 
-  // Mostrar spinner mientras se cargan los datos
+  const BackButton = () => (
+    <button
+      type="button"
+      onClick={() => navigate(-1)}
+      aria-label="Volver"
+      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-line bg-surface text-muted shadow-card transition-colors hover:bg-brand-50 hover:text-brand-700"
+    >
+      <FiArrowLeft size={17} />
+    </button>
+  );
+
   if (loadigProducts || loadingSucursales || loadingDetalleOrdenEspecial || isLoading) {
     return (
-      <Container
-        className="d-flex justify-content-center align-items-center"
-        style={{ minHeight: "70vh" }}
-      >
-        <DotsMove />
-      </Container>
+      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-3">
+        <span className="h-10 w-10 animate-spin-smooth rounded-full border-4 border-brand-200 border-t-brand-600" />
+        <p className="text-sm text-muted">Cargando orden especial...</p>
+      </div>
     );
   }
 
-  // Mostrar error si falla la carga de la orden
   if (showErrorDetalleOrdenEspecial) {
     return (
-      <Container className="my-4">
-        <Alert type="danger" message={errorDetalleMessage} icon={<BsExclamationTriangleFill />} />
-        <Button variant="secondary" onClick={() => navigate(-1)} className="mt-3">
-          Volver
-        </Button>
-      </Container>
+      <div className="flex flex-col gap-6">
+        <header className="flex items-center gap-3">
+          <BackButton />
+          <h1 className="text-xl font-bold text-ink sm:text-2xl">Orden Especial #{idOrdenEspecial}</h1>
+        </header>
+        <Alert type="danger" title="No se pudo cargar la orden" message={errorDetalleMessage} />
+      </div>
     );
   }
 
-  // Mostrar mensaje si no se encuentra la orden
   if (!detalleOrdenEspecial) {
     return (
-      <Container className="my-4">
-        <Alert type="info" message="No se encontró la orden especial" icon={<BsFillInfoCircleFill />} />
-        <Button variant="secondary" onClick={() => navigate(-1)} className="mt-3">
-          Volver
-        </Button>
-      </Container>
+      <div className="flex flex-col gap-6">
+        <header className="flex items-center gap-3">
+          <BackButton />
+          <h1 className="text-xl font-bold text-ink sm:text-2xl">Orden Especial #{idOrdenEspecial}</h1>
+        </header>
+        <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-line bg-surface py-16 text-center">
+          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-surface-2 text-muted">
+            <FiInbox size={20} />
+          </span>
+          <p className="text-sm text-muted">No se encontró la orden especial.</p>
+        </div>
+      </div>
     );
   }
 
-  // Obtener la sucursal seleccionada para mostrar su nombre
-  const sucursalSeleccionada = sucursales.find(s => s.idSucursal === detalleOrdenEspecial.ordenEncabezado.idSucursal);
+  const sucursalSeleccionada = sucursales.find((s) => s.idSucursal === detalleOrdenEspecial.ordenEncabezado.idSucursal);
+  const entregaVencida = dayjs(detalleOrdenEspecial.ordenEncabezado.fechaEntrega).isBefore(dayjs(), "day");
 
   return (
-    <Container className="my-4">
-      {/* Alertas de error para productos y sucursales */}
+    <div className="flex flex-col gap-6">
+      {/* ── Alertas flotantes ────────────────────────────────────────── */}
+      {isPopupErrorOpen && (
+        <Alert
+          floating
+          position="top-right"
+          type="danger"
+          title="No se pudo guardar"
+          message={errorPopupMessage}
+          onDismiss={() => setIsPopupErrorOpen(false)}
+        />
+      )}
+      {isPopupOpen && (
+        <Alert
+          floating
+          position="top-right"
+          type="success"
+          title="¡Orden actualizada!"
+          message="La orden especial se actualizó correctamente."
+          duration={3000}
+          onDismiss={() => setIsPopupOpen(false)}
+        />
+      )}
+
+      {/* ── Header ───────────────────────────────────────────────────── */}
+      <header className="flex items-center gap-3">
+        <BackButton />
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-600 text-white shadow-brand">
+          <FiPackage size={19} />
+        </span>
+        <div className="min-w-0">
+          <h1 className="truncate text-xl font-bold text-ink sm:text-2xl">Orden Especial #{idOrdenEspecial}</h1>
+          <p className="text-sm text-muted">{isEditing ? "Editando información" : "Detalle de la orden"}</p>
+        </div>
+      </header>
+
       {showErrorProductos && productosFiltrados?.length === 0 && (
-        <div className="row justify-content-center my-2">
-          <div className="col-md-6 text-center">
-            <Alert
-              type="danger"
-              message="Error al cargar los productos"
-              icon={<BsExclamationTriangleFill />}
-            />
-          </div>
-        </div>
+        <Alert type="danger" title="No se pudieron cargar los productos" />
       )}
+      {showErrorSucursales && <Alert type="danger" title="No se pudieron cargar las sucursales" />}
 
-      {showErrorSucursales && (
-        <div className="row justify-content-center my-2">
-          <div className="col-md-6 text-center">
-            <Alert
-              type="danger"
-              message="Error al cargar las sucursales"
-              icon={<BsExclamationTriangleFill />}
-            />
-          </div>
-        </div>
-      )}
-
-      {/* Encabezado */}
-      <div className="text-center">
-        <div className="row">
-          <div className="col-2">
-            <button
-              className="btn bt-return rounded-circle d-flex align-items-center justify-content-center shadow"
-              style={{ width: "40px", height: "40px" }}
-              onClick={() => navigate(-1)}
-            >
-              <BsArrowLeft size={20} />
-            </button>
-          </div>
-          <div className="col-8">
-            <Title title={`Orden Especial #${idOrdenEspecial}`} />
-          </div>
-        </div>
-      </div>
-
-      {/* Información del cliente */}
-      <div className="card card-info-cliente p-4 mb-4 shadow-sm">
-        <div className="d-flex justify-content-between align-items-center mb-4">
-          <h5>Información del Cliente</h5>
+      {/* ── Información del cliente ──────────────────────────────────── */}
+      <div className="rounded-2xl border border-line bg-surface p-5 shadow-card">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <h2 className="text-sm font-semibold text-ink">Información del cliente</h2>
           {!isEditing ? (
-            <Button
-              variant="primary"
+            <button
+              type="button"
               onClick={() => setIsEditing(true)}
-              disabled={dayjs(detalleOrdenEspecial.ordenEncabezado.fechaEntrega).isBefore(dayjs(), 'day')}
+              disabled={entregaVencida}
+              title={entregaVencida ? "No se puede editar una orden con fecha de entrega vencida" : ""}
+              className="flex items-center gap-2 rounded-xl border-0 bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-brand transition-colors hover:bg-brand-500 disabled:cursor-not-allowed disabled:bg-surface-2 disabled:text-muted disabled:shadow-none"
             >
-              <FiEdit className="me-2" /> Modificar
-            </Button>
+              <FiEdit size={15} /> Modificar
+            </button>
           ) : (
-            <div>
-              <Button variant="success" onClick={handleSubmit} disabled={isLoading} className="me-2">
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={handleCancelEdit}
+                className="flex items-center gap-2 rounded-xl border border-line bg-surface px-4 py-2 text-sm font-medium text-ink transition-colors hover:bg-surface-2"
+              >
+                <FiX size={15} /> Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={handleSubmit}
+                disabled={isLoading}
+                className="flex items-center gap-2 rounded-xl border-0 bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-brand transition-colors hover:bg-brand-500 disabled:cursor-not-allowed disabled:opacity-60"
+              >
                 {isLoading ? (
-                  <Spinner animation="border" size="sm" className="me-2" />
+                  <span className="h-4 w-4 animate-spin-smooth rounded-full border-2 border-white/40 border-t-white" />
                 ) : (
-                  <FiSave className="me-2" />
+                  <FiSave size={15} />
                 )}
-                Guardar Cambios
-              </Button>
-              <Button variant="secondary" onClick={handleCancelEdit}>
-                <FiX className="me-2" /> Cancelar
-              </Button>
+                Guardar cambios
+              </button>
             </div>
           )}
         </div>
-        
-        <Row>
-          <Col md={6} className="mb-3">
-            <Form.Group>
-              <Form.Label>Nombre del Cliente *</Form.Label>
-              <Form.Control
+
+        {!isEditing ? (
+          // ── Vista de solo lectura: ficha de datos, no inputs deshabilitados ──
+          <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div className="flex items-start gap-2.5">
+              <FiUser size={16} className="mt-0.5 shrink-0 text-brand-600" />
+              <div className="min-w-0">
+                <dt className="text-xs text-muted">Cliente</dt>
+                <dd className="truncate text-sm font-medium text-ink">
+                  {detalleOrdenEspecial.ordenEncabezado.nombreCliente || "—"}
+                </dd>
+              </div>
+            </div>
+            <div className="flex items-start gap-2.5">
+              <FiPhone size={16} className="mt-0.5 shrink-0 text-brand-600" />
+              <div className="min-w-0">
+                <dt className="text-xs text-muted">Teléfono</dt>
+                <dd className="truncate text-sm font-medium text-ink">
+                  {detalleOrdenEspecial.ordenEncabezado.telefonoCliente || "—"}
+                </dd>
+              </div>
+            </div>
+            <div className="flex items-start gap-2.5">
+              <FiCalendar size={16} className="mt-0.5 shrink-0 text-brand-600" />
+              <div className="min-w-0">
+                <dt className="text-xs text-muted">Fecha de entrega</dt>
+                <dd className="flex items-center gap-2 text-sm font-medium text-ink">
+                  {dayjs(detalleOrdenEspecial.ordenEncabezado.fechaEntrega).format("DD/MM/YYYY")}
+                  {entregaVencida && (
+                    <span className="rounded-full bg-surface-2 px-2 py-0.5 text-2xs font-semibold text-muted">Vencida</span>
+                  )}
+                </dd>
+              </div>
+            </div>
+            <div className="flex items-start gap-2.5">
+              <FiMapPin size={16} className="mt-0.5 shrink-0 text-brand-600" />
+              <div className="min-w-0">
+                <dt className="text-xs text-muted">Sucursal de entrega</dt>
+                <dd className="truncate text-sm font-medium text-ink">
+                  {sucursalSeleccionada?.nombreSucursal || "Sin asignar"}
+                </dd>
+              </div>
+            </div>
+          </dl>
+        ) : (
+          // ── Modo edición: campos reales ──
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div>
+              <label className="mb-1.5 block text-xs font-medium text-muted">Nombre del cliente *</label>
+              <input
                 type="text"
                 placeholder="Ingrese el nombre completo"
                 value={detalleOrdenEspecial.ordenEncabezado.nombreCliente || ""}
-                onChange={(e) => setDetalleOrdenEspecial({
-                  ...detalleOrdenEspecial,
-                  ordenEncabezado: {
-                    ...detalleOrdenEspecial.ordenEncabezado,
-                    nombreCliente: e.target.value
-                  }
-                })}
-                readOnly={!isEditing}
+                onChange={(e) =>
+                  setDetalleOrdenEspecial({
+                    ...detalleOrdenEspecial,
+                    ordenEncabezado: { ...detalleOrdenEspecial.ordenEncabezado, nombreCliente: e.target.value },
+                  })
+                }
+                className={inputClass}
               />
-            </Form.Group>
-          </Col>
-          <Col md={6} className="mb-3">
-            <Form.Group>
-              <Form.Label>Teléfono de la orden *</Form.Label>
-              <Form.Control
+            </div>
+
+            <div>
+              <label className="mb-1.5 block text-xs font-medium text-muted">Teléfono de la orden *</label>
+              <input
                 type="text"
                 placeholder="Ingrese el número de teléfono"
                 value={detalleOrdenEspecial.ordenEncabezado.telefonoCliente || ""}
-                onChange={(e) => setDetalleOrdenEspecial({
-                  ...detalleOrdenEspecial,
-                  ordenEncabezado: {
-                    ...detalleOrdenEspecial.ordenEncabezado,
-                    telefonoCliente: e.target.value
-                  }
-                })}
-                readOnly={!isEditing}
+                onChange={(e) =>
+                  setDetalleOrdenEspecial({
+                    ...detalleOrdenEspecial,
+                    ordenEncabezado: { ...detalleOrdenEspecial.ordenEncabezado, telefonoCliente: e.target.value },
+                  })
+                }
+                className={inputClass}
               />
-            </Form.Group>
-          </Col>
-          <Col md={6} className="mb-3">
-            <Form.Group>
-              <Form.Label>Fecha de Entrega *</Form.Label>
-              <Form.Control
-                type="date"
-                value={dayjs(detalleOrdenEspecial.ordenEncabezado.fechaEntrega).format("YYYY-MM-DD") || ""}
-                onChange={(e) => setDetalleOrdenEspecial({
-                  ...detalleOrdenEspecial,
-                  ordenEncabezado: {
-                    ...detalleOrdenEspecial.ordenEncabezado,
-                    fechaEntrega: e.target.value
+            </div>
+
+            <div>
+              <label className="mb-1.5 block text-xs font-medium text-muted">Fecha de entrega *</label>
+              <div className="relative">
+                <FiCalendar size={14} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" />
+                <input
+                  type="date"
+                  value={dayjs(detalleOrdenEspecial.ordenEncabezado.fechaEntrega).format("YYYY-MM-DD") || ""}
+                  min={dayjs().format("YYYY-MM-DD")}
+                  onChange={(e) =>
+                    setDetalleOrdenEspecial({
+                      ...detalleOrdenEspecial,
+                      ordenEncabezado: { ...detalleOrdenEspecial.ordenEncabezado, fechaEntrega: e.target.value },
+                    })
                   }
-                })}
-                min={dayjs().format("YYYY-MM-DD")}
-                disabled={!isEditing}
-              />
-            </Form.Group>
-          </Col>
-          <Col md={6} className="mb-3">
-            <Form.Group>
-              <Form.Label>Sucursal de Entrega *</Form.Label>
-              <Dropdown>
-                <Dropdown.Toggle 
-                  variant="light" 
-                  className="w-100 text-start dropdown-toggle-custom" 
-                  style={{ border: "1px solid #e2e8f0" }}
-                  disabled={!isEditing}
+                  className={`${inputClass} pl-10`}
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="mb-1.5 block text-xs font-medium text-muted">Sucursal de entrega *</label>
+              <div className="relative">
+                <FiMapPin size={14} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" />
+                <select
+                  value={detalleOrdenEspecial.ordenEncabezado.idSucursal || ""}
+                  onChange={(e) => {
+                    const sucursal = sucursales.find((s) => s.idSucursal === Number(e.target.value));
+                    setDetalleOrdenEspecial({
+                      ...detalleOrdenEspecial,
+                      ordenEncabezado: {
+                        ...detalleOrdenEspecial.ordenEncabezado,
+                        idSucursal: sucursal?.idSucursal,
+                        sucursalEntrega: sucursal?.nombreSucursal,
+                      },
+                    });
+                  }}
+                  className={selectClass}
                 >
-                  {sucursalSeleccionada ? `${sucursalSeleccionada.nombreSucursal}` : "Seleccione una sucursal"}
-                </Dropdown.Toggle>
-                <Dropdown.Menu className="w-100 dropdown-menu-custom">
-                  {sucursales?.map((sucursal) => (
-                    <Dropdown.Item 
-                      className="dropdown-item-custom"
-                      key={sucursal.idSucursal}
-                      onClick={() => setDetalleOrdenEspecial({
-                        ...detalleOrdenEspecial,
-                        ordenEncabezado: {
-                          ...detalleOrdenEspecial.ordenEncabezado,
-                          idSucursal: sucursal.idSucursal,
-                          sucursalEntrega: sucursal.nombreSucursal
-                        }
-                      })}
-                      active={detalleOrdenEspecial.ordenEncabezado.idSucursal === sucursal.idSucursal}
-                    >
-                      {sucursal.nombreSucursal}
-                    </Dropdown.Item>
+                  <option value="">Seleccione una sucursal</option>
+                  {sucursales?.map((s) => (
+                    <option key={s.idSucursal} value={s.idSucursal}>
+                      {s.nombreSucursal}
+                    </option>
                   ))}
-                </Dropdown.Menu>
-              </Dropdown>
-            </Form.Group>
-          </Col>
-        </Row>
+                </select>
+                <FiChevronDown size={14} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-muted" />
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Filtros de productos (solo en modo edición) */}
+      {/* ── Filtros de productos, solo en edición ───────────────────── */}
       {isEditing && (
-        <div className="d-flex flex-column flex-md-row justify-content-between gap-3 mb-4 my-3">
-          <div className="flex-grow-1">
-            <h6 className="mb-3">Buscar producto:</h6>
-            <div className="position-relative">
-              <Form.Control
+        <div className="rounded-2xl border border-line bg-surface p-4 shadow-card">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <div className="relative min-w-0 flex-1">
+              <FiSearch size={15} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" />
+              <input
                 type="text"
                 placeholder="Buscar por nombre..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="search-input"
+                className="w-full rounded-xl border border-line bg-surface py-2.5 pl-10 pr-9 text-sm text-ink placeholder:text-muted transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/25"
               />
               {searchTerm && (
                 <button
+                  type="button"
                   onClick={clearSearch}
-                  className="btn btn-clear-search position-absolute end-0 top-50 translate-middle-y"
+                  aria-label="Limpiar búsqueda"
+                  className="absolute right-2.5 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-md border-0 bg-transparent text-muted transition-colors hover:text-ink"
                 >
-                  &times;
+                  <FiX size={16} />
                 </button>
               )}
             </div>
+
+            <div className="relative shrink-0 sm:hidden">
+              <FiFilter size={14} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" />
+              <select
+                value={categoriaActiva}
+                onChange={(e) => setCategoriaActiva(e.target.value)}
+                className="w-full appearance-none rounded-xl border border-line bg-surface py-2.5 pl-10 pr-9 text-sm font-medium text-ink transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/25"
+              >
+                {categorias.map((categoria) => (
+                  <option key={categoria} value={categoria}>
+                    {categoria}
+                  </option>
+                ))}
+              </select>
+              <FiChevronDown size={14} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-muted" />
+            </div>
           </div>
 
-          <div>
-            <h6 className="mb-3">Filtrar por categoría:</h6>
-            <Dropdown>
-              <Dropdown.Toggle variant="primary" id="dropdown-categorias">
-                {categoriaActiva === "Todas"
-                  ? "Todas las categorías"
-                  : categoriaActiva}
-              </Dropdown.Toggle>
-              <Dropdown.Menu className="category-dropdown-menu">
-                <Dropdown.Item
-                  active={categoriaActiva === "Todas"}
-                  onClick={() => setCategoriaActiva("Todas")}
-                >
-                  Todas
-                </Dropdown.Item>
-                {categorias.map((categoria) => (
-                  <Dropdown.Item
-                    className="category-dropdown-item"
-                    key={categoria}
-                    active={categoriaActiva === categoria}
-                    onClick={() => setCategoriaActiva(categoria)}
-                  >
-                    {categoria}
-                  </Dropdown.Item>
-                ))}
-              </Dropdown.Menu>
-            </Dropdown>
+          <div className="mt-3 hidden flex-wrap gap-2 sm:flex">
+            {categorias.map((categoria) => (
+              <button
+                key={categoria}
+                type="button"
+                onClick={() => setCategoriaActiva(categoria)}
+                className={`shrink-0 rounded-full border-0 px-3.5 py-1.5 text-xs font-medium transition-colors duration-150 ${
+                  categoriaActiva === categoria
+                    ? "bg-brand-600 text-white shadow-brand"
+                    : "bg-surface-2 text-muted hover:bg-brand-50 hover:text-brand-700"
+                }`}
+              >
+                {categoria}
+              </button>
+            ))}
           </div>
         </div>
       )}
 
-      {/* Tabla de productos */}
-      <div className="table-responsive excel-table-container mb-4">
-        <Table striped bordered hover className="excel-table">
-          <thead>
-            <tr>
-              <th className="dark-header text-center" style={{ width: "60%" }}>
-                Producto
-              </th>
-              <th className="dark-header text-center" style={{ width: "40%" }}>
-                Cantidad Requerida
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {productosFiltrados.length > 0 ? (
-              productosFiltrados.map((producto) => (
-                <tr key={producto.idProducto}>
-                  <td>
-                    <div className="product-info">
-                      <div
-                        className="product-badge-stock"
-                        style={{
-                          backgroundColor: getUniqueColor(producto.nombreProducto),
-                        }}
+      {/* ── Productos ────────────────────────────────────────────────── */}
+      <div className="overflow-hidden rounded-2xl border border-line bg-surface shadow-card">
+        <div className="flex items-center justify-between border-b border-line bg-surface-2/60 px-5 py-3">
+          <h2 className="text-sm font-semibold text-ink">Productos de la orden</h2>
+          <span className="rounded-full bg-brand-50 px-2.5 py-1 text-2xs font-semibold text-brand-700">
+            {productosFiltrados.length}
+          </span>
+        </div>
+
+        {productosFiltrados.length > 0 ? (
+          <table className="w-full table-fixed border-collapse text-sm">
+            <thead className="bg-surface-2/40">
+              <tr>
+                <th className="w-3/5 px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-muted sm:px-5">
+                  Producto
+                </th>
+                <th className="w-2/5 px-4 py-2.5 text-center text-xs font-semibold uppercase tracking-wide text-muted sm:px-5">
+                  Cantidad
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {productosFiltrados.map((producto, i) => (
+                <tr key={producto.idProducto} className={`border-t border-line ${i % 2 === 1 ? "bg-surface-2/30" : ""}`}>
+                  <td className="px-4 py-3 sm:px-5">
+                    <div className="flex items-center gap-3">
+                      <span
+                        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
+                        style={{ backgroundColor: getUniqueColor(producto.nombreProducto) }}
                       >
                         {getInitials(producto.nombreProducto)}
-                      </div>
-                      <span className="product-name">
-                        {producto.nombreProducto}
                       </span>
+                      <span className="truncate font-medium text-ink">{producto.nombreProducto}</span>
                     </div>
                   </td>
-                  <td className="text-center align-middle">
-                    <Form.Control
-                      type="number"
-                      min="0"
-                      value={cantidadValues[producto.idProducto] || ""}
-                      onChange={(e) =>
-                        handleCantidadChange(producto.idProducto, e.target.value)
-                      }
-                      className="quantity-input"
-                      placeholder="0"
-                      readOnly={!isEditing}
-                    />
+                  <td className="px-4 py-3 text-center sm:px-5">
+                    {isEditing ? (
+                      <input
+                        type="number"
+                        min="0"
+                        value={cantidadValues[producto.idProducto] || ""}
+                        onChange={(e) => handleCantidadChange(producto.idProducto, e.target.value)}
+                        placeholder="0"
+                        className="mx-auto block w-24 rounded-lg border border-line bg-surface px-2 py-2 text-center text-sm font-semibold text-ink transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/25"
+                      />
+                    ) : (
+                      <span className="inline-flex min-w-[3rem] justify-center rounded-full bg-brand-50 px-2.5 py-1 text-sm font-bold text-brand-700">
+                        {cantidadValues[producto.idProducto] || 0}
+                      </span>
+                    )}
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="2" className="text-center py-4">
-                  {isEditing 
-                    ? "No hay productos disponibles con los filtros actuales" 
-                    : "No hay productos en esta orden"}
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </Table>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <p className="px-5 py-10 text-center text-sm text-muted">
+            {isEditing ? "No hay productos disponibles con los filtros actuales." : "No hay productos en esta orden."}
+          </p>
+        )}
       </div>
-
-      {/* Popup de éxito */}
-      <SuccessPopup
-        isOpen={isPopupOpen}
-        onClose={() => {
-          setIsPopupOpen(false);
-          navigate(`/pedido-especial/detalle/${idOrdenEspecial}`);
-        }}
-        title="¡Éxito!"
-        message="La orden especial ha sido actualizada correctamente"
-        nombreBotonVolver="Ver Detalle"
-        nombreBotonNuevo="Volver al Listado"
-        onView={() => setIsPopupOpen(false)}
-        onNew={() => navigate(`/pedido-especial`)}
-      />
-
-      {/* Popup de error */}
-      <ErrorPopup
-        isOpen={isPopupErrorOpen}
-        onClose={() => setIsPopupErrorOpen(false)}
-        title="¡Error!"
-        message={errorPopupMessage}
-      />
-    </Container>
+    </div>
   );
-};
+}
 
 export default OrdenEspecialDetail;
