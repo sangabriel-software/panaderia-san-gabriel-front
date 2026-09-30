@@ -1,223 +1,234 @@
-import React, { useState, useRef, useEffect } from "react"; // Asegúrate de importar useEffect
-import { Container, Row, Col, Accordion, Button, Modal, Form, } from "react-bootstrap";
+import { useState, useRef, useMemo } from "react";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router";
+import {
+  FiArrowLeft,
+  FiPlus,
+  FiSearch,
+  FiX,
+  FiEdit2,
+  FiTrash2,
+  FiCheck,
+  FiPackage,
+  FiInbox,
+  FiInfo,
+} from "react-icons/fi";
 import useGetRecetas from "../../hooks/recetas/useGetRecetas";
 import useGetProductosYPrecios from "../../hooks/productosprecios/useGetProductosYprecios";
-import DotsMove from "../../components/Spinners/DotsMove";
 import Alert from "../../components/Alerts/Alert";
-import { BsExclamationTriangleFill, BsPencil, BsTrash, BsPlus, BsClipboardData, BsCalculator, BsArrowLeft, BsFillInfoCircleFill, } from "react-icons/bs";
-import Title from "../../components/Title/Title";
-import { useNavigate } from "react-router";
-import ToastNotification from "../../components/ToastNotifications/Notification/ToastNotification";
 import SearchableSelect from "../../components/SearchableSelect/SearchableSelect";
-import SuccessPopup from "../../components/Popup/SuccessPopup";
-import ConfirmPopUp from "../../components/Popup/ConfirmPopup";
-import "./GestionDeRecetasPage.css";
-import { getProductOptions, handleAddReceta, handleConfirmDeleteReceta, handleDeleteReceta, handleEditReceta, handleIngresarReceta, handleModificarReceta } from "./GestionDeRecetas.utils";
+import {
+  getProductOptions,
+  handleIngresarReceta,
+  handleModificarReceta,
+  handleDeleteReceta,
+} from "./GestionDeRecetas.utils";
 
-const GestionDeRecetasPage = () => {
+function GestionDeRecetasPage() {
   const { recetas, loadingRecetas, showErrorRecetas, setRecetas } = useGetRecetas();
   const { productos, loadigProducts, showErrorProductos } = useGetProductosYPrecios();
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [selectedReceta, setSelectedReceta] = useState(null);
-  const [showToast, setShowToast] = useState(false); // Inicialmente en false
+  const navigate = useNavigate();
+
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [showInfoBanner, setShowInfoBanner] = useState(true);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [searchableSelectError, setSearchableSelectError] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const searchableSelectRef = useRef(null);
-  const navigate = useNavigate();
 
-  // Variables de estado para mostrar popup y almacenar la orden a eliminar
-  const [isPopupOpen, setIsPopupOpen] = useState(false); //Abrir pop up de confirmacion de elminacion
-  const [isPopupOpenSuccess, setIsPopupOpenSuccess] = useState(false);
-  const [errorPopupMessage, setErrorPopupMessage] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [editingValue, setEditingValue] = useState("");
+  const [confirmingId, setConfirmingId] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [editingReceta, setEditingReceta] = useState(false);
+
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorPopupMessage, setErrorPopupMessage] = useState("");
   const [isPopupErrorOpen, setIsPopupErrorOpen] = useState(false);
-  const [recetaToDelete, setRecetaToDelete] = useState(null);
-  const [editingReceta, setEditingReceta] = useState(false); // Estado para guardar la sucursal que se está editando
-  const [isLoading, setIsLoading] = useState(false); //Para setear carga de alguna opcion
 
-  // React Hook Form para el modal de agregar
-  const { register: registerAdd, handleSubmit: handleSubmitAdd, reset: resetAdd, formState: { errors: errorsAdd }, } = useForm();
-  // React Hook Form para el modal de editar
-  const { register: registerEdit, handleSubmit: handleSubmitEdit, reset: resetEdit, formState: { errors: errorsEdit }, setValue: setEditValue, } = useForm();
+  const [searchTerm, setSearchTerm] = useState("");
 
-  const onSubmitAdd = (data) => {
-    handleIngresarReceta( data, selectedProduct, setEditingReceta, setShowAddModal, resetAdd, setRecetas, setSelectedProduct,
-                   setSearchableSelectError, setErrorMessage, setIsPopupOpenSuccess, setIsPopupErrorOpen, setErrorPopupMessage );
+  const {
+    register: registerAdd,
+    handleSubmit: handleSubmitAdd,
+    reset: resetAdd,
+    formState: { errors: errorsAdd },
+  } = useForm();
+
+  const {
+    register: registerEdit,
+    handleSubmit: handleSubmitEdit,
+    reset: resetEdit,
+    setValue: setEditValue,
+    formState: { errors: errorsEdit },
+  } = useForm();
+
+  const recetasFiltradas = useMemo(() => {
+    const term = searchTerm.trim().toLowerCase();
+    if (!term) return recetas;
+    return recetas.filter((r) => `${r.nombreProducto} ${r.nombreIngrediente}`.toLowerCase().includes(term));
+  }, [recetas, searchTerm]);
+
+  const closeAddForm = () => {
+    setShowAddForm(false);
+    resetAdd();
+    setSelectedProduct(null);
+    setSearchableSelectError("");
   };
 
-  const onSubmitEdit = (data) => {
-    handleModificarReceta( data, selectedReceta, setRecetas, setEditingReceta, setShowEditModal, resetEdit, setErrorMessage,
-                      setIsPopupOpenSuccess, setIsPopupErrorOpen, setErrorPopupMessage );
-};
+  const onSubmitAdd = (data) => {
+    handleIngresarReceta(
+      data,
+      selectedProduct,
+      setEditingReceta,
+      closeAddForm,
+      resetAdd,
+      setRecetas,
+      setSelectedProduct,
+      setSearchableSelectError,
+      setErrorMessage,
+      (success) => {
+        if (success) setSuccessMessage("La receta se ha ingresado con éxito.");
+      },
+      setIsPopupErrorOpen,
+      setErrorPopupMessage
+    );
+  };
 
-  // Usa useEffect para mostrar el Toast solo al cargar la página por primera vez
-  useEffect(() => {
-    setShowToast(true); // Muestra el Toast cuando el componente se monta
-  }, []); // El array vacío asegura que esto solo ocurra una vez
+  const startEdit = (receta) => {
+    setEditingId(receta.idReceta);
+    setEditingValue(receta.cantidadNecesaria);
+    setEditValue("cantidadNecesaria", receta.cantidadNecesaria);
+  };
 
+  const cancelEdit = () => {
+    setEditingId(null);
+    resetEdit();
+  };
 
-  // Loading mientras se cargan los recursos
+  const onSubmitEdit = (data, receta) => {
+    handleModificarReceta(
+      data,
+      receta,
+      setRecetas,
+      setEditingReceta,
+      () => setEditingId(null),
+      resetEdit,
+      setErrorMessage,
+      (success) => {
+        if (success) setSuccessMessage("La información se ha modificado con éxito.");
+      },
+      setIsPopupErrorOpen,
+      setErrorPopupMessage
+    );
+  };
+
+  const confirmDelete = (idProducto) => {
+    setIsLoading(true);
+    handleDeleteReceta(idProducto, setRecetas, () => setConfirmingId(null), setErrorPopupMessage, setIsPopupErrorOpen, setIsLoading);
+  };
+
   if (loadingRecetas || loadigProducts) {
     return (
-      <Container
-        className="d-flex justify-content-center align-items-center"
-        style={{ minHeight: "70vh" }}
-      >
-        <DotsMove />
-      </Container>
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <span className="h-10 w-10 animate-spin-smooth rounded-full border-4 border-brand-200 border-t-brand-600" />
+      </div>
     );
   }
 
-  // Notificación de error al consultar los recursos
   if (showErrorRecetas || showErrorProductos) {
     return (
-      <Container className="justify-content-center align-items-center my-5">
-        <Row className="justify-content-center">
-          <Col md={8} className="text-center">
-            <Alert
-              type="danger"
-              message="Hubo un error al consultar los productos y sus ingredientes."
-              icon={<BsExclamationTriangleFill />}
-            />
-          </Col>
-        </Row>
-      </Container>
+      <div className="flex flex-col gap-6">
+        <header className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => navigate("/config")}
+            aria-label="Volver"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-line bg-surface text-muted shadow-card transition-colors hover:bg-brand-50 hover:text-brand-700"
+          >
+            <FiArrowLeft size={17} />
+          </button>
+          <h1 className="text-xl font-bold text-ink sm:text-2xl">Configuración de ingredientes</h1>
+        </header>
+        <Alert type="danger" title="No se pudieron cargar los datos" message="Intenta recargar la página." />
+      </div>
     );
   }
 
   return (
-    <Container>
-      {/* ---------------- Titulo ----------------- */}
-      <div className="text-center mb-3">
-        <div className="row">
-          <div className="col-2">
-            <button
-              className="btn bt-return rounded-circle d-flex align-items-center justify-content-center shadow"
-              style={{ width: "40px", height: "40px" }}
-              onClick={() => navigate("/config")}
-            >
-              <BsArrowLeft size={20} />
-            </button>
-          </div>
-          <div className="col-8">
-            <Title
-              title="Configuración de ingredientes"
-              description="Configura los productos y sus ingredientes."
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Botón para agregar Recetas */}
-      <Row className="mb-4">
-        <Col>
-          <Button
-            variant="primary"
-            onClick={() => handleAddReceta(setShowAddModal)}
-            className="d-flex align-items-center"
-          >
-            <BsPlus className="me-2" /> Agregar Nueva Receta
-          </Button>
-        </Col>
-      </Row>
-
-      {/* Mostrar mensaje de error general */}
-      {errorMessage && (
-        <Row className="mb-4">
-          <Col>
-            <Alert
-              type="danger"
-              message={errorMessage}
-              icon={<BsExclamationTriangleFill />}
-              onClose={() => setErrorMessage("")}
-            />
-          </Col>
-        </Row>
+    <div className="flex flex-col gap-6">
+      {/* ── Alertas flotantes ────────────────────────────────────────── */}
+      {isPopupErrorOpen && (
+        <Alert
+          floating
+          position="top-right"
+          type="danger"
+          title="No se pudo completar"
+          message={errorPopupMessage}
+          onDismiss={() => setIsPopupErrorOpen(false)}
+        />
+      )}
+      {successMessage && (
+        <Alert
+          floating
+          position="top-right"
+          type="success"
+          title="¡Éxito!"
+          message={successMessage}
+          duration={3000}
+          onDismiss={() => setSuccessMessage("")}
+        />
       )}
 
-      {/* Mapear las recetas en dos columnas */}
-      <Row>
-        <Col>
-          <Accordion>
-            <Row>
-              {recetas.map((receta, index) => (
-                <Col key={receta.idReceta} xs={12} md={6} className="mb-3">
-                  <Accordion.Item
-                    eventKey={index.toString()}
-                    className="shadow-sm custom-accordion-item"
-                  >
-                    <Accordion.Header className="custom-accordion-header">
-                      <div className="d-flex justify-content-between w-100 align-items-center">
-                        <span className="fw-bold d-flex align-items-center">
-                          {receta.nombreProducto}
-                        </span>
-                      </div>
-                    </Accordion.Header>
-                    <Accordion.Body className="custom-accordion-body">
-                      <Row>
-                        <Col>
-                          <p className="d-flex align-items-center">
-                            <BsClipboardData
-                              className="me-2"
-                              style={{ color: "#198754" }}
-                            />
-                            <strong>Ingrediente:</strong>{" "}
-                            {receta.nombreIngrediente}
-                          </p>
-                          <p className="d-flex align-items-center">
-                            <BsCalculator
-                              className="me-2"
-                              style={{ color: "#ffc107" }}
-                            />
-                            <strong>Cantidad:</strong>{" "}
-                            {receta.cantidadNecesaria} {receta.unidadMedida}
-                          </p>
-                        </Col>
-                        <Col className="d-flex justify-content-end align-items-center">
-                          <Button
-                            variant="outline-primary"
-                            onClick={() => handleEditReceta(receta, setSelectedReceta, setShowEditModal, setEditValue)}
-                            className="me-2 d-flex align-items-center custom-button"
-                          >
-                            <BsPencil className="me-2" /> Editar
-                          </Button>
-                          <Button
-                            variant="danger"
-                            onClick={() => handleConfirmDeleteReceta(receta.idProducto, setRecetaToDelete, setIsPopupOpen)}
-                            className="d-flex align-items-center custom-button-cancel"
-                          >
-                            <BsTrash className="me-2" /> Eliminar
-                          </Button>
-                        </Col>
-                      </Row>
-                    </Accordion.Body>
-                  </Accordion.Item>
-                </Col>
-              ))}
-            </Row>
-          </Accordion>
-        </Col>
-      </Row>
+      {/* ── Header ───────────────────────────────────────────────────── */}
+      <header className="flex flex-wrap items-center gap-3">
+        <button
+          type="button"
+          onClick={() => navigate("/config")}
+          aria-label="Volver"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-line bg-surface text-muted shadow-card transition-colors hover:bg-brand-50 hover:text-brand-700"
+        >
+          <FiArrowLeft size={17} />
+        </button>
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-600 text-white shadow-brand">
+          <FiPackage size={19} />
+        </span>
+        <div className="min-w-0 flex-1">
+          <h1 className="truncate text-xl font-bold text-ink sm:text-2xl">Configuración de ingredientes</h1>
+          <p className="text-sm text-muted">{recetas.length} recetas configuradas</p>
+        </div>
+        <button
+          type="button"
+          onClick={() => setShowAddForm((v) => !v)}
+          className="flex w-full items-center justify-center gap-2 rounded-xl border-0 bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white shadow-brand transition-colors hover:bg-brand-500 sm:w-auto"
+        >
+          <FiPlus size={15} /> {showAddForm ? "Cancelar" : "Agregar receta"}
+        </button>
+      </header>
 
-      {/*----------------- Modal para agregar nueva receta ----------------------------*/}
-      <Modal
-        show={showAddModal}
-        onHide={() => {
-          setShowAddModal(false); // Cerrar el modal
-          resetAdd(); // Limpiar el formulario
-          setSelectedProduct(null); // Limpiar el producto seleccionado
-          setSearchableSelectError(""); // Limpiar el mensaje de error
-        }}
-      >
-        <Modal.Header closeButton>
-          <Modal.Title className="modal-title-center">Nueva Receta</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form onSubmit={handleSubmitAdd(onSubmitAdd)}>
-            <Form.Group className="mb-3">
-              <Form.Label>Producto</Form.Label>
+      {showInfoBanner && (
+        <Alert
+          type="info"
+          title="¿Qué es esto?"
+          message="Configura cuánta materia prima consume cada producto, para que se refleje automáticamente en las órdenes de producción."
+          onDismiss={() => setShowInfoBanner(false)}
+        />
+      )}
+
+      {errorMessage && (
+        <Alert type="danger" title={errorMessage} onDismiss={() => setErrorMessage("")} />
+      )}
+
+      {/* ── Panel de agregar, inline — no modal ──────────────────────── */}
+      {showAddForm && (
+        <form
+          onSubmit={handleSubmitAdd(onSubmitAdd)}
+          className="animate-slide-up rounded-2xl border border-line bg-surface p-5 shadow-card"
+        >
+          <h2 className="mb-4 text-sm font-semibold text-ink">Nueva receta</h2>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <div>
+              <label className="mb-1.5 block text-xs font-medium text-muted">Producto *</label>
               <SearchableSelect
                 options={getProductOptions(productos)}
                 placeholder="Selecciona un producto..."
@@ -225,191 +236,218 @@ const GestionDeRecetasPage = () => {
                   setSelectedProduct(selected);
                   setSearchableSelectError("");
                 }}
-                className="custom-input"
+                ref={searchableSelectRef}
                 required
-                ref={searchableSelectRef} // Esto ahora funcionará correctamente
               />
-              {searchableSelectError && (
-                <span className="text-danger">{searchableSelectError}</span>
-              )}
-            </Form.Group>
+              {searchableSelectError && <p className="mt-1.5 text-xs text-danger-600">{searchableSelectError}</p>}
+            </div>
 
-            <Form.Group className="mb-3">
-              <Form.Label>Ingrediente</Form.Label>
-              <Form.Control
-                as="select"
-                {...registerAdd("nombreIngrediente", { required: true })}
-                className="custom-input"
-                disabled
-              >
-                <option value="Harina">Harina</option>
-                {/* Agrega más opciones según sea necesario */}
-              </Form.Control>
-              {errorsAdd.nombreIngrediente && (
-                <span className="text-danger">Este campo es requerido</span>
-              )}
-            </Form.Group>
+            <div>
+              <label className="mb-1.5 block text-xs font-medium text-muted">Ingrediente</label>
+              <div className="flex h-[42px] items-center rounded-xl border border-line bg-surface-2 px-3.5 text-sm font-medium text-muted">
+                Harina
+              </div>
+              <input type="hidden" value="Harina" {...registerAdd("nombreIngrediente")} />
+            </div>
 
-            <Form.Group className="mb-3">
-              <Form.Label>Cantidad</Form.Label>
-              <Form.Control
+            <div>
+              <label className="mb-1.5 block text-xs font-medium text-muted">Cantidad necesaria *</label>
+              <input
                 type="number"
-                placeholder="Cantidad"
+                step="any"
+                placeholder="0"
                 {...registerAdd("cantidadNecesaria", { required: true })}
-                className="custom-input"
+                className="w-full rounded-xl border border-line bg-surface px-3.5 py-2.5 text-sm text-ink placeholder:text-muted transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/25"
               />
-              {errorsAdd.cantidadNecesaria && (
-                <span className="text-danger">Este campo es requerido</span>
-              )}
-            </Form.Group>
-          </Form>
-        </Modal.Body>
-        <Modal.Footer className="modal-footer-centered">
-          <Button
-            variant="primary"
-            type="submit"
-            onClick={handleSubmitAdd(onSubmitAdd)}
-            className="custom-button-guardar"
-          >
-            Guardar Receta
-          </Button>
-        </Modal.Footer>
-      </Modal>
-
-      {/*---------------------------- Modal para editar receta -----------------*/}
-      <Modal
-        show={showEditModal}
-        onHide={() => {
-          setShowEditModal(false); // Cerrar el modal
-          resetEdit(); // Limpiar el formulario
-        }}
-        className="my-2"
-      >
-        <Modal.Header closeButton>
-          <Modal.Title className="modal-title-center">
-            Editar Receta
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form onSubmit={handleSubmitEdit(onSubmitEdit)}>
-            {/* Campo de Producto (deshabilitado) */}
-            <Form.Group className="mb-3">
-              <Form.Label>Producto</Form.Label>
-              <Form.Control
-                as="select"
-                value={selectedReceta?.nombreProducto || ""}
-                disabled
-                className="custom-input"
-                {...registerEdit("nombreProducto")}
-              >
-                <option>{selectedReceta?.nombreProducto}</option>
-              </Form.Control>
-            </Form.Group>
-
-            {/* Campo de Ingrediente (deshabilitado) */}
-            <Form.Group className="mb-3">
-              <Form.Label>Ingrediente</Form.Label>
-              <Form.Control
-                as="select"
-                value={selectedReceta?.nombreIngrediente || ""}
-                disabled
-                className="custom-input"
-                {...registerEdit("nombreIngrediente")}
-              >
-                <option>{selectedReceta?.nombreIngrediente}</option>
-              </Form.Control>
-            </Form.Group>
-
-            {/* Campo de Cantidad (editable) */}
-            <Form.Group className="mb-3">
-              <Form.Label>Cantidad</Form.Label>
-              <Form.Control
-                type="number"
-                placeholder="Cantidad"
-                {...registerEdit("cantidadNecesaria", { required: true })}
-                className="custom-input"
-              />
-              {errorsEdit.cantidadNecesaria && (
-                <span className="text-danger">Este campo es requerido</span>
-              )}
-            </Form.Group>
-          </Form>
-        </Modal.Body>
-        <Modal.Footer className="modal-footer-centered">
-          <Button
-            variant="primary"
-            type="submit"
-            onClick={handleSubmitEdit(onSubmitEdit)}
-            className="custom-button-guardar"
-          >
-            Guardar Cambios
-          </Button>
-        </Modal.Footer>
-      </Modal>
-
-      {/* ---------------- PopUp y Alertas de errores e informacion -------------------- */}
-      {recetas.length === 0 && (
-        <div className="row justify-content-center my-3">
-          <div className="col-md-6 text-center">
-            <Alert
-              type="primary"
-              message="No se han ingresado Recetas."
-              icon={<BsFillInfoCircleFill />}
-            />
+              {errorsAdd.cantidadNecesaria && <p className="mt-1.5 text-xs text-danger-600">Este campo es requerido</p>}
+            </div>
           </div>
+
+          <div className="mt-4 flex justify-end gap-2">
+            <button
+              type="button"
+              onClick={closeAddForm}
+              className="rounded-xl border border-line bg-surface px-4 py-2 text-sm font-medium text-ink transition-colors hover:bg-surface-2"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              className="rounded-xl border-0 bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-brand transition-colors hover:bg-brand-500"
+            >
+              Guardar receta
+            </button>
+          </div>
+        </form>
+      )}
+
+      {/* ── Buscador ─────────────────────────────────────────────────── */}
+      {recetas.length > 0 && (
+        <div className="relative">
+          <FiSearch size={15} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" />
+          <input
+            type="text"
+            placeholder="Buscar producto o ingrediente..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full rounded-xl border border-line bg-surface py-2.5 pl-10 pr-9 text-sm text-ink placeholder:text-muted transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/25"
+          />
+          {searchTerm && (
+            <button
+              type="button"
+              onClick={() => setSearchTerm("")}
+              aria-label="Limpiar búsqueda"
+              className="absolute right-2.5 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-md border-0 bg-transparent text-muted transition-colors hover:text-ink"
+            >
+              <FiX size={16} />
+            </button>
+          )}
         </div>
       )}
 
-      {/* Popup modificacion e ingreso exitoso */}
-      <SuccessPopup
-        isOpen={isPopupOpenSuccess}
-        onClose={() => setIsPopupOpenSuccess(false)}
-        title="¡Éxito!"
-        message={
-          editingReceta
-            ? `La informacion se ha modificado con exito.`
-            : "La Receta se ha ingresado con éxito."
-        }
-        nombreBotonVolver="Ver Recetas"
-        nombreBotonNuevo="Ingresar Receta"
-        onView={() => setIsPopupOpenSuccess(false)}
-        onNew={() => {
-          setIsPopupOpenSuccess(false);
-          setShowAddModal(true);
-        }}
-      />
+      {/* ── Lista de recetas ─────────────────────────────────────────── */}
+      {recetas.length === 0 ? (
+        <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-line bg-surface py-16 text-center">
+          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-surface-2 text-muted">
+            <FiInbox size={20} />
+          </span>
+          <p className="text-sm text-muted">No se han configurado recetas todavía.</p>
+          <button
+            type="button"
+            onClick={() => setShowAddForm(true)}
+            className="flex items-center gap-2 rounded-xl border-0 bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-brand transition-colors hover:bg-brand-500"
+          >
+            <FiPlus size={15} /> Agregar receta
+          </button>
+        </div>
+      ) : recetasFiltradas.length === 0 ? (
+        <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-line bg-surface py-16 text-center">
+          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-surface-2 text-muted">
+            <FiSearch size={20} />
+          </span>
+          <p className="text-sm text-muted">Ninguna receta coincide con tu búsqueda.</p>
+        </div>
+      ) : (
+        <ul className="overflow-hidden rounded-2xl border border-line bg-surface shadow-card">
+          {recetasFiltradas.map((receta, i) => {
+            const editando = editingId === receta.idReceta;
+            const confirmando = confirmingId === receta.idProducto;
 
-      {/* Popup confirmacion de eliminación */}
-      <ConfirmPopUp
-        isOpen={isPopupOpen}
-        onClose={() => setIsPopupOpen(false)}
-        title="Confirmar Eliminación"
-        message="¿Está seguro de eliminar la sucursal?"
-        onConfirm={() => {
-          handleDeleteReceta(
-            recetaToDelete,
-            setRecetas,
-            setIsPopupOpen,
-            setErrorPopupMessage,
-            setIsPopupErrorOpen,
-            setIsLoading
-          );
-        }}
-        onCancel={() => setIsPopupOpen(false)}
-        isLoading={isLoading}
-      />
+            return (
+              <li key={receta.idReceta} className={`border-b border-line last:border-0 ${i % 2 === 1 ? "bg-surface-2/30" : ""}`}>
+                {editando ? (
+                  <form
+                    onSubmit={handleSubmitEdit((data) => onSubmitEdit(data, receta))}
+                    className="flex flex-col gap-3 p-4 sm:flex-row sm:items-end"
+                  >
+                    <div className="flex-1">
+                      <p className="text-sm font-semibold text-ink">{receta.nombreProducto}</p>
+                      <p className="text-xs text-muted">Ingrediente: {receta.nombreIngrediente}</p>
+                    </div>
+                    <div className="sm:w-40">
+                      <label className="mb-1 block text-2xs font-medium text-muted">Cantidad necesaria</label>
+                      <input
+                        type="number"
+                        step="any"
+                        autoFocus
+                        {...registerEdit("cantidadNecesaria", { required: true })}
+                        className="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/25"
+                      />
+                      {errorsEdit.cantidadNecesaria && <p className="mt-1 text-2xs text-danger-600">Requerido</p>}
+                    </div>
+                    <div className="flex shrink-0 gap-2">
+                      <button
+                        type="button"
+                        onClick={cancelEdit}
+                        className="flex h-9 w-9 items-center justify-center rounded-lg border border-line bg-surface text-muted transition-colors hover:bg-surface-2"
+                      >
+                        <FiX size={15} />
+                      </button>
+                      <button
+                        type="submit"
+                        className="flex h-9 w-9 items-center justify-center rounded-lg border-0 bg-brand-600 text-white transition-colors hover:bg-brand-500"
+                      >
+                        <FiCheck size={15} />
+                      </button>
+                    </div>
+                  </form>
+                ) : (
+                  <div className="flex items-center gap-4 p-4">
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-50 text-sm font-bold text-brand-700">
+                      {receta.nombreProducto?.charAt(0).toUpperCase()}
+                    </span>
 
-      {/* Notificaciones*/}
-      <ToastNotification
-        show={showToast}
-        onClose={() => setShowToast(false)}
-        delay={2000}
-        title="Configuración de ingredientes"
-        message="Configura los ingredientes de cada producto para que se muestren en las órdenes de producción."
-        position="top-end"
-      />
-    </Container>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-semibold text-ink">{receta.nombreProducto}</p>
+                      <p className="truncate text-xs text-muted">{receta.nombreIngrediente}</p>
+                    </div>
+
+                    <span className="shrink-0 rounded-full bg-surface-2 px-3 py-1.5 text-sm font-bold text-ink">
+                      {receta.cantidadNecesaria} {receta.unidadMedida}
+                    </span>
+
+                    <div className="flex shrink-0 items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => startEdit(receta)}
+                        aria-label="Editar"
+                        title="Editar cantidad"
+                        className="flex h-9 w-9 items-center justify-center rounded-lg border-0 bg-transparent text-muted transition-colors hover:bg-brand-50 hover:text-brand-700"
+                      >
+                        <FiEdit2 size={15} />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setConfirmingId(confirmando ? null : receta.idProducto)}
+                        aria-label="Eliminar"
+                        title="Eliminar receta"
+                        className={`flex h-9 w-9 items-center justify-center rounded-lg border-0 transition-colors ${
+                          confirmando ? "bg-danger-50 text-danger-600" : "bg-transparent text-muted hover:bg-danger-50 hover:text-danger-600"
+                        }`}
+                      >
+                        <FiTrash2 size={15} />
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {confirmando && (
+                  <div className="animate-slide-up border-t border-danger-200 bg-danger-50 px-4 py-3">
+                    <p className="text-sm font-semibold text-danger-800">
+                      ¿Eliminar la receta de {receta.nombreProducto}?
+                    </p>
+                    <p className="mt-0.5 text-xs text-danger-700">Esta acción no se puede deshacer.</p>
+                    <div className="mt-3 flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setConfirmingId(null)}
+                        disabled={isLoading}
+                        className="rounded-lg border border-line bg-white px-3.5 py-1.5 text-xs font-semibold text-ink transition-colors hover:bg-surface-2 disabled:cursor-not-allowed"
+                      >
+                        Cancelar
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => confirmDelete(receta.idProducto)}
+                        disabled={isLoading}
+                        className="flex min-w-[5.5rem] items-center justify-center rounded-lg border-0 bg-danger-600 px-3.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-danger-500 disabled:cursor-not-allowed disabled:bg-danger-400"
+                      >
+                        {isLoading ? (
+                          <span className="h-3.5 w-3.5 animate-spin-smooth rounded-full border-2 border-white/40 border-t-white" />
+                        ) : (
+                          "Eliminar"
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </div>
   );
-};
+}
 
 export default GestionDeRecetasPage;
