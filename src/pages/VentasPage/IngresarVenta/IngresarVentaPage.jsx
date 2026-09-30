@@ -14,7 +14,6 @@ import {
   handleGuardarVentaBatch,
   handleModificarDatos,
 } from "./IngresarVenta.Utils";
-import "./IngresarVentaPage.css";
 import { useBuscarOrden } from "../../../hooks/ventas/useBuscarOrden";
 import { useCategoriasActivas } from "../../../hooks/ventas/useCategoriasActivas";
 import ModalSeleccionarSucursalTurno from "../../../components/ventas/ModalInicio/ModalSeleccionarSucursalTurno";
