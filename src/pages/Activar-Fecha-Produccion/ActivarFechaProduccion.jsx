@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { FiClock, FiZap, FiInfo } from "react-icons/fi";
+import { FiClock, FiZap, FiInfo, FiArrowLeft } from "react-icons/fi";
 import { ingresarFechaProduccionService } from "../../services/activar-fecha-produccion/activar-fecha-produccion.service";
 import useGetFechaProduccion from "../../hooks/fecha-produccion/useGetFechaProduccion";
 import Alert from "../../components/Alerts/Alert";
+import { useNavigate } from "react-router";
 
 // ─── Utilidades de fecha ───────────────────────────────────────────────────
 const formatDateTimeForDB = (date) => {
@@ -40,13 +41,12 @@ function ActivarFechaProduccion() {
   const [secondsRemaining, setSecondsRemaining] = useState(0);
   const [toggling, setToggling] = useState(false);
   const [error, setError] = useState(null);
-
   const intervalRef = useRef(null);
   const initializedRef = useRef(false);
-
   const now = new Date();
   const previewInicio = now;
   const previewFin = new Date(now.getTime() + DURATION_MS);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (initializedRef.current) return;
@@ -135,6 +135,14 @@ function ActivarFechaProduccion() {
     <div className="flex flex-col gap-6">
       {/* ── Header ───────────────────────────────────────────────────── */}
       <header className="flex items-center gap-3">
+      <button
+          type="button"
+          onClick={() => navigate("/config")}
+          aria-label="Volver"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-line bg-surface text-muted shadow-card transition-colors hover:bg-brand-50 hover:text-brand-700"
+        >
+          <FiArrowLeft size={17} />
+        </button>
         <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-600 text-white shadow-brand">
           <FiZap size={19} />
         </span>
