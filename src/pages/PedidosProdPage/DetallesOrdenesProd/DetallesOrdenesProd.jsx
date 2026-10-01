@@ -23,6 +23,7 @@ import { useGetConsumoIngredientes } from "../../../hooks/consumoIngredientes/us
 import { decryptId } from "../../../utils/CryptoParams";
 import { generateOrderExcel } from "../../../utils/PdfUtils/ExcelUtils";
 import { handleDownloadPDF } from "./DetallesOrdenesProdUtils";
+import { getUniqueColor } from "../../../utils/utils";
 
 // ─── Utilidades ────────────────────────────────────────────────────────────────
 
@@ -79,7 +80,7 @@ const TONOS_PILL = {
 const Avatar = ({ nombre }) => (
   <span
     className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[10px] font-bold text-white sm:h-8 sm:w-8 sm:text-xs"
-    style={{ backgroundColor: colorDe(nombre) }}
+    style={{ backgroundColor: getUniqueColor(nombre) }}
   >
     {iniciales(nombre)}
   </span>

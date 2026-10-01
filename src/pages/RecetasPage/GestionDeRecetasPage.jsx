@@ -23,6 +23,24 @@ import {
   handleModificarReceta,
   handleDeleteReceta,
 } from "./GestionDeRecetas.utils";
+import { getUniqueColor } from "../../utils/utils";
+
+const iniciales = (nombre = "") =>
+  nombre
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((p) => p[0].toUpperCase())
+    .join("");
+
+const Avatar = ({ nombre }) => (
+  <span
+    className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[10px] font-bold text-white sm:h-8 sm:w-8 sm:text-xs"
+    style={{ backgroundColor: getUniqueColor(nombre) }}
+  >
+    {iniciales(nombre)}
+  </span>
+);
 
 function GestionDeRecetasPage() {
   const { recetas, loadingRecetas, showErrorRecetas, setRecetas } = useGetRecetas();
@@ -373,9 +391,7 @@ function GestionDeRecetasPage() {
                   </form>
                 ) : (
                   <div className="flex items-center gap-4 p-4">
-                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-50 text-sm font-bold text-brand-700">
-                      {receta.nombreProducto?.charAt(0).toUpperCase()}
-                    </span>
+                    <Avatar nombre={receta.nombreProducto} />
 
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-semibold text-ink">{receta.nombreProducto}</p>
