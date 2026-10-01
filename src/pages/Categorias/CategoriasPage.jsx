@@ -1,104 +1,65 @@
-// CategoriasPage.jsx - Componente optimizado
 import { useState, useMemo } from "react";
+import { useNavigate } from "react-router";
+import {
+  FiArrowLeft,
+  FiPlus,
+  FiX,
+  FiEdit2,
+  FiTrash2,
+  FiFolder,
+  FiTag,
+  FiAlignLeft,
+} from "react-icons/fi";
 import useGetCategorias from "../../hooks/categorias/UseGetCategorias";
 import { ingresarCategoriaService, actualizarCategoriaService, eliminarCategoriaService } from "../../services/categorias/categorias.service";
-import "./CategoriasStyle.css";
 import { currentDate } from "../../utils/dateUtils";
+import Alert from "../../components/Alerts/Alert";
 
-// ── Iconos inline ────────────────────────────────────
-const Icons = {
-  Plus: () => (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
-      <line x1="12" y1="5" x2="12" y2="19"/>
-      <line x1="5" y1="12" x2="19" y2="12"/>
-    </svg>
-  ),
-  Close: () => (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-      <line x1="18" y1="6" x2="6" y2="18"/>
-      <line x1="6" y1="6" x2="18" y2="18"/>
-    </svg>
-  ),
-  Edit: () => (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-    </svg>
-  ),
-  Delete: () => (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-      <polyline points="3 6 5 6 21 6"/>
-      <path d="M19 6l-1 14H6L5 6"/>
-      <path d="M10 11v6M14 11v6"/>
-      <path d="M9 6V4h6v2"/>
-    </svg>
-  ),
-  Success: () => (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
-      <polyline points="20 6 9 17 4 12"/>
-    </svg>
-  ),
-  Error: () => (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-      <circle cx="12" cy="12" r="10"/>
-      <line x1="12" y1="8" x2="12" y2="12"/>
-      <line x1="12" y1="16" x2="12.01" y2="16"/>
-    </svg>
-  ),
-  Folder: () => (
-    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
-      <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
-    </svg>
-  ),
-};
+const CARD_TONES = [
+  { bg: "bg-brand-50", avatar: "bg-brand-600", text: "text-brand-700" },
+  { bg: "bg-accent-50", avatar: "bg-accent-600", text: "text-accent-700" },
+  { bg: "bg-warning-50", avatar: "bg-warning-500", text: "text-warning-700" },
+  { bg: "bg-danger-50", avatar: "bg-danger-600", text: "text-danger-700" },
+];
 
-const CategoriasPage = () => {
+const inputClass =
+  "w-full rounded-xl border border-line bg-surface px-3.5 py-2.5 text-sm text-ink placeholder:text-muted transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/25";
+
+function CategoriasPage() {
+  const navigate = useNavigate();
   const { categorias, loadingCategorias, showErrorCategorias, setCategorias } = useGetCategorias();
 
-  // ── Estados ─────────────────────────────────────────
-  const [modo, setModo] = useState(null); // "nuevo" | "editar" | "eliminar"
+  const [modo, setModo] = useState(null); // "nuevo" | "editar"
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState(null);
   const [form, setForm] = useState({ nombreCategoria: "", descripcionCategoria: "" });
   const [formError, setFormError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [toast, setToast] = useState(null);
+  const [confirmingId, setConfirmingId] = useState(null);
 
-  // ── Toast ────────────────────────────────────────────
-  const mostrarToast = (tipo, msg) => {
-    setToast({ tipo, msg });
-    setTimeout(() => setToast(null), 4000);
-  };
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
-  // ── Abrir modos ──────────────────────────────────────
   const abrirNuevo = () => {
     setForm({ nombreCategoria: "", descripcionCategoria: "" });
     setFormError("");
+    setCategoriaSeleccionada(null);
     setModo("nuevo");
   };
 
   const abrirEditar = (cat) => {
     setCategoriaSeleccionada(cat);
-    setForm({
-      nombreCategoria: cat.nombreCategoria,
-      descripcionCategoria: cat.descripcionCategoria,
-    });
+    setForm({ nombreCategoria: cat.nombreCategoria, descripcionCategoria: cat.descripcionCategoria });
     setFormError("");
     setModo("editar");
   };
 
-  const abrirEliminar = (cat) => {
-    setCategoriaSeleccionada(cat);
-    setModo("eliminar");
-  };
-
-  const cerrar = () => {
+  const cerrarForm = () => {
     setModo(null);
     setCategoriaSeleccionada(null);
     setForm({ nombreCategoria: "", descripcionCategoria: "" });
     setFormError("");
   };
 
-  // ── Validación ──────────────────────────────────────
   const validar = () => {
     const nombre = form.nombreCategoria.trim();
     if (!nombre) {
@@ -113,33 +74,25 @@ const CategoriasPage = () => {
     return true;
   };
 
-  // ── CRUD ─────────────────────────────────────────────
-    const handleInsertar = async () => {
-        if (!validar()) return;
-        setLoading(true);
-        try {
-            const payload = {
-                nombreCategoria: form.nombreCategoria.trim(),
-                descripcionCategoria: form.descripcionCategoria.trim(),
-                fechaCreacion: currentDate()
-            };
-            const res = await ingresarCategoriaService(payload);
-            setCategorias(prev => [
-                ...prev,
-                {
-                    ...payload,
-                    idCategoria: res.categoriaId,
-                    estado: "A"
-                }
-            ]);
-            mostrarToast("success", "Categoría creada correctamente.");
-            cerrar();
-        } catch {
-            mostrarToast("error", "No se pudo crear la categoría.");
-        } finally {
-            setLoading(false);
-        }
-    };
+  const handleInsertar = async () => {
+    if (!validar()) return;
+    setLoading(true);
+    try {
+      const payload = {
+        nombreCategoria: form.nombreCategoria.trim(),
+        descripcionCategoria: form.descripcionCategoria.trim(),
+        fechaCreacion: currentDate(),
+      };
+      const res = await ingresarCategoriaService(payload);
+      setCategorias((prev) => [...prev, { ...payload, idCategoria: res.categoriaId, estado: "A" }]);
+      setSuccessMessage("Categoría creada correctamente.");
+      cerrarForm();
+    } catch {
+      setErrorMessage("No se pudo crear la categoría.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleActualizar = async () => {
     if (!validar()) return;
@@ -151,265 +104,274 @@ const CategoriasPage = () => {
         descripcionCategoria: form.descripcionCategoria.trim(),
       };
       await actualizarCategoriaService(payload);
-      setCategorias((prev) =>
-        prev.map((c) =>
-          c.idCategoria === categoriaSeleccionada.idCategoria ? { ...c, ...payload } : c
-        )
-      );
-      mostrarToast("success", "Categoría actualizada.");
-      cerrar();
+      setCategorias((prev) => prev.map((c) => (c.idCategoria === categoriaSeleccionada.idCategoria ? { ...c, ...payload } : c)));
+      setSuccessMessage("Categoría actualizada.");
+      cerrarForm();
     } catch {
-      mostrarToast("error", "No se pudo actualizar.");
+      setErrorMessage("No se pudo actualizar.");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleEliminar = async () => {
+  const handleEliminar = async (cat) => {
     setLoading(true);
     try {
-      await eliminarCategoriaService(categoriaSeleccionada.idCategoria);
-      setCategorias((prev) =>
-        prev.filter((c) => c.idCategoria !== categoriaSeleccionada.idCategoria)
-      );
-      mostrarToast("success", "Categoría eliminada.");
-      cerrar();
-    } catch(error) {
+      await eliminarCategoriaService(cat.idCategoria);
+      setCategorias((prev) => prev.filter((c) => c.idCategoria !== cat.idCategoria));
+      setSuccessMessage("Categoría eliminada.");
+      setConfirmingId(null);
+    } catch (error) {
       if (error.status === 409) {
-        const mensaje =
-        error.response?.data?.error?.message ||
-        "No se pudo eliminar.";
-        mostrarToast("error", mensaje + "\n" + "Reasígnelos antes de eliminarla.");
-      }else{
-        mostrarToast("error", "No se pudo eliminar.");
+        const mensaje = error.response?.data?.error?.message || "No se pudo eliminar.";
+        setErrorMessage(`${mensaje} Reasígnelos antes de eliminarla.`);
+      } else {
+        setErrorMessage("No se pudo eliminar.");
       }
+      setConfirmingId(null);
     } finally {
       setLoading(false);
     }
   };
 
-  // ── Memo ─────────────────────────────────────────────
-  const categoriasActivas = useMemo(
-    () => categorias?.filter((c) => c.estado === "A") ?? [],
-    [categorias]
-  );
+  const categoriasActivas = useMemo(() => categorias?.filter((c) => c.estado === "A") ?? [], [categorias]);
 
-  // ── Render ───────────────────────────────────────────
-  const renderContent = () => {
-    if (loadingCategorias) {
-      return (
-        <div className="cat-loading">
-          <div className="cat-spinner" />
-          <span>Cargando categorías...</span>
-        </div>
-      );
-    }
-
-    if (showErrorCategorias) {
-      return (
-        <div className="cat-empty">
-          <Icons.Error />
-          <p>Error al cargar las categorías.</p>
-        </div>
-      );
-    }
-
-    if (categoriasActivas.length === 0) {
-      return (
-        <div className="cat-empty">
-          <Icons.Folder />
-          <p>No hay categorías registradas.</p>
-          <button className="cat-btn-primary" onClick={abrirNuevo}>
-            <Icons.Plus /> Crear primera categoría
-          </button>
-        </div>
-      );
-    }
-
+  if (loadingCategorias) {
     return (
-      <div className="cat-grid">
-        {categoriasActivas.map((cat) => (
-          <div className="cat-card" key={cat.idCategoria}>
-            <div className="cat-card-top">
-              <div className="cat-card-avatar">
-                {cat.nombreCategoria.charAt(0).toUpperCase()}
-              </div>
-              <div className="cat-card-info">
-                <p className="cat-card-name">{cat.nombreCategoria}</p>
-                <p className="cat-card-desc">
-                  {cat.descripcionCategoria || "Sin descripción"}
-                </p>
-              </div>
-            </div>
-            <div className="cat-card-actions">
-              <button className="cat-btn-edit" onClick={() => abrirEditar(cat)}>
-                <Icons.Edit /> Editar
-              </button>
-              {
-                cat.idCategoria !== 1 && (
-                  <button 
-                    disabled={cat.idCategoria === 1}
-                    className="cat-btn-delete" 
-                    onClick={() => abrirEliminar(cat)}>
-                    <Icons.Delete /> Eliminar
-                  </button>
-                )
-              }
-            </div>
-          </div>
-        ))}
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <span className="h-10 w-10 animate-spin-smooth rounded-full border-4 border-brand-200 border-t-brand-600" />
       </div>
     );
-  };
+  }
 
   return (
-    <div className="cat-page">
-      {/* Toast */}
-      {toast && (
-        <div className={`cat-toast cat-toast--${toast.tipo}`}>
-          {toast.tipo === "success" ? <Icons.Success /> : <Icons.Error />}
-          {toast.msg}
+    <div className="flex flex-col gap-6">
+      {/* ── Alertas flotantes ────────────────────────────────────────── */}
+      {errorMessage && (
+        <Alert
+          floating
+          position="top-right"
+          type="danger"
+          title="No se pudo completar"
+          message={errorMessage}
+          onDismiss={() => setErrorMessage("")}
+        />
+      )}
+      {successMessage && (
+        <Alert
+          floating
+          position="top-right"
+          type="success"
+          title="¡Éxito!"
+          message={successMessage}
+          duration={3000}
+          onDismiss={() => setSuccessMessage("")}
+        />
+      )}
+
+      {/* ── Header ───────────────────────────────────────────────────── */}
+      <header className="flex flex-wrap items-center gap-3">
+        <button
+          type="button"
+          onClick={() => navigate("/config")}
+          aria-label="Volver"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-line bg-surface text-muted shadow-card transition-colors hover:bg-brand-50 hover:text-brand-700"
+        >
+          <FiArrowLeft size={17} />
+        </button>
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-600 text-white shadow-brand">
+          <FiTag size={19} />
+        </span>
+        <div className="min-w-0 flex-1">
+          <h1 className="truncate text-xl font-bold text-ink sm:text-2xl">Categorías</h1>
+          <p className="text-sm text-muted">Gestiona las categorías de productos</p>
+        </div>
+        <button
+          type="button"
+          onClick={modo === "nuevo" ? cerrarForm : abrirNuevo}
+          className="flex w-full items-center justify-center gap-2 rounded-xl border-0 bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white shadow-brand transition-colors hover:bg-brand-500 sm:w-auto"
+        >
+          {modo === "nuevo" ? (
+            <>
+              <FiX size={15} /> Cancelar
+            </>
+          ) : (
+            <>
+              <FiPlus size={15} /> Nueva categoría
+            </>
+          )}
+        </button>
+      </header>
+
+      {showErrorCategorias && (
+        <Alert type="danger" title="No se pudieron cargar las categorías" message="Intenta recargar la página." />
+      )}
+
+      {/* ── Panel de formulario, inline — crear o editar ─────────────── */}
+      {modo && (
+        <div className="animate-slide-up rounded-2xl border border-line bg-surface p-5 shadow-card">
+          <h2 className="mb-4 text-sm font-semibold text-ink">
+            {modo === "nuevo" ? "Nueva categoría" : `Editar ${categoriaSeleccionada?.nombreCategoria}`}
+          </h2>
+
+          <div className="flex flex-col gap-4">
+            <div>
+              <label className="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-muted">
+                <FiTag size={13} className="text-brand-600" /> Nombre *
+              </label>
+              <input
+                type="text"
+                placeholder="Ej. Panadería"
+                value={form.nombreCategoria}
+                onChange={(e) => {
+                  setForm((p) => ({ ...p, nombreCategoria: e.target.value }));
+                  setFormError("");
+                }}
+                maxLength={60}
+                autoFocus
+                className={`${inputClass} ${formError && !form.nombreCategoria.trim() ? "border-danger-400 focus:border-danger-500 focus:ring-danger-500/20" : ""}`}
+              />
+            </div>
+
+            <div>
+              <label className="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-muted">
+                <FiAlignLeft size={13} className="text-accent-600" /> Descripción
+              </label>
+              <textarea
+                placeholder="Describe brevemente esta categoría..."
+                value={form.descripcionCategoria}
+                onChange={(e) => setForm((p) => ({ ...p, descripcionCategoria: e.target.value }))}
+                rows={3}
+                maxLength={200}
+                className={`${inputClass} resize-none`}
+              />
+              <p className="mt-1 text-right text-2xs text-muted">{form.descripcionCategoria.length}/200</p>
+            </div>
+
+            {formError && <p className="text-xs text-danger-600">{formError}</p>}
+          </div>
+
+          <div className="mt-4 flex justify-end gap-2">
+            <button
+              type="button"
+              onClick={cerrarForm}
+              disabled={loading}
+              className="rounded-xl border border-line bg-surface px-4 py-2 text-sm font-medium text-ink transition-colors hover:bg-surface-2 disabled:cursor-not-allowed"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              onClick={modo === "nuevo" ? handleInsertar : handleActualizar}
+              disabled={loading}
+              className="flex min-w-[9rem] items-center justify-center gap-2 rounded-xl border-0 bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-brand transition-colors hover:bg-brand-500 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {loading ? (
+                <>
+                  <span className="h-4 w-4 animate-spin-smooth rounded-full border-2 border-white/40 border-t-white" />
+                  Guardando...
+                </>
+              ) : modo === "nuevo" ? (
+                "Crear categoría"
+              ) : (
+                "Guardar cambios"
+              )}
+            </button>
+          </div>
         </div>
       )}
 
-      {/* Header */}
-      <div className="cat-header">
-        <div>
-          <h1 className="cat-title">Categorías</h1>
-          <p className="cat-subtitle">Gestiona las categorías de productos</p>
+      {/* ── Lista de categorías ──────────────────────────────────────── */}
+      {categoriasActivas.length === 0 ? (
+        <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-line bg-surface py-16 text-center">
+          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-surface-2 text-muted">
+            <FiFolder size={20} />
+          </span>
+          <p className="text-sm text-muted">No hay categorías registradas.</p>
+          <button
+            type="button"
+            onClick={abrirNuevo}
+            className="flex items-center gap-2 rounded-xl border-0 bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-brand transition-colors hover:bg-brand-500"
+          >
+            <FiPlus size={15} /> Crear primera categoría
+          </button>
         </div>
-        <button className="cat-btn-primary" onClick={abrirNuevo}>
-          <Icons.Plus /> Nueva categoría
-        </button>
-      </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {categoriasActivas.map((cat, i) => {
+            const tone = CARD_TONES[i % CARD_TONES.length];
+            const confirmando = confirmingId === cat.idCategoria;
+            const puedeEliminar = cat.idCategoria !== 1;
 
-      {/* Content */}
-      {renderContent()}
-
-      {/* Panel Modal */}
-      {modo && (
-        <div className="cat-overlay" onClick={cerrar}>
-          <div className="cat-panel" onClick={(e) => e.stopPropagation()}>
-            {modo === "nuevo" || modo === "editar" ? (
-              <>
-                <div className="cat-panel-header">
-                  <h2 className="cat-panel-title">
-                    {modo === "nuevo" ? "Nueva categoría" : "Editar categoría"}
-                  </h2>
-                  <button className="cat-panel-close" onClick={cerrar}>
-                    <Icons.Close />
-                  </button>
+            return (
+              <div
+                key={cat.idCategoria}
+                className="flex flex-col gap-4 rounded-2xl border border-line bg-surface p-5 shadow-card transition-shadow duration-150 hover:shadow-modal"
+              >
+                <div className="flex items-start gap-3">
+                  <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-base font-bold text-white ${tone.avatar}`}>
+                    {cat.nombreCategoria.charAt(0).toUpperCase()}
+                  </span>
+                  <div className="min-w-0">
+                    <h3 className="truncate text-base font-semibold text-ink">{cat.nombreCategoria}</h3>
+                    <p className="truncate text-xs text-muted">{cat.descripcionCategoria || "Sin descripción"}</p>
+                  </div>
                 </div>
 
-                <div className="cat-panel-body">
-                  <div className="cat-field">
-                    <label className="cat-label">Nombre *</label>
-                    <input
-                      type="text"
-                      className={`cat-input ${formError && !form.nombreCategoria.trim() ? "cat-input--error" : ""}`}
-                      placeholder="Ej. Panadería"
-                      value={form.nombreCategoria}
-                      onChange={(e) => {
-                        setForm((p) => ({ ...p, nombreCategoria: e.target.value }));
-                        setFormError("");
-                      }}
-                      maxLength={60}
-                      autoFocus
-                    />
-                  </div>
-
-                  <div className="cat-field">
-                    <label className="cat-label">Descripción</label>
-                    <textarea
-                      className="cat-textarea"
-                      placeholder="Describe brevemente esta categoría..."
-                      value={form.descripcionCategoria}
-                      onChange={(e) =>
-                        setForm((p) => ({ ...p, descripcionCategoria: e.target.value }))
-                      }
-                      rows={3}
-                      maxLength={200}
-                    />
-                    <span className="cat-char-count">
-                      {form.descripcionCategoria.length}/200
-                    </span>
-                  </div>
-
-                  {formError && (
-                    <div className="cat-form-error">
-                      <Icons.Error /> {formError}
-                    </div>
+                <div className="mt-auto flex gap-2 border-t border-line pt-3">
+                  <button
+                    type="button"
+                    onClick={() => abrirEditar(cat)}
+                    className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border-0 bg-brand-50 py-2 text-xs font-semibold text-brand-700 transition-colors hover:bg-brand-100"
+                  >
+                    <FiEdit2 size={13} /> Editar
+                  </button>
+                  {puedeEliminar && (
+                    <button
+                      type="button"
+                      onClick={() => setConfirmingId(confirmando ? null : cat.idCategoria)}
+                      className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border-0 bg-danger-50 py-2 text-xs font-semibold text-danger-700 transition-colors hover:bg-danger-100"
+                    >
+                      <FiTrash2 size={13} /> Eliminar
+                    </button>
                   )}
                 </div>
 
-                <div className="cat-panel-footer">
-                  <button className="cat-btn-ghost" onClick={cerrar} disabled={loading}>
-                    Cancelar
-                  </button>
-                  <button
-                    className="cat-btn-primary"
-                    onClick={modo === "nuevo" ? handleInsertar : handleActualizar}
-                    disabled={loading}
-                  >
-                    {loading ? (
-                      <>
-                        <div className="cat-btn-spinner" /> Guardando...
-                      </>
-                    ) : modo === "nuevo" ? (
-                      "Crear categoría"
-                    ) : (
-                      "Guardar cambios"
-                    )}
-                  </button>
-                </div>
-              </>
-            ) : (
-              // Eliminar
-              <>
-                <div className="cat-panel-header">
-                  <h2 className="cat-panel-title">Eliminar categoría</h2>
-                  <button className="cat-panel-close" onClick={cerrar}>
-                    <Icons.Close />
-                  </button>
-                </div>
-
-                <div className="cat-panel-body">
-                  <div className="cat-confirm-icon">
-                    <Icons.Delete />
+                {confirmando && (
+                  <div className="animate-slide-up rounded-xl border border-danger-200 bg-danger-50 p-3">
+                    <p className="text-xs font-semibold text-danger-800">¿Eliminar "{cat.nombreCategoria}"?</p>
+                    <p className="mt-0.5 text-2xs text-danger-700">Esta acción desactivará la categoría.</p>
+                    <div className="mt-2.5 flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setConfirmingId(null)}
+                        disabled={loading}
+                        className="flex-1 rounded-lg border border-line bg-white px-3 py-1.5 text-xs font-semibold text-ink transition-colors hover:bg-surface-2 disabled:cursor-not-allowed"
+                      >
+                        Cancelar
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleEliminar(cat)}
+                        disabled={loading}
+                        className="flex flex-1 items-center justify-center rounded-lg border-0 bg-danger-600 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-danger-500 disabled:cursor-not-allowed"
+                      >
+                        {loading ? (
+                          <span className="h-3.5 w-3.5 animate-spin-smooth rounded-full border-2 border-white/40 border-t-white" />
+                        ) : (
+                          "Sí, eliminar"
+                        )}
+                      </button>
+                    </div>
                   </div>
-                  <p className="cat-confirm-title">
-                    ¿Eliminar "{categoriaSeleccionada?.nombreCategoria}"?
-                  </p>
-                  <p className="cat-confirm-sub">
-                    Esta acción desactivará la categoría. 
-                  </p>
-                </div>
-
-                <div className="cat-panel-footer">
-                  <button className="cat-btn-ghost" onClick={cerrar} disabled={loading}>
-                    Cancelar
-                  </button>
-                  <button
-                    className="cat-btn-danger"
-                    onClick={handleEliminar}
-                    disabled={loading}
-                  >
-                    {loading ? (
-                      <>
-                        <div className="cat-btn-spinner" /> Eliminando...
-                      </>
-                    ) : (
-                      "Sí, eliminar"
-                    )}
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       )}
     </div>
   );
-};
+}
 
 export default CategoriasPage;
