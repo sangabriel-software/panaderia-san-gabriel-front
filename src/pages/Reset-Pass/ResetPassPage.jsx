@@ -20,11 +20,7 @@ const STORAGE_KEY = "rp_passes";
 const EXPIRY_MINUTES = 15;
 
 const AVATAR_TONES = [
-  "bg-brand-600",
-  "bg-accent-600",
-  "bg-warning-300",
-  "bg-danger-600",
-  "bg-teal-600",
+  "bg-brand-50",
 ];
 
 const getInitials = (nombre) =>
@@ -244,7 +240,7 @@ function ResetPassPage() {
                 }`}
               >
                 <div className="flex items-center gap-3 p-4">
-                  <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white ${avatarTone}`}>
+                  <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-sm font-bold text-brand-700 ${avatarTone}`}>
                     {getInitials(u.nombreUsuario)}
                   </span>
 
@@ -266,7 +262,7 @@ function ResetPassPage() {
                         ? "cursor-not-allowed bg-surface-2 text-muted"
                         : isLoading
                         ? "cursor-wait bg-brand-50 text-brand-700"
-                        : "bg-brand-600 text-white shadow-brand hover:bg-brand-500"
+                        : "bg-brand-50 text-brand-700 shadow-brand hover:bg-brand-100"
                     }`}
                   >
                     {isLoading ? (

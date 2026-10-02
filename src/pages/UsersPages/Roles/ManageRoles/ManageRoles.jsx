@@ -54,7 +54,7 @@ function ManageRoles() {
       <header className="flex flex-wrap items-center gap-3">
         <button
           type="button"
-          onClick={() => navigate("/users")}
+          onClick={() => navigate("/config")}
           aria-label="Volver"
           className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-line bg-surface text-muted shadow-card transition-colors hover:bg-brand-50 hover:text-brand-700"
         >
