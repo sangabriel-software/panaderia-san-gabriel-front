@@ -3,9 +3,6 @@ import React, { useCallback } from "react";
 import { NavLink } from "react-router-dom";
 import { MdOutlineBakeryDining } from "react-icons/md";
 import { FaSun, FaMoon, FaChevronLeft, FaSignOutAlt } from "react-icons/fa";
-// DarkReader invertía los colores por encima de Tailwind y chocaba con la clase `dark` de <html>.
-// El tema ahora lo maneja ThemeContext (clase `dark` + tokens CSS), así que ya no se usa.
-// import * as DarkReader from "darkreader";
 import { useTheme } from "../../context/ThemeContext";
 import { getUserData, getUserPermissions } from "../../utils/Auth/decodedata";
 import { getColorFromName } from "./Sidebar.uitils";
@@ -59,33 +56,6 @@ function Sidebar({ expanded, onToggle, mobileOpen, onCloseMobile }) {
     return acc;
   }, {});
   const isRouteAllowed = (route) => !route || permissionsMap[route];
-
-  // useEffect(() => {
-  //   if (theme === "dark") {
-  //     DarkReader.enable({ brightness: 100, contrast: 100, sepia: 0 });
-  //   } else {
-  //     DarkReader.disable();
-  //   }
-  // }, [theme]);
-
-  // const toggleTheme = useCallback(() => {
-  //   if (isChangingTheme) return;
-  //   setIsChangingTheme(true);
-  //   const newTheme = theme === "light" ? "dark" : "light";
-  //   setTheme(newTheme);
-  //   localStorage.setItem("theme", newTheme);
-  //
-  //   const apply = () => {
-  //     if (newTheme === "dark") {
-  //       DarkReader.enable({ brightness: 99, contrast: 90, sepia: 10 });
-  //     } else {
-  //       DarkReader.disable();
-  //     }
-  //     setIsChangingTheme(false);
-  //   };
-  //   if ("requestIdleCallback" in window) requestIdleCallback(apply);
-  //   else setTimeout(apply, 0);
-  // }, [theme, isChangingTheme]);
 
   const handleNavClick = useCallback(() => {
     if (window.innerWidth <= 768) onCloseMobile();

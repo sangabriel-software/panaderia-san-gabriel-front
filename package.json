@@ -17,7 +17,6 @@
     "bootstrap": "^5.3.3",
     "chart.js": "^4.4.7",
     "crypto-js": "^4.2.0",
-    "darkreader": "^4.9.104",
     "date-fns": "^4.1.0",
     "dayjs": "^1.11.13",
     "dotenv": "^16.4.7",

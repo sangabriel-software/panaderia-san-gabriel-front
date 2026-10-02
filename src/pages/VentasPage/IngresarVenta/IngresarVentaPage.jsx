@@ -20,6 +20,9 @@ import {
   FiUser,
   FiX,
   FiArrowLeft,
+  FiFileText,
+  FiList,
+  FiUploadCloud,
 } from "react-icons/fi";
 
 import Alert from "../../../components/Alerts/Alert";
@@ -27,7 +30,7 @@ import useGetSucursales from "../../../hooks/sucursales/useGetSucursales";
 import { getUserData } from "../../../utils/Auth/decodedata";
 import { getUniqueColor } from "../../../utils/utils";
 import { cosultarStockGeneralService } from "../../../services/stockservices/stock.service";
-import { ingresarVentaService } from "../../../services/ventas/ventas.service";
+import { ingresarVentaService, ingresarVentaBatchService } from "../../../services/ventas/ventas.service";
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // Constantes y utilidades
@@ -79,10 +82,12 @@ const limpiarDecimal = (valor, decimales = 2) => {
   return t;
 };
 
-const mensajeError = (error) =>
+const mensajeError = (error, modo = "manual") =>
   error?.response?.data?.error?.message ??
   error?.response?.data?.message ??
-  "Hubo un error al guardar la venta. Inténtalo de nuevo.";
+  (modo === "excel"
+    ? "No se pudo procesar el archivo o registrar la venta. Revisa el archivo e inténtalo de nuevo."
+    : "Hubo un error al guardar la venta. Inténtalo de nuevo.");
 
 // ─── Validaciones ──────────────────────────────────────────────────────────────
 
@@ -106,6 +111,14 @@ const validarMonto = (crudo, { permitirCero }) => {
   if (texto === "") return "Ingresa el monto";
   if (!/^\d+(\.\d{1,2})?$/.test(texto)) return "Monto inválido (máximo 2 decimales)";
   if (!permitirCero && Number(texto) <= 0) return "Debe ser mayor que 0";
+  return "";
+};
+
+// Archivo Excel: obligatorio, extensión .xlsx y con contenido
+const validarArchivo = (archivo) => {
+  if (!archivo) return "Selecciona el archivo Excel (.xlsx) con el detalle de la venta";
+  if (!archivo.name.toLowerCase().endsWith(".xlsx")) return "El archivo debe tener extensión .xlsx";
+  if (archivo.size === 0) return "El archivo está vacío";
   return "";
 };
 
@@ -140,7 +153,7 @@ const normalizarStock = (lista) => {
 
 // ─── Payload (contrato del backend, sin cambios) ───────────────────────────────
 
-const construirPayload = ({ usuario, idSucursal, turno, fechaVenta, productos, noVendidas, monto, gastos }) => {
+const construirPayload = ({ modo, usuario, idSucursal, turno, fechaVenta, productos, noVendidas, monto, gastos }) => {
   const montoTotalGasto = gastos.reduce((acc, g) => acc + Math.round(Number(g.monto) * 100), 0) / 100;
 
   return {
@@ -153,14 +166,17 @@ const construirPayload = ({ usuario, idSucursal, turno, fechaVenta, productos, n
       fechaCreacion: fechaVenta,
       fechaYHoraVenta: dayjs().format("YYYY-MM-DD HH:mm:ss"),
     },
-    detalleVenta: productos.map((p) => ({
-      idProducto: p.idProducto,
-      controlarStock: p.controlarStock,
-      controlarStockDiario: p.controlarStockDiario,
-      idCategoria: p.idCategoria,
-      fechaCreacion: fechaVenta,
-      unidadesNoVendidas: Number(String(noVendidas[p.idProducto] ?? "").replace(/\.$/, "") || 0),
-    })),
+    // Modo manual: los productos salen del formulario. Modo Excel: los procesa el backend desde el archivo.
+    ...(modo === "manual" && {
+      detalleVenta: productos.map((p) => ({
+        idProducto: p.idProducto,
+        controlarStock: p.controlarStock,
+        controlarStockDiario: p.controlarStockDiario,
+        idCategoria: p.idCategoria,
+        fechaCreacion: fechaVenta,
+        unidadesNoVendidas: Number(String(noVendidas[p.idProducto] ?? "").replace(/\.$/, "") || 0),
+      })),
+    }),
     detalleIngreso: {
       montoTotalIngresado: Number(Number(monto).toFixed(2)),
       fechaIngreso: fechaVenta,
@@ -295,7 +311,6 @@ const TURNOS = [
 const PasoSucursalTurno = ({
   esAdmin,
   sucursalesActivas,
-  sucursalAsignada,
   loadingSucursales,
   showErrorSucursales,
   idSucursal,
@@ -316,13 +331,15 @@ const PasoSucursalTurno = ({
       <Campo label="Sucursal" error={errorSucursal}>
         {loadingSucursales ? (
           <div className="h-[46px] animate-pulse rounded-xl bg-surface-2" />
-        ) : esAdmin ? (
+        ) : (
           <div className="relative">
             <FiHome size={16} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-brand-600 dark:text-brand-400" />
             <select
               value={idSucursal}
               onChange={(e) => setIdSucursal(e.target.value)}
-              className={`${INPUT} appearance-none pl-10 pr-9`}
+              disabled={!esAdmin}
+              aria-label="Sucursal"
+              className={`${INPUT} appearance-none pl-10 pr-9 ${!esAdmin ? "cursor-not-allowed opacity-80" : ""}`}
             >
               <option value="">Seleccionar sucursal</option>
               {sucursalesActivas.map((s) => (
@@ -331,18 +348,11 @@ const PasoSucursalTurno = ({
                 </option>
               ))}
             </select>
-            <FiChevronDown size={15} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-muted" />
-          </div>
-        ) : (
-          <div className="relative">
-            <FiHome size={16} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-brand-600 dark:text-brand-400" />
-            <input
-              type="text"
-              readOnly
-              value={sucursalAsignada?.nombreSucursal ?? ""}
-              className={`${INPUT} cursor-not-allowed pl-10 pr-9 opacity-80`}
-            />
-            <FiLock size={14} className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-muted" />
+            {esAdmin ? (
+              <FiChevronDown size={15} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-muted" />
+            ) : (
+              <FiLock size={14} className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-muted" />
+            )}
           </div>
         )}
       </Campo>
@@ -393,7 +403,7 @@ const enfocarSiguiente = (e) => {
   inputs[inputs.indexOf(e.currentTarget) + 1]?.focus();
 };
 
-const PasoProductos = ({ productos, noVendidas, setNoVendida, errores }) => {
+const TablaProductosManual = ({ productos, noVendidas, setNoVendida, errores }) => {
   const [busqueda, setBusqueda] = useState("");
   const [categoria, setCategoria] = useState("Todas");
 
@@ -693,7 +703,7 @@ const PasoGastos = ({ gastos, totalGastos, onAgregar, onCambiar, onEliminar, err
 // Paso 5 — Resumen
 // ═══════════════════════════════════════════════════════════════════════════════
 
-const PasoResumen = ({ sucursal, turno, fecha, nombreUsuario, productos, noVendidas, monto, gastos, totalGastos }) => (
+const PasoResumen = ({ modo, archivo, sucursal, turno, fecha, nombreUsuario, productos, noVendidas, monto, gastos, totalGastos }) => (
   <div className="flex flex-col gap-4">
     <section className={`${CARD} grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4`}>
       <InfoItem icon={FiHome} label="Sucursal">
@@ -710,6 +720,7 @@ const PasoResumen = ({ sucursal, turno, fecha, nombreUsuario, productos, noVendi
       </InfoItem>
     </section>
 
+    {modo === "manual" ? (
     <section className="overflow-hidden rounded-2xl border border-line bg-surface shadow-card">
       <div className="flex items-center justify-between gap-3 border-b border-line px-4 py-3">
         <h2 className="text-lg font-semibold text-ink">Productos</h2>
@@ -757,6 +768,18 @@ const PasoResumen = ({ sucursal, turno, fecha, nombreUsuario, productos, noVendi
         </tbody>
       </table>
     </section>
+    ) : (
+      <section className={`${CARD} flex items-center gap-3`}>
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-success-500/20 text-success-700 dark:text-success-300">
+          <FiFileText size={20} />
+        </span>
+        <div className="min-w-0">
+          <p className="text-sm text-muted">Productos desde archivo Excel</p>
+          <p className="truncate text-md font-semibold text-ink">{archivo?.name}</p>
+          <p className="text-xs text-muted">Los productos se procesan al guardar la venta.</p>
+        </div>
+      </section>
+    )}
 
     <div className="grid gap-4 lg:grid-cols-2">
       <section className={`${CARD} flex items-center justify-between gap-4`}>
@@ -790,6 +813,213 @@ const PasoResumen = ({ sucursal, turno, fecha, nombreUsuario, productos, noVendi
 );
 
 // ═══════════════════════════════════════════════════════════════════════════════
+// Paso 2 — Modo de ingreso de productos: manual o archivo Excel
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const COLUMNAS_EXCEL = ["Código", "Producto", "Stock Actual", "Cantidad"];
+
+const MODOS = [
+  { valor: "manual", Icono: FiList, corto: "Manual", largo: "Ingreso manual" },
+  { valor: "excel", Icono: FiFileText, corto: "Cargar Excel", largo: "Cargar archivo Excel (.xlsx)" },
+];
+
+const SelectorModo = ({ modo, onCambiar }) => (
+  <div
+    role="radiogroup"
+    aria-label="Modo de ingreso de productos"
+    className="grid grid-cols-2 gap-1 rounded-2xl border border-line bg-surface-2 p-1"
+  >
+    {MODOS.map(({ valor, Icono, corto, largo }) => {
+      const activo = modo === valor;
+      return (
+        <button
+          key={valor}
+          type="button"
+          role="radio"
+          aria-checked={activo}
+          onClick={() => onCambiar(valor)}
+          className={`flex items-center justify-center gap-2 rounded-xl border-0 px-3 py-3 text-md font-semibold transition-colors ${
+            activo ? "bg-brand-600 text-white shadow-brand" : "bg-transparent text-muted hover:bg-bg hover:text-ink"
+          }`}
+        >
+          <Icono size={16} />
+          <span className="sm:hidden">{corto}</span>
+          <span className="hidden sm:inline">{largo}</span>
+        </button>
+      );
+    })}
+  </div>
+);
+
+const CargaArchivo = ({ archivo, error, onSeleccionar, onQuitar }) => {
+  const inputRef = useRef(null);
+  const dragDepth = useRef(0);
+  const [arrastrando, setArrastrando] = useState(false);
+
+  const abrirSelector = () => inputRef.current?.click();
+
+  const onKeyDown = (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      abrirSelector();
+    }
+  };
+
+  const onDragEnter = (e) => {
+    e.preventDefault();
+    dragDepth.current += 1;
+    setArrastrando(true);
+  };
+  const onDragOver = (e) => e.preventDefault();
+  const onDragLeave = (e) => {
+    e.preventDefault();
+    dragDepth.current = Math.max(0, dragDepth.current - 1);
+    if (dragDepth.current === 0) setArrastrando(false);
+  };
+  const onDrop = (e) => {
+    e.preventDefault();
+    dragDepth.current = 0;
+    setArrastrando(false);
+    onSeleccionar(e.dataTransfer.files?.[0]);
+  };
+
+  const estado = arrastrando
+    ? "border-brand-500 bg-brand-500/15"
+    : error
+      ? "border-danger-500 bg-danger-500/5"
+      : archivo
+        ? "border-solid border-success-500/50 bg-success-500/10"
+        : "border-brand-500/40 bg-brand-500/5 hover:border-brand-500 hover:bg-brand-500/10";
+
+  return (
+    <div className="flex flex-col gap-2">
+      <input
+        ref={inputRef}
+        type="file"
+        accept=".xlsx"
+        className="hidden"
+        onChange={(e) => {
+          onSeleccionar(e.target.files?.[0]);
+          e.target.value = ""; // permite volver a elegir el mismo archivo
+        }}
+      />
+
+      <div
+        role="button"
+        tabIndex={0}
+        aria-label="Seleccionar archivo .xlsx"
+        onClick={abrirSelector}
+        onKeyDown={onKeyDown}
+        onDragEnter={onDragEnter}
+        onDragOver={onDragOver}
+        onDragLeave={onDragLeave}
+        onDrop={onDrop}
+        className={`flex min-h-[190px] w-full cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed px-4 py-8 text-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40 ${estado}`}
+      >
+        {arrastrando ? (
+          <div className="flex flex-col items-center gap-2 text-brand-700 dark:text-brand-300">
+            <FiUploadCloud size={44} />
+            <p className="text-lg font-medium">Suelta el archivo aquí</p>
+          </div>
+        ) : archivo ? (
+          <div className="flex w-full max-w-md items-center gap-3 text-left">
+            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-success-500/20 text-success-700 dark:text-success-300">
+              <FiFileText size={22} />
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-lg font-medium text-ink">{archivo.name}</p>
+              <p className="text-sm text-muted">
+                {(archivo.size / 1024).toFixed(1)} KB · Toca para cambiar el archivo
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onQuitar();
+              }}
+              aria-label="Quitar archivo"
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border-0 bg-transparent text-muted transition-colors hover:bg-danger-500/10 hover:text-danger-600"
+            >
+              <FiX size={18} />
+            </button>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center gap-1.5">
+            <span className="mb-1 flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-500/15 text-brand-600 dark:text-brand-300">
+              <FiUploadCloud size={26} />
+            </span>
+            <p className="text-lg font-medium text-ink">
+              Toca para elegir un archivo <span className="text-brand-600 dark:text-brand-300">.xlsx</span>
+            </p>
+            <p className="text-sm text-muted">o arrástralo y suéltalo aquí</p>
+          </div>
+        )}
+      </div>
+
+      {error && <p className="text-sm text-danger-600 dark:text-danger-400">{error}</p>}
+    </div>
+  );
+};
+
+const PasoProductos = ({
+  modo,
+  setModo,
+  productos,
+  noVendidas,
+  setNoVendida,
+  errores,
+  archivo,
+  onSeleccionarArchivo,
+  onQuitarArchivo,
+  errorArchivo,
+}) => (
+  <div className="flex flex-col gap-4">
+    <SelectorModo modo={modo} onCambiar={setModo} />
+
+    {modo === "manual" ? (
+      <TablaProductosManual
+        productos={productos}
+        noVendidas={noVendidas}
+        setNoVendida={setNoVendida}
+        errores={errores}
+      />
+    ) : (
+      <section className={`${CARD} flex flex-col gap-4`}>
+        <div className="flex items-center gap-3">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-accent-500/15 text-accent-600 dark:text-accent-300">
+            <FiFileText size={17} />
+          </span>
+          <div className="min-w-0">
+            <h2 className="text-xl font-semibold text-ink">Archivo de productos</h2>
+            <p className="text-sm text-muted">Se procesa al guardar la venta; no necesitas ingresarlos a mano.</p>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-1.5 text-sm text-muted">
+          <span>Columnas requeridas:</span>
+          {COLUMNAS_EXCEL.map((col) => (
+            <code
+              key={col}
+              className="rounded-md bg-brand-500/10 px-1.5 py-0.5 font-mono text-xs text-brand-700 dark:text-brand-300"
+            >
+              {col}
+            </code>
+          ))}
+        </div>
+
+        <CargaArchivo
+          archivo={archivo}
+          error={errorArchivo}
+          onSeleccionar={onSeleccionarArchivo}
+          onQuitar={onQuitarArchivo}
+        />
+      </section>
+    )}
+  </div>
+);
+
+// ═══════════════════════════════════════════════════════════════════════════════
 // Página
 // ═══════════════════════════════════════════════════════════════════════════════
 
@@ -804,13 +1034,17 @@ const IngresarVentaPage = () => {
   // ── Estado del wizard ──
   const [paso, setPaso] = useState(1);
   const [fechaVenta, setFechaVenta] = useState(() => dayjs().format("YYYY-MM-DD"));
-  const [idSucursal, setIdSucursal] = useState(esAdmin ? "" : String(usuario?.idSucursal ?? ""));
+  // null = el usuario (solo admin) aún no ha elegido; se usa la sucursal asignada
+  const [idSucursalElegida, setIdSucursalElegida] = useState(null);
   const [turno, setTurno] = useState("");
   const [productos, setProductos] = useState([]);
   const [stockKey, setStockKey] = useState(null); // sucursal|fecha del stock cargado
   const [noVendidas, setNoVendidas] = useState({});
   const [monto, setMonto] = useState("");
   const [gastos, setGastos] = useState([]);
+  const [modo, setModo] = useState("manual"); // "manual" | "excel"
+  const [archivo, setArchivo] = useState(null);
+  const [errorSeleccionArchivo, setErrorSeleccionArchivo] = useState("");
 
   const [cargandoStock, setCargandoStock] = useState(false);
   const [guardando, setGuardando] = useState(false);
@@ -822,6 +1056,18 @@ const IngresarVentaPage = () => {
 
   const listaSucursales = Array.isArray(sucursales) ? sucursales : [];
   const sucursalesActivas = useMemo(() => listaSucursales.filter((s) => s.estado === "A"), [listaSucursales]);
+
+  // Sucursal según rol: se compara siempre como texto (puede llegar número o cadena) y solo
+  // se acepta si existe como opción válida del dropdown. Sin dato asignado no se elige ninguna.
+  const idAsignado =
+    usuario?.idSucursal !== undefined && usuario?.idSucursal !== null && String(usuario.idSucursal).trim() !== ""
+      ? String(usuario.idSucursal)
+      : "";
+  const asignadaDisponible = idAsignado !== "" && sucursalesActivas.some((s) => String(s.idSucursal) === idAsignado);
+  const sucursalPorDefecto = asignadaDisponible ? idAsignado : "";
+  // Admin (idRol 1): parte de la asignada pero puede cambiarla; una carga tardía no pisa su elección.
+  // Resto de roles: siempre la asignada, sin importar nada más.
+  const idSucursal = esAdmin ? (idSucursalElegida ?? sucursalPorDefecto) : sucursalPorDefecto;
   const sucursalSeleccionada = listaSucursales.find((s) => String(s.idSucursal) === String(idSucursal));
 
   useEffect(() => {
@@ -829,7 +1075,11 @@ const IngresarVentaPage = () => {
   }, [paso]);
 
   // ── Validaciones por paso ──
-  const errorSucursal = idSucursal ? "" : "Selecciona una sucursal";
+  const errorSucursal = idSucursal
+    ? ""
+    : esAdmin
+      ? "Selecciona una sucursal"
+      : "No tienes una sucursal activa asignada. Contacta al administrador.";
   const errorTurno = turno ? "" : "Selecciona un turno";
 
   const erroresProductos = useMemo(() => {
@@ -843,6 +1093,7 @@ const IngresarVentaPage = () => {
   const cantidadErroresProductos = Object.keys(erroresProductos).length;
 
   const errorMonto = validarMonto(monto, { permitirCero: true });
+  const errorArchivo = errorSeleccionArchivo || (intento ? validarArchivo(archivo) : "");
 
   const erroresGastos = useMemo(() => {
     const errores = {};
@@ -860,7 +1111,8 @@ const IngresarVentaPage = () => {
   const mensajeBloqueo = (() => {
     if (!intento) return "";
     if (paso === 1) return errorSucursal || errorTurno;
-    if (paso === 2 && cantidadErroresProductos > 0)
+    if (paso === 2 && modo === "excel") return errorArchivo;
+    if (paso === 2 && modo === "manual" && cantidadErroresProductos > 0)
       return `Corrige ${cantidadErroresProductos} ${cantidadErroresProductos === 1 ? "producto marcado" : "productos marcados"} en rojo.`;
     if (paso === 3) return errorMonto;
     if (paso === 4 && hayErroresGastos) return "Completa o elimina los gastos incompletos.";
@@ -913,7 +1165,8 @@ const IngresarVentaPage = () => {
       if (errorSucursal || errorTurno) return;
       if (!(await asegurarStock())) return;
     }
-    if (paso === 2 && cantidadErroresProductos > 0) {
+    if (paso === 2 && modo === "excel" && validarArchivo(archivo)) return;
+    if (paso === 2 && modo === "manual" && cantidadErroresProductos > 0) {
       document.querySelector('[data-error="true"]')?.scrollIntoView({ block: "center", behavior: "smooth" });
       return;
     }
@@ -936,6 +1189,23 @@ const IngresarVentaPage = () => {
     }
   };
 
+  // ── Archivo Excel ──
+  const seleccionarArchivo = (file) => {
+    if (!file) return;
+    const mensaje = validarArchivo(file);
+    if (mensaje) {
+      setErrorSeleccionArchivo(mensaje); // se conserva el archivo anterior, si había uno
+      return;
+    }
+    setErrorSeleccionArchivo("");
+    setArchivo(file);
+  };
+
+  const quitarArchivo = () => {
+    setArchivo(null);
+    setErrorSeleccionArchivo("");
+  };
+
   // ── Gastos ──
   const agregarGasto = () => {
     idGasto.current += 1;
@@ -948,7 +1218,10 @@ const IngresarVentaPage = () => {
   const reiniciar = () => {
     setPaso(1);
     setFechaVenta(dayjs().format("YYYY-MM-DD"));
-    setIdSucursal(esAdmin ? "" : String(usuario?.idSucursal ?? ""));
+    setIdSucursalElegida(null);
+    setModo("manual");
+    setArchivo(null);
+    setErrorSeleccionArchivo("");
     setTurno("");
     setProductos([]);
     setStockKey(null); // el stock cambió con esta venta: se vuelve a consultar
@@ -964,7 +1237,16 @@ const IngresarVentaPage = () => {
     setGuardando(true);
 
     try {
+      if (modo === "excel") {
+        const errorDeArchivo = validarArchivo(archivo);
+        if (errorDeArchivo) {
+          setAviso({ type: "danger", title: "Falta el archivo", message: errorDeArchivo });
+          return;
+        }
+      }
+
       const payload = construirPayload({
+        modo,
         usuario,
         idSucursal,
         turno,
@@ -975,7 +1257,17 @@ const IngresarVentaPage = () => {
         gastos,
       });
 
-      const respuesta = await ingresarVentaService(payload);
+      let respuesta;
+      if (modo === "excel") {
+        // Una sola petición multipart: la venta como JSON + el archivo. Los nombres de las partes
+        // ("venta" y "archivo") son los que recibe hoy el backend. El Content-Type lo resuelve el servicio.
+        const formData = new FormData();
+        formData.append("venta", JSON.stringify(payload));
+        formData.append("archivo", archivo);
+        respuesta = await ingresarVentaBatchService(formData);
+      } else {
+        respuesta = await ingresarVentaService(payload);
+      }
       if (respuesta?.status && respuesta.status >= 300) {
         throw Object.assign(new Error("Respuesta no exitosa"), { response: { data: respuesta } });
       }
@@ -992,7 +1284,7 @@ const IngresarVentaPage = () => {
       });
     } catch (error) {
       console.error("Error al guardar la venta:", error);
-      setAviso({ type: "danger", title: "No se pudo guardar la venta", message: mensajeError(error) });
+      setAviso({ type: "danger", title: "No se pudo guardar la venta", message: mensajeError(error, modo) });
     } finally {
       guardandoRef.current = false;
       setGuardando(false);
@@ -1033,11 +1325,10 @@ const IngresarVentaPage = () => {
         <PasoSucursalTurno
           esAdmin={esAdmin}
           sucursalesActivas={sucursalesActivas}
-          sucursalAsignada={sucursalSeleccionada}
           loadingSucursales={loadingSucursales}
           showErrorSucursales={showErrorSucursales}
           idSucursal={idSucursal}
-          setIdSucursal={setIdSucursal}
+          setIdSucursal={setIdSucursalElegida}
           turno={turno}
           setTurno={setTurno}
           fecha={fechaVenta}
@@ -1049,10 +1340,16 @@ const IngresarVentaPage = () => {
 
       {paso === 2 && (
         <PasoProductos
+          modo={modo}
+          setModo={setModo}
           productos={productos}
           noVendidas={noVendidas}
           setNoVendida={(id, valor) => setNoVendidas((prev) => ({ ...prev, [id]: valor }))}
           errores={erroresProductos}
+          archivo={archivo}
+          onSeleccionarArchivo={seleccionarArchivo}
+          onQuitarArchivo={quitarArchivo}
+          errorArchivo={errorArchivo}
         />
       )}
 
@@ -1071,6 +1368,8 @@ const IngresarVentaPage = () => {
 
       {paso === 5 && (
         <PasoResumen
+          modo={modo}
+          archivo={archivo}
           sucursal={sucursalSeleccionada?.nombreSucursal ?? "—"}
           turno={turno}
           fecha={fechaVenta}
