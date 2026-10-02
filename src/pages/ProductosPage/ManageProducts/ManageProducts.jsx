@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
 import {
@@ -36,7 +36,6 @@ const inputClass =
 const selectClass =
   "w-full appearance-none rounded-xl border bg-surface py-2.5 pl-3.5 pr-9 text-sm font-medium text-ink transition-colors focus:outline-none focus:ring-2";
 
-// ── Toggle tipo switch, reutilizable ──────────────────────────────────────
 function SwitchField({ label, checked, onChange, disabled }) {
   return (
     <div>
@@ -81,6 +80,8 @@ function ManageProducts() {
   const [hasChanges, setHasChanges] = useState(false);
   const [loadingModificar, setLoadingModificar] = useState(false);
 
+  const editPanelRef = useRef(null);
+
   const { categorias: categoriasModify, loadingCategorias, showErrorCategorias } = useGetCategorias();
 
   const {
@@ -104,37 +105,76 @@ function ManageProducts() {
   useCheckFormChanges(selectedProduct, initialProductValues, formValues, isPanaderia, setHasChanges);
   useSwitchExclusivity(controlStock, stockDiario, setValue, setHasChanges);
 
+  // Lleva el panel a la vista apenas se abre — soluciona el caso de editar
+  // un producto que está más abajo en la grilla y el formulario aparecer
+  // fuera de pantalla, arriba del todo, sin que el usuario lo note.
+  // useEffect(() => {
+  //   if (showEditPanel && editPanelRef.current) {
+  //     editPanelRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+  //   }
+  // }, [showEditPanel]);
+
+  // Versión más robusta del scroll anterior:
+  //  - Depende también del producto seleccionado: si showEditPanel pasa a true ANTES de que
+  //    selectedProduct esté listo, el formulario todavía no existe (editPanelRef es null) y el
+  //    efecto anterior nunca volvía a ejecutarse. Así se vuelve a intentar cuando el formulario ya se montó.
+  //    También funciona al pasar de editar un producto a editar otro con el panel ya abierto.
+  //  - requestAnimationFrame espera a que el formulario esté pintado y a que useProductFormSetup
+  //    termine de rellenar los campos; sin esto el scroll se calcula con el layout viejo y se queda corto.
+  //  - Se usa scrollIntoView (y no window.scrollTo) porque encuentra solo el contenedor que realmente
+  //    hace scroll (window, body o un <main> con overflow), según como esté armado el layout.
+  useEffect(() => {
+    if (!showEditPanel || !selectedProduct) return;
+
+    const frame = requestAnimationFrame(() => {
+      editPanelRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }, [showEditPanel, selectedProduct?.idProducto]);
+
+  // Firma correcta: (selectedProduct, reset, setValue, setIsPanaderia, setTipoProduccion, setHasChanges).
+  // Antes se llamaba con los parámetros en el orden equivocado, lo que lanzaba
+  // un error no capturado dentro de resetFormToInitialValues y detenía la
+  // ejecución antes de cerrar el panel — por eso Cancelar/X no funcionaban.
   const closeEditPanel = () => {
-    resetFormToInitialValues(reset, initialProductValues);
+    if (selectedProduct) {
+      resetFormToInitialValues(selectedProduct, reset, setValue, setIsPanaderia, setTipoProduccion, setHasChanges);
+    }
     setShowEditPanel(false);
     setSelectedProduct(null);
+    setInitialProductValues(null);
   };
 
   const openEditPanel = (producto) => {
-    handleModify(producto, setSelectedProduct, () => setShowEditPanel(true), reset, setIsPanaderia, setTipoProduccion, setInitialProductValues, setHasChanges);
+    handleModify(
+      producto,
+      setSelectedProduct,
+      () => setShowEditPanel(true),
+      reset,
+      setIsPanaderia,
+      setTipoProduccion,
+      setInitialProductValues,
+      setHasChanges
+    );
   };
 
   const onSubmit = async (data) => {
-    setLoadingModificar(true);
-    try {
-      await handleUpdateProduct(
-        data,
-        selectedProduct,
-        setProductos,
-        () => {
-          setShowEditPanel(false);
-          setSuccessMessage("El producto se actualizó correctamente.");
-        },
-        setSelectedProduct,
-        setInitialProductValues,
-        setHasChanges,
-        setErrorMessage,
-        () => {},
-        setLoadingModificar
-      );
-    } finally {
-      setLoadingModificar(false);
-    }
+    await handleUpdateProduct(
+      data,
+      selectedProduct,
+      setProductos,
+      setShowEditPanel,
+      (val) => {
+        setSelectedProduct(val);
+        if (val === null) setSuccessMessage("El producto se actualizó correctamente.");
+      },
+      setInitialProductValues,
+      setHasChanges,
+      setErrorMessage,
+      () => {},
+      setLoadingModificar
+    );
   };
 
   const handleDeleteConfirm = async (idProducto) => {
@@ -234,10 +274,12 @@ function ManageProducts() {
       </div>
 
       {/* ── Panel de edición, inline ─────────────────────────────────── */}
+      {/* scroll-mt: deja un margen arriba al hacer scrollIntoView, para que no quede tapado por una barra fija */}
       {showEditPanel && selectedProduct && (
         <form
+          ref={editPanelRef}
           onSubmit={handleSubmit(onSubmit)}
-          className="animate-slide-up flex flex-col gap-5 rounded-2xl border border-line bg-surface p-5 shadow-card"
+          className="animate-slide-up flex scroll-mt-[calc(var(--header-height)+1rem)] flex-col gap-5 rounded-2xl border border-line bg-surface p-5 shadow-card"
         >
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-semibold text-ink">Modificar {selectedProduct.nombreProducto}</h2>
