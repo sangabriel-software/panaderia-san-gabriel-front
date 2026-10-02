@@ -27,7 +27,6 @@ const ManageUsers = lazy(() => import("./pages/UsersPages/Users/ManageUsers/Mana
 const ManageRoles = lazy(() => import("./pages/UsersPages/Roles/ManageRoles/ManageRoles"));
 const CreateRolForm = lazy(() => import("./pages/UsersPages/Roles/CreateRoles/CreateRolForm"));
 const UpdateRolesForm = lazy(() => import("./pages/UsersPages/Roles/UpdateRoles/UpdateRolesForm"));
-const CreateUsers = lazy(() => import("./pages/UsersPages/Users/createUsers/CreateUsers"));
 const PrivateRoute = lazy(() => import("./components/PrivateRoute/PrivateRoute"));
 const ManageProducts = lazy(() => import("./pages/ProductosPage/ManageProducts/ManageProducts"));
 const IngresarProductos = lazy(() => import("./pages/ProductosPage/IngresarProductos/IngresarProductos"));
@@ -97,7 +96,6 @@ function App() {
 
             <Route path="/users">
               <Route index element={<ManageUsers />} />
-              <Route path="create-user" element={<CreateUsers />} />
               <Route path="roles" element={<ManageRoles />} />
               <Route path="createRol" element={<CreateRolForm />} />
               <Route path="editRol/:idRol" element={<UpdateRolesForm />} />

@@ -1,7 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { FiEye, FiEyeOff, FiCheck, FiLock, FiArrowRight } from "react-icons/fi";
+
 import { getUserData } from "../../utils/Auth/decodedata";
 import { cambiarPassService } from "../../services/userServices/usersservices/users.service";
+import sgMark from "../../assets/sg-mark.svg";
 
 const CambiarPasswordPage = () => {
   const navigate = useNavigate();
@@ -43,8 +46,9 @@ const CambiarPasswordPage = () => {
     },
   ];
 
-  const completedRules = rules.filter((rule) => rule.ok).length;
   const isValid = rules.every((rule) => rule.ok);
+
+  const completedRules = rules.filter((rule) => rule.ok).length;
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -78,7 +82,7 @@ const CambiarPasswordPage = () => {
 
         setTimeout(() => {
           navigate("/login");
-        }, 2500);
+        }, 3000);
       }
     } catch (err) {
       setError(
@@ -91,567 +95,520 @@ const CambiarPasswordPage = () => {
   };
 
   /*
-   * ─────────────────────────────────────────────────────────────
-   * SUCCESS STATE
-   * ─────────────────────────────────────────────────────────────
+   * ─────────────────────────────────────────────
+   * PANTALLA DE ÉXITO
+   * ─────────────────────────────────────────────
    */
 
   if (success) {
     return (
-      <div className="min-h-screen bg-bg text-ink flex items-center justify-center px-4 relative overflow-hidden">
-        {/* Ambient background */}
-        <div className="pointer-events-none absolute inset-0">
-          <div className="absolute -top-40 -left-40 h-96 w-96 rounded-full bg-brand-500/10 blur-3xl" />
-          <div className="absolute -bottom-40 -right-40 h-96 w-96 rounded-full bg-accent-500/10 blur-3xl" />
-        </div>
+      <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-bg px-4 py-8">
 
-        <div className="relative w-full max-w-md animate-scale-in">
-          <div className="rounded-3xl border border-line bg-surface/90 p-8 shadow-modal backdrop-blur-xl text-center">
-            {/* Success icon */}
-            <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-success-500/10 text-success-500 ring-1 ring-success-500/20">
-              <svg
-                width="30"
-                height="30"
-                viewBox="0 0 24 24"
+        {/* Background grid */}
+        <svg
+          className="pointer-events-none absolute inset-0 h-full w-full"
+          aria-hidden="true"
+        >
+          <defs>
+            <pattern
+              id="successGrid"
+              width="40"
+              height="40"
+              patternUnits="userSpaceOnUse"
+            >
+              <path
+                d="M40 0 H0 V40"
                 fill="none"
                 stroke="currentColor"
-                strokeWidth="2.2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <polyline points="20 6 9 17 4 12" />
-              </svg>
+                strokeWidth="1"
+                strokeDasharray="2 4"
+                className="text-line"
+              />
+            </pattern>
+
+            <radialGradient
+              id="successFade"
+              cx="50%"
+              cy="40%"
+              r="70%"
+            >
+              <stop
+                offset="0%"
+                stopColor="white"
+                stopOpacity="1"
+              />
+
+              <stop
+                offset="100%"
+                stopColor="white"
+                stopOpacity="0.2"
+              />
+            </radialGradient>
+
+            <mask id="successMask">
+              <rect
+                width="100%"
+                height="100%"
+                fill="url(#successFade)"
+              />
+            </mask>
+          </defs>
+
+          <rect
+            width="100%"
+            height="100%"
+            fill="url(#successGrid)"
+            mask="url(#successMask)"
+          />
+        </svg>
+
+        {/* Brand glow */}
+        <div className="pointer-events-none absolute -left-32 -top-32 h-96 w-96 rounded-full bg-brand-400/20 blur-3xl" />
+
+        <div className="pointer-events-none absolute bottom-0 right-0 h-96 w-96 rounded-full bg-brand-600/10 blur-3xl" />
+
+        {/* Success card */}
+        <div className="relative z-10 w-full max-w-md animate-scale-in">
+          <div className="rounded-3xl border border-line bg-surface/90 p-6 text-center shadow-modal backdrop-blur-sm sm:p-10">
+
+            {/* Logo */}
+            <div className="mb-7 flex justify-center">
+              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-surface shadow-brand">
+                <img
+                  src={sgMark}
+                  alt="Panadería San Gabriel"
+                  className="h-14 w-14 rounded-2xl"
+                />
+              </div>
             </div>
 
-            <div className="space-y-2">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-success-500">
-                Seguridad actualizada
-              </p>
-
-              <h1 className="text-2xl font-semibold tracking-tight text-ink">
-                Contraseña actualizada
-              </h1>
-
-              <p className="text-sm leading-6 text-muted">
-                Tu contraseña se actualizó correctamente. Te enviaremos
-                al inicio de sesión para continuar.
-              </p>
+            {/* Success icon */}
+            <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-success-500/10 text-success-500 ring-8 ring-success-500/5">
+              <FiCheck size={30} strokeWidth={2.5} />
             </div>
+
+            <h1 className="text-xl font-semibold tracking-tight text-ink sm:text-2xl">
+              Contraseña actualizada
+            </h1>
+
+            <p className="mx-auto mt-3 max-w-sm text-sm leading-relaxed text-muted">
+              Tu contraseña fue actualizada correctamente.
+              Serás redirigido al inicio de sesión.
+            </p>
 
             {/* Progress */}
-            <div className="mt-7 space-y-2">
-              <div className="h-1.5 overflow-hidden rounded-full bg-surface-2">
-                <div className="h-full w-full rounded-full bg-success-500 animate-[slide-in_2.5s_linear]" />
+            <div className="mt-8">
+              <div className="mb-2 flex items-center justify-between text-[11px] text-muted">
+                <span>Redirigiendo</span>
+                <span>Login</span>
               </div>
 
-              <p className="text-[11px] text-muted">
-                Redirigiendo...
-              </p>
+              <div className="h-1.5 overflow-hidden rounded-full bg-surface-2">
+                <div
+                  className="h-full w-full origin-left rounded-full bg-brand-500"
+                  style={{
+                    animation:
+                      "redirectProgress 3s linear forwards",
+                  }}
+                />
+              </div>
+            </div>
+
+            <div className="mt-6 flex items-center justify-center gap-2 text-xs text-muted">
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-brand-500" />
+              Volviendo al inicio de sesión...
             </div>
           </div>
         </div>
+
+        <style>{`
+          @keyframes redirectProgress {
+            from {
+              transform: scaleX(0);
+            }
+            to {
+              transform: scaleX(1);
+            }
+          }
+        `}</style>
       </div>
     );
   }
 
   /*
-   * ─────────────────────────────────────────────────────────────
-   * MAIN
-   * ─────────────────────────────────────────────────────────────
+   * ─────────────────────────────────────────────
+   * FORMULARIO
+   * ─────────────────────────────────────────────
    */
 
   return (
-    <div className="min-h-screen bg-bg text-ink relative overflow-hidden">
-      {/* Ambient background */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -top-48 -left-48 h-[500px] w-[500px] rounded-full bg-brand-500/8 blur-3xl" />
+    <div className="relative min-h-screen overflow-hidden bg-bg">
 
-        <div className="absolute top-1/3 -right-48 h-[450px] w-[450px] rounded-full bg-accent-500/8 blur-3xl" />
+      {/* Background grid */}
+      <svg
+        className="pointer-events-none absolute inset-0 h-full w-full"
+        aria-hidden="true"
+      >
+        <defs>
+          <pattern
+            id="passwordGrid"
+            width="40"
+            height="40"
+            patternUnits="userSpaceOnUse"
+          >
+            <path
+              d="M40 0 H0 V40"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1"
+              strokeDasharray="2 4"
+              className="text-line"
+            />
+          </pattern>
 
-        <div className="absolute bottom-0 left-1/3 h-[300px] w-[500px] rounded-full bg-brand-500/5 blur-3xl" />
-      </div>
+          <radialGradient
+            id="passwordFade"
+            cx="50%"
+            cy="35%"
+            r="75%"
+          >
+            <stop
+              offset="0%"
+              stopColor="white"
+              stopOpacity="1"
+            />
 
-      <div className="relative min-h-screen flex items-center justify-center px-4 py-8 sm:px-6 lg:px-8">
-        <div className="w-full max-w-5xl">
+            <stop
+              offset="100%"
+              stopColor="white"
+              stopOpacity="0.2"
+            />
+          </radialGradient>
 
-          {/* ───────────────────────────────────────────────
-              Desktop layout
-          ─────────────────────────────────────────────── */}
+          <mask id="passwordMask">
+            <rect
+              width="100%"
+              height="100%"
+              fill="url(#passwordFade)"
+            />
+          </mask>
+        </defs>
 
-          <div className="grid overflow-hidden rounded-3xl border border-line bg-surface/80 shadow-modal backdrop-blur-xl lg:grid-cols-[0.85fr_1.15fr]">
+        <rect
+          width="100%"
+          height="100%"
+          fill="url(#passwordGrid)"
+          mask="url(#passwordMask)"
+        />
+      </svg>
 
-            {/* ─────────────────────────────────────────────
-                LEFT PANEL
-            ───────────────────────────────────────────── */}
+      {/* Brand glow */}
+      <div className="pointer-events-none absolute -left-32 -top-32 h-96 w-96 rounded-full bg-brand-400/20 blur-3xl" />
 
-            <div className="relative hidden lg:flex flex-col justify-between overflow-hidden bg-slate-950 p-10 text-white dark:bg-black">
-              {/* Decorative grid */}
-              <div
-                className="absolute inset-0 opacity-[0.08]"
-                style={{
-                  backgroundImage:
-                    "linear-gradient(rgba(255,255,255,.15) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.15) 1px, transparent 1px)",
-                  backgroundSize: "32px 32px",
-                }}
-              />
+      <div className="pointer-events-none absolute bottom-0 right-0 h-96 w-96 rounded-full bg-brand-600/10 blur-3xl" />
 
-              {/* Glow */}
-              <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-brand-400/20 blur-3xl" />
+      {/* Content */}
+      <div className="relative z-10 mx-auto flex min-h-screen max-w-6xl items-center justify-center px-4 py-8 sm:px-6 sm:py-12 lg:justify-between lg:gap-16">
 
-              <div className="relative">
-                {/* Logo mark */}
-                <div className="mb-10 flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-brand-300 shadow-glow">
-                  <svg
-                    width="21"
-                    height="21"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.8"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <rect x="4" y="10" width="16" height="11" rx="2" />
-                    <path d="M8 10V7a4 4 0 0 1 8 0v3" />
-                    <circle cx="12" cy="15.5" r="1" />
-                  </svg>
-                </div>
+        {/* ─────────────────────────────────────────
+            LEFT / DESKTOP
+        ───────────────────────────────────────── */}
 
-                <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-brand-300">
-                  Protección de cuenta
-                </p>
+        <div className="hidden max-w-md lg:block">
 
-                <h2 className="max-w-sm text-3xl font-semibold leading-tight tracking-tight">
-                  Mantén tu cuenta protegida.
-                </h2>
-
-                <p className="mt-4 max-w-sm text-sm leading-6 text-slate-400">
-                  Configura una contraseña segura para proteger el acceso
-                  a tu información y operaciones.
-                </p>
-              </div>
-
-              {/* Security features */}
-              <div className="relative space-y-3">
-                {[
-                  "Protección de acceso",
-                  "Contraseña segura",
-                  "Información protegida",
-                ].map((item) => (
-                  <div
-                    key={item}
-                    className="flex items-center gap-3 text-sm text-slate-300"
-                  >
-                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-brand-400/10 text-brand-300">
-                      <svg
-                        width="11"
-                        height="11"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="3"
-                        strokeLinecap="round"
-                      >
-                        <polyline points="20 6 9 17 4 12" />
-                      </svg>
-                    </span>
-
-                    {item}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* ─────────────────────────────────────────────
-                FORM PANEL
-            ───────────────────────────────────────────── */}
-
-            <div className="p-6 sm:p-8 lg:p-10">
-              <div className="mx-auto max-w-md">
-
-                {/* Header */}
-                <div className="mb-8">
-                  <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-500/10 text-brand-500 ring-1 ring-brand-500/20">
-                    <svg
-                      width="23"
-                      height="23"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <rect
-                        x="3"
-                        y="11"
-                        width="18"
-                        height="10"
-                        rx="2"
-                      />
-                      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                      <circle cx="12" cy="16" r="1" />
-                    </svg>
-                  </div>
-
-                  <div className="space-y-2">
-                    <h1 className="text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
-                      Crea tu nueva contraseña
-                    </h1>
-
-                    <p className="text-sm leading-6 text-muted">
-                      Antes de continuar necesitamos que establezcas
-                      una contraseña nueva para tu cuenta.
-                    </p>
-                  </div>
-                </div>
-
-                {/* User identity */}
-                <div className="mb-7 flex items-center gap-3 rounded-2xl border border-line bg-bg/70 p-3.5">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-accent-600 text-sm font-semibold text-white shadow-brand">
-                    {usuario?.usuario?.charAt(0)?.toUpperCase() ?? "U"}
-                  </div>
-
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-semibold text-ink">
-                      {usuario?.nombreUsuario ?? "Usuario"}
-                    </p>
-
-                    <p className="truncate text-xs text-muted">
-                      @{usuario?.usuario}
-                    </p>
-                  </div>
-
-                  <div className="ml-auto flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-success-500/10 text-success-500">
-                    <svg
-                      width="13"
-                      height="13"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2.5"
-                      strokeLinecap="round"
-                    >
-                      <polyline points="20 6 9 17 4 12" />
-                    </svg>
-                  </div>
-                </div>
-
-                <form
-                  onSubmit={handleSubmit}
-                  className="space-y-5"
-                  autoComplete="off"
-                >
-                  {/* Nueva contraseña */}
-                  <div>
-                    <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted">
-                      Nueva contraseña
-                    </label>
-
-                    <div className="group relative">
-                      <input
-                        type={showNueva ? "text" : "password"}
-                        name="nueva"
-                        value={form.nueva}
-                        onChange={handleChange}
-                        autoComplete="new-password"
-                        placeholder="Introduce una contraseña segura"
-                        className="h-12 w-full rounded-xl border border-line bg-bg px-4 pr-12 text-sm text-ink outline-none transition-all placeholder:text-muted/60 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10"
-                      />
-
-                      <button
-                        type="button"
-                        onClick={() => setShowNueva((prev) => !prev)}
-                        aria-label={
-                          showNueva ? "Ocultar contraseña" : "Mostrar contraseña"
-                        }
-                        className="absolute right-3 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-lg text-muted transition-colors hover:bg-surface-2 hover:text-ink"
-                      >
-                        {showNueva ? (
-                          <svg
-                            width="17"
-                            height="17"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="1.8"
-                            strokeLinecap="round"
-                          >
-                            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
-                            <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
-                            <line x1="1" y1="1" x2="23" y2="23" />
-                          </svg>
-                        ) : (
-                          <svg
-                            width="17"
-                            height="17"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="1.8"
-                            strokeLinecap="round"
-                          >
-                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                            <circle cx="12" cy="12" r="3" />
-                          </svg>
-                        )}
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Password strength */}
-                  {form.nueva && (
-                    <div className="animate-slide-up rounded-2xl border border-line bg-bg/60 p-4">
-                      <div className="mb-3 flex items-center justify-between">
-                        <span className="text-xs font-semibold text-ink">
-                          Seguridad de la contraseña
-                        </span>
-
-                        <span
-                          className={`text-[11px] font-semibold ${
-                            completedRules === 5
-                              ? "text-success-500"
-                              : completedRules >= 3
-                              ? "text-warning-500"
-                              : "text-muted"
-                          }`}
-                        >
-                          {completedRules}/5
-                        </span>
-                      </div>
-
-                      {/* Strength bar */}
-                      <div className="mb-4 grid grid-cols-5 gap-1">
-                        {rules.map((rule, index) => (
-                          <div
-                            key={rule.label}
-                            className={`h-1 rounded-full transition-all duration-300 ${
-                              rule.ok
-                                ? "bg-success-500"
-                                : index < completedRules
-                                ? "bg-warning-500"
-                                : "bg-surface-2"
-                            }`}
-                          />
-                        ))}
-                      </div>
-
-                      <div className="grid gap-2 sm:grid-cols-2">
-                        {rules.map((rule) => (
-                          <div
-                            key={rule.label}
-                            className={`flex items-center gap-2 text-xs transition-colors ${
-                              rule.ok
-                                ? "text-success-500"
-                                : "text-muted"
-                            }`}
-                          >
-                            <span
-                              className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full ${
-                                rule.ok
-                                  ? "bg-success-500/10"
-                                  : "bg-surface-2"
-                              }`}
-                            >
-                              {rule.ok ? (
-                                <svg
-                                  width="9"
-                                  height="9"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  strokeWidth="3"
-                                  strokeLinecap="round"
-                                >
-                                  <polyline points="20 6 9 17 4 12" />
-                                </svg>
-                              ) : (
-                                <span className="h-1.5 w-1.5 rounded-full bg-current opacity-50" />
-                              )}
-                            </span>
-
-                            {rule.label}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Confirmar contraseña */}
-                  <div>
-                    <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted">
-                      Confirmar contraseña
-                    </label>
-
-                    <div className="relative">
-                      <input
-                        type={showConf ? "text" : "password"}
-                        name="confirmar"
-                        value={form.confirmar}
-                        onChange={handleChange}
-                        autoComplete="new-password"
-                        placeholder="Repite tu contraseña"
-                        className={`h-12 w-full rounded-xl border bg-bg px-4 pr-12 text-sm text-ink outline-none transition-all placeholder:text-muted/60 focus:ring-4 ${
-                          form.confirmar &&
-                          form.nueva !== form.confirmar
-                            ? "border-danger-500 focus:border-danger-500 focus:ring-danger-500/10"
-                            : form.confirmar &&
-                              form.nueva === form.confirmar
-                            ? "border-success-500 focus:border-success-500 focus:ring-success-500/10"
-                            : "border-line focus:border-brand-500 focus:ring-brand-500/10"
-                        }`}
-                      />
-
-                      <button
-                        type="button"
-                        onClick={() => setShowConf((prev) => !prev)}
-                        aria-label={
-                          showConf ? "Ocultar contraseña" : "Mostrar contraseña"
-                        }
-                        className="absolute right-3 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-lg text-muted transition-colors hover:bg-surface-2 hover:text-ink"
-                      >
-                        {showConf ? (
-                          <svg
-                            width="17"
-                            height="17"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="1.8"
-                            strokeLinecap="round"
-                          >
-                            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
-                            <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
-                            <line x1="1" y1="1" x2="23" y2="23" />
-                          </svg>
-                        ) : (
-                          <svg
-                            width="17"
-                            height="17"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="1.8"
-                            strokeLinecap="round"
-                          >
-                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                            <circle cx="12" cy="12" r="3" />
-                          </svg>
-                        )}
-                      </button>
-                    </div>
-
-                    {form.confirmar &&
-                      form.nueva !== form.confirmar && (
-                        <p className="mt-2 flex items-center gap-1.5 text-xs text-danger-500 animate-fade-in">
-                          <svg
-                            width="13"
-                            height="13"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                          >
-                            <circle cx="12" cy="12" r="10" />
-                            <line x1="12" y1="8" x2="12" y2="12" />
-                            <line x1="12" y1="16" x2="12.01" y2="16" />
-                          </svg>
-                          Las contraseñas no coinciden
-                        </p>
-                      )}
-                  </div>
-
-                  {/* Error */}
-                  {error && (
-                    <div className="flex items-start gap-3 rounded-xl border border-danger-500/20 bg-danger-500/5 px-4 py-3 text-sm text-danger-500 animate-fade-in">
-                      <svg
-                        width="17"
-                        height="17"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        className="mt-0.5 shrink-0"
-                      >
-                        <circle cx="12" cy="12" r="10" />
-                        <line x1="12" y1="8" x2="12" y2="12" />
-                        <line x1="12" y1="16" x2="12.01" y2="16" />
-                      </svg>
-
-                      <span>{error}</span>
-                    </div>
-                  )}
-
-                  {/* Submit */}
-                  <button
-                    type="submit"
-                    disabled={!isValid || loading}
-                    className="group relative flex h-12 w-full items-center justify-center gap-2 overflow-hidden rounded-xl bg-brand-600 px-5 text-sm font-semibold text-white shadow-brand transition-all duration-200 hover:bg-brand-500 hover:shadow-glow active:scale-[0.99] disabled:cursor-not-allowed disabled:bg-surface-2 disabled:text-muted disabled:shadow-none"
-                  >
-                    {loading ? (
-                      <>
-                        <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-                        Actualizando...
-                      </>
-                    ) : (
-                      <>
-                        Actualizar contraseña
-
-                        <svg
-                          width="16"
-                          height="16"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          className="transition-transform duration-200 group-hover:translate-x-0.5"
-                        >
-                          <line x1="5" y1="12" x2="19" y2="12" />
-                          <polyline points="12 5 19 12 12 19" />
-                        </svg>
-                      </>
-                    )}
-                  </button>
-
-                  {/* Security note */}
-                  <div className="flex items-start gap-2.5 pt-1 text-[11px] leading-5 text-muted">
-                    <svg
-                      width="14"
-                      height="14"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
-                      strokeLinecap="round"
-                      className="mt-0.5 shrink-0"
-                    >
-                      <rect
-                        x="4"
-                        y="10"
-                        width="16"
-                        height="11"
-                        rx="2"
-                      />
-                      <path d="M8 10V7a4 4 0 0 1 8 0v3" />
-                    </svg>
-
-                    <span>
-                      Tu contraseña se almacena de forma segura y no se
-                      mostrará a otros usuarios.
-                    </span>
-                  </div>
-                </form>
-              </div>
-            </div>
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-line bg-surface/80 px-3 py-1.5 text-xs font-medium text-brand-700 shadow-card backdrop-blur-sm">
+            <span className="h-1.5 w-1.5 rounded-full bg-brand-500" />
+            Seguridad de la cuenta
           </div>
 
-          {/* Footer */}
-          <p className="mt-5 text-center text-[11px] text-muted">
-            Actualización de credenciales · Acceso protegido
+          <h1 className="text-4xl font-bold leading-tight tracking-tight text-ink sm:text-5xl">
+            Protege
+            <br />
+            <span className="text-brand-600">
+              tu cuenta.
+            </span>
+          </h1>
+
+          <p className="mt-5 max-w-md text-base leading-relaxed text-muted">
+            Establece una contraseña segura para mantener
+            protegida tu información dentro del sistema de
+            Panadería San Gabriel.
           </p>
+
+          {/* Security indicators */}
+          <div className="mt-8 space-y-3">
+
+            <div className="flex items-center gap-3 text-sm text-muted">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-500/10 text-brand-500">
+                <FiLock size={15} />
+              </div>
+              Protección de acceso
+            </div>
+
+            <div className="flex items-center gap-3 text-sm text-muted">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-500/10 text-brand-500">
+                <FiCheck size={15} />
+              </div>
+              Validación de seguridad
+            </div>
+
+          </div>
+        </div>
+
+        {/* ─────────────────────────────────────────
+            CARD
+        ───────────────────────────────────────── */}
+
+        <div className="w-full max-w-md animate-fade-in lg:max-w-sm">
+
+          <div className="rounded-3xl border border-line bg-surface/90 p-5 shadow-modal backdrop-blur-sm sm:p-8">
+
+            {/* Header */}
+            <div className="mb-7 text-center">
+
+              <div className="mb-5 flex justify-center">
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-surface shadow-brand">
+                  <img
+                    src={sgMark}
+                    alt="Panadería San Gabriel"
+                    className="h-12 w-12 rounded-2xl"
+                  />
+                </div>
+              </div>
+
+              <h2 className="text-xl font-semibold tracking-tight text-ink">
+                Cambia tu contraseña
+              </h2>
+
+              <p className="mt-2 text-sm leading-relaxed text-muted">
+                Por seguridad, establece una nueva contraseña
+                antes de continuar.
+              </p>
+            </div>
+
+            {/* User */}
+            <div className="mb-6 flex items-center gap-3 rounded-2xl border border-line bg-bg/60 p-3">
+
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-500/10 text-sm font-semibold text-brand-600">
+                {usuario?.usuario?.charAt(0)?.toUpperCase() || "U"}
+              </div>
+
+              <div className="min-w-0">
+                <p className="truncate text-sm font-semibold text-ink">
+                  {usuario?.nombreUsuario || "Usuario"}
+                </p>
+
+                <p className="truncate text-xs text-muted">
+                  @{usuario?.usuario}
+                </p>
+              </div>
+
+              <div className="ml-auto flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-success-500/10 text-success-500">
+                <FiCheck size={14} />
+              </div>
+            </div>
+
+            {/* Form */}
+            <form
+              onSubmit={handleSubmit}
+              className="flex flex-col gap-5"
+              autoComplete="off"
+            >
+
+              {/* Nueva contraseña */}
+              <div>
+                <label
+                  htmlFor="nueva"
+                  className="mb-2 block text-xs font-semibold text-muted"
+                >
+                  Nueva contraseña
+                </label>
+
+                <div className="relative">
+
+                  <input
+                    id="nueva"
+                    name="nueva"
+                    type={showNueva ? "text" : "password"}
+                    value={form.nueva}
+                    onChange={handleChange}
+                    autoComplete="new-password"
+                    placeholder="Crea una contraseña segura"
+                    className="h-14 w-full rounded-xl border border-line bg-bg px-4 pr-12 text-base text-ink placeholder:text-muted transition-all focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-brand-500/10"
+                  />
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setShowNueva((prev) => !prev)
+                    }
+                    aria-label={
+                      showNueva
+                        ? "Ocultar contraseña"
+                        : "Mostrar contraseña"
+                    }
+                    className="absolute right-3 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-lg text-muted transition-colors hover:bg-surface-2 hover:text-ink"
+                  >
+                    {showNueva ? (
+                      <FiEyeOff size={18} />
+                    ) : (
+                      <FiEye size={18} />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {/* Confirmar */}
+              <div>
+                <label
+                  htmlFor="confirmar"
+                  className="mb-2 block text-xs font-semibold text-muted"
+                >
+                  Confirmar contraseña
+                </label>
+
+                <div className="relative">
+
+                  <input
+                    id="confirmar"
+                    name="confirmar"
+                    type={showConf ? "text" : "password"}
+                    value={form.confirmar}
+                    onChange={handleChange}
+                    autoComplete="new-password"
+                    placeholder="Repite tu contraseña"
+                    className={`h-14 w-full rounded-xl border bg-bg px-4 pr-12 text-base text-ink placeholder:text-muted transition-all focus:outline-none focus:ring-4 ${
+                      form.confirmar &&
+                      form.nueva !== form.confirmar
+                        ? "border-danger-400 focus:border-danger-500 focus:ring-danger-500/10"
+                        : "border-line focus:border-brand-500 focus:ring-brand-500/10"
+                    }`}
+                  />
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setShowConf((prev) => !prev)
+                    }
+                    aria-label={
+                      showConf
+                        ? "Ocultar contraseña"
+                        : "Mostrar contraseña"
+                    }
+                    className="absolute right-3 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-lg text-muted transition-colors hover:bg-surface-2 hover:text-ink"
+                  >
+                    {showConf ? (
+                      <FiEyeOff size={18} />
+                    ) : (
+                      <FiEye size={18} />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {/* Password strength */}
+              {form.nueva && (
+                <div className="rounded-2xl border border-line bg-bg/60 p-4 animate-slide-up">
+
+                  <div className="mb-3 flex items-center justify-between">
+
+                    <span className="text-xs font-semibold text-ink">
+                      Seguridad de contraseña
+                    </span>
+
+                    <span className="text-[11px] font-medium text-muted">
+                      {completedRules}/5
+                    </span>
+
+                  </div>
+
+                  {/* Strength bar */}
+                  <div className="mb-4 flex gap-1">
+                    {rules.map((rule, index) => (
+                      <div
+                        key={index}
+                        className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${
+                          rule.ok
+                            ? "bg-brand-500"
+                            : "bg-surface-2"
+                        }`}
+                      />
+                    ))}
+                  </div>
+
+                  {/* Rules */}
+                  <div className="grid gap-2 sm:grid-cols-2">
+
+                    {rules.map((rule, index) => (
+                      <div
+                        key={index}
+                        className={`flex items-center gap-2 text-[11px] transition-colors ${
+                          rule.ok
+                            ? "text-brand-600"
+                            : "text-muted"
+                        }`}
+                      >
+
+                        <span
+                          className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border transition-all ${
+                            rule.ok
+                              ? "border-brand-500 bg-brand-500 text-white"
+                              : "border-line text-transparent"
+                          }`}
+                        >
+                          <FiCheck size={9} />
+                        </span>
+
+                        {rule.label}
+                      </div>
+                    ))}
+
+                  </div>
+                </div>
+              )}
+
+              {/* Error */}
+              {error && (
+                <div className="flex items-start gap-2 rounded-xl border border-danger-500/20 bg-danger-500/10 px-3.5 py-3 text-xs text-danger-600 animate-slide-up">
+                  <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-danger-500 text-[10px] font-bold text-white">
+                    !
+                  </span>
+
+                  <span>{error}</span>
+                </div>
+              )}
+
+              {/* Submit */}
+              <button
+                type="submit"
+                disabled={!isValid || loading}
+                className="group flex h-14 items-center justify-center gap-2 rounded-xl bg-brand-600 px-4 text-base font-semibold text-white shadow-brand transition-all duration-150 hover:bg-brand-500 active:scale-[0.99] active:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
+              >
+                {loading ? (
+                  <>
+                    <span className="h-4 w-4 animate-spin-smooth rounded-full border-2 border-white/40 border-t-white" />
+                    Actualizando...
+                  </>
+                ) : (
+                  <>
+                    Actualizar contraseña
+
+                    <FiArrowRight
+                      size={17}
+                      className="transition-transform duration-150 group-hover:translate-x-0.5"
+                    />
+                  </>
+                )}
+              </button>
+
+            </form>
+
+            {/* Footer */}
+            <p className="mt-7 text-center text-[11px] text-muted">
+              © {new Date().getFullYear()} Panadería San Gabriel
+            </p>
+
+          </div>
         </div>
       </div>
     </div>
