@@ -62,8 +62,6 @@ const ResetPassPage = lazy(() => import("./pages/Reset-Pass/ResetPassPage"));
 import CambiarPasswordPage from "./pages/CambiarPassword/CambiarPasswordPage";
 import InstallBanner from "./shared/pwa/InstallBanner";
 
-const PWAInstallPrompt = lazy(() => import("./components/PWAInstallPrompt/PWAInstallPrompt"));
-
 function App() {
   return (
     <Suspense fallback={<PageLoader />}>
