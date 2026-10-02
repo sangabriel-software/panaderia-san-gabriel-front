@@ -42,7 +42,6 @@ const PanelConfig = lazy(() => import("./pages/Configuracioens/ConfiguracionesPa
 const GestionDeRecetasPage = lazy(() => import("./pages/RecetasPage/GestionDeRecetasPage"));
 const PerfilPage = lazy(() => import("./pages/Configuracioens/PerfilPage/PerfilPage"));
 const GestionarStockPage = lazy(() => import("./pages/StockProductos/GestionarStock/GestionarStockPage"));
-const StockDiarioPage = lazy(() => import("./pages/StockProductos/StockDiarioPage/StockDiarioPage"));
 const IngresarStockGeneralPage = lazy(() => import("./pages/StockProductos/IngresarStock/IngresarStockPage"));
 const StockUnificado = lazy(() => import("./pages/StockProductos/StockUnificado/StockUnificado"));
 const OrdenesEspecialesList = lazy(() => import("./pages/OrdenesEspeciales/OrdenesEspecialesList/OrdenesEspecialesList"));
@@ -133,7 +132,6 @@ function App() {
 
             <Route path="/stock-productos">
               <Route index element={<GestionarStockPage />} />
-              <Route path="venta-diaria/:idSucursal" element={<StockDiarioPage />} />
               <Route path="ingresar-stock/:idSucursal" element={<IngresarStockGeneralPage />} />
               <Route path="stock-general/:idSucursal" element={<StockUnificado />} />
             </Route>
