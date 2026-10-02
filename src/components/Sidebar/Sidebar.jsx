@@ -1,8 +1,12 @@
-import React, { useState, useEffect, useCallback } from "react";
+// import React, { useState, useEffect, useCallback } from "react";
+import React, { useCallback } from "react";
 import { NavLink } from "react-router-dom";
 import { MdOutlineBakeryDining } from "react-icons/md";
 import { FaSun, FaMoon, FaChevronLeft, FaSignOutAlt } from "react-icons/fa";
-import * as DarkReader from "darkreader";
+// DarkReader invertía los colores por encima de Tailwind y chocaba con la clase `dark` de <html>.
+// El tema ahora lo maneja ThemeContext (clase `dark` + tokens CSS), así que ya no se usa.
+// import * as DarkReader from "darkreader";
+import { useTheme } from "../../context/ThemeContext";
 import { getUserData, getUserPermissions } from "../../utils/Auth/decodedata";
 import { getColorFromName } from "./Sidebar.uitils";
 import {
@@ -42,8 +46,11 @@ const NAV_GROUPS = [
 ];
 
 function Sidebar({ expanded, onToggle, mobileOpen, onCloseMobile }) {
-  const [theme, setTheme] = useState(localStorage.getItem("theme") || "dark");
-  const [isChangingTheme, setIsChangingTheme] = useState(false);
+  // El tema vive en ThemeContext: cambiarlo aplica la clase `dark` en <html> al instante
+  const { theme, toggleTheme } = useTheme();
+
+  // const [theme, setTheme] = useState(localStorage.getItem("theme") || "dark");
+  // const [isChangingTheme, setIsChangingTheme] = useState(false);
   const permisosUsuario = getUserPermissions();
   const userData = getUserData();
 
@@ -53,32 +60,32 @@ function Sidebar({ expanded, onToggle, mobileOpen, onCloseMobile }) {
   }, {});
   const isRouteAllowed = (route) => !route || permissionsMap[route];
 
-  useEffect(() => {
-    if (theme === "dark") {
-      DarkReader.enable({ brightness: 100, contrast: 100, sepia: 0 });
-    } else {
-      DarkReader.disable();
-    }
-  }, [theme]);
+  // useEffect(() => {
+  //   if (theme === "dark") {
+  //     DarkReader.enable({ brightness: 100, contrast: 100, sepia: 0 });
+  //   } else {
+  //     DarkReader.disable();
+  //   }
+  // }, [theme]);
 
-  const toggleTheme = useCallback(() => {
-    if (isChangingTheme) return;
-    setIsChangingTheme(true);
-    const newTheme = theme === "light" ? "dark" : "light";
-    setTheme(newTheme);
-    localStorage.setItem("theme", newTheme);
-
-    const apply = () => {
-      if (newTheme === "dark") {
-        DarkReader.enable({ brightness: 99, contrast: 90, sepia: 10 });
-      } else {
-        DarkReader.disable();
-      }
-      setIsChangingTheme(false);
-    };
-    if ("requestIdleCallback" in window) requestIdleCallback(apply);
-    else setTimeout(apply, 0);
-  }, [theme, isChangingTheme]);
+  // const toggleTheme = useCallback(() => {
+  //   if (isChangingTheme) return;
+  //   setIsChangingTheme(true);
+  //   const newTheme = theme === "light" ? "dark" : "light";
+  //   setTheme(newTheme);
+  //   localStorage.setItem("theme", newTheme);
+  //
+  //   const apply = () => {
+  //     if (newTheme === "dark") {
+  //       DarkReader.enable({ brightness: 99, contrast: 90, sepia: 10 });
+  //     } else {
+  //       DarkReader.disable();
+  //     }
+  //     setIsChangingTheme(false);
+  //   };
+  //   if ("requestIdleCallback" in window) requestIdleCallback(apply);
+  //   else setTimeout(apply, 0);
+  // }, [theme, isChangingTheme]);
 
   const handleNavClick = useCallback(() => {
     if (window.innerWidth <= 768) onCloseMobile();
@@ -112,7 +119,7 @@ function Sidebar({ expanded, onToggle, mobileOpen, onCloseMobile }) {
           type="button"
           onClick={onToggle}
           aria-label={expanded ? "Colapsar menú" : "Expandir menú"}
-          className="absolute -right-3 top-9 hidden h-6 w-6 items-center justify-center rounded-full border-0 bg-surface text-muted shadow-card transition-transform duration-200 hover:text-brand-700 md:flex"
+          className="absolute -right-3 top-9 hidden h-6 w-6 items-center justify-center rounded-full border-0 bg-surface text-muted shadow-card transition-transform duration-200 hover:text-brand-700 dark:hover:text-brand-300 md:flex"
         >
           <FaChevronLeft size={10} className={`transition-transform duration-200 ${expanded ? "" : "rotate-180"}`} />
         </button>
@@ -132,7 +139,7 @@ function Sidebar({ expanded, onToggle, mobileOpen, onCloseMobile }) {
         {/* Usuario: avatar + nombre + tema + logout, todo en una fila, todo a 1 clic */}
         <div className={`flex items-center gap-2 px-3 pb-3 ${expanded ? "" : "flex-col"}`}>
           {userData?.avatar ? (
-            <img src={userData.avatar} className="h-9 w-9 shrink-0 rounded-full object-cover ring-2 ring-brand-100" alt="User" />
+            <img src={userData.avatar} className="h-9 w-9 shrink-0 rounded-full object-cover ring-2 ring-brand-100 dark:ring-brand-900/60" alt="User" />
           ) : (
             <div
               className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white"
@@ -151,18 +158,19 @@ function Sidebar({ expanded, onToggle, mobileOpen, onCloseMobile }) {
           <button
             type="button"
             onClick={toggleTheme}
-            disabled={isChangingTheme}
             aria-label="Cambiar tema"
             title="Cambiar tema"
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-0 bg-transparent text-muted transition-colors hover:bg-surface-2 hover:text-brand-700"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-0 bg-transparent text-muted transition-colors hover:bg-surface-2 hover:text-brand-700 dark:hover:text-brand-300"
           >
-            {isChangingTheme ? (
+            {/* El cambio de tema ahora es instantáneo, ya no hace falta el spinner de isChangingTheme */}
+            {/* {isChangingTheme ? (
               <span className="h-3.5 w-3.5 animate-spin-smooth rounded-full border-2 border-brand-300 border-t-transparent" />
             ) : theme === "dark" ? (
               <FaMoon size={13} />
             ) : (
               <FaSun size={13} />
-            )}
+            )} */}
+            {theme === "dark" ? <FaMoon size={13} /> : <FaSun size={13} />}
           </button>
 
           <button
@@ -170,7 +178,7 @@ function Sidebar({ expanded, onToggle, mobileOpen, onCloseMobile }) {
             onClick={handleLogout}
             aria-label="Cerrar sesión"
             title="Cerrar sesión"
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-0 bg-transparent text-muted transition-colors hover:bg-danger-50 hover:text-danger-600"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-0 bg-transparent text-muted transition-colors hover:bg-danger-50 hover:text-danger-600 dark:hover:bg-danger-900/30 dark:hover:text-danger-400"
           >
             <FaSignOutAlt size={14} />
           </button>

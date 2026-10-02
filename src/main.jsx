@@ -2,6 +2,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import App from "./App.jsx";
+import { ThemeProvider } from "./context/ThemeContext.jsx";
 import { initBetterStack } from "./observability/betterStack.js";
 import './styles/globals.css';
 
@@ -10,14 +11,17 @@ initBetterStack();
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <BrowserRouter
-      future={{
-        v7_startTransition: true, // Habilita el uso de React.startTransition para actualizaciones.
-        v7_relativeSplatPath: true, // Cambia la resolución de rutas relativas en rutas splat (*).
-      }}
-    >
-      <App />
-    </BrowserRouter>
+    {/* ThemeProvider va por fuera de todo: así cualquier componente (Sidebar, páginas, login) puede usar useTheme() */}
+    <ThemeProvider>
+      <BrowserRouter
+        future={{
+          v7_startTransition: true, // Habilita el uso de React.startTransition para actualizaciones.
+          v7_relativeSplatPath: true, // Cambia la resolución de rutas relativas en rutas splat (*).
+        }}
+      >
+        <App />
+      </BrowserRouter>
+    </ThemeProvider>
   </StrictMode>
 );
 

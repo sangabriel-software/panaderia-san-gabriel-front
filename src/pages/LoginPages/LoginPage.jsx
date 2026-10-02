@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
-import * as DarkReader from "darkreader";
+import { useTheme } from "../../context/ThemeContext";
 import { FiEye, FiEyeOff, FiArrowRight } from "react-icons/fi";
 import sgMark from "../../assets/sg-mark.svg";
 import { handleLogin } from "./loginUtils";
@@ -16,13 +16,12 @@ function LoginPage() {
     handleSubmit,
     formState: { errors },
   } = useForm();
+  
 
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [theme, setTheme] = useState(
-    localStorage.getItem("theme") || "dark"
-  );
-  const [isChangingTheme, setIsChangingTheme] = useState(false);
+
+  const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
@@ -41,48 +40,6 @@ function LoginPage() {
     }
   }, [location]);
 
-  useEffect(() => {
-    if (theme === "dark") {
-      DarkReader.enable({
-        brightness: 100,
-        contrast: 100,
-        sepia: 0,
-      });
-    } else {
-      DarkReader.disable();
-    }
-  }, [theme]);
-
-  const toggleTheme = useCallback(() => {
-    if (isChangingTheme) return;
-
-    setIsChangingTheme(true);
-
-    const newTheme = theme === "light" ? "dark" : "light";
-
-    setTheme(newTheme);
-    localStorage.setItem("theme", newTheme);
-
-    const apply = () => {
-      if (newTheme === "dark") {
-        DarkReader.enable({
-          brightness: 99,
-          contrast: 90,
-          sepia: 10,
-        });
-      } else {
-        DarkReader.disable();
-      }
-
-      setIsChangingTheme(false);
-    };
-
-    if ("requestIdleCallback" in window) {
-      requestIdleCallback(apply);
-    } else {
-      setTimeout(apply, 0);
-    }
-  }, [theme, isChangingTheme]);
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-bg">
@@ -159,13 +116,10 @@ function LoginPage() {
       <button
         type="button"
         onClick={toggleTheme}
-        disabled={isChangingTheme}
         aria-label="Cambiar tema"
         className="fixed right-4 top-4 z-20 flex h-10 w-10 items-center justify-center rounded-full border border-line bg-surface/80 text-muted shadow-card backdrop-blur-sm transition-colors hover:text-brand-700 sm:right-6 sm:top-6"
       >
-        {isChangingTheme ? (
-          <span className="h-4 w-4 animate-spin-smooth rounded-full border-2 border-brand-300 border-t-transparent" />
-        ) : theme === "dark" ? (
+        { theme === "dark" ? (
           <span className="text-sm">☀︎</span>
         ) : (
           <span className="text-sm">☾</span>
