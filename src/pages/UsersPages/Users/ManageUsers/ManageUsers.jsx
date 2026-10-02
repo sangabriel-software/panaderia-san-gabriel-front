@@ -48,7 +48,7 @@ const AVATAR_TONES = ["bg-brand-50"];
 
 function ManageUsers() {
   const navigate = useNavigate();
-  const { usuarios, loadingUsers, showErrorUsers, showInfoUsers, setUsuarios } = useGetUsers();
+  const { usuarios, loadingUsers, showErrorUsers, showInfoUsers, setUsuarios, refetchUsuarios } = useGetUsers();
   const { filteredUsers, searchQuery, showNoResults, handleSearch } = useUsersSerch(usuarios);
   const { roles, loading: loadingRoles, showError: showErrorRoles } = useRoles();
   const { sucursales, loading: loadingSucursales, showError: showErrorSucursales } = useGetSucursales();
@@ -124,6 +124,7 @@ function ManageUsers() {
         () => {
           setSuccessMessage("El usuario ha sido creado correctamente. Se envió al correo ingresado.");
           cerrarForm();
+          refetchUsuarios();
         },
         () => setErrorMessage("Ocurrió un error al crear el usuario."),
         setErrorMessage,
