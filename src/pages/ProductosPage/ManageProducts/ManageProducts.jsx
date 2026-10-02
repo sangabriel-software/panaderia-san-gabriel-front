@@ -1,227 +1,300 @@
-import React, { useState } from "react";
-import { useForm } from "react-hook-form";
-import { useGetProductosYPrecios } from "../../../hooks/productosprecios/useGetProductosYprecios";
-import { checkForChanges, handleDeleleProducto, handleUpdateProduct, useCategoriasYFiltrado, useSerchPrductos, resetFormToInitialValues, useProductFormSetup, useCheckFormChanges, useSwitchExclusivity, handleModify, handleCloseModal, handleConfirmDeleteProducto } from "./ManageProductsUtils";
-import SearchInput from "../../../components/SerchInput/SerchInput";
-import Title from "../../../components/Title/Title";
-import CardProductos from "../../../components/CardProductos/CardPoductos";
+import { useState } from "react";
 import { useNavigate } from "react-router";
-import Alert from "../../../components/Alerts/Alert";
-import { BsExclamationTriangleFill, BsFillInfoCircleFill, BsX } from "react-icons/bs";
-import ConfirmPopUp from "../../../components/Popup/ConfirmPopup";
-import ErrorPopup from "../../../components/Popup/ErrorPopUp";
-import ModalIngreso from "../../../components/ModalGenerico/Modal";
-import { Form, Row, Col, Container } from "react-bootstrap";
+import { useForm } from "react-hook-form";
+import {
+  FiPlus,
+  FiSearch,
+  FiX,
+  FiChevronDown,
+  FiEdit2,
+  FiTrash2,
+  FiPackage,
+  FiInbox,
+  FiSave,
+  FiFilter,
+  FiDollarSign,
+  FiHash,
+} from "react-icons/fi";
+import { useGetProductosYPrecios } from "../../../hooks/productosprecios/useGetProductosYprecios";
 import useGetCategorias from "../../../hooks/categorias/UseGetCategorias";
-import "./ManageProducts.css";
-import AddButton from "../../../components/AddButton/AddButton";
-import DotsMove from "../../../components/Spinners/DotsMove";
-import { descargarPlantillaOrden } from "../../../utils/PdfUtils/ExcelUtils";
+import Alert from "../../../components/Alerts/Alert";
+import {
+  checkForChanges,
+  handleUpdateProduct,
+  useCategoriasYFiltrado,
+  useSerchPrductos,
+  resetFormToInitialValues,
+  useProductFormSetup,
+  useCheckFormChanges,
+  useSwitchExclusivity,
+  handleModify,
+  handleConfirmDeleteProducto,
+} from "./ManageProductsUtils";
 
-const ManageProducts = () => {
-  const { productos, loadigProducts, showErrorProductos, showInfoProductos, setProductos, } = useGetProductosYPrecios();
+const inputClass =
+  "w-full rounded-xl border bg-surface px-3.5 py-2.5 text-sm text-ink placeholder:text-muted transition-colors focus:outline-none focus:ring-2";
+const selectClass =
+  "w-full appearance-none rounded-xl border bg-surface py-2.5 pl-3.5 pr-9 text-sm font-medium text-ink transition-colors focus:outline-none focus:ring-2";
+
+// ── Toggle tipo switch, reutilizable ──────────────────────────────────────
+function SwitchField({ label, checked, onChange, disabled }) {
+  return (
+    <div>
+      <label className="mb-1.5 block text-xs font-medium text-muted">{label}</label>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={checked}
+        disabled={disabled}
+        onClick={() => onChange(!checked)}
+        className={`relative h-7 w-12 shrink-0 rounded-full transition-colors duration-150 ${
+          checked ? "bg-brand-600" : "bg-surface-2"
+        } ${disabled ? "cursor-not-allowed opacity-50" : ""}`}
+      >
+        <span
+          className={`absolute left-0.5 top-0.5 h-6 w-6 rounded-full bg-white shadow-card transition-transform duration-150 ${
+            checked ? "translate-x-5" : "translate-x-0"
+          }`}
+        />
+      </button>
+    </div>
+  );
+}
+
+function ManageProducts() {
+  const { productos, loadigProducts, showErrorProductos, showInfoProductos, setProductos } = useGetProductosYPrecios();
   const { filteredProductos, searchQuery, showNoResults, handleSearch } = useSerchPrductos(productos);
-  const { categorias, filteredByCategory, selectedCategory, setSelectedCategory, } = useCategoriasYFiltrado(productos, filteredProductos);
-  const [productoToDelete, setProductoToDelete] = useState(null);
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const [errorPopupMessage, setErrorPopupMessage] = useState(false);
-  const [isPopupErrorOpen, setIsPopupErrorOpen] = useState(false);
-  const [showModifyModal, setShowModifyModal] = useState(false);
+  const { categorias, filteredByCategory, selectedCategory, setSelectedCategory } = useCategoriasYFiltrado(
+    productos,
+    filteredProductos
+  );
+  const navigate = useNavigate();
+
+  const [confirmingId, setConfirmingId] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+
+  const [showEditPanel, setShowEditPanel] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [initialProductValues, setInitialProductValues] = useState(null);
   const [hasChanges, setHasChanges] = useState(false);
-  const navigate = useNavigate();
-  const { categorias: categoriasModify, loadingCategorias, showErrorCategorias, showInfoCategorias } = useGetCategorias();
   const [loadingModificar, setLoadingModificar] = useState(false);
-  const { register, handleSubmit, reset, watch, setValue, formState: { errors } } = useForm();  // React Hook Form
 
-  // Estado para controlar la visibilidad de los controles de Panaderia
+  const { categorias: categoriasModify, loadingCategorias, showErrorCategorias } = useGetCategorias();
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm();
+
   const [isPanaderia, setIsPanaderia] = useState(false);
   const [tipoProduccion, setTipoProduccion] = useState("bandejas");
 
-  // Observar todos los valores relevantes
   const formValues = watch();
-  const controlStock = watch("controlStock") === 1; 
+  const controlStock = watch("controlStock") === 1;
   const stockDiario = watch("stockDiario") === 1;
   const controlarInventario = watch("controlarInventario") === 1;
 
-  // Custom hooks para manejar la lógica del formulario
   useProductFormSetup(selectedProduct, setValue, reset, setIsPanaderia, setTipoProduccion, setInitialProductValues);
   useCheckFormChanges(selectedProduct, initialProductValues, formValues, isPanaderia, setHasChanges);
   useSwitchExclusivity(controlStock, stockDiario, setValue, setHasChanges);
 
+  const closeEditPanel = () => {
+    resetFormToInitialValues(reset, initialProductValues);
+    setShowEditPanel(false);
+    setSelectedProduct(null);
+  };
 
-  // Función para guardar los cambios del producto
+  const openEditPanel = (producto) => {
+    handleModify(producto, setSelectedProduct, () => setShowEditPanel(true), reset, setIsPanaderia, setTipoProduccion, setInitialProductValues, setHasChanges);
+  };
+
   const onSubmit = async (data) => {
-    handleUpdateProduct( data, selectedProduct, setProductos, setShowModifyModal, setSelectedProduct, setInitialProductValues, setHasChanges, setErrorPopupMessage, setIsPopupErrorOpen, setLoadingModificar);
+    setLoadingModificar(true);
+    try {
+      await handleUpdateProduct(
+        data,
+        selectedProduct,
+        setProductos,
+        () => {
+          setShowEditPanel(false);
+          setSuccessMessage("El producto se actualizó correctamente.");
+        },
+        setSelectedProduct,
+        setInitialProductValues,
+        setHasChanges,
+        setErrorMessage,
+        () => {},
+        setLoadingModificar
+      );
+    } finally {
+      setLoadingModificar(false);
+    }
+  };
+
+  const handleDeleteConfirm = async (idProducto) => {
+    setIsDeleting(true);
+    await handleConfirmDeleteProducto(
+      idProducto,
+      setProductos,
+      () => setConfirmingId(null),
+      setErrorMessage,
+      () => {}
+    );
+    setIsDeleting(false);
   };
 
   if (loadigProducts) {
     return (
-      <Container
-        className="d-flex justify-content-center align-items-center"
-        style={{ minHeight: "70vh" }}
-      >
-        <DotsMove />
-      </Container>
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <span className="h-10 w-10 animate-spin-smooth rounded-full border-4 border-brand-200 border-t-brand-600" />
+      </div>
     );
   }
 
   return (
-    <div className="container">
-      <Title
-        title="Productos"
-        description="Administración de productos existentes"
-      />
-<div className="row mb-4">
-  <AddButton
-    buttonText="Ingresar Producto"
-    onRedirect={() => navigate("ingresar-producto")}
-  />
-  <div className="col-12 col-md-6">
-    <SearchInput
-      id="searchInput"
-      aria-label="Buscar Producto"
-      searchQuery={searchQuery}
-      handleSearch={handleSearch}
-      placeholder={
-        showErrorProductos || showInfoProductos
-          ? "No se pueden realizar búsquedas"
-          : "Buscar Producto"
-      }
-      readOnly={showErrorProductos || showInfoProductos}
-    />
-  </div>
-  <div className="col-12 col-md-3">
-    <select
-      id="selectedCategory"
-      name="selectedCategory"
-      className="form-control input-data"
-      value={selectedCategory}
-      onChange={(e) => setSelectedCategory(e.target.value)}
-    >
-      {categorias.map((categoria) => (
-        <option key={categoria} value={categoria}>
-          {categoria}
-        </option>
-      ))}
-    </select>
-  </div>
+    <div className="flex flex-col gap-6">
+      {/* ── Alertas flotantes ────────────────────────────────────────── */}
+      {errorMessage && (
+        <Alert
+          floating
+          position="top-right"
+          type="danger"
+          title="No se pudo completar"
+          message={errorMessage}
+          onDismiss={() => setErrorMessage("")}
+        />
+      )}
+      {successMessage && (
+        <Alert
+          floating
+          position="top-right"
+          type="success"
+          title="¡Éxito!"
+          message={successMessage}
+          duration={3000}
+          onDismiss={() => setSuccessMessage("")}
+        />
+      )}
 
-  {/* ✅ Botón descargar plantilla */}
-  <div className="col-12 col-md-auto mt-2 mt-md-0 d-flex align-items-end">
-    {/*<button
-      type="button"
-      className="csv-plantilla-btn w-100"
-      onClick={() => descargarPlantillaOrden(productos)}
-      disabled={!productos || productos.length === 0}
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-        stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-        <polyline points="7 10 12 15 17 10"/>
-        <line x1="12" y1="15" x2="12" y2="3"/>
-      </svg>
-      Descargar plantilla
-    </button>
-        />*/}
-  </div>
+      {/* ── Header ───────────────────────────────────────────────────── */}
+      <header className="flex flex-wrap items-center gap-3">
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-600 text-white shadow-brand">
+          <FiPackage size={19} />
+        </span>
+        <div className="min-w-0 flex-1">
+          <h1 className="truncate text-xl font-bold text-ink sm:text-2xl">Productos</h1>
+          <p className="text-sm text-muted">Administración de productos existentes</p>
+        </div>
+        <button
+          type="button"
+          onClick={() => navigate("ingresar-producto")}
+          className="flex w-full items-center justify-center gap-2 rounded-xl border-0 bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white shadow-brand transition-colors hover:bg-brand-500 sm:w-auto"
+        >
+          <FiPlus size={15} /> Ingresar producto
+        </button>
+      </header>
 
-</div>
-      <div className="container mt-4">
-        <div className="row">
-          {filteredByCategory.map((producto) => (
-            <div
-              key={producto.idProducto}
-              className="col-xs-12 col-12 col-lg-6 mb-4"
+      {/* ── Filtros ──────────────────────────────────────────────────── */}
+      <div className="rounded-2xl border border-line bg-surface p-4 shadow-card">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <div className="relative min-w-0 flex-1">
+            <FiSearch size={15} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" />
+            <input
+              type="text"
+              placeholder={showErrorProductos || showInfoProductos ? "No se pueden realizar búsquedas" : "Buscar producto..."}
+              value={searchQuery}
+              onChange={handleSearch}
+              readOnly={showErrorProductos || showInfoProductos}
+              className="w-full rounded-xl border border-line bg-surface py-2.5 pl-10 pr-9 text-sm text-ink placeholder:text-muted transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/25"
+            />
+          </div>
+
+          <div className="relative shrink-0 sm:w-56">
+            <FiFilter size={14} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" />
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="w-full appearance-none rounded-xl border border-line bg-surface py-2.5 pl-10 pr-9 text-sm font-medium text-ink transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/25"
             >
-              <CardProductos
-                id={producto.idProducto}
-                nombreProducto={producto.nombreProducto}
-                cantidad={producto.cantidad}
-                precio={producto.precio}
-                image={producto.imagenB64}
-                categoria={producto.nombreCategoria}
-                onDelete={() =>
-                  handleDeleleProducto(
-                    producto.idProducto,
-                    setProductoToDelete,
-                    setIsPopupOpen
-                  )
-                }
-                onModify={() => handleModify(producto, setSelectedProduct, setShowModifyModal, reset, setIsPanaderia, setTipoProduccion, setInitialProductValues, setHasChanges)}
-              />
-            </div>
-          ))}
+              {categorias.map((categoria) => (
+                <option key={categoria} value={categoria}>
+                  {categoria}
+                </option>
+              ))}
+            </select>
+            <FiChevronDown size={14} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-muted" />
+          </div>
         </div>
       </div>
 
-      {/* Modal para modificación de productos */}
-      <ModalIngreso
-        show={showModifyModal}
-        onHide={() => {handleCloseModal(resetFormToInitialValues, setShowModifyModal)}}
-        title="Modificar Producto"
-        onConfirm={handleSubmit(onSubmit)}
-        confirmText="Modificar"
-        confirmDisabled={!hasChanges}
-        isLoading={loadingModificar}
-      >
-        {selectedProduct && (
-          <Form>
-            {/* Campo: Nombre del Producto */}
-            <Form.Group className="mb-3" controlId="nombreProducto">
-              <Form.Label>Nombre del Producto</Form.Label>
-              <div className="input-wrapper">
-                <Form.Control
-                  type="text"
-                  placeholder="Ingrese el nombre"
-                  defaultValue={selectedProduct.nombreProducto}
-                  {...register("nombreProducto", {
-                    required: "El nombre del producto es obligatorio.",
-                  })}
-                  isInvalid={!!errors.nombreProducto}
-                  className="input-field input-data"
-                />
-                <BsX
-                  className="input-icon"
-                  onClick={() => setValue("nombreProducto", "")}
-                />
-              </div>
-              {errors.nombreProducto && (
-                <Form.Control.Feedback type="invalid">
-                  {errors.nombreProducto.message}
-                </Form.Control.Feedback>
-              )}
-            </Form.Group>
+      {/* ── Panel de edición, inline ─────────────────────────────────── */}
+      {showEditPanel && selectedProduct && (
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="animate-slide-up flex flex-col gap-5 rounded-2xl border border-line bg-surface p-5 shadow-card"
+        >
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-semibold text-ink">Modificar {selectedProduct.nombreProducto}</h2>
+            <button
+              type="button"
+              onClick={closeEditPanel}
+              aria-label="Cerrar"
+              className="flex h-8 w-8 items-center justify-center rounded-lg border-0 bg-transparent text-muted transition-colors hover:bg-surface-2 hover:text-ink"
+            >
+              <FiX size={16} />
+            </button>
+          </div>
 
-            {/* Campo: Categoría */}
-            <Form.Group className="mb-3" controlId="idCategoria">
-              <Form.Label>Categoría</Form.Label>
-              <div className="input-wrapper">
-                <Form.Select
-                      defaultValue={selectedProduct.idCategoria}
-                      {...register("idCategoria", {
-                        required: "La categoría es obligatoria.",
-                      })}
-                      isInvalid={!!errors.idCategoria}
-                      className="input-field input-data"
-                      onChange={(e) => {
-                        const newValue = e.target.value;
-                        setValue("idCategoria", newValue);
-                        const isNowPanaderia = newValue == 1 || newValue == 2;
-                        setIsPanaderia(isNowPanaderia);
-                        
-                        // Cambio clave aquí: establecer "bandejas" como valor por defecto si es Panaderia
-                        if (isNowPanaderia) {
-                          setTipoProduccion("bandejas");
-                          setValue("tipoProduccion", "bandejas");
-                        } else {
-                          setTipoProduccion(null);
-                          setValue("tipoProduccion", null);
-                        }
-                        
-                        setHasChanges(checkForChanges(watch(), initialProductValues));
-                      }}
-                    >
+          {/* Datos básicos */}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div className="sm:col-span-2">
+              <label className="mb-1.5 block text-xs font-medium text-muted">Nombre del producto *</label>
+              <input
+                type="text"
+                placeholder="Ingrese el nombre"
+                defaultValue={selectedProduct.nombreProducto}
+                {...register("nombreProducto", { required: "El nombre del producto es obligatorio." })}
+                className={`${inputClass} ${
+                  errors.nombreProducto
+                    ? "border-danger-400 focus:border-danger-500 focus:ring-danger-500/20"
+                    : "border-line focus:border-brand-500 focus:ring-brand-500/25"
+                }`}
+              />
+              {errors.nombreProducto && <p className="mt-1.5 text-xs text-danger-600">{errors.nombreProducto.message}</p>}
+            </div>
+
+            <div className="sm:col-span-2">
+              <label className="mb-1.5 block text-xs font-medium text-muted">Categoría *</label>
+              <div className="relative">
+                <select
+                  defaultValue={selectedProduct.idCategoria}
+                  {...register("idCategoria", { required: "La categoría es obligatoria." })}
+                  onChange={(e) => {
+                    const newValue = e.target.value;
+                    setValue("idCategoria", newValue);
+                    const isNowPanaderia = newValue == 1 || newValue == 2;
+                    setIsPanaderia(isNowPanaderia);
+                    if (isNowPanaderia) {
+                      setTipoProduccion("bandejas");
+                      setValue("tipoProduccion", "bandejas");
+                    } else {
+                      setTipoProduccion(null);
+                      setValue("tipoProduccion", null);
+                    }
+                    setHasChanges(checkForChanges(watch(), initialProductValues));
+                  }}
+                  className={`${selectClass} ${
+                    errors.idCategoria
+                      ? "border-danger-400 focus:border-danger-500 focus:ring-danger-500/20"
+                      : "border-line focus:border-brand-500 focus:ring-brand-500/25"
+                  }`}
+                >
                   <option value="">Selecciona una categoría...</option>
                   {loadingCategorias ? (
                     <option>Cargando categorías...</option>
@@ -229,282 +302,286 @@ const ManageProducts = () => {
                     <option>Error al cargar categorías</option>
                   ) : (
                     categoriasModify.map((categoria) => (
-                      <option
-                        key={categoria.idCategoria}
-                        value={categoria.idCategoria}
-                      >
+                      <option key={categoria.idCategoria} value={categoria.idCategoria}>
                         {categoria.nombreCategoria}
                       </option>
                     ))
                   )}
-                </Form.Select>
+                </select>
+                <FiChevronDown size={14} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-muted" />
               </div>
-              {errors.idCategoria && (
-                <Form.Control.Feedback type="invalid">
-                  {errors.idCategoria.message}
-                </Form.Control.Feedback>
-              )}
-            </Form.Group>
+              {errors.idCategoria && <p className="mt-1.5 text-xs text-danger-600">{errors.idCategoria.message}</p>}
+            </div>
 
-            {/* Campos: Cantidad y Precio */}
-            <Row className="mb-3">
-              <Col xs={6}>
-                <Form.Group controlId="cantidad">
-                  <Form.Label>Cantidad</Form.Label>
-                  <div className="input-wrapper">
-                    <Form.Control
-                      type="number"
-                      placeholder="Ingrese la cantidad"
-                      defaultValue={selectedProduct.cantidad}
-                      {...register("cantidad", {
-                        required: "La cantidad es obligatoria.",
-                        min: {
-                          value: 1,
-                          message: "La cantidad debe ser mayor a 0.",
-                        },
-                      })}
-                      isInvalid={!!errors.cantidad}
-                      className="input-field input-data"
-                    />
-                    <BsX
-                      className="input-icon"
-                      onClick={() => setValue("cantidad", "")}
-                    />
-                  </div>
-                  {errors.cantidad && (
-                    <Form.Control.Feedback type="invalid">
-                      {errors.cantidad.message}
-                    </Form.Control.Feedback>
-                  )}
-                </Form.Group>
-              </Col>
-              <Col xs={6}>
-                <Form.Group controlId="precio">
-                  <Form.Label>Precio</Form.Label>
-                  <div className="input-wrapper">
-                    <Form.Control
-                      type="number"
-                      step="0.01"
-                      placeholder="Ingrese el precio"
-                      defaultValue={selectedProduct.precio}
-                      {...register("precio", {
-                        required: "El precio es obligatorio.",
-                        min: {
-                          value: 0.01,
-                          message: "El precio debe ser mayor a 0.",
-                        },
-                      })}
-                      isInvalid={!!errors.precio}
-                      className="input-field input-data"
-                    />
-                    <BsX
-                      className="input-icon"
-                      onClick={() => setValue("precio", "")}
-                    />
-                  </div>
-                  {errors.precio && (
-                    <Form.Control.Feedback type="invalid">
-                      {errors.precio.message}
-                    </Form.Control.Feedback>
-                  )}
-                </Form.Group>
-              </Col>
-            </Row>
+            <div>
+              <label className="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-muted">
+                <FiHash size={12} className="text-brand-600" /> Cantidad *
+              </label>
+              <input
+                type="number"
+                placeholder="Ingrese la cantidad"
+                defaultValue={selectedProduct.cantidad}
+                {...register("cantidad", { required: "La cantidad es obligatoria.", min: { value: 1, message: "La cantidad debe ser mayor a 0." } })}
+                className={`${inputClass} ${
+                  errors.cantidad
+                    ? "border-danger-400 focus:border-danger-500 focus:ring-danger-500/20"
+                    : "border-line focus:border-brand-500 focus:ring-brand-500/25"
+                }`}
+              />
+              {errors.cantidad && <p className="mt-1.5 text-xs text-danger-600">{errors.cantidad.message}</p>}
+            </div>
 
-            <Form.Group className="mb-3">
-              <h6 className="label-title">Configuración de Inventario</h6>
-              <Form.Label className="label-title">Controlar Inventario</Form.Label>
-              <div className="d-flex align-items-center">
-                <span className="me-2">No</span>
-                <Form.Check
-                  type="switch"
-                  id="controlarInventario"
-                  checked={controlarInventario}
-                  onChange={(e) => {
-                    setValue("controlarInventario", e.target.checked ? 1 : 0);
+            <div>
+              <label className="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-muted">
+                <FiDollarSign size={12} className="text-brand-600" /> Precio *
+              </label>
+              <input
+                type="number"
+                step="0.01"
+                placeholder="Ingrese el precio"
+                defaultValue={selectedProduct.precio}
+                {...register("precio", { required: "El precio es obligatorio.", min: { value: 0.01, message: "El precio debe ser mayor a 0." } })}
+                className={`${inputClass} ${
+                  errors.precio
+                    ? "border-danger-400 focus:border-danger-500 focus:ring-danger-500/20"
+                    : "border-line focus:border-brand-500 focus:ring-brand-500/25"
+                }`}
+              />
+              {errors.precio && <p className="mt-1.5 text-xs text-danger-600">{errors.precio.message}</p>}
+            </div>
+          </div>
+
+          {/* Configuración de inventario */}
+          <div className="rounded-xl border border-line bg-surface-2/40 p-4">
+            <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted">Configuración de inventario</h3>
+            <SwitchField
+              label="Controlar inventario"
+              checked={controlarInventario}
+              onChange={(val) => {
+                setValue("controlarInventario", val ? 1 : 0);
+                setHasChanges(true);
+              }}
+            />
+          </div>
+
+          {/* Configuración de panadería */}
+          {isPanaderia && (
+            <div className="rounded-xl border border-line bg-surface-2/40 p-4">
+              <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted">
+                Configuración para producción y stock
+              </h3>
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <SwitchField
+                  label="Control de stock"
+                  checked={controlStock}
+                  disabled={stockDiario}
+                  onChange={(val) => {
+                    setValue("controlStock", val ? 1 : 0);
                     setHasChanges(true);
                   }}
                 />
-                <span className="ms-2">Sí</span>
+                <SwitchField
+                  label="Stock diario"
+                  checked={stockDiario}
+                  disabled={controlStock}
+                  onChange={(val) => {
+                    setValue("stockDiario", val ? 1 : 0);
+                    setHasChanges(true);
+                  }}
+                />
               </div>
-            </Form.Group>
 
-            {/* Sección específica para Panaderia */}
-            {isPanaderia && (
-              <>
-                <div className="mb-3">
-                  <h6 className="label-title">Configuración para Producción y Stock</h6>
+              <div className="mt-4">
+                <label className="mb-1.5 block text-xs font-medium text-muted">Tipo de producción</label>
+                <div className="flex gap-2">
+                  {["bandejas", "harina"].map((tipo) => (
+                    <button
+                      key={tipo}
+                      type="button"
+                      onClick={() => {
+                        setTipoProduccion(tipo);
+                        setValue("tipoProduccion", tipo);
+                        setHasChanges(true);
+                      }}
+                      className={`flex-1 rounded-xl border-0 py-2 text-sm font-semibold capitalize transition-colors ${
+                        tipoProduccion === tipo ? "bg-brand-600 text-white shadow-brand" : "bg-surface-2 text-muted hover:bg-surface-2/70"
+                      }`}
+                    >
+                      {tipo}
+                    </button>
+                  ))}
                 </div>
+              </div>
 
-                {/* Controles de stock en una fila */}
-                <Row className="mb-3">
-                  <Col xs={6}>
-                    <Form.Group>
-                      <Form.Label className="label-title">Control de Stock</Form.Label>
-                      <div className="d-flex align-items-center">
-                        <span className="me-2">No</span>
-                        <Form.Check
-                          type="switch"
-                          id="controlStock"
-                          checked={controlStock}
-                          onChange={(e) => {
-                            setValue("controlStock", e.target.checked ? 1 : 0);
-                            setHasChanges(true);
-                          }}
-                          disabled={stockDiario}
-                        />
-                        <span className="ms-2">Sí</span>
-                      </div>
-                    </Form.Group>
-                  </Col>
-                  <Col xs={6}>
-                    <Form.Group>
-                      <Form.Label className="label-title">Stock Diario</Form.Label>
-                      <div className="d-flex align-items-center">
-                        <span className="me-2">No</span>
-                        <Form.Check
-                          type="switch"
-                          id="stockDiario"
-                          checked={stockDiario}
-                          onChange={(e) => {
-                            setValue("stockDiario", e.target.checked ? 1 : 0);
-                            setHasChanges(true);
-                          }}
-                          disabled={controlStock}
-                        />
-                        <span className="ms-2">Sí</span>
-                      </div>
-                    </Form.Group>
-                  </Col>
-                </Row>
-
-                {/* Selector de tipo de producción */}
-                <Form.Group className="mb-3">
-                  <Form.Label className="label-title">Tipo de Producción</Form.Label>
-                  <div className="d-flex align-items-center">
-                    <Form.Check
-                      type="radio"
-                      id="bandejas"
-                      label="Bandejas"
-                      value="bandejas"
-                      checked={tipoProduccion === "bandejas"}
-                      onChange={() => {
-                        setTipoProduccion("bandejas");
-                        setValue("tipoProduccion", "bandejas");
-                        setHasChanges(true);
-                      }}
-                      className="me-3 tipoProd"
-                    />
-                    <Form.Check
-                      className="tipoProd"
-                      type="radio"
-                      id="harina"
-                      label="Harina"
-                      value="harina"
-                      checked={tipoProduccion === "harina"}
-                      onChange={() => {
-                        setTipoProduccion("harina");
-                        setValue("tipoProduccion", "harina");
-                        setHasChanges(true);
-                      }}
-                    />
-                  </div>
-                </Form.Group>
-
-                {/* Input para unidades por bandeja */}
-                {tipoProduccion === "bandejas" && (
-                  <Form.Group className="mb-3">
-                    <Form.Label className="label-title">Unidades por Bandeja</Form.Label>
-                    <Form.Control
-                    className="input-data"
+              {tipoProduccion === "bandejas" && (
+                <div className="mt-4">
+                  <label className="mb-1.5 block text-xs font-medium text-muted">Unidades por bandeja *</label>
+                  <input
                     type="number"
                     placeholder="Ingrese las unidades por bandeja"
-                    defaultValue={selectedProduct.unidadesPorBandeja || ''}
+                    defaultValue={selectedProduct.unidadesPorBandeja || ""}
                     {...register("unidadesPorBandeja", {
                       required: tipoProduccion === "bandejas" ? "Las unidades por bandeja son obligatorias." : false,
-                      min: {
-                        value: 1,
-                        message: "Las unidades por bandeja deben ser mayor a 0.",
-                      },
+                      min: { value: 1, message: "Las unidades por bandeja deben ser mayor a 0." },
                     })}
-                    isInvalid={!!errors.unidadesPorBandeja}
                     onChange={(e) => {
                       setValue("unidadesPorBandeja", e.target.value);
                       setHasChanges(checkForChanges(watch(), initialProductValues));
                     }}
+                    className={`${inputClass} ${
+                      errors.unidadesPorBandeja
+                        ? "border-danger-400 focus:border-danger-500 focus:ring-danger-500/20"
+                        : "border-line focus:border-brand-500 focus:ring-brand-500/25"
+                    }`}
                   />
-                    <Form.Control.Feedback type="invalid">
-                      {errors.unidadesPorBandeja?.message}
-                    </Form.Control.Feedback>
-                  </Form.Group>
-                )}
-              </>
-            )}
-          </Form>
-        )}
-      </ModalIngreso>
-
-      {/* Resto del código (alertas, popups, etc.) */}
-      {filteredProductos.length === 0 &&
-        !loadigProducts &&
-        !showErrorProductos &&
-        showInfoProductos && (
-          <div className="row justify-content-center">
-            <div className="col-md-6 text-center">
-              <Alert
-                type="primary"
-                message="No hay productos ingresados."
-                icon={<BsFillInfoCircleFill />}
-              />
+                  {errors.unidadesPorBandeja && <p className="mt-1.5 text-xs text-danger-600">{errors.unidadesPorBandeja.message}</p>}
+                </div>
+              )}
             </div>
+          )}
+
+          <div className="flex justify-end gap-2">
+            <button
+              type="button"
+              onClick={closeEditPanel}
+              disabled={loadingModificar}
+              className="rounded-xl border border-line bg-surface px-4 py-2 text-sm font-medium text-ink transition-colors hover:bg-surface-2 disabled:cursor-not-allowed"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              disabled={!hasChanges || loadingModificar}
+              className={`flex min-w-[9rem] items-center justify-center gap-2 rounded-xl border-0 px-4 py-2 text-sm font-semibold transition-colors ${
+                !hasChanges && !loadingModificar
+                  ? "cursor-not-allowed bg-surface-2 text-muted"
+                  : "bg-brand-600 text-white shadow-brand hover:bg-brand-500"
+              }`}
+            >
+              {loadingModificar ? (
+                <>
+                  <span className="h-4 w-4 animate-spin-smooth rounded-full border-2 border-white/40 border-t-white" />
+                  Guardando...
+                </>
+              ) : (
+                <>
+                  <FiSave size={15} /> Modificar
+                </>
+              )}
+            </button>
           </div>
-        )}
+        </form>
+      )}
+
+      {/* ── Estados vacíos ───────────────────────────────────────────── */}
+      {filteredProductos.length === 0 && !loadigProducts && !showErrorProductos && showInfoProductos && (
+        <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-line bg-surface py-16 text-center">
+          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-surface-2 text-muted">
+            <FiInbox size={20} />
+          </span>
+          <p className="text-sm text-muted">No hay productos ingresados.</p>
+        </div>
+      )}
+
       {showNoResults && (
-        <div className="row justify-content-center">
-          <div className="col-md-6 text-center">
-            <Alert
-              type="primary"
-              message="No se encontraron productos que coincidan con la búsqueda."
-              icon={<BsFillInfoCircleFill />}
-            />
-          </div>
+        <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-line bg-surface py-16 text-center">
+          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-surface-2 text-muted">
+            <FiSearch size={20} />
+          </span>
+          <p className="text-sm text-muted">No se encontraron productos que coincidan con la búsqueda.</p>
         </div>
       )}
+
       {showErrorProductos && !showInfoProductos && (
-        <div className="row justify-content-center">
-          <div className="col-md-6 text-center">
-            <Alert
-              type="danger"
-              message="Hubo un error al consultar los productos. Intenta más tarde..."
-              icon={<BsExclamationTriangleFill />}
-            />
-          </div>
+        <Alert type="danger" title="No se pudieron cargar los productos" message="Intenta más tarde." />
+      )}
+
+      {/* ── Lista de productos ───────────────────────────────────────── */}
+      {filteredByCategory.length > 0 && (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          {filteredByCategory.map((producto) => {
+            const confirmando = confirmingId === producto.idProducto;
+
+            return (
+              <div
+                key={producto.idProducto}
+                className="flex flex-col gap-4 rounded-2xl border border-line bg-surface p-5 shadow-card transition-shadow duration-150 hover:shadow-modal"
+              >
+                <div className="flex items-start gap-3">
+                  {producto.imagenB64 ? (
+                    <img
+                      src={producto.imagenB64}
+                      alt={producto.nombreProducto}
+                      className="h-14 w-14 shrink-0 rounded-xl object-cover"
+                    />
+                  ) : (
+                    <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-600">
+                      <FiPackage size={22} />
+                    </span>
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <h3 className="truncate text-base font-semibold text-ink">{producto.nombreProducto}</h3>
+                    <p className="truncate text-xs text-muted">{producto.nombreCategoria}</p>
+                    <div className="mt-1.5 flex items-center gap-3 text-sm">
+                      <span className="font-semibold text-brand-700">Q{producto.precio}</span>
+                      <span className="text-muted">{producto.cantidad} unidades</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-auto flex gap-2 border-t border-line pt-3">
+                  <button
+                    type="button"
+                    onClick={() => openEditPanel(producto)}
+                    className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border-0 bg-brand-50 py-2 text-xs font-semibold text-brand-700 transition-colors hover:bg-brand-100"
+                  >
+                    <FiEdit2 size={13} /> Editar
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setConfirmingId(confirmando ? null : producto.idProducto)}
+                    className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border-0 bg-danger-50 py-2 text-xs font-semibold text-danger-700 transition-colors hover:bg-danger-100"
+                  >
+                    <FiTrash2 size={13} /> Eliminar
+                  </button>
+                </div>
+
+                {confirmando && (
+                  <div className="animate-slide-up rounded-xl border border-danger-200 bg-danger-50 p-3">
+                    <p className="text-xs font-semibold text-danger-800">¿Eliminar "{producto.nombreProducto}"?</p>
+                    <p className="mt-0.5 text-2xs text-danger-700">Ya no se mostrará en ninguna parte.</p>
+                    <div className="mt-2.5 flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setConfirmingId(null)}
+                        disabled={isDeleting}
+                        className="flex-1 rounded-lg border border-line bg-white px-3 py-1.5 text-xs font-semibold text-ink transition-colors hover:bg-surface-2 disabled:cursor-not-allowed"
+                      >
+                        Cancelar
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteConfirm(producto.idProducto)}
+                        disabled={isDeleting}
+                        className="flex flex-1 items-center justify-center rounded-lg border-0 bg-danger-600 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-danger-500 disabled:cursor-not-allowed"
+                      >
+                        {isDeleting ? (
+                          <span className="h-3.5 w-3.5 animate-spin-smooth rounded-full border-2 border-white/40 border-t-white" />
+                        ) : (
+                          "Eliminar"
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       )}
-      <ConfirmPopUp
-        isOpen={isPopupOpen}
-        onClose={() => setIsPopupOpen(false)}
-        title="Confirmar Eliminación"
-        message="Al eliminar el producto no se volverá a mostrar en ninguna parte"
-        onConfirm={() =>
-          handleConfirmDeleteProducto(
-            productoToDelete,
-            setProductos,
-            setIsPopupOpen,
-            setErrorPopupMessage,
-            setIsPopupErrorOpen
-          )
-        }
-        onCancel={() => setIsPopupOpen(false)}
-      />
-      <ErrorPopup
-        isOpen={isPopupErrorOpen}
-        onClose={() => setIsPopupErrorOpen(false)}
-        title="¡Error!"
-        message={errorPopupMessage}
-      />
     </div>
   );
-};
+}
 
 export default ManageProducts;
