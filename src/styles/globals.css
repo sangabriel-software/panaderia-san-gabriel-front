@@ -32,18 +32,28 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+/*
+  IMPORTANTE (pull-to-refresh):
+  - Se usa min-height en lugar de height para que el scroll lo haga el documento.
+  - overflow-x: clip recorta el desborde horizontal SIN convertir el elemento
+    en contenedor de scroll (overflow-x: hidden sí lo hace).
+  - Se eliminó overscroll-behavior-y: none del body, que bloqueaba el gesto.
+*/
 html,
 body,
 #root {
-  height: 100%;
-  overflow-x: hidden;
+  min-height: 100%;
   max-width: 100vw;
+}
+
+html,
+body {
+  overflow-x: clip;
 }
 
 body {
   @apply bg-bg text-ink;
   font-family: theme('fontFamily.sans');
-  overscroll-behavior-y: none;
   transition: background-color 0.15s ease;
 }
 

@@ -61,6 +61,7 @@ const CreateSurvey = lazy(() => import("./pages/Encuestas/CreateSurvey/CreateSur
 const ResetPassPage = lazy(() => import("./pages/Reset-Pass/ResetPassPage"));
 import CambiarPasswordPage from "./pages/CambiarPassword/CambiarPasswordPage";
 import InstallBanner from "./shared/pwa/InstallBanner";
+import { GestionarEncuestasPage } from "./pages/Encuestas/GestionarEncuestasPage";
 
 function App() {
   return (
@@ -166,7 +167,7 @@ function App() {
             </Route>
 
             <Route path="/encuestas-config">
-              <Route index element={<CreateSurvey />} />
+              <Route index element={<GestionarEncuestasPage />} />
             </Route>
 
             <Route path="/activar-fecha-produccion">
