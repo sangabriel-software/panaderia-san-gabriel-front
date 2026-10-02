@@ -25,7 +25,7 @@ import { useGetUsers } from "../../../../hooks/usuarioshook/useGetUsers";
 import useRoles from "../../../../hooks/roleshooks/roles.hooks";
 import useGetSucursales from "../../../../hooks/sucursales/useGetSucursales";
 import { handleBloqueoDesbloqueo, handleConfirmDelete, useUsersSerch } from "./ManageUsersUtils";
-import { handleCreateUserSubmit } from "../createUsers/CreateUsersUtils";
+import { handleCreateUserSubmit } from "./CreateUsersUtils";
 import { actualizardatosUsuarioServices } from "../../../../services/userServices/usersservices/users.service";
 
 const selectClass =
