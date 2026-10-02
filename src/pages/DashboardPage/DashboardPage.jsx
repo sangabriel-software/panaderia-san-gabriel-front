@@ -319,7 +319,7 @@ function DashboardPage() {
                       <YAxis
                         type="category"
                         dataKey="nombre"
-                        tick={{ fontSize: 11, fill: "rgb(15 23 42)" }}
+                        tick={{ fontSize: 11, fill: "rgb(100 116 139)" }}
                         axisLine={false}
                         tickLine={false}
                         width={110}
