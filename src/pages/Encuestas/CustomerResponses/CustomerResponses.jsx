@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import './CustomerResponses.styles.css';
 import { useGetCampaniaEncuesta } from '../../../hooks/Encuestas/useGetCampaniaEncuesta';
 import { getCurrentDateTimeWithSeconds } from '../../../utils/dateUtils';
 import { registrarRespuestaService } from '../../../services/Encuestas/encuestas.service';
