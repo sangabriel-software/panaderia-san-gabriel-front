@@ -60,6 +60,7 @@ const CategoriasPage = lazy(() => import("./pages/Categorias/CategoriasPage"));
 const CreateSurvey = lazy(() => import("./pages/Encuestas/CreateSurvey/CreateSurvey"));
 const ResetPassPage = lazy(() => import("./pages/Reset-Pass/ResetPassPage"));
 import CambiarPasswordPage from "./pages/CambiarPassword/CambiarPasswordPage";
+import InstallBanner from "./shared/pwa/InstallBanner";
 
 const PWAInstallPrompt = lazy(() => import("./components/PWAInstallPrompt/PWAInstallPrompt"));
 
@@ -74,7 +75,7 @@ function App() {
         toastClassName="!rounded-xl !border !border-line !bg-surface !text-ink !shadow-modal !font-sans"
         progressClassName="!bg-brand-600"
       />
-      <PWAInstallPrompt />
+      <InstallBanner /> 
 
       <Routes>
         {/* Rutas públicas */}

@@ -4,10 +4,15 @@ import { BrowserRouter } from "react-router-dom";
 import App from "./App.jsx";
 import { ThemeProvider } from "./context/ThemeContext.jsx";
 import { initBetterStack } from "./observability/betterStack.js";
+import { initPwaInstall } from "./shared/pwa/usePwaInstall.js";
 import './styles/globals.css';
 
 
 initBetterStack();
+
+// Escucha beforeinstallprompt / appinstalled desde el arranque, antes de montar React,
+// para no perder el evento si el navegador lo dispara temprano.
+initPwaInstall();
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>

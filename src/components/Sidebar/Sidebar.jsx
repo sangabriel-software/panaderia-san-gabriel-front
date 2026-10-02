@@ -4,6 +4,7 @@ import { NavLink } from "react-router-dom";
 import { MdOutlineBakeryDining } from "react-icons/md";
 import { FaSun, FaMoon, FaChevronLeft, FaSignOutAlt } from "react-icons/fa";
 import { useTheme } from "../../context/ThemeContext";
+import { usePwaInstall } from "../../shared/pwa/usePwaInstall";
 import { getUserData, getUserPermissions } from "../../utils/Auth/decodedata";
 import { getColorFromName } from "./Sidebar.uitils";
 import {
@@ -15,6 +16,7 @@ import {
   FiShoppingCart,
   FiBarChart2,
   FiSettings,
+  FiDownload,
 } from "react-icons/fi";
 
 const NAV_GROUPS = [
@@ -46,6 +48,11 @@ function Sidebar({ expanded, onToggle, mobileOpen, onCloseMobile }) {
   // El tema vive en ThemeContext: cambiarlo aplica la clase `dark` en <html> al instante
   const { theme, toggleTheme } = useTheme();
 
+  // Instalación de la PWA: isInstallable solo es true si el navegador ofreció instalarla
+  // y todavía no se instaló (si ya está instalada, el botón desaparece solo)
+  const { isInstallable, isInstalled, promptInstall } = usePwaInstall();
+  const showInstall = isInstallable && !isInstalled;
+
   // const [theme, setTheme] = useState(localStorage.getItem("theme") || "dark");
   // const [isChangingTheme, setIsChangingTheme] = useState(false);
   const permisosUsuario = getUserPermissions();
@@ -60,6 +67,11 @@ function Sidebar({ expanded, onToggle, mobileOpen, onCloseMobile }) {
   const handleNavClick = useCallback(() => {
     if (window.innerWidth <= 768) onCloseMobile();
   }, [onCloseMobile]);
+
+  const handleInstall = useCallback(async () => {
+    await promptInstall();
+    if (window.innerWidth <= 768) onCloseMobile();
+  }, [promptInstall, onCloseMobile]);
 
   const handleLogout = useCallback(() => {
     // TODO: reemplazar por tu lógica real de logout
@@ -195,26 +207,44 @@ function Sidebar({ expanded, onToggle, mobileOpen, onCloseMobile }) {
           })}
         </nav>
 
-        {/* Configuraciones — al fondo, como única acción secundaria */}
-        {isRouteAllowed("/config") && (
-          <div className="border-t border-line px-3 py-3">
-            <NavLink
-              to="/config"
-              onClick={handleNavClick}
-              title={!expanded ? "Configuraciones" : undefined}
-              className={({ isActive }) =>
-                `flex items-center gap-3 rounded-xl px-2.5 py-2.5 text-sm font-medium no-underline transition-colors duration-150 ${
+        {/* Parte baja: instalar app (solo si aún no está instalada) + Configuraciones */}
+        {(showInstall || isRouteAllowed("/config")) && (
+          <div className="flex flex-col gap-0.5 border-t border-line px-3 py-3">
+            {showInstall && (
+              <button
+                type="button"
+                onClick={handleInstall}
+                title={!expanded ? "Instalar app" : undefined}
+                aria-label="Instalar app"
+                className={`flex items-center gap-3 rounded-xl border-0 bg-transparent px-2.5 py-2.5 text-left text-sm font-medium text-brand-600 transition-colors duration-150 hover:bg-brand-50 dark:text-brand-400 dark:hover:bg-brand-900/30 ${
                   expanded ? "" : "justify-center"
-                } ${
-                  isActive
-                    ? "bg-brand-600 text-white shadow-brand"
-                    : "text-muted hover:bg-surface-2 hover:text-ink"
-                }`
-              }
-            >
-              <FiSettings size={18} className="shrink-0" />
-              {expanded && <span className="truncate">Configuraciones</span>}
-            </NavLink>
+                }`}
+              >
+                <FiDownload size={18} className="shrink-0" />
+                {expanded && <span className="truncate">Instalar app</span>}
+              </button>
+            )}
+
+            {/* Configuraciones — al fondo, como única acción secundaria */}
+            {isRouteAllowed("/config") && (
+              <NavLink
+                to="/config"
+                onClick={handleNavClick}
+                title={!expanded ? "Configuraciones" : undefined}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 rounded-xl px-2.5 py-2.5 text-sm font-medium no-underline transition-colors duration-150 ${
+                    expanded ? "" : "justify-center"
+                  } ${
+                    isActive
+                      ? "bg-brand-600 text-white shadow-brand"
+                      : "text-muted hover:bg-surface-2 hover:text-ink"
+                  }`
+                }
+              >
+                <FiSettings size={18} className="shrink-0" />
+                {expanded && <span className="truncate">Configuraciones</span>}
+              </NavLink>
+            )}
           </div>
         )}
       </aside>
