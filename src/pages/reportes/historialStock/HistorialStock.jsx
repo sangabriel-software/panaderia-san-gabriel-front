@@ -6,7 +6,6 @@ import { useNavigate } from 'react-router-dom';
 import useGetProductosYPrecios from "../../../hooks/productosprecios/useGetProductosYprecios";
 import useGetSucursales from "../../../hooks/sucursales/useGetSucursales";
 import { generarReporteHistorialStockService } from "../../../services/reportes/reportes.service";
-import './HistorialStock.styles.css';
 import { getUserData } from "../../../utils/Auth/decodedata";
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
