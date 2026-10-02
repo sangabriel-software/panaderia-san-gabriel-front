@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Badge, Button, Modal } from 'react-bootstrap';
 import { FiEye, FiEdit2, FiBarChart2, FiTrash2, FiX, FiCalendar, FiUser, FiFileText, FiCheckCircle, FiClock } from 'react-icons/fi';
 import dayjs from 'dayjs';
-import './CreateSurvey.styles.css';
 import useGetEncuestasList from '../../../hooks/Encuestas/useGetEncuestasList';
 import { BsFillInfoCircleFill, BsExclamationTriangleFill } from 'react-icons/bs';
 import Alert from '../../../components/Alerts/Alert';
