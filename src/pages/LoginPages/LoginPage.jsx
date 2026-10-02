@@ -286,7 +286,7 @@ function LoginPage() {
                   autoCapitalize="none"
                   autoComplete="username"
                   placeholder="Tu usuario"
-                  className={`h-14 w-full rounded-xl border bg-bg px-4 text-base text-ink placeholder:text-muted transition-all focus:outline-none focus:ring-4 ${
+                  className={`h-14 w-full rounded-xl border border-line bg-bg px-4 pr-12 text-lg font-medium tracking-wide text-ink placeholder:text-base placeholder:font-normal placeholder:tracking-normal placeholder:text-muted transition-all focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-brand-500/10 ${
                     errors.usuario
                       ? "border-danger-400 focus:border-danger-500 focus:ring-danger-500/15"
                       : "border-line focus:border-brand-500 focus:ring-brand-500/10"
@@ -322,7 +322,7 @@ function LoginPage() {
                     id="contrasena"
                     autoComplete="current-password"
                     placeholder="Tu contraseña"
-                    className={`h-14 w-full rounded-xl border bg-bg px-4 pr-12 text-base text-ink placeholder:text-muted transition-all focus:outline-none focus:ring-4 ${
+                    className={`h-14 w-full rounded-xl border border-line bg-bg px-4 pr-12 text-lg font-medium tracking-wide text-ink placeholder:text-base placeholder:font-normal placeholder:tracking-normal placeholder:text-muted transition-all focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-brand-500/10 ${
                       errors.contrasena
                         ? "border-danger-400 focus:border-danger-500 focus:ring-danger-500/15"
                         : "border-line focus:border-brand-500 focus:ring-brand-500/10"

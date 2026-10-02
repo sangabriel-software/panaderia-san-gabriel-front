@@ -94,17 +94,10 @@ const CambiarPasswordPage = () => {
     }
   };
 
-  /*
-   * ─────────────────────────────────────────────
-   * PANTALLA DE ÉXITO
-   * ─────────────────────────────────────────────
-   */
-
   if (success) {
     return (
       <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-bg px-4 py-8">
 
-        {/* Background grid */}
         <svg
           className="pointer-events-none absolute inset-0 h-full w-full"
           aria-hidden="true"
@@ -162,16 +155,13 @@ const CambiarPasswordPage = () => {
           />
         </svg>
 
-        {/* Brand glow */}
         <div className="pointer-events-none absolute -left-32 -top-32 h-96 w-96 rounded-full bg-brand-400/20 blur-3xl" />
 
         <div className="pointer-events-none absolute bottom-0 right-0 h-96 w-96 rounded-full bg-brand-600/10 blur-3xl" />
 
-        {/* Success card */}
         <div className="relative z-10 w-full max-w-md animate-scale-in">
           <div className="rounded-3xl border border-line bg-surface/90 p-6 text-center shadow-modal backdrop-blur-sm sm:p-10">
 
-            {/* Logo */}
             <div className="mb-7 flex justify-center">
               <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-surface shadow-brand">
                 <img
@@ -182,7 +172,6 @@ const CambiarPasswordPage = () => {
               </div>
             </div>
 
-            {/* Success icon */}
             <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-success-500/10 text-success-500 ring-8 ring-success-500/5">
               <FiCheck size={30} strokeWidth={2.5} />
             </div>
@@ -196,7 +185,6 @@ const CambiarPasswordPage = () => {
               Serás redirigido al inicio de sesión.
             </p>
 
-            {/* Progress */}
             <div className="mt-8">
               <div className="mb-2 flex items-center justify-between text-[11px] text-muted">
                 <span>Redirigiendo</span>
@@ -235,16 +223,9 @@ const CambiarPasswordPage = () => {
     );
   }
 
-  /*
-   * ─────────────────────────────────────────────
-   * FORMULARIO
-   * ─────────────────────────────────────────────
-   */
-
   return (
     <div className="relative min-h-screen overflow-hidden bg-bg">
 
-      {/* Background grid */}
       <svg
         className="pointer-events-none absolute inset-0 h-full w-full"
         aria-hidden="true"
@@ -302,17 +283,11 @@ const CambiarPasswordPage = () => {
         />
       </svg>
 
-      {/* Brand glow */}
       <div className="pointer-events-none absolute -left-32 -top-32 h-96 w-96 rounded-full bg-brand-400/20 blur-3xl" />
 
       <div className="pointer-events-none absolute bottom-0 right-0 h-96 w-96 rounded-full bg-brand-600/10 blur-3xl" />
 
-      {/* Content */}
       <div className="relative z-10 mx-auto flex min-h-screen max-w-6xl items-center justify-center px-4 py-8 sm:px-6 sm:py-12 lg:justify-between lg:gap-16">
-
-        {/* ─────────────────────────────────────────
-            LEFT / DESKTOP
-        ───────────────────────────────────────── */}
 
         <div className="hidden max-w-md lg:block">
 
@@ -335,7 +310,6 @@ const CambiarPasswordPage = () => {
             Panadería San Gabriel.
           </p>
 
-          {/* Security indicators */}
           <div className="mt-8 space-y-3">
 
             <div className="flex items-center gap-3 text-sm text-muted">
@@ -355,15 +329,10 @@ const CambiarPasswordPage = () => {
           </div>
         </div>
 
-        {/* ─────────────────────────────────────────
-            CARD
-        ───────────────────────────────────────── */}
-
         <div className="w-full max-w-md animate-fade-in lg:max-w-sm">
 
           <div className="rounded-3xl border border-line bg-surface/90 p-5 shadow-modal backdrop-blur-sm sm:p-8">
 
-            {/* Header */}
             <div className="mb-7 text-center">
 
               <div className="mb-5 flex justify-center">
@@ -386,7 +355,6 @@ const CambiarPasswordPage = () => {
               </p>
             </div>
 
-            {/* User */}
             <div className="mb-6 flex items-center gap-3 rounded-2xl border border-line bg-bg/60 p-3">
 
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-500/10 text-sm font-semibold text-brand-600">
@@ -408,7 +376,6 @@ const CambiarPasswordPage = () => {
               </div>
             </div>
 
-            {/* Form */}
             <form
               onSubmit={handleSubmit}
               className="flex flex-col gap-5"
@@ -434,7 +401,7 @@ const CambiarPasswordPage = () => {
                     onChange={handleChange}
                     autoComplete="new-password"
                     placeholder="Crea una contraseña segura"
-                    className="h-14 w-full rounded-xl border border-line bg-bg px-4 pr-12 text-base text-ink placeholder:text-muted transition-all focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-brand-500/10"
+                    className="h-14 w-full rounded-xl border border-line bg-bg px-4 pr-12 text-lg font-medium tracking-wide text-ink placeholder:text-base placeholder:font-normal placeholder:tracking-normal placeholder:text-muted transition-all focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-brand-500/10"
                   />
 
                   <button
@@ -458,7 +425,7 @@ const CambiarPasswordPage = () => {
                 </div>
               </div>
 
-              {/* Confirmar */}
+              {/* Confirmar contraseña */}
               <div>
                 <label
                   htmlFor="confirmar"
@@ -477,7 +444,7 @@ const CambiarPasswordPage = () => {
                     onChange={handleChange}
                     autoComplete="new-password"
                     placeholder="Repite tu contraseña"
-                    className={`h-14 w-full rounded-xl border bg-bg px-4 pr-12 text-base text-ink placeholder:text-muted transition-all focus:outline-none focus:ring-4 ${
+                    className={`h-14 w-full rounded-xl border bg-bg px-4 pr-12 text-lg font-medium tracking-wide text-ink placeholder:text-base placeholder:font-normal placeholder:tracking-normal placeholder:text-muted transition-all focus:outline-none focus:ring-4 ${
                       form.confirmar &&
                       form.nueva !== form.confirmar
                         ? "border-danger-400 focus:border-danger-500 focus:ring-danger-500/10"
@@ -522,7 +489,6 @@ const CambiarPasswordPage = () => {
 
                   </div>
 
-                  {/* Strength bar */}
                   <div className="mb-4 flex gap-1">
                     {rules.map((rule, index) => (
                       <div
@@ -536,7 +502,6 @@ const CambiarPasswordPage = () => {
                     ))}
                   </div>
 
-                  {/* Rules */}
                   <div className="grid gap-2 sm:grid-cols-2">
 
                     {rules.map((rule, index) => (
@@ -603,7 +568,6 @@ const CambiarPasswordPage = () => {
 
             </form>
 
-            {/* Footer */}
             <p className="mt-7 text-center text-[11px] text-muted">
               © {new Date().getFullYear()} Panadería San Gabriel
             </p>
