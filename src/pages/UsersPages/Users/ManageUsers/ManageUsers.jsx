@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
 import {
@@ -64,6 +64,30 @@ function ManageUsers() {
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm();
 
+  // Referencia al formulario visible (el de crear arriba, o el de editar dentro de la tarjeta)
+  const formRef = useRef(null);
+
+  // Al abrir el formulario (o cambiar de usuario a editar) se lleva a la vista y se enfoca el primer campo.
+  // Se hace aquí y no en un `ref` inline: así corre solo al abrir, no en cada tecla.
+  useEffect(() => {
+    if (!modo) return undefined;
+
+    const frame = requestAnimationFrame(() => {
+      const formulario = formRef.current;
+      if (!formulario) return;
+
+      // "nearest": solo se desplaza lo necesario para que el formulario quede visible
+      formulario.scrollIntoView({ behavior: "smooth", block: "nearest" });
+
+      // En celulares no se enfoca solo, para no abrir el teclado y tapar el formulario
+      if (window.matchMedia("(pointer: fine)").matches) {
+        formulario.querySelector('input[name="nombreUsuario"]')?.focus({ preventScroll: true });
+      }
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }, [modo, selectedUser?.idUsuario]);
+
   const abrirNuevo = () => {
     setSelectedUser(null);
     reset({ nombreUsuario: "", apellidoUsuario: "", usuario: "", correoUsuario: "", idRol: "", idSucursal: "" });
@@ -72,6 +96,7 @@ function ManageUsers() {
 
   const abrirEditar = (user) => {
     const { nombre, apellido } = splitName(user.nombreUsuario);
+    setConfirmingId(null);
     setSelectedUser(user);
     reset({
       nombreUsuario: nombre,
@@ -157,6 +182,152 @@ function ManageUsers() {
 
   const inputDisabled = showErrorUsers || showInfoUsers;
 
+  // ── Formulario (crear / editar). Solo se muestra uno a la vez, así que se define una vez
+  //    y se coloca en el lugar que corresponde: arriba al crear, dentro de la tarjeta al editar.
+  const formulario = modo ? (
+    <form
+      ref={formRef}
+      onSubmit={handleSubmit(onSubmit)}
+      className="scroll-mt-4 animate-slide-up rounded-2xl border border-brand-500/40 bg-surface p-5 shadow-card"
+    >
+      <h2 className="mb-4 text-sm font-semibold text-ink">
+        {modo === "nuevo" ? "Nuevo usuario" : `Editar ${selectedUser?.nombreUsuario}`}
+      </h2>
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div>
+          <label className="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-muted">
+            <FiUser size={13} className="text-brand-600" /> Nombre(s) *
+          </label>
+          <input
+            type="text"
+            placeholder="Ingrese el nombre del usuario"
+            {...register("nombreUsuario", { required: "El nombre del usuario es obligatorio." })}
+            className={`${inputClass} ${errors.nombreUsuario ? "border-danger-400 focus:border-danger-500 focus:ring-danger-500/20" : "border-line focus:border-brand-500 focus:ring-brand-500/25"}`}
+          />
+          {errors.nombreUsuario && <p className="mt-1.5 text-xs text-danger-600">{errors.nombreUsuario.message}</p>}
+        </div>
+
+        <div>
+          <label className="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-muted">
+            <FiUser size={13} className="text-accent-600" /> Apellido(s) {modo === "nuevo" && "*"}
+          </label>
+          <input
+            type="text"
+            placeholder="Ingrese el apellido del usuario"
+            {...register("apellidoUsuario", modo === "nuevo" ? { required: "El apellido del usuario es obligatorio." } : {})}
+            className={`${inputClass} ${errors.apellidoUsuario ? "border-danger-400 focus:border-danger-500 focus:ring-danger-500/20" : "border-line focus:border-brand-500 focus:ring-brand-500/25"}`}
+          />
+          {errors.apellidoUsuario && <p className="mt-1.5 text-xs text-danger-600">{errors.apellidoUsuario.message}</p>}
+        </div>
+
+        {modo === "editar" && (
+          <div>
+            <label className="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-muted">
+              <FiUser size={13} className="text-muted" /> Nombre de usuario
+            </label>
+            <input type="text" readOnly {...register("usuario")} className={`${inputClass} border-line bg-surface-2 text-muted`} />
+          </div>
+        )}
+
+        <div>
+          <label className="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-muted">
+            <FiMail size={13} className="text-warning-600" /> Correo electrónico *
+          </label>
+          <input
+            type="text"
+            placeholder="Ingrese el correo electrónico"
+            {...register("correoUsuario", {
+              required: "El correo electrónico es obligatorio.",
+              pattern: { value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i, message: "Ingrese un correo electrónico válido." },
+            })}
+            className={`${inputClass} ${errors.correoUsuario ? "border-danger-400 focus:border-danger-500 focus:ring-danger-500/20" : "border-line focus:border-brand-500 focus:ring-brand-500/25"}`}
+          />
+          {errors.correoUsuario && <p className="mt-1.5 text-xs text-danger-600">{errors.correoUsuario.message}</p>}
+        </div>
+
+        <div>
+          <label className="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-muted">
+            <FiShield size={13} className="text-brand-600" /> Rol *
+          </label>
+          <div className="relative">
+            <select
+              disabled={loadingRoles}
+              {...register("idRol", { required: "El rol del usuario es obligatorio." })}
+              className={selectClass}
+            >
+              <option value="">Selecciona un rol...</option>
+              {roles.map((rol) => (
+                <option key={rol.idRol} value={rol.idRol}>
+                  {rol.nombreRol}
+                </option>
+              ))}
+            </select>
+            <FiChevronDown size={14} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-muted" />
+          </div>
+          {errors.idRol && <p className="mt-1.5 text-xs text-danger-600">{errors.idRol.message}</p>}
+          {showErrorRoles && <p className="mt-1.5 text-xs text-danger-600">Error al cargar roles</p>}
+        </div>
+
+        <div>
+          <label className="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-muted">
+            <FiMapPin size={13} className="text-accent-600" /> Sucursal asignada *
+          </label>
+          <div className="relative">
+            <select
+              disabled={loadingSucursales}
+              {...register("idSucursal", { required: "La sucursal del usuario es obligatoria." })}
+              className={selectClass}
+            >
+              <option value="">Selecciona una sucursal...</option>
+              {sucursales.map((sucursal) => (
+                <option key={sucursal.idSucursal} value={sucursal.idSucursal}>
+                  {sucursal.nombreSucursal} - {sucursal.municipioSucursal}
+                </option>
+              ))}
+            </select>
+            <FiChevronDown size={14} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-muted" />
+          </div>
+          {errors.idSucursal && <p className="mt-1.5 text-xs text-danger-600">{errors.idSucursal.message}</p>}
+          {showErrorSucursales && <p className="mt-1.5 text-xs text-danger-600">Error al cargar sucursales</p>}
+        </div>
+      </div>
+
+      {modo === "nuevo" && (
+        <p className="mt-4 rounded-xl bg-brand-50 px-3.5 py-2.5 text-xs text-brand-700">
+          Se generará un usuario y contraseña automáticos, enviados al correo ingresado.
+        </p>
+      )}
+
+      <div className="mt-4 flex justify-end gap-2">
+        <button
+          type="button"
+          onClick={cerrarForm}
+          disabled={isSaving}
+          className="rounded-xl border border-line bg-surface px-4 py-2 text-sm font-medium text-ink transition-colors hover:bg-surface-2 disabled:cursor-not-allowed"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          disabled={isSaving}
+          className="flex min-w-[9rem] items-center justify-center gap-2 rounded-xl border-0 bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-brand transition-colors hover:bg-brand-500 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {isSaving ? (
+            <>
+              <span className="h-4 w-4 animate-spin-smooth rounded-full border-2 border-white/40 border-t-white" />
+              Guardando...
+            </>
+          ) : (
+            <>
+              <FiSave size={15} /> {modo === "nuevo" ? "Crear usuario" : "Guardar cambios"}
+            </>
+          )}
+        </button>
+      </div>
+    </form>
+  ) : null;
+
   return (
     <div className="flex flex-col gap-6">
       {/* ── Alertas flotantes ────────────────────────────────────────── */}
@@ -231,149 +402,8 @@ function ManageUsers() {
         />
       </div>
 
-      {/* ── Panel de formulario, inline — crear o editar ─────────────── */}
-      {modo && (
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          className="animate-slide-up rounded-2xl border border-line bg-surface p-5 shadow-card"
-        >
-          <h2 className="mb-4 text-sm font-semibold text-ink">
-            {modo === "nuevo" ? "Nuevo usuario" : `Editar ${selectedUser?.nombreUsuario}`}
-          </h2>
-
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div>
-              <label className="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-muted">
-                <FiUser size={13} className="text-brand-600" /> Nombre(s) *
-              </label>
-              <input
-                type="text"
-                placeholder="Ingrese el nombre del usuario"
-                {...register("nombreUsuario", { required: "El nombre del usuario es obligatorio." })}
-                className={`${inputClass} ${errors.nombreUsuario ? "border-danger-400 focus:border-danger-500 focus:ring-danger-500/20" : "border-line focus:border-brand-500 focus:ring-brand-500/25"}`}
-              />
-              {errors.nombreUsuario && <p className="mt-1.5 text-xs text-danger-600">{errors.nombreUsuario.message}</p>}
-            </div>
-
-            <div>
-              <label className="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-muted">
-                <FiUser size={13} className="text-accent-600" /> Apellido(s) {modo === "nuevo" && "*"}
-              </label>
-              <input
-                type="text"
-                placeholder="Ingrese el apellido del usuario"
-                {...register("apellidoUsuario", modo === "nuevo" ? { required: "El apellido del usuario es obligatorio." } : {})}
-                className={`${inputClass} ${errors.apellidoUsuario ? "border-danger-400 focus:border-danger-500 focus:ring-danger-500/20" : "border-line focus:border-brand-500 focus:ring-brand-500/25"}`}
-              />
-              {errors.apellidoUsuario && <p className="mt-1.5 text-xs text-danger-600">{errors.apellidoUsuario.message}</p>}
-            </div>
-
-            {modo === "editar" && (
-              <div>
-                <label className="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-muted">
-                  <FiUser size={13} className="text-muted" /> Nombre de usuario
-                </label>
-                <input type="text" readOnly {...register("usuario")} className={`${inputClass} border-line bg-surface-2 text-muted`} />
-              </div>
-            )}
-
-            <div>
-              <label className="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-muted">
-                <FiMail size={13} className="text-warning-600" /> Correo electrónico *
-              </label>
-              <input
-                type="text"
-                placeholder="Ingrese el correo electrónico"
-                {...register("correoUsuario", {
-                  required: "El correo electrónico es obligatorio.",
-                  pattern: { value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i, message: "Ingrese un correo electrónico válido." },
-                })}
-                className={`${inputClass} ${errors.correoUsuario ? "border-danger-400 focus:border-danger-500 focus:ring-danger-500/20" : "border-line focus:border-brand-500 focus:ring-brand-500/25"}`}
-              />
-              {errors.correoUsuario && <p className="mt-1.5 text-xs text-danger-600">{errors.correoUsuario.message}</p>}
-            </div>
-
-            <div>
-              <label className="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-muted">
-                <FiShield size={13} className="text-brand-600" /> Rol *
-              </label>
-              <div className="relative">
-                <select
-                  disabled={loadingRoles}
-                  {...register("idRol", { required: "El rol del usuario es obligatorio." })}
-                  className={selectClass}
-                >
-                  <option value="">Selecciona un rol...</option>
-                  {roles.map((rol) => (
-                    <option key={rol.idRol} value={rol.idRol}>
-                      {rol.nombreRol}
-                    </option>
-                  ))}
-                </select>
-                <FiChevronDown size={14} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-muted" />
-              </div>
-              {errors.idRol && <p className="mt-1.5 text-xs text-danger-600">{errors.idRol.message}</p>}
-              {showErrorRoles && <p className="mt-1.5 text-xs text-danger-600">Error al cargar roles</p>}
-            </div>
-
-            <div>
-              <label className="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-muted">
-                <FiMapPin size={13} className="text-accent-600" /> Sucursal asignada *
-              </label>
-              <div className="relative">
-                <select
-                  disabled={loadingSucursales}
-                  {...register("idSucursal", { required: "La sucursal del usuario es obligatoria." })}
-                  className={selectClass}
-                >
-                  <option value="">Selecciona una sucursal...</option>
-                  {sucursales.map((sucursal) => (
-                    <option key={sucursal.idSucursal} value={sucursal.idSucursal}>
-                      {sucursal.nombreSucursal} - {sucursal.municipioSucursal}
-                    </option>
-                  ))}
-                </select>
-                <FiChevronDown size={14} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-muted" />
-              </div>
-              {errors.idSucursal && <p className="mt-1.5 text-xs text-danger-600">{errors.idSucursal.message}</p>}
-              {showErrorSucursales && <p className="mt-1.5 text-xs text-danger-600">Error al cargar sucursales</p>}
-            </div>
-          </div>
-
-          {modo === "nuevo" && (
-            <p className="mt-4 rounded-xl bg-brand-50 px-3.5 py-2.5 text-xs text-brand-700">
-              Se generará un usuario y contraseña automáticos, enviados al correo ingresado.
-            </p>
-          )}
-
-          <div className="mt-4 flex justify-end gap-2">
-            <button
-              type="button"
-              onClick={cerrarForm}
-              disabled={isSaving}
-              className="rounded-xl border border-line bg-surface px-4 py-2 text-sm font-medium text-ink transition-colors hover:bg-surface-2 disabled:cursor-not-allowed"
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              disabled={isSaving}
-              className="flex min-w-[9rem] items-center justify-center gap-2 rounded-xl border-0 bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-brand transition-colors hover:bg-brand-500 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {isSaving ? (
-                <>
-                  <span className="h-4 w-4 animate-spin-smooth rounded-full border-2 border-white/40 border-t-white" />
-                  Guardando...
-                </>
-              ) : (
-                <>
-                  <FiSave size={15} /> {modo === "nuevo" ? "Crear usuario" : "Guardar cambios"}
-                </>
-              )}
-            </button>
-          </div>
-        </form>
-      )}
+      {/* ── Crear usuario: el formulario va arriba, junto al botón que lo abre ── */}
+      {modo === "nuevo" && formulario}
 
       {/* ── Estados vacíos ───────────────────────────────────────────── */}
       {filteredUsers.length === 0 && !loadingUsers && !showErrorUsers && showInfoUsers && (
@@ -405,6 +435,17 @@ function ManageUsers() {
             const activo = user.estadoUsuario === "A";
             const confirmando = confirmingId === user.idUsuario;
             const avatarTone = AVATAR_TONES[i % AVATAR_TONES.length];
+            const editandoEste = modo === "editar" && selectedUser?.idUsuario === user.idUsuario;
+
+            // Editar: la tarjeta se convierte en el formulario, justo donde hizo clic el usuario.
+            // Ocupa todo el ancho de la fila para que los campos se vean cómodos.
+            if (editandoEste) {
+              return (
+                <div key={user.idUsuario} className="sm:col-span-2">
+                  {formulario}
+                </div>
+              );
+            }
 
             return (
               <div
