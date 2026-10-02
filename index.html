@@ -6,293 +6,157 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
 
-  <!-- ================================================================
-         PWA / NAVEGADOR
-         ================================================================ -->
-
+  <!-- ================================================================ PWA / NAVEGADOR ================================================================ -->
   <meta name="theme-color" content="#020617" />
 
-  <meta name="description" content="San Gabriel App — Sistema de administración" />
+  <meta name="description" content="San Gabriel App — Sistema de administración de Panadería San Gabriel" />
 
-  <!-- Manifest de la PWA -->
+  <meta name="application-name" content="San Gabriel App" /> <!-- Manifest -->
   <link rel="manifest" href="/manifest.json" />
-
-  <!-- ================================================================
-         PWA MOBILE
-         ================================================================ -->
-
-  <!-- Android / navegadores -->
-  <meta name="mobile-web-app-capable" content="yes" />
-
-  <!-- iOS -->
+  <!-- ================================================================ PWA MOBILE ================================================================ -->
+  <meta name="mobile-web-app-capable" content="yes" /> <!-- iOS -->
   <meta name="apple-mobile-web-app-capable" content="yes" />
 
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
-  <meta name="apple-mobile-web-app-title" content="San Gabriel App" />
+  <meta name="apple-mobile-web-app-title" content="San Gabriel" />
 
-  <!-- ================================================================
-     ICONOS
-     ================================================================ -->
-
-  <!-- Favicon principal -->
-  <link rel="icon" type="image/svg+xml" href="/sg-mark.svg" />
-
-  <!-- Favicon PNG 32x32 -->
+  <!-- ================================================================ ICONOS ================================================================ -->
+  <!-- Favicon -->
   <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
-
-  <!-- Favicon PNG 16x16 -->
-  <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16.png" />
-
-  <!-- Icono para iPhone / iPad -->
+  <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16.png" /> <!-- Apple -->
   <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
-
   <title>San Gabriel App</title>
-
-  <!-- ================================================================
-         SPLASH / LOADING
-         ================================================================ -->
-
+  <!-- ================================================================ SPLASH / LOADING ================================================================ -->
   <style>
-    /*
-       * ================================================================
-       * SPLASH / LOADING
-       * ================================================================
-       *
-       * Esta pantalla aparece antes de que React termine de cargar.
-       *
-       * No depende de:
-       * - Tailwind
-       * - React
-       * - main.jsx
-       *
-       * Esto evita un flash blanco durante la carga.
-       */
+    /* ================================================================ RESET MÍNIMO ================================================================ */
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      min-height: 100%;
+      background: #020617;
+    }
 
+    body {
+      background: #020617;
+      color: #f8fafc;
+    }
+
+    /* ================================================================ SPLASH ================================================================ */
     .app-loading {
       position: fixed;
       inset: 0;
-
       display: flex;
       align-items: center;
       justify-content: center;
-
+      /* * Slate 950 * * #020617 */
       background: #020617;
-
       z-index: 9999;
-
       overflow: hidden;
+      /* * Respeta el notch y las áreas seguras */
+      padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
     }
 
-    /*
-       * ================================================================
-       * CUADRÍCULA TECNOLÓGICA
-       * ================================================================
-       *
-       * Brand Cyan:
-       * #06B6D4
-       */
-
+    /* ================================================================ GRID TECNOLÓGICA ================================================================ */
     .app-loading::before {
       content: "";
-
       position: absolute;
       inset: 0;
-
-      opacity: 0.055;
-
-      background-image:
-        linear-gradient(rgba(6, 182, 212, 0.8) 1px,
-          transparent 1px),
-        linear-gradient(90deg,
-          rgba(6, 182, 212, 0.8) 1px,
-          transparent 1px);
-
+      opacity: 0.045;
+      background-image: linear-gradient(rgba(6, 182, 212, 0.75) 1px, transparent 1px), linear-gradient(90deg, rgba(6, 182, 212, 0.75) 1px, transparent 1px);
       background-size: 48px 48px;
-    }
-
-    /*
-       * ================================================================
-       * GLOW CENTRAL
-       * ================================================================
-       *
-       * Brand Cyan:
-       * #06B6D4
-       *
-       * Accent Blue:
-       * #3B82F6
-       */
-
-    .app-loading::after {
-      content: "";
-
-      position: absolute;
-
-      width: 220px;
-      height: 220px;
-
-      border-radius: 9999px;
-
-      background:
-        radial-gradient(circle,
-          rgba(6, 182, 212, 0.12) 0%,
-          rgba(59, 130, 246, 0.06) 35%,
-          transparent 70%);
-
-      filter: blur(10px);
-
+      /* * Evita que la cuadrícula interfiera visualmente * con el logo. */
       pointer-events: none;
     }
 
-    /*
-       * ================================================================
-       * CONTENEDOR DEL LOGO
-       * ================================================================
-       */
+    /* ================================================================ GLOW CENTRAL ================================================================ */
+    .app-loading::after {
+      content: "";
+      position: absolute;
+      width: 280px;
+      height: 280px;
+      border-radius: 9999px;
+      background: radial-gradient(circle, rgba(6, 182, 212, 0.14) 0%, rgba(59, 130, 246, 0.07) 32%, rgba(6, 182, 212, 0.025) 52%, transparent 72%);
+      filter: blur(18px);
+      pointer-events: none;
+    }
 
+    /* ================================================================ CONTENEDOR DEL LOGO ================================================================ */
     .app-loading__logo {
       position: relative;
-
       z-index: 1;
-
-      width: 76px;
-      height: 76px;
-
+      width: 82px;
+      height: 82px;
       display: flex;
       align-items: center;
       justify-content: center;
-
       border-radius: 20px;
-
+      /* * IMPORTANTE: * * El mismo fondo de la aplicación evita que el logo * parezca estar sobre una tarjeta blanca. */
       background: #020617;
-
-      border: 1px solid rgba(6, 182, 212, 0.25);
-
-      box-shadow:
-        0 0 0 0 rgba(6, 182, 212, 0.35),
-        0 0 30px rgba(6, 182, 212, 0.12);
-
+      /* * Borde Cyan muy sutil */
+      border: 1px solid rgba(6, 182, 212, 0.28);
+      /* * Glow Cyan */
+      box-shadow: 0 0 0 0 rgba(6, 182, 212, 0.28), 0 0 28px rgba(6, 182, 212, 0.10);
       animation: app-loading-brand-glow 2.4s ease-in-out infinite;
     }
 
-    /*
-       * ================================================================
-       * LOGO
-       * ================================================================
-       */
-
+    /* ================================================================ LOGO ================================================================ */
     .app-loading__logo img {
       width: 64px;
       height: 64px;
-
       display: block;
-
       object-fit: contain;
+      /* * Evita pequeños artefactos visuales del renderizado. */
+      image-rendering: auto;
+      /* * El SVG/PNG no debe recibir sombra propia. */
+      filter: none;
     }
 
-    /*
-       * ================================================================
-       * ANIMACIÓN
-       * ================================================================
-       */
-
+    /* ================================================================ ANIMACIÓN DEL BRAND ================================================================ */
     @keyframes app-loading-brand-glow {
 
       0%,
       100% {
-        box-shadow:
-          0 0 0 0 rgba(6, 182, 212, 0.35),
-          0 0 30px rgba(6, 182, 212, 0.1);
+        box-shadow: 0 0 0 0 rgba(6, 182, 212, 0.28), 0 0 28px rgba(6, 182, 212, 0.10);
       }
 
       50% {
-        box-shadow:
-          0 0 0 9px rgba(6, 182, 212, 0),
-          0 0 38px rgba(6, 182, 212, 0.18);
+        box-shadow: 0 0 0 8px rgba(6, 182, 212, 0), 0 0 42px rgba(6, 182, 212, 0.18);
       }
     }
 
-    /*
-       * ================================================================
-       * REDUCIR ANIMACIONES
-       * ================================================================
-       */
-
+    /* ================================================================ REDUCIR ANIMACIONES ================================================================ */
     @media (prefers-reduced-motion: reduce) {
       .app-loading__logo {
         animation: none;
       }
     }
   </style>
-
-  <!-- ================================================================
-         TEMA INICIAL
-         ================================================================ -->
-
-  <script>
-    /*
-     * Ejecutar antes de cargar React.
-     *
-     * Esto evita:
-     *
-     *   pantalla oscura
-     *        ↓
-     *   pantalla blanca
-     *        ↓
-     *   aplicación oscura
-     *
-     * La aplicación utiliza:
-     *
-     * darkMode: "class"
-     */
-
-    (function () {
-      try {
-        var storedTheme = localStorage.getItem("theme");
-
-        var isDark = storedTheme
-          ? storedTheme === "dark"
-          : true;
-
-        document.documentElement.classList.toggle(
-          "dark",
-          isDark
-        );
-      } catch (error) {
-        document.documentElement.classList.add("dark");
-      }
-    })();
-  </script>
+  <!-- ================================================================ TEMA INICIAL ================================================================ -->
+  <script> /* * Aplicamos el tema ANTES de cargar React. * * Por defecto: * * dark * * Esto evita el flash blanco durante el arranque. */ (function () { try { var storedTheme = localStorage.getItem("theme"); var isDark = storedTheme ? storedTheme === "dark" : true; document.documentElement.classList.toggle("dark", isDark); } catch (error) { document.documentElement.classList.add("dark"); } })(); </script>
 </head>
 
 <body class="bg-bg text-ink antialiased overscroll-none">
-
-  <!-- ================================================================
-         ROOT
-         ================================================================ -->
-
+  <!-- ================================================================ ROOT ================================================================ -->
   <div id="root">
-
     <!-- ============================================================
-           SPLASH ESTÁTICO
-           ============================================================ -->
+       SPLASH ESTÁTICO
+       ============================================================ -->
 
     <div class="app-loading" aria-hidden="true">
+
       <div class="app-loading__logo">
 
         <img src="/sg-mark.svg" alt="" width="64" height="64" />
 
       </div>
+
     </div>
 
   </div>
-
-  <!-- ================================================================
-         APLICACIÓN REACT
-         ================================================================ -->
-
+  <!-- ================================================================ APLICACIÓN REACT ================================================================ -->
   <script type="module" src="/src/main.jsx"></script>
-
 </body>
 
 </html>
