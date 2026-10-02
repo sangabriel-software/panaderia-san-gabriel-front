@@ -11,23 +11,36 @@
 
   <meta name="description" content="San Gabriel App — Sistema de administración de Panadería San Gabriel" />
 
-  <meta name="application-name" content="San Gabriel App" /> <!-- Manifest -->
+  <meta name="application-name" content="San Gabriel App" />
+
+  <!-- Manifest -->
   <link rel="manifest" href="/manifest.json" />
+
   <!-- ================================================================ PWA MOBILE ================================================================ -->
-  <meta name="mobile-web-app-capable" content="yes" /> <!-- iOS -->
+  <meta name="mobile-web-app-capable" content="yes" />
+
+  <!-- iOS -->
   <meta name="apple-mobile-web-app-capable" content="yes" />
-
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-
   <meta name="apple-mobile-web-app-title" content="San Gabriel" />
 
   <!-- ================================================================ ICONOS ================================================================ -->
   <!-- Favicon -->
   <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
-  <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16.png" /> <!-- Apple -->
+  <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16.png" />
+
+  <!-- Apple (iOS no soporta transparencia: este icono va a sangre, sin esquinas) -->
   <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
+
   <title>San Gabriel App</title>
+
   <!-- ================================================================ SPLASH / LOADING ================================================================ -->
+  <!--
+    IMPORTANTE: este splash debe ser IDÉNTICO al componente PageLoader.jsx
+    (mismo tamaño de logo, misma separación, mismos puntos, mismos colores).
+    Si cambias uno, cambia el otro. Así, cuando React toma el control,
+    el usuario no percibe ninguna transición: se ve una sola pantalla de carga.
+  -->
   <style>
     /* ================================================================ RESET MÍNIMO ================================================================ */
     html,
@@ -35,30 +48,99 @@
       margin: 0;
       padding: 0;
       min-height: 100%;
-      background: #020617;
+      /* Modo claro por defecto; el modo oscuro se aplica con la clase .dark */
+      background: #ffffff;
     }
 
-    body {
+    html.dark,
+    html.dark body {
+      /* Slate 950 — igual que --color-bg en modo oscuro */
       background: #020617;
-      color: #f8fafc;
     }
 
     /* ================================================================ SPLASH ================================================================ */
     .app-loading {
       position: fixed;
       inset: 0;
+      z-index: 9999;
       display: flex;
       align-items: center;
       justify-content: center;
-      /* * Slate 950 * * #020617 */
-      background: #020617;
-      z-index: 9999;
-      overflow: hidden;
-      /* * Respeta el notch y las áreas seguras */
-      padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+      background: #ffffff;
     }
 
-    /* ================================================================ GRID TECNOLÓGICA ================================================================ */
+    html.dark .app-loading {
+      background: #020617;
+    }
+
+    /* Logo + puntos (equivale a "flex flex-col items-center gap-4") */
+    .app-loading__content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    /* ================================================================ LOGO ================================================================ */
+    /* 64px, radio 17px = el radio del squircle del SVG (30/112 * 64) */
+    .app-loading__logo {
+      display: block;
+      width: 64px;
+      height: 64px;
+      border-radius: 17px;
+      animation: app-loading-brand-glow 2.4s ease-in-out infinite;
+    }
+
+    /* ================================================================ PUNTOS ================================================================ */
+    .app-loading__dots {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .app-loading__dots span {
+      width: 6px;
+      height: 6px;
+      border-radius: 9999px;
+      /* brand-500 */
+      background: #06b6d4;
+      animation: app-loading-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    .app-loading__dots span:nth-child(1) { animation-delay: -0.3s; }
+    .app-loading__dots span:nth-child(2) { animation-delay: -0.15s; }
+    .app-loading__dots span:nth-child(3) { animation-delay: 0s; }
+
+    /* ================================================================ ANIMACIONES (mismas que tailwind.config.js) ================================================================ */
+    @keyframes app-loading-brand-glow {
+      0%,
+      100% {
+        box-shadow: 0 0 0 0 rgb(6 182 212 / 0.35);
+      }
+
+      50% {
+        box-shadow: 0 0 0 8px rgb(6 182 212 / 0);
+      }
+    }
+
+    @keyframes app-loading-pulse {
+      50% {
+        opacity: 0.5;
+      }
+    }
+
+    /* ================================================================ REDUCIR ANIMACIONES ================================================================ */
+    @media (prefers-reduced-motion: reduce) {
+      .app-loading__logo,
+      .app-loading__dots span {
+        animation: none;
+      }
+    }
+
+    /* ================================================================ DESACTIVADO ================================================================ */
+    /* Grid tecnológica y glow central del splash anterior.
+       Se desactivaron porque PageLoader no los tiene y se notaba el cambio entre ambas pantallas.
+
     .app-loading::before {
       content: "";
       position: absolute;
@@ -66,11 +148,9 @@
       opacity: 0.045;
       background-image: linear-gradient(rgba(6, 182, 212, 0.75) 1px, transparent 1px), linear-gradient(90deg, rgba(6, 182, 212, 0.75) 1px, transparent 1px);
       background-size: 48px 48px;
-      /* * Evita que la cuadrícula interfiera visualmente * con el logo. */
       pointer-events: none;
     }
 
-    /* ================================================================ GLOW CENTRAL ================================================================ */
     .app-loading::after {
       content: "";
       position: absolute;
@@ -81,80 +161,54 @@
       filter: blur(18px);
       pointer-events: none;
     }
-
-    /* ================================================================ CONTENEDOR DEL LOGO ================================================================ */
-    .app-loading__logo {
-      position: relative;
-      z-index: 1;
-      width: 82px;
-      height: 82px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 20px;
-      /* * IMPORTANTE: * * El mismo fondo de la aplicación evita que el logo * parezca estar sobre una tarjeta blanca. */
-      background: #020617;
-      /* * Borde Cyan muy sutil */
-      border: 1px solid rgba(6, 182, 212, 0.28);
-      /* * Glow Cyan */
-      box-shadow: 0 0 0 0 rgba(6, 182, 212, 0.28), 0 0 28px rgba(6, 182, 212, 0.10);
-      animation: app-loading-brand-glow 2.4s ease-in-out infinite;
-    }
-
-    /* ================================================================ LOGO ================================================================ */
-    .app-loading__logo img {
-      width: 64px;
-      height: 64px;
-      display: block;
-      object-fit: contain;
-      /* * Evita pequeños artefactos visuales del renderizado. */
-      image-rendering: auto;
-      /* * El SVG/PNG no debe recibir sombra propia. */
-      filter: none;
-    }
-
-    /* ================================================================ ANIMACIÓN DEL BRAND ================================================================ */
-    @keyframes app-loading-brand-glow {
-
-      0%,
-      100% {
-        box-shadow: 0 0 0 0 rgba(6, 182, 212, 0.28), 0 0 28px rgba(6, 182, 212, 0.10);
-      }
-
-      50% {
-        box-shadow: 0 0 0 8px rgba(6, 182, 212, 0), 0 0 42px rgba(6, 182, 212, 0.18);
-      }
-    }
-
-    /* ================================================================ REDUCIR ANIMACIONES ================================================================ */
-    @media (prefers-reduced-motion: reduce) {
-      .app-loading__logo {
-        animation: none;
-      }
-    }
+    */
   </style>
+
   <!-- ================================================================ TEMA INICIAL ================================================================ -->
-  <script> /* * Aplicamos el tema ANTES de cargar React. * * Por defecto: * * dark * * Esto evita el flash blanco durante el arranque. */ (function () { try { var storedTheme = localStorage.getItem("theme"); var isDark = storedTheme ? storedTheme === "dark" : true; document.documentElement.classList.toggle("dark", isDark); } catch (error) { document.documentElement.classList.add("dark"); } })(); </script>
+  <script>
+    /*
+     * Aplicamos el tema ANTES de cargar React.
+     *
+     * Por defecto: dark
+     *
+     * Esto evita el flash blanco durante el arranque y deja el splash
+     * del mismo color que PageLoader (que usa bg-bg).
+     */
+    (function () {
+      try {
+        var storedTheme = localStorage.getItem("theme");
+        var isDark = storedTheme ? storedTheme === "dark" : true;
+        document.documentElement.classList.toggle("dark", isDark);
+
+        // Barra de estado / barra de título del navegador según el tema
+        var themeMeta = document.querySelector('meta[name="theme-color"]');
+        if (themeMeta) themeMeta.setAttribute("content", isDark ? "#020617" : "#ffffff");
+      } catch (error) {
+        document.documentElement.classList.add("dark");
+      }
+    })();
+  </script>
 </head>
 
 <body class="bg-bg text-ink antialiased overscroll-none">
   <!-- ================================================================ ROOT ================================================================ -->
   <div id="root">
     <!-- ============================================================
-       SPLASH ESTÁTICO
+       SPLASH ESTÁTICO (idéntico a PageLoader.jsx)
+       React lo reemplaza automáticamente al montar la app.
        ============================================================ -->
-
     <div class="app-loading" aria-hidden="true">
-
-      <div class="app-loading__logo">
-
-        <img src="/sg-mark.svg" alt="" width="64" height="64" />
-
+      <div class="app-loading__content">
+        <img class="app-loading__logo" src="/sg-mark.svg" alt="" width="64" height="64" />
+        <div class="app-loading__dots">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
       </div>
-
     </div>
-
   </div>
+
   <!-- ================================================================ APLICACIÓN REACT ================================================================ -->
   <script type="module" src="/src/main.jsx"></script>
 </body>
