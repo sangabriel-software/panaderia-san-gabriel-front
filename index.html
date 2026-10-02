@@ -1,313 +1,298 @@
 <!doctype html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
 
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1"
-    />
+<head>
+  <meta charset="UTF-8" />
 
-    <!-- Color inicial del navegador / barra de estado -->
-    <meta name="theme-color" content="#020617" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
 
-    <meta
-      name="description"
-      content="San Gabriel App — Sistema de administración"
-    />
+  <!-- ================================================================
+         PWA / NAVEGADOR
+         ================================================================ -->
 
-    <!-- iOS -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta
-      name="apple-mobile-web-app-status-bar-style"
-      content="black-translucent"
-    />
-    <meta
-      name="apple-mobile-web-app-title"
-      content="San Gabriel App"
-    />
+  <meta name="theme-color" content="#020617" />
 
-    <!-- Iconos -->
-    <link
-      rel="apple-touch-icon"
-      sizes="180x180"
-      href="/icons/apple-touch-icon.png"
-    />
+  <meta name="description" content="San Gabriel App — Sistema de administración" />
 
-    <link
-      rel="icon"
-      type="image/svg+xml"
-      href="/favicon.svg"
-    />
+  <!-- Manifest de la PWA -->
+  <link rel="manifest" href="/manifes.json" />
 
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="32x32"
-      href="/icons/favicon-32.png"
-    />
+  <!-- ================================================================
+         PWA MOBILE
+         ================================================================ -->
 
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="16x16"
-      href="/icons/favicon-16.png"
-    />
+  <!-- Android / navegadores -->
+  <meta name="mobile-web-app-capable" content="yes" />
 
-    <link
-      rel="shortcut icon"
-      href="/icons/favicon.ico"
-    />
+  <!-- iOS -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
 
-    <title>San Gabriel App</title>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
-    <style>
-      /*
+  <meta name="apple-mobile-web-app-title" content="San Gabriel App" />
+
+  <!-- ================================================================
+     ICONOS
+     ================================================================ -->
+
+  <!-- Favicon principal -->
+  <link rel="icon" type="image/svg+xml" href="/sg-mark.svg" />
+
+  <!-- Favicon PNG 32x32 -->
+  <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
+
+  <!-- Favicon PNG 16x16 -->
+  <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16.png" />
+
+  <!-- Icono para iPhone / iPad -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
+
+  <title>San Gabriel App</title>
+
+  <!-- ================================================================
+         SPLASH / LOADING
+         ================================================================ -->
+
+  <style>
+    /*
        * ================================================================
        * SPLASH / LOADING
        * ================================================================
        *
-       * Esta pantalla aparece antes de que React/JS termine de cargar.
+       * Esta pantalla aparece antes de que React termine de cargar.
        *
-       * Importante:
-       * - No depende de Tailwind.
-       * - No depende de React.
-       * - No depende de main.js.
+       * No depende de:
+       * - Tailwind
+       * - React
+       * - main.jsx
        *
-       * Esto evita un flash blanco mientras carga la aplicación.
+       * Esto evita un flash blanco durante la carga.
        */
 
-      .app-loading {
-        position: fixed;
-        inset: 0;
+    .app-loading {
+      position: fixed;
+      inset: 0;
 
-        display: flex;
-        align-items: center;
-        justify-content: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
 
-        background: #020617;
+      background: #020617;
 
-        z-index: 9999;
+      z-index: 9999;
 
-        overflow: hidden;
-      }
+      overflow: hidden;
+    }
 
-      /*
-       * Cuadrícula tecnológica.
+    /*
+       * ================================================================
+       * CUADRÍCULA TECNOLÓGICA
+       * ================================================================
        *
-       * Usa tu color BRAND:
+       * Brand Cyan:
        * #06B6D4
        */
-      .app-loading::before {
-        content: '';
 
-        position: absolute;
-        inset: 0;
+    .app-loading::before {
+      content: "";
 
-        opacity: 0.055;
+      position: absolute;
+      inset: 0;
 
-        background-image:
-          linear-gradient(
-            rgba(6, 182, 212, 0.8) 1px,
-            transparent 1px
-          ),
-          linear-gradient(
-            90deg,
-            rgba(6, 182, 212, 0.8) 1px,
-            transparent 1px
-          );
+      opacity: 0.055;
 
-        background-size: 48px 48px;
-      }
+      background-image:
+        linear-gradient(rgba(6, 182, 212, 0.8) 1px,
+          transparent 1px),
+        linear-gradient(90deg,
+          rgba(6, 182, 212, 0.8) 1px,
+          transparent 1px);
 
-      /*
-       * Glow central.
+      background-size: 48px 48px;
+    }
+
+    /*
+       * ================================================================
+       * GLOW CENTRAL
+       * ================================================================
        *
-       * Usa brand cyan + accent blue.
+       * Brand Cyan:
+       * #06B6D4
+       *
+       * Accent Blue:
+       * #3B82F6
        */
-      .app-loading::after {
-        content: '';
 
-        position: absolute;
+    .app-loading::after {
+      content: "";
 
-        width: 220px;
-        height: 220px;
+      position: absolute;
 
-        border-radius: 9999px;
+      width: 220px;
+      height: 220px;
 
-        background:
-          radial-gradient(
-            circle,
-            rgba(6, 182, 212, 0.12) 0%,
-            rgba(59, 130, 246, 0.06) 35%,
-            transparent 70%
-          );
+      border-radius: 9999px;
 
-        filter: blur(10px);
+      background:
+        radial-gradient(circle,
+          rgba(6, 182, 212, 0.12) 0%,
+          rgba(59, 130, 246, 0.06) 35%,
+          transparent 70%);
 
-        pointer-events: none;
-      }
+      filter: blur(10px);
 
-      /*
-       * Contenedor del logo.
+      pointer-events: none;
+    }
+
+    /*
+       * ================================================================
+       * CONTENEDOR DEL LOGO
+       * ================================================================
        */
-      .app-loading__logo {
-        position: relative;
 
-        z-index: 1;
+    .app-loading__logo {
+      position: relative;
 
-        width: 76px;
-        height: 76px;
+      z-index: 1;
 
-        display: flex;
-        align-items: center;
-        justify-content: center;
+      width: 76px;
+      height: 76px;
 
-        border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
 
-        /*
-         * Fondo acorde al sistema oscuro.
-         */
-        background: #020617;
+      border-radius: 20px;
 
-        /*
-         * Borde cyan muy sutil.
-         */
-        border: 1px solid rgba(6, 182, 212, 0.25);
+      background: #020617;
 
-        /*
-         * Glow cyan.
-         */
+      border: 1px solid rgba(6, 182, 212, 0.25);
+
+      box-shadow:
+        0 0 0 0 rgba(6, 182, 212, 0.35),
+        0 0 30px rgba(6, 182, 212, 0.12);
+
+      animation: app-loading-brand-glow 2.4s ease-in-out infinite;
+    }
+
+    /*
+       * ================================================================
+       * LOGO
+       * ================================================================
+       */
+
+    .app-loading__logo img {
+      width: 64px;
+      height: 64px;
+
+      display: block;
+
+      object-fit: contain;
+    }
+
+    /*
+       * ================================================================
+       * ANIMACIÓN
+       * ================================================================
+       */
+
+    @keyframes app-loading-brand-glow {
+
+      0%,
+      100% {
         box-shadow:
           0 0 0 0 rgba(6, 182, 212, 0.35),
-          0 0 30px rgba(6, 182, 212, 0.12);
-
-        animation: app-loading-brand-glow 2.4s ease-in-out infinite;
+          0 0 30px rgba(6, 182, 212, 0.1);
       }
 
-      /*
-       * Tu logo.
-       */
-      .app-loading__logo img {
-        width: 64px;
-        height: 64px;
-
-        display: block;
-
-        object-fit: contain;
+      50% {
+        box-shadow:
+          0 0 0 9px rgba(6, 182, 212, 0),
+          0 0 38px rgba(6, 182, 212, 0.18);
       }
+    }
 
-      /*
-       * Animación equivalente a tu brand-glow
-       * de Tailwind.
-       */
-      @keyframes app-loading-brand-glow {
-        0%,
-        100% {
-          box-shadow:
-            0 0 0 0 rgba(6, 182, 212, 0.35),
-            0 0 30px rgba(6, 182, 212, 0.10);
-        }
-
-        50% {
-          box-shadow:
-            0 0 0 9px rgba(6, 182, 212, 0),
-            0 0 38px rgba(6, 182, 212, 0.18);
-        }
-      }
-
-      /*
-       * Respeta usuarios que prefieren reducir animaciones.
-       */
-      @media (prefers-reduced-motion: reduce) {
-        .app-loading__logo {
-          animation: none;
-        }
-      }
-    </style>
-
-    <script>
-      /*
+    /*
        * ================================================================
-       * TEMA INICIAL
+       * REDUCIR ANIMACIONES
        * ================================================================
-       *
-       * Se ejecuta ANTES de que cargue main.js.
-       *
-       * Esto evita:
-       *
-       *   pantalla oscura
-       *        ↓
-       *   pantalla blanca
-       *        ↓
-       *   aplicación oscura
-       *
-       * o cualquier otro parpadeo de tema.
        */
 
-      (function () {
-        try {
-          var storedTheme = localStorage.getItem('theme');
+    @media (prefers-reduced-motion: reduce) {
+      .app-loading__logo {
+        animation: none;
+      }
+    }
+  </style>
 
-          /*
-           * Tu aplicación usa darkMode: 'class'.
-           *
-           * Por defecto:
-           * DARK
-           */
-          var isDark = storedTheme
-            ? storedTheme === 'dark'
-            : true;
+  <!-- ================================================================
+         TEMA INICIAL
+         ================================================================ -->
 
-          document.documentElement.classList.toggle(
-            'dark',
-            isDark
-          );
-        } catch (error) {
-          /*
-           * Si localStorage no está disponible,
-           * utilizamos oscuro como fallback.
-           */
-          document.documentElement.classList.add('dark');
-        }
-      })();
-    </script>
-  </head>
+  <script>
+    /*
+     * Ejecutar antes de cargar React.
+     *
+     * Esto evita:
+     *
+     *   pantalla oscura
+     *        ↓
+     *   pantalla blanca
+     *        ↓
+     *   aplicación oscura
+     *
+     * La aplicación utiliza:
+     *
+     * darkMode: "class"
+     */
 
-  <body class="bg-bg text-ink antialiased overscroll-none">
+    (function () {
+      try {
+        var storedTheme = localStorage.getItem("theme");
 
-    <div id="root">
+        var isDark = storedTheme
+          ? storedTheme === "dark"
+          : true;
 
-      <!--
-        Loading estático.
+        document.documentElement.classList.toggle(
+          "dark",
+          isDark
+        );
+      } catch (error) {
+        document.documentElement.classList.add("dark");
+      }
+    })();
+  </script>
+</head>
 
-        React reemplazará este contenido cuando main.js
-        monte la aplicación.
-      -->
-      <div
-        class="app-loading"
-        aria-hidden="true"
-      >
-        <div class="app-loading__logo">
-          <img
-            src="/sg-mark.svg"
-            alt=""
-            width="64"
-            height="64"
-          />
-        </div>
+<body class="bg-bg text-ink antialiased overscroll-none">
+
+  <!-- ================================================================
+         ROOT
+         ================================================================ -->
+
+  <div id="root">
+
+    <!-- ============================================================
+           SPLASH ESTÁTICO
+           ============================================================ -->
+
+    <div class="app-loading" aria-hidden="true">
+      <div class="app-loading__logo">
+
+        <img src="/sg-mark.svg" alt="" width="64" height="64" />
+
       </div>
-
     </div>
 
-    <!--
-      Aplicación JavaScript
-    -->
-    <script
-      type="module"
-      src="/src/main.jsx"
-    ></script>
+  </div>
 
-  </body>
+  <!-- ================================================================
+         APLICACIÓN REACT
+         ================================================================ -->
+
+  <script type="module" src="/src/main.jsx"></script>
+
+</body>
+
 </html>

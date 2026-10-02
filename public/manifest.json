@@ -2,13 +2,19 @@
   "name": "San Gabriel App",
   "short_name": "San Gabriel",
   "description": "Sistema de administración de Panadería San Gabriel",
+
+  "id": "/",
+
   "start_url": "/",
   "scope": "/",
+
   "display": "standalone",
+
   "orientation": "portrait-primary",
+
   "theme_color": "#020617",
   "background_color": "#020617",
-  "id": "/",
+
   "icons": [
     {
       "src": "/icons/icon-192.png",
