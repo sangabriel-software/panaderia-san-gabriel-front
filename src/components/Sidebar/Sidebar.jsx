@@ -1,4 +1,3 @@
-// import React, { useState, useEffect, useCallback } from "react";
 import React, { useCallback } from "react";
 import { NavLink } from "react-router-dom";
 import { MdOutlineBakeryDining } from "react-icons/md";
@@ -7,6 +6,7 @@ import { useTheme } from "../../context/ThemeContext";
 import { usePwaInstall } from "../../shared/pwa/usePwaInstall";
 import { getUserData, getUserPermissions } from "../../utils/Auth/decodedata";
 import { getColorFromName } from "./Sidebar.uitils";
+import useLogout from "../../services/session/logout"; // ⚠️ ajusta la ruta a donde tengas el hook
 import {
   FiHome,
   FiPieChart,
@@ -53,8 +53,9 @@ function Sidebar({ expanded, onToggle, mobileOpen, onCloseMobile }) {
   const { isInstallable, isInstalled, promptInstall } = usePwaInstall();
   const showInstall = isInstallable && !isInstalled;
 
-  // const [theme, setTheme] = useState(localStorage.getItem("theme") || "dark");
-  // const [isChangingTheme, setIsChangingTheme] = useState(false);
+  // Cierre de sesión centralizado (limpia token, userData, observabilidad y redirige a /login)
+  const { handleLogout } = useLogout();
+
   const permisosUsuario = getUserPermissions();
   const userData = getUserData();
 
@@ -72,12 +73,6 @@ function Sidebar({ expanded, onToggle, mobileOpen, onCloseMobile }) {
     await promptInstall();
     if (window.innerWidth <= 768) onCloseMobile();
   }, [promptInstall, onCloseMobile]);
-
-  const handleLogout = useCallback(() => {
-    // TODO: reemplazar por tu lógica real de logout
-    localStorage.removeItem("token");
-    window.location.href = "/login";
-  }, []);
 
   return (
     <>
@@ -144,14 +139,6 @@ function Sidebar({ expanded, onToggle, mobileOpen, onCloseMobile }) {
             title="Cambiar tema"
             className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-0 bg-transparent text-muted transition-colors hover:bg-surface-2 hover:text-brand-700 dark:hover:text-brand-300"
           >
-            {/* El cambio de tema ahora es instantáneo, ya no hace falta el spinner de isChangingTheme */}
-            {/* {isChangingTheme ? (
-              <span className="h-3.5 w-3.5 animate-spin-smooth rounded-full border-2 border-brand-300 border-t-transparent" />
-            ) : theme === "dark" ? (
-              <FaMoon size={13} />
-            ) : (
-              <FaSun size={13} />
-            )} */}
             {theme === "dark" ? <FaMoon size={13} /> : <FaSun size={13} />}
           </button>
 

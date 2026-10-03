@@ -16,6 +16,18 @@ const PrivateRoute = () => {
   const userData          = getUserData(); // ✅ obtener datos del usuario
   const mustChangePass    = userData?.cambioContrasenia === 1;
 
+  // Si el navegador restaura la página desde caché (botón atrás / bfcache),
+  // los efectos no se vuelven a ejecutar: se valida la sesión manualmente.
+  useEffect(() => {
+    const onPageShow = (e) => {
+      if (e.persisted && !getTokenExpiration()) {
+        window.location.replace("/login");
+      }
+    };
+    window.addEventListener("pageshow", onPageShow);
+    return () => window.removeEventListener("pageshow", onPageShow);
+  }, []);
+
   useEffect(() => {
     if (!TokenExpired) {
       toast.error("Necesitas iniciar sesión para acceder.", { autoClose: 3000 });
@@ -23,6 +35,7 @@ const PrivateRoute = () => {
     } else if (isTokenExpired(TokenExpired)) {
       toast.error("Tu sesión ha expirado.", { autoClose: 3000 });
       removeLocalStorage("token");
+      removeLocalStorage("userData"); // ✅ no dejar permisos de la sesión vencida
       navigate("/login", { state: { from: "expired" }, replace: true });
     } else if (mustChangePass && rutaActual !== "/cambiar-password") {
       // ✅ Si debe cambiar contraseña, solo puede estar en esa ruta
