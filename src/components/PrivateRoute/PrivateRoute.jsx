@@ -1,7 +1,5 @@
 import React, { useEffect } from "react";
 import { useNavigate, Outlet, useLocation } from "react-router-dom";
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import { removeLocalStorage } from "../../utils/Auth/localstorage";
 import { getTokenExpiration, getUserData, getUserPermissions } from "../../utils/Auth/decodedata";
 import { hasPermission, isTokenExpired } from "../../utils/Auth/validacionpermisos";
@@ -36,11 +34,11 @@ const PrivateRoute = () => {
   }, [rutaActual, TokenExpired]);
 
   useEffect(() => {
+    // El motivo de la redirección viaja en `state.from`; la pantalla de login
+    // se encarga de mostrar el aviso con <Alert />.
     if (!TokenExpired) {
-      toast.error("Necesitas iniciar sesión para acceder.", { autoClose: 3000 });
       navigate("/login", { state: { from: "unauthorized" }, replace: true });
     } else if (isTokenExpired(TokenExpired)) {
-      toast.error("Tu sesión ha expirado.", { autoClose: 3000 });
       removeLocalStorage("token");
       removeLocalStorage("userData"); // ✅ no dejar permisos de la sesión vencida
       navigate("/login", { state: { from: "expired" }, replace: true });
