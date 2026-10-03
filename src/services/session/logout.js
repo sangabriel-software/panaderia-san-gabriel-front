@@ -1,28 +1,20 @@
+import { useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { clearbetterUser } from "../../observability/betterStack";
 import { removeLocalStorage } from "../../utils/Auth/localstorage";
-import { toast } from "react-toastify";
 
 const useLogout = () => {
-  const handleLogout = () => {
-    // Mostrar notificación de proceso
-    toast.loading("Cerrando sesión...", {
-      toastId: 'logout-process',
-      autoClose: false,
-      autoClose: 2000,
-    });
+  const navigate = useNavigate(); // ✅ nivel superior del hook
 
-    // Esperar un momento para que el usuario vea el mensaje
-    setTimeout(() => {
-      // Limpiar datos
-      removeLocalStorage("userData");
-      removeLocalStorage("token");
+  const handleLogout = useCallback(() => {
+    removeLocalStorage("userData");
+    removeLocalStorage("token");
+    removeLocalStorage("lastRoute"); // ✅ el siguiente usuario no aterriza en la ruta del anterior
+    sessionStorage.clear();
+    clearbetterUser();
 
-      clearbetterUser();
-      
-      // Redirigir con parámetro
-      window.location.href = "/login?logout=success";
-    }, 1000);
-  };
+    navigate("/login", { replace: true });
+  }, [navigate]);
 
   return { handleLogout };
 };

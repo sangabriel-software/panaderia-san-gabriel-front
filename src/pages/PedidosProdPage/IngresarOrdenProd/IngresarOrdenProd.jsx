@@ -1,26 +1,63 @@
 import { useEffect, useRef, useState } from "react";
-import { Container, Form, Row, Col, Button, Card, InputGroup, Table, Dropdown } from "react-bootstrap";
 import { useForm } from "react-hook-form";
-import { BsArrowLeft, BsArrowUp, BsExclamationTriangleFill, BsFilter, BsX } from "react-icons/bs";
-import { FaSearch } from "react-icons/fa";
 import { useNavigate } from "react-router";
-import Title from "../../../components/Title/Title";
-import Alert from "../../../components/Alerts/Alert";
-import SuccessPopup from "../../../components/Popup/SuccessPopup";
-import OrderSummary from "../../../components/OrderSummary/OrderSummary";
 import dayjs from "dayjs";
-import ErrorPopup from "../../../components/Popup/ErrorPopUp";
-import useGetProductosYPrecios from "../../../hooks/productosprecios/useGetProductosYprecios";
-import { useGetSucursales } from "../../../hooks/sucursales/useGetSucursales";
-import { descargarPdfDuranteIngresoOrden, filterProductsByName, getFilteredProductsByCategory, getInitials, getUniqueColor, getUserSucursalName, handleIngresarOrdenProduccionSubmit, scrollToAlert } from "./IngresarOrdenProdUtils";
-import { getUserData } from "../../../utils/Auth/decodedata";
-import "./ordenes.css";
-import useGetFechaProduccion from "../../../hooks/fecha-produccion/useGetFechaProduccion";
-import { ingresarOrdenProduccionBatchService } from "../../../services/ordenesproduccion/ordenesProduccion.service";
-import { getCurrentDateTimeWithSeconds } from "../../../utils/dateUtils";
-import { descargarPlantillaOrden, limpiarCSV } from "../../../utils/PdfUtils/ExcelUtils";
+import {
+  FiArrowLeft,
+  FiCalendar,
+  FiCheckCircle,
+  FiChevronDown,
+  FiClipboard,
+  FiDownload,
+  FiFileText,
+  FiHome,
+  FiLock,
+  FiMoon,
+  FiSend,
+  FiSun,
+  FiUploadCloud,
+  FiUser,
+  FiX,
+} from "react-icons/fi";
 
-// ─── Utilidades countdown ──────────────────────────────────────────────────────
+import Alert from "../../../components/Alerts/Alert";
+import useGetProductosYPrecios from "../../../hooks/productosprecios/useGetProductosYprecios";
+import useGetFechaProduccion from "../../../hooks/fecha-produccion/useGetFechaProduccion";
+import { useGetSucursales } from "../../../hooks/sucursales/useGetSucursales";
+import { ingresarOrdenProduccionBatchService } from "../../../services/ordenesproduccion/ordenesProduccion.service";
+import { getUserData } from "../../../utils/Auth/decodedata";
+import { getCurrentDateTimeWithSeconds } from "../../../utils/dateUtils";
+import { descargarPlantillaOrden } from "../../../utils/PdfUtils/ExcelUtils";
+import {
+  descargarPdfDuranteIngresoOrden,
+  getUserSucursalName,
+} from "./IngresarOrdenProdUtils";
+
+// ─── Constantes y utilidades ───────────────────────────────────────────────────
+
+const COLUMNAS_REQUERIDAS = ["idProducto", "cantidad", "tipoProduccion"];
+const AVISO_POCO_TIEMPO = 10 * 60; // segundos
+
+// Clases reutilizadas (utilidades explícitas, sin .card/.btn-* para no chocar con Bootstrap)
+const CARD = "rounded-2xl border border-line bg-surface p-4 shadow-card sm:p-5";
+const INPUT =
+  "w-full rounded-xl border border-line bg-bg py-2.5 pl-10 pr-3.5 text-base text-ink placeholder:text-muted transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/25";
+const ICONO_CAMPO = "pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-brand-600 dark:text-brand-400";
+
+const TURNOS = [
+  {
+    valor: "AM",
+    Icono: FiSun,
+    activo:
+      "peer-checked:border-warning-500/60 peer-checked:bg-warning-500/15 peer-checked:text-warning-700 dark:peer-checked:text-warning-300",
+  },
+  {
+    valor: "PM",
+    Icono: FiMoon,
+    activo:
+      "peer-checked:border-accent-500/60 peer-checked:bg-accent-500/15 peer-checked:text-accent-700 dark:peer-checked:text-accent-300",
+  },
+];
 
 const formatCountdown = (seconds) => {
   if (seconds <= 0) return "00:00:00";
@@ -30,88 +67,150 @@ const formatCountdown = (seconds) => {
   return [h, m, s].map((v) => String(v).padStart(2, "0")).join(":");
 };
 
+const esXlsx = (file) => !!file && file.name.toLowerCase().endsWith(".xlsx");
+
+// ─── Piezas pequeñas ───────────────────────────────────────────────────────────
+
+const SectionHeader = ({ icon: Icon, tone, title, subtitle }) => (
+  <div className="flex items-center gap-3">
+    <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${tone}`}>
+      <Icon size={17} />
+    </span>
+    <div className="min-w-0">
+      <h2 className="text-xl font-semibold text-ink">{title}</h2>
+      {subtitle && <p className="text-sm text-muted">{subtitle}</p>}
+    </div>
+  </div>
+);
+
+const Field = ({ label, htmlFor, error, children }) => (
+  <div>
+    <label htmlFor={htmlFor} className="mb-1.5 block text-sm font-medium text-muted">
+      {label}
+    </label>
+    <div className="relative">{children}</div>
+    {error && <p className="mt-1.5 text-sm text-danger-600 dark:text-danger-400">{error}</p>}
+  </div>
+);
+
 // ─── Banner de ventana activa ──────────────────────────────────────────────────
 
 const VentanaActivaBanner = ({ segundosRestantes, expiraEn }) => {
-  const [seconds, setSeconds] = useState(segundosRestantes);
+  const [restantes, setRestantes] = useState(segundosRestantes);
   const [visible, setVisible] = useState(true);
-  const intervalRef = useRef(null);
+  const totalRef = useRef(Math.max(segundosRestantes, 1));
 
+  // Contador contra una hora de fin fija: no se atrasa si la pestaña queda en segundo plano.
   useEffect(() => {
-    setSeconds(segundosRestantes);
+    totalRef.current = Math.max(segundosRestantes, 1);
+    const finaliza = Date.now() + segundosRestantes * 1000;
+
+    const tick = () => {
+      const faltan = Math.max(0, Math.round((finaliza - Date.now()) / 1000));
+      setRestantes(faltan);
+      if (faltan === 0) clearInterval(id);
+    };
+
+    const id = setInterval(tick, 1000);
+    tick();
+    return () => clearInterval(id);
   }, [segundosRestantes]);
 
-  useEffect(() => {
-    if (seconds <= 0) return;
-    intervalRef.current = setInterval(() => {
-      setSeconds((prev) => {
-        if (prev <= 1) {
-          clearInterval(intervalRef.current);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-    return () => clearInterval(intervalRef.current);
-  }, [segundosRestantes]);
+  if (!visible || restantes <= 0) return null;
 
-  if (!visible || seconds <= 0) return null;
-
-  const expiraFormateado = expiraEn
-    ? dayjs(expiraEn.replace(" ", "T")).format("HH:mm")
-    : "--:--";
+  const pocoTiempo = restantes <= AVISO_POCO_TIEMPO;
+  const porcentaje = Math.min(100, (restantes / totalRef.current) * 100);
+  const expiraFormateado = expiraEn ? dayjs(expiraEn.replace(" ", "T")).format("HH:mm") : "--:--";
 
   return (
-    <div className="vab-banner">
-      <div className="vab-left">
-        <span className="vab-dot" />
-        <div className="vab-text">
-          <span className="vab-title">Ingreso del día habilitado</span>
-          <span className="vab-subtitle">Vence a las {expiraFormateado}</span>
+    <div
+      role="status"
+      className={`mb-4 overflow-hidden rounded-2xl border shadow-card animate-fade-in ${
+        pocoTiempo
+          ? "border-warning-500/40 bg-warning-500/10"
+          : "border-brand-500/30 bg-brand-500/10"
+      }`}
+    >
+      <div className="flex items-center gap-3 px-4 py-3">
+        <span
+          className={`h-2.5 w-2.5 shrink-0 rounded-full ${
+            pocoTiempo ? "bg-warning-500" : "bg-brand-500 animate-brand-glow"
+          }`}
+        />
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-md font-semibold text-ink">Ingreso del día habilitado</p>
+          <p className="text-sm text-muted">Vence a las {expiraFormateado}</p>
         </div>
-      </div>
-      <div className="vab-right">
-        <span className="vab-timer">{formatCountdown(seconds)}</span>
-        <button
-          className="vab-close"
-          onClick={() => setVisible(false)}
-          title="Cerrar"
+        <span
+          className={`font-mono text-2xl font-semibold tabular-nums ${
+            pocoTiempo ? "text-warning-700 dark:text-warning-300" : "text-brand-700 dark:text-brand-300"
+          }`}
         >
-          <BsX size={18} />
+          {formatCountdown(restantes)}
+        </span>
+        <button
+          type="button"
+          onClick={() => setVisible(false)}
+          aria-label="Cerrar aviso"
+          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-muted transition-colors hover:text-ink"
+        >
+          <FiX size={17} />
         </button>
+      </div>
+      <div className="h-1 w-full bg-ink/5">
+        <div
+          className={`h-full transition-[width] duration-1000 ease-linear ${
+            pocoTiempo ? "bg-warning-500" : "bg-brand-500"
+          }`}
+          style={{ width: `${porcentaje}%` }}
+        />
       </div>
     </div>
   );
 };
 
-// ─── Componente Principal ──────────────────────────────────────────────────────
+// ─── Componente principal ──────────────────────────────────────────────────────
 
 const IngresarOrdenProd = () => {
-  const usuario = getUserData();
-  const alertRef = useRef(null);
-  const csvInputRef = useRef(null);
   const navigate = useNavigate();
-  const { sucursales, loadingSucursales, showErrorSucursales } = useGetSucursales();
-  const { productos, loadigProducts, showErrorProductos } = useGetProductosYPrecios();
-  const { diaProduccion, loadingFechaProduccion } = useGetFechaProduccion();
-  const [isDraggingOver, setIsDraggingOver] = useState(false);
-
-  const tomorrow = dayjs().add(1, "day").format("YYYY-MM-DD");
-  const today = dayjs().format("YYYY-MM-DD");
   const userData = getUserData();
+  const esAdmin = userData.idRol === 1;
 
-  console.log("Carga inicial")
+  const { sucursales, loadingSucursales, showErrorSucursales } = useGetSucursales();
+  const { productos, loadigProducts } = useGetProductosYPrecios();
+  const { diaProduccion, loadingFechaProduccion } = useGetFechaProduccion();
 
-  const registroActivo = Array.isArray(diaProduccion) && diaProduccion.length > 0 ? diaProduccion[0] : null;
+  const csvInputRef = useRef(null);
+  const dragDepth = useRef(0);
+
+  const [csvFile, setCsvFile] = useState(null);
+  const [csvLoading, setCsvLoading] = useState(false);
+  const [isDraggingOver, setIsDraggingOver] = useState(false);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [isPopupErrorOpen, setIsPopupErrorOpen] = useState(false);
+  const [errorPopupMessage, setErrorPopupMessage] = useState("");
+
+  // Ventana de ingreso del día
+  const today = dayjs().format("YYYY-MM-DD");
+  const tomorrow = dayjs().add(1, "day").format("YYYY-MM-DD");
+  const registroActivo =
+    Array.isArray(diaProduccion) && diaProduccion.length > 0 ? diaProduccion[0] : null;
   const ventanaActiva = registroActivo?.fecha_produccion_a_setear === "today";
   const segundosRestantes = registroActivo?.segundos_restantes ?? 0;
   const expiraEn = registroActivo?.expira_en ?? null;
   const fechaMinima = ventanaActiva ? today : tomorrow;
   const fechaDefault = ventanaActiva ? today : tomorrow;
 
-  const { register, handleSubmit, formState: { errors }, setValue, watch, reset, getValues } = useForm({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+    getValues,
+    reset,
+  } = useForm({
     defaultValues: {
-      sucursal: userData.idRol === 1 ? "" : userData.idSucursal.toString(),
+      sucursal: esAdmin ? "" : String(userData.idSucursal ?? ""),
       turno: "AM",
       fechaAProducir: fechaDefault,
       nombrePanadero: "",
@@ -119,119 +218,102 @@ const IngresarOrdenProd = () => {
   });
 
   useEffect(() => {
-    if (userData.idRol !== 1 && userData.idSucursal) {
-      setValue("sucursal", userData.idSucursal.toString());
+    if (!esAdmin && userData.idSucursal) {
+      setValue("sucursal", String(userData.idSucursal));
     }
-  }, [userData.idRol, userData.idSucursal, setValue]);
+  }, [esAdmin, userData.idSucursal, setValue]);
 
   useEffect(() => {
-    if (!loadingFechaProduccion) {
-      setValue("fechaAProducir", fechaDefault);
-    }
+    if (!loadingFechaProduccion) setValue("fechaAProducir", fechaDefault);
   }, [loadingFechaProduccion, fechaDefault, setValue]);
 
-  const turnoValue = watch("turno");
+  // ── Archivo ──────────────────────────────────────────────────────────────────
 
-  const [activeCategory, setActiveCategory] = useState("Panaderia");
-  const [trayQuantities, setTrayQuantities] = useState({});
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const [isPopupErrorOpen, setIsPopupErrorOpen] = useState(false);
-  const [errorPopupMessage, setErrorPopupMessage] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [showOrderSummary, setShowOrderSummary] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [productionTypeFilter, setProductionTypeFilter] = useState("todos");
-  const [showScrollButton, setShowScrollButton] = useState(false);
-
-  // CSV
-  const [modoIngreso, setModoIngreso] = useState("csv");
-  const [csvFile, setCsvFile] = useState(null);
-  const [csvLoading, setCsvLoading] = useState(false);
-  const [csvResult, setCsvResult] = useState(null);
-
-  const handleCloseOrderSummary = () => setShowOrderSummary(false);
-
-  const filteredProducts = productos.filter((p) => p.idCategoria === 1 || p.idCategoria === 2);
-  const productsToShow = getFilteredProductsByCategory(productos, searchTerm, activeCategory, usuario)
-    .filter((p) => productionTypeFilter === "todos" || p.tipoProduccion === productionTypeFilter);
-
-  const onSubmit = async () => setShowOrderSummary(true);
-
-  const handleConfirmOrder = async () => {
-    const data = getValues();
-    await handleIngresarOrdenProduccionSubmit(
-      data, trayQuantities, setTrayQuantities,
-      setIsPopupOpen, setErrorPopupMessage, setIsPopupErrorOpen,
-      setIsLoading, reset
-    );
-    setShowOrderSummary(false);
+  const mostrarError = (mensaje) => {
+    setErrorPopupMessage(mensaje);
+    setIsPopupErrorOpen(true);
   };
 
-  scrollToAlert(errorPopupMessage, isPopupErrorOpen, alertRef);
-
-  useEffect(() => {
-    const handleScroll = () => setShowScrollButton(window.scrollY > 20);
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  const scrollToTop = () => window.scrollTo({ top: 30, behavior: "smooth" });
-
-  const getFilterLabel = () => {
-    switch (productionTypeFilter) {
-      case "bandejas": return "Bandejas";
-      case "harina": return "Harina";
-      default: return "Todos los productos";
-    }
-  };
-
-  const handleCsvFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file && file.name.endsWith(".xlsx")) {
+  const seleccionarArchivo = (file) => {
+    if (!file) return;
+    if (esXlsx(file)) {
       setCsvFile(file);
-      setCsvResult(null);
     } else {
-      setErrorPopupMessage("Solo se permiten archivos .xlsx");
-      setIsPopupErrorOpen(true);
-      e.target.value = "";
+      mostrarError("Solo se permiten archivos .xlsx");
+      if (csvInputRef.current) csvInputRef.current.value = "";
     }
   };
 
-  const handleCsvUpload = async () => {
-    if (!csvFile) return;
+  const quitarArchivo = (e) => {
+    e.stopPropagation();
+    setCsvFile(null);
+    if (csvInputRef.current) csvInputRef.current.value = "";
+  };
 
-    const { idUsuario } = getUserData();
-    const data = getValues();
+  const abrirSelector = () => csvInputRef.current?.click();
 
-    if (!data.sucursal || !data.fechaAProducir || !data.turno || !data.nombrePanadero) {
-      setErrorPopupMessage("Ingresa el turno, la sucursal y/o el nombre del panadero.");
-      setIsPopupErrorOpen(true);
+  const onDropzoneKeyDown = (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      abrirSelector();
+    }
+  };
+
+  const onDragEnter = (e) => {
+    e.preventDefault();
+    dragDepth.current += 1;
+    setIsDraggingOver(true);
+  };
+
+  const onDragOver = (e) => e.preventDefault();
+
+  const onDragLeave = (e) => {
+    e.preventDefault();
+    dragDepth.current = Math.max(0, dragDepth.current - 1);
+    if (dragDepth.current === 0) setIsDraggingOver(false);
+  };
+
+  const onDrop = (e) => {
+    e.preventDefault();
+    dragDepth.current = 0;
+    setIsDraggingOver(false);
+    seleccionarArchivo(e.dataTransfer.files[0]);
+  };
+
+  // ── Envío ────────────────────────────────────────────────────────────────────
+
+  const limpiarFormulario = () => {
+    setCsvFile(null);
+    if (csvInputRef.current) csvInputRef.current.value = "";
+    reset({
+      sucursal: getValues("sucursal"),
+      turno: "AM",
+      fechaAProducir: fechaDefault,
+      nombrePanadero: "",
+    });
+  };
+
+  const onSubmit = async (data) => {
+    if (!csvFile) {
+      mostrarError("Selecciona el archivo .xlsx con la producción.");
       return;
     }
 
     setCsvLoading(true);
-    setCsvResult(null);
 
     try {
-      // ✅ Limpiar encoding antes de enviar
       const ordenHaader = JSON.stringify({
         idSucursal: data.sucursal,
         ordenTurno: data.turno,
         nombrePanadero: data.nombrePanadero,
         fechaAProducir: data.fechaAProducir,
-        idUsuario: idUsuario,
+        idUsuario: userData.idUsuario,
         fechaCreacion: getCurrentDateTimeWithSeconds(),
       });
 
       const formData = new FormData();
       const fechaArchivo = dayjs().format("YYYYMMDD-HHmmss");
-
-      // ✅ Usa csvLimpio en lugar de csvFile
-      formData.append(
-        "ordenProduccionBatch",
-        csvFile,
-        `orden-produccion-${fechaArchivo}.xlsx`
-      );
+      formData.append("ordenProduccionBatch", csvFile, `orden-produccion-${fechaArchivo}.xlsx`);
       formData.append("ordenHaader", ordenHaader);
 
       const res = await ingresarOrdenProduccionBatchService(formData);
@@ -240,594 +322,340 @@ const IngresarOrdenProd = () => {
         descargarPdfDuranteIngresoOrden(res.ordenProduccion.idOrdenGenerada);
       }
 
-      setCsvResult({ insertados: res.idOrdenProduccion ? 1 : 0 });
+      // Se limpia al terminar para evitar un doble envío mientras el aviso está visible
+      limpiarFormulario();
       setIsPopupOpen(true);
-
     } catch (error) {
       if (error.status === 409) {
-        setErrorPopupMessage(error.response.data.error.message);
+        mostrarError(error.response?.data?.error?.message ?? "La orden ya existe.");
       } else {
-        setErrorPopupMessage("Hubo un error al ingresar la orden. Inténtelo más tarde.");
+        mostrarError("Hubo un error al ingresar la orden. Inténtelo más tarde.");
       }
-      setIsPopupErrorOpen(true);
     } finally {
       setCsvLoading(false);
     }
   };
 
-  const handleRemoveCsv = (e) => {
-    e.stopPropagation();
-    setCsvFile(null);
-    setCsvResult(null);
-    if (csvInputRef.current) csvInputRef.current.value = "";
-  };
+  // ── Estado visual del dropzone ───────────────────────────────────────────────
 
-  const handleDescargarPlantilla = () => {
-    const link = document.createElement("a");
-    link.href = "/plantillas/plantilla_produccion.xlsxs";
-    link.download = "plantilla_produccion.xlsx";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
+  const dropzoneEstado = isDraggingOver
+    ? "border-brand-500 bg-brand-500/15"
+    : csvFile
+      ? "border-solid border-success-500/50 bg-success-500/10"
+      : "border-brand-500/40 bg-brand-500/5 hover:border-brand-500 hover:bg-brand-500/10";
 
-  /* Drag and drop */
-  const handleDragOver = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDraggingOver(true);
-  };
+  const envioVacio = !csvFile && !csvLoading;
 
-  const handleDragLeave = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDraggingOver(false);
-  };
-
-  const handleDrop = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDraggingOver(false);
-
-    const file = e.dataTransfer.files[0];
-    if (file && file.name.endsWith(".xlsx")) {
-      setCsvFile(file);
-      setCsvResult(null);
-    } else {
-      setErrorPopupMessage("Solo se permiten archivos .xlsx");
-      setIsPopupErrorOpen(true);
-    }
-  };
+  // ── Render ───────────────────────────────────────────────────────────────────
 
   return (
-    <Container className="glassmorphism-container py-4">
+    <div className="flex flex-col gap-5 pb-6">
+      {/* ── Header ── */}
+      <header className="flex items-center gap-3">
+        <button
+          type="button"
+          onClick={() => navigate("/ordenes-produccion")}
+          aria-label="Volver a órdenes de producción"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-line bg-surface text-muted shadow-card transition-colors hover:bg-brand-50 hover:text-brand-700 dark:hover:bg-brand-500/10 dark:hover:text-brand-300"
+        >
+          <FiArrowLeft size={17} />
+        </button>
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-600 text-white shadow-brand">
+          <FiClipboard size={19} />
+        </span>
+        <div className="min-w-0">
+          <h1 className="truncate text-xl font-bold text-ink sm:text-2xl">Nueva orden de producción</h1>
+          <p className="text-sm text-muted">Completa los datos del turno y sube el archivo con la producción</p>
+        </div>
+      </header>
 
-      {/* Banner ventana activa */}
       {ventanaActiva && (
-        <VentanaActivaBanner
-          segundosRestantes={segundosRestantes}
-          expiraEn={expiraEn}
+        <VentanaActivaBanner segundosRestantes={segundosRestantes} expiraEn={expiraEn} />
+      )}
+
+      <form onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col gap-5">
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
+          {/* ── Datos de la orden ── */}
+          <section className={`${CARD} space-y-4`}>
+            <SectionHeader
+              icon={FiClipboard}
+              tone="bg-brand-500/15 text-brand-600 dark:text-brand-300"
+              title="Datos de la orden"
+              subtitle="Se aplican a todo el archivo"
+            />
+
+            <Field label="Fecha de producción" htmlFor="fechaAProducir" error={errors.fechaAProducir?.message}>
+              <FiCalendar size={16} className={ICONO_CAMPO} />
+              <input
+                id="fechaAProducir"
+                type="date"
+                min={fechaMinima}
+                className={INPUT}
+                {...register("fechaAProducir", { required: "Selecciona una fecha" })}
+              />
+            </Field>
+            {ventanaActiva && (
+              <p className="-mt-2 flex items-center gap-1.5 text-sm text-brand-700 dark:text-brand-300">
+                <span className="h-1.5 w-1.5 rounded-full bg-brand-500" />
+                Hoy está habilitado para ingresar órdenes
+              </p>
+            )}
+
+            {/* Turno: radios reales con color por turno */}
+            <fieldset>
+              <legend className="mb-1.5 text-sm font-medium text-muted">Turno</legend>
+              <div className="grid grid-cols-2 gap-2">
+                {TURNOS.map(({ valor, Icono, activo }) => (
+                  <label key={valor} className="relative cursor-pointer">
+                    <input type="radio" value={valor} className="peer sr-only" {...register("turno")} />
+                    <span
+                      className={`flex items-center justify-center gap-2 rounded-xl border border-line bg-bg py-2.5 text-md font-semibold text-muted transition-colors hover:bg-surface-2 peer-focus-visible:ring-2 peer-focus-visible:ring-brand-500/40 ${activo}`}
+                    >
+                      <Icono size={16} />
+                      {valor}
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+
+            {/* Sucursal */}
+            <div>
+              {loadingSucursales ? (
+                <>
+                  <span className="mb-1.5 block text-sm font-medium text-muted">Sucursal</span>
+                  <div className="h-[42px] animate-pulse rounded-xl bg-surface-2" />
+                </>
+              ) : esAdmin ? (
+                <Field label="Sucursal" htmlFor="sucursal" error={errors.sucursal?.message}>
+                  <FiHome size={16} className={ICONO_CAMPO} />
+                  <select
+                    id="sucursal"
+                    className={`${INPUT} appearance-none pr-9`}
+                    {...register("sucursal", { required: "Selecciona una sucursal" })}
+                  >
+                    <option value="">Seleccionar sucursal</option>
+                    {sucursales.map((s) => (
+                      <option key={s.idSucursal} value={s.idSucursal}>
+                        {s.nombreSucursal}
+                      </option>
+                    ))}
+                  </select>
+                  <FiChevronDown
+                    size={15}
+                    className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-muted"
+                  />
+                </Field>
+              ) : (
+                <Field label="Sucursal" htmlFor="sucursal-asignada">
+                  <FiHome size={16} className={ICONO_CAMPO} />
+                  <input
+                    id="sucursal-asignada"
+                    type="text"
+                    readOnly
+                    value={getUserSucursalName(sucursales, userData)}
+                    className={`${INPUT} cursor-not-allowed pr-9 opacity-80`}
+                  />
+                  <FiLock
+                    size={14}
+                    className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-muted"
+                  />
+                  <input type="hidden" {...register("sucursal", { required: true })} />
+                </Field>
+              )}
+              {showErrorSucursales && (
+                <p className="mt-1.5 text-sm text-danger-600 dark:text-danger-400">
+                  No se pudieron cargar las sucursales.
+                </p>
+              )}
+            </div>
+
+            {/* Panadero */}
+            <Field label="Panadero responsable" htmlFor="nombrePanadero" error={errors.nombrePanadero?.message}>
+              <FiUser size={16} className={ICONO_CAMPO} />
+              <input
+                id="nombrePanadero"
+                type="text"
+                autoComplete="off"
+                placeholder="Nombre del panadero"
+                className={INPUT}
+                {...register("nombrePanadero", {
+                  required: "Ingresa el nombre del panadero",
+                  validate: (v) => v.trim().length > 0 || "Ingresa el nombre del panadero",
+                })}
+              />
+            </Field>
+          </section>
+
+          {/* ── Archivo ── */}
+          <section className={`${CARD} flex flex-col gap-4`}>
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <SectionHeader
+                icon={FiFileText}
+                tone="bg-accent-500/15 text-accent-600 dark:text-accent-300"
+                title="Archivo de producción"
+              />
+              <button
+                type="button"
+                onClick={() => descargarPlantillaOrden(productos)}
+                disabled={loadigProducts || !productos || productos.length === 0}
+                className="inline-flex items-center gap-2 rounded-xl border border-accent-500/30 bg-accent-500/10 px-3.5 py-2 text-sm font-medium text-accent-700 transition-colors hover:bg-accent-500/20 disabled:cursor-not-allowed disabled:opacity-50 dark:text-accent-300"
+              >
+                <FiDownload size={15} />
+                Descargar plantilla
+              </button>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-1.5 text-sm text-muted">
+              <span>Columnas requeridas:</span>
+              {COLUMNAS_REQUERIDAS.map((col) => (
+                <code
+                  key={col}
+                  className="rounded-md bg-brand-500/10 px-1.5 py-0.5 font-mono text-xs text-brand-700 dark:text-brand-300"
+                >
+                  {col}
+                </code>
+              ))}
+            </div>
+
+            {/* Zona de carga */}
+            <div
+              role="button"
+              tabIndex={0}
+              aria-label="Seleccionar archivo .xlsx"
+              onClick={abrirSelector}
+              onKeyDown={onDropzoneKeyDown}
+              onDragEnter={onDragEnter}
+              onDragOver={onDragOver}
+              onDragLeave={onDragLeave}
+              onDrop={onDrop}
+              className={`flex min-h-[190px] w-full cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed px-4 py-8 text-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40 ${dropzoneEstado}`}
+            >
+              <input
+                ref={csvInputRef}
+                type="file"
+                accept=".xlsx"
+                className="hidden"
+                onChange={(e) => seleccionarArchivo(e.target.files[0])}
+              />
+
+              {isDraggingOver ? (
+                <div className="flex flex-col items-center gap-2 text-brand-700 dark:text-brand-300">
+                  <FiUploadCloud size={44} />
+                  <p className="text-lg font-medium">Suelta el archivo aquí</p>
+                </div>
+              ) : csvFile ? (
+                <div className="flex w-full max-w-md items-center gap-3 text-left">
+                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-success-500/20 text-success-700 dark:text-success-300">
+                    <FiFileText size={22} />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-lg font-medium text-ink">{csvFile.name}</p>
+                    <p className="text-sm text-muted">{(csvFile.size / 1024).toFixed(1)} KB</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={quitarArchivo}
+                    aria-label="Quitar archivo"
+                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-muted transition-colors hover:bg-danger-500/10 hover:text-danger-600"
+                  >
+                    <FiX size={18} />
+                  </button>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center gap-1.5">
+                  <span className="mb-1 flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-500/15 text-brand-600 dark:text-brand-300">
+                    <FiUploadCloud size={26} />
+                  </span>
+                  <p className="text-lg font-medium text-ink">
+                    Toca para elegir un archivo{" "}
+                    <span className="text-brand-600 dark:text-brand-300">.xlsx</span>
+                  </p>
+                  <p className="text-sm text-muted">o arrástralo y suéltalo aquí</p>
+                </div>
+              )}
+            </div>
+          </section>
+        </div>
+
+        {/* ── Barra de acción fija ── */}
+        <div className="sticky bottom-[calc(var(--bottom-nav-height)+env(safe-area-inset-bottom))] z-10 lg:bottom-4">
+          <div className="flex items-center justify-between gap-3 rounded-2xl border border-line bg-surface/95 p-3 shadow-modal backdrop-blur">
+            <p className="flex min-w-0 items-center gap-2 pl-1 text-md text-muted">
+              {csvFile ? (
+                <FiCheckCircle size={16} className="shrink-0 text-success-600 dark:text-success-400" />
+              ) : (
+                <span className="h-2 w-2 shrink-0 rounded-full bg-warning-500" />
+              )}
+              <span className="truncate">
+                {csvFile ? "Archivo listo para enviar" : "Selecciona un archivo para continuar"}
+              </span>
+            </p>
+
+            <button
+              type="submit"
+              disabled={envioVacio || csvLoading}
+              className={`inline-flex shrink-0 items-center justify-center gap-2 rounded-xl px-5 py-3 text-md font-semibold transition-colors ${
+                envioVacio
+                  ? "cursor-not-allowed border border-line bg-surface-2 text-muted"
+                  : "border-0 bg-brand-600 text-white shadow-brand hover:bg-brand-500"
+              }`}
+            >
+              {csvLoading ? (
+                <>
+                  <span className="h-4 w-4 animate-spin-smooth rounded-full border-2 border-white/40 border-t-white" />
+                  Procesando...
+                </>
+              ) : (
+                <>
+                  <FiSend size={16} />
+                  Enviar orden
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+      </form>
+
+      {/* ── Avisos flotantes ── */}
+      {isPopupErrorOpen && (
+        <Alert
+          floating
+          position="top-right"
+          type="danger"
+          title="Ocurrió un error"
+          message={errorPopupMessage}
+          onDismiss={() => setIsPopupErrorOpen(false)}
+          autoClose
+          duration={3000}
         />
       )}
 
-      {/* Encabezado */}
-      <div className="text-center mb-5">
-        <div className="d-flex align-items-center justify-content-center gap-3">
-          <button
-            className="btn btn-return rounded-circle shadow-sm"
-            onClick={() => navigate("/ordenes-produccion")}
-          >
-            <BsArrowLeft size={20} />
-          </button>
-          <Title
-            title="Nueva Orden de Producción"
-            className="gradient-text"
-            icon="🍞"
-          />
-        </div>
-      </div>
-
-      {/* Manejo de Errores */}
-      {errorPopupMessage && !isPopupErrorOpen && (
-        <>
-          <div ref={alertRef} />
-          <Alert
-            type="danger"
-            message={errorPopupMessage}
-            icon={<BsExclamationTriangleFill />}
-            className="mt-4 mx-auto text-center"
-            style={{ maxWidth: "500px" }}
-          />
-        </>
+      {isPopupOpen && (
+        <Alert
+          floating
+          position="top-right"
+          type="success"
+          title="¡Orden ingresada!"
+          message="La orden de producción se agregó correctamente."
+          onDismiss={() => setIsPopupOpen(false)}
+          autoClose
+          duration={3000}
+          actions={[
+            {
+              label: "Ver órdenes",
+              variant: "primary",
+              onClick: () => navigate("/ordenes-produccion"),
+            },
+            {
+              label: "Ingresar otra",
+              variant: "secondary",
+              onClick: () => setIsPopupOpen(false),
+            },
+          ]}
+        />
       )}
-
-      {/* Formulario Principal */}
-      <Card className="glass-card mb-5">
-        <Card.Body className="p-4">
-          <Form onSubmit={handleSubmit(onSubmit)}>
-            <Row className="g-4">
-
-              {/* Fecha y Turno */}
-              <Col xs={12} lg={6}>
-                <Row className="g-3">
-                  <Col xs={12} md={6}>
-                    <Form.Group>
-                      <label className="form-label small text-uppercase text-muted fw-bold mb-2">
-                        Fecha de Producción
-                        {ventanaActiva && (
-                          <span className="vab-fecha-badge">Hoy habilitado</span>
-                        )}
-                      </label>
-                      <InputGroup className="modern-input-group">
-                        <Form.Control
-                          type="date"
-                          {...register("fechaAProducir", { required: "Seleccione una fecha" })}
-                          className="form-control modern-datepicker"
-                          min={fechaMinima}
-                        />
-                      </InputGroup>
-                      {errors.fechaAProducir && (
-                        <div className="text-danger small mt-1">{errors.fechaAProducir.message}</div>
-                      )}
-                    </Form.Group>
-                  </Col>
-
-                  <Col xs={12} md={6}>
-                    <Form.Group>
-                      <label className="form-label small text-uppercase text-muted fw-bold mb-2">
-                        Turno
-                      </label>
-                      <div className="d-flex gap-2 shift-selector">
-                        <Button
-                          variant={turnoValue === "AM" ? "primary" : "outline-primary"}
-                          className="shift-btn-ventas"
-                          onClick={() => setValue("turno", "AM")}
-                        >
-                          🌅 AM
-                        </Button>
-                        <Button
-                          variant={turnoValue === "PM" ? "primary" : "outline-primary"}
-                          className="shift-btn-ventas"
-                          onClick={() => setValue("turno", "PM")}
-                        >
-                          🌇 PM
-                        </Button>
-                      </div>
-                    </Form.Group>
-                  </Col>
-                </Row>
-              </Col>
-
-              {/* Sucursal y Panadero */}
-              <Col xs={12} lg={6}>
-                <Row className="g-3">
-                  <Col xs={12} md={6}>
-                    <Form.Group>
-                      <label className="form-label small text-uppercase text-muted fw-bold mb-2">
-                        Sucursal
-                      </label>
-                      {loadingSucursales ? (
-                        <div className="loading-spinner">
-                          <div className="spinner-border text-primary" role="status" />
-                        </div>
-                      ) : userData.idRol === 1 ? (
-                        <Form.Select
-                          {...register("sucursal", { required: "Seleccione sucursal" })}
-                          className="modern-select"
-                        >
-                          <option value="">Seleccionar sucursal</option>
-                          {sucursales.map((s) => (
-                            <option key={s.idSucursal} value={s.idSucursal}>
-                              {s.nombreSucursal}
-                            </option>
-                          ))}
-                        </Form.Select>
-                      ) : (
-                        <div className="sucursal-assigned">
-                          <Form.Control
-                            type="text"
-                            value={getUserSucursalName(sucursales, userData)}
-                            readOnly
-                            className="modern-input"
-                          />
-                          <input type="hidden" {...register("sucursal", { required: true })} />
-                        </div>
-                      )}
-                      {errors.sucursal && (
-                        <div className="text-danger small mt-1">{errors.sucursal.message}</div>
-                      )}
-                    </Form.Group>
-                  </Col>
-
-                  <Col xs={12} md={6}>
-                    <Form.Group>
-                      <label className="form-label small text-uppercase text-muted fw-bold mb-2">
-                        Panadero Responsable
-                      </label>
-                      <Form.Control
-                        type="text"
-                        placeholder="Nombre del panadero"
-                        {...register("nombrePanadero", { required: "Campo requerido" })}
-                        className="modern-input"
-                      />
-                      {errors.nombrePanadero && (
-                        <div className="text-danger small mt-1">{errors.nombrePanadero.message}</div>
-                      )}
-                    </Form.Group>
-                  </Col>
-                </Row>
-              </Col>
-            </Row>
-
-            {/* Botón submit — solo modo manual */}
-            {/* {modoIngreso === "manual" && (
-              <div className="text-center mt-5">
-                <Button
-                  variant="primary"
-                  className="submit-btn"
-                  type="submit"
-                  disabled={isLoading || loadingSucursales || loadigProducts || showErrorSucursales || showErrorProductos}
-                >
-                  {isLoading ? (
-                    <span className="spinner-border spinner-border-sm" role="status" />
-                  ) : (
-                    <>
-                      <span className="btn-icon">🚀</span>
-                      Guardar Orden
-                    </>
-                  )}
-                </Button>
-              </div>
-            )} */}
-          </Form>
-        </Card.Body>
-      </Card>
-
-      {/* Sección de Productos */}
-      {loadigProducts ? (
-        <div className="loading-products">
-          <div className="spinner-border text-primary" role="status" />
-        </div>
-      ) : (
-        <div className="products-section">
-
-          {/* Selector de modo */}
-          <div className="modo-selector">
-            {/* <button
-              className={`modo-btn ${modoIngreso === "manual" ? "active" : ""}`}
-              onClick={() => setModoIngreso("manual")}
-              type="button"
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-              </svg>
-              Ingreso manual
-            </button> */}
-            <button
-              className={`modo-btn ${modoIngreso === "csv" ? "active" : ""}`}
-              onClick={() => setModoIngreso("csv")}
-              type="button"
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                <polyline points="14 2 14 8 20 8" />
-                <line x1="12" y1="18" x2="12" y2="12" />
-                <line x1="9" y1="15" x2="15" y2="15" />
-              </svg>
-              Cargar archivo XLSX
-            </button>
-          </div>
-
-          {/* ── Modo Manual ── */}
-          {modoIngreso === "manual" && (
-            <>
-              {/* <div className="mb-4 search-filter-container">
-                <div className="search-wrapper">
-                  <Form.Control
-                    type="text"
-                    placeholder="Buscar producto por nombre..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="search-input"
-                  />
-                  <FaSearch className="search-icon" />
-                </div>
-
-                <Dropdown className="filter-dropdown">
-                  <Dropdown.Toggle variant="primary" id="dropdown-filter">
-                    <BsFilter className="me-2" />
-                    {getFilterLabel()}
-                  </Dropdown.Toggle>
-                  <Dropdown.Menu>
-                    <Dropdown.Item active={productionTypeFilter === "todos"} onClick={() => setProductionTypeFilter("todos")}>
-                      Todos los productos
-                    </Dropdown.Item>
-                    <Dropdown.Item active={productionTypeFilter === "bandejas"} onClick={() => setProductionTypeFilter("bandejas")}>
-                      Bandejas
-                    </Dropdown.Item>
-                    <Dropdown.Item active={productionTypeFilter === "harina"} onClick={() => setProductionTypeFilter("harina")}>
-                      Harina
-                    </Dropdown.Item>
-                  </Dropdown.Menu>
-                </Dropdown>
-              </div>
-
-              <div className="table-responsive excel-table-container">
-                <Table striped bordered hover className="excel-table">
-                  <thead>
-                    <tr>
-                      <th className="dark-header text-center">Producto</th>
-                      <th className="dark-header text-center">Cantidad</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {productsToShow.length > 0 ? (
-                      productsToShow.map((producto) => (
-                        <tr key={producto.idProducto}>
-                          <td className="text-center align-middle">
-                            <div className="product-info">
-                              <div
-                                className="product-badge-ingresar-orden"
-                                style={{ backgroundColor: getUniqueColor(producto.nombreProducto) }}
-                              >
-                                {getInitials(producto.nombreProducto)}
-                              </div>
-                              <span className="product-name">{producto.nombreProducto}</span>
-                            </div>
-                          </td>
-                          <td className="text-center align-middle">
-                            <div className="quantity-input-container">
-                              <span
-                                style={{
-                                  fontSize: "16px",
-                                  fontWeight: "bold",
-                                  color: producto.tipoProduccion === "bandejas" ? "#28a745" : "#007bff",
-                                }}
-                                className="quantity-type-label"
-                              >
-                                {producto.tipoProduccion === "bandejas" ? "Bandejas" : "Libras"}
-                              </span>
-                              <Form.Control
-                                type="number"
-                                min="0"
-                                value={trayQuantities[producto.idProducto]?.cantidad || ""}
-                                onChange={(e) =>
-                                  setTrayQuantities({
-                                    ...trayQuantities,
-                                    [producto.idProducto]: {
-                                      cantidad:             parseInt(e.target.value) || 0,
-                                      idCategoria:          producto.idCategoria,
-                                      tipoProduccion:       producto.tipoProduccion,
-                                      controlarStock:       producto.controlarStock,
-                                      controlarStockDiario: producto.controlarStockDiario,
-                                    },
-                                  })
-                                }
-                                onWheel={(e) => e.target.blur()}
-                                className="quantity-input"
-                                placeholder="0"
-                              />
-                            </div>
-                          </td>
-                        </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td colSpan="2" className="text-center py-4">
-                          {productos.length === 0 ? "No se han ingresado Productos." : "No se encontraron Productos."}
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </Table>
-              </div> */}
-            </>
-          )}
-
-          {/* ── Modo CSV ── */}
-          {modoIngreso === "csv" && (
-            <div className="csv-section">
-
-              {/* Info formato + botón plantilla */}
-              <div className="csv-format-info-wrap">
-                <div className="csv-format-info">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                    <circle cx="12" cy="12" r="10" />
-                    <line x1="12" y1="8" x2="12" y2="12" />
-                    <line x1="12" y1="16" x2="12.01" y2="16" />
-                  </svg>
-                  <span>El archivo debe tener las columnas: <strong>idProducto, cantidad, tipoProduccion</strong></span>
-                </div>
-                <button
-                  type="button"
-                  className="csv-plantilla-btn"
-                  onClick={() => descargarPlantillaOrden(productos)}
-                  disabled={!productos || productos.length === 0}
-                >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                    <polyline points="7 10 12 15 17 10" />
-                    <line x1="12" y1="15" x2="12" y2="3" />
-                  </svg>
-                  Descargar plantilla
-                </button>
-              </div>
-
-              {/* Drop zone */}
-              <div
-                className={`csv-dropzone ${csvFile ? "has-file" : ""} ${isDraggingOver ? "dragging" : ""}`}
-                onClick={() => !isDraggingOver && csvInputRef.current?.click()}
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                onDrop={handleDrop}
-              >
-                <input
-                  ref={csvInputRef}
-                  type="file"
-                  accept=".xlsx"
-                  onChange={handleCsvFileChange}
-                  style={{ display: "none" }}
-                />
-                {isDraggingOver ? (
-                  <div className="csv-drag-overlay">
-                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
-                      stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
-                      <polyline points="16 16 12 12 8 16" />
-                      <line x1="12" y1="12" x2="12" y2="21" />
-                      <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3" />
-                    </svg>
-                    <p className="csv-drag-text">Suelta el archivo aquí</p>
-                  </div>
-                ) : csvFile ? (
-                  <div className="csv-file-selected">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none"
-                      stroke="#6a01ac" strokeWidth="1.8" strokeLinecap="round">
-                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                      <polyline points="14 2 14 8 20 8" />
-                    </svg>
-                    <div>
-                      <p className="csv-filename">{csvFile.name}</p>
-                      <p className="csv-filesize">{(csvFile.size / 1024).toFixed(1)} KB</p>
-                    </div>
-                    <button
-                      className="csv-remove-btn"
-                      onClick={handleRemoveCsv}
-                      type="button"
-                      aria-label="Quitar archivo"
-                    >
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                        <line x1="18" y1="6" x2="6" y2="18" />
-                        <line x1="6" y1="6" x2="18" y2="18" />
-                      </svg>
-                    </button>
-                  </div>
-                ) : (
-                  <div className="csv-empty">
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none"
-                      stroke="#9e9e9e" strokeWidth="1.5" strokeLinecap="round">
-                      <polyline points="16 16 12 12 8 16" />
-                      <line x1="12" y1="12" x2="12" y2="21" />
-                      <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3" />
-                    </svg>
-                    <p className="csv-empty-text">Haz clic para seleccionar un archivo <strong>.xlsx</strong></p>
-                    <p className="csv-empty-text">O arrastra y suelta un archivo aquí</p>
-                  </div>
-                )}
-              </div>
-
-              {/* Resultado */}
-              {csvResult && (
-                <div className="csv-result">
-                  <div className="csv-result-item success">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-                      stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
-                      <polyline points="20 6 9 17 4 12" />
-                    </svg>
-                    {csvResult.insertados} producto{csvResult.insertados !== 1 ? "s" : ""} insertado{csvResult.insertados !== 1 ? "s" : ""}
-                  </div>
-                  {csvResult.errores?.length > 0 && (
-                    <div className="csv-result-item error">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                        <circle cx="12" cy="12" r="10" />
-                        <line x1="12" y1="8" x2="12" y2="12" />
-                        <line x1="12" y1="16" x2="12.01" y2="16" />
-                      </svg>
-                      {csvResult.errores.length} fila{csvResult.errores.length !== 1 ? "s" : ""} con error
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Botón enviar */}
-              <button
-                className="csv-submit-btn"
-                onClick={handleCsvUpload}
-                disabled={!csvFile || csvLoading}
-                type="button"
-              >
-                {csvLoading ? (
-                  <>
-                    <span className="csv-spinner" />
-                    Procesando...
-                  </>
-                ) : (
-                  <>
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
-                      stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                      <line x1="22" y1="2" x2="11" y2="13" />
-                      <polygon points="22 2 15 22 11 13 2 9 22 2" />
-                    </svg>
-                    Enviar archivo
-                  </>
-                )}
-              </button>
-
-            </div>
-          )}
-
-        </div>
-      )}
-
-      {/* Botón flotante scroll */}
-      {showScrollButton && (
-        <button
-          onClick={scrollToTop}
-          className="btn btn-dark rounded-circle shadow"
-          style={{
-            position: "fixed", bottom: "1px", right: "1px",
-            width: "40px", height: "40px",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            transition: "opacity 0.3s ease, transform 0.3s ease",
-            opacity: showScrollButton ? 1 : 0,
-            transform: showScrollButton ? "translateY(0)" : "translateY(20px)",
-            pointerEvents: showScrollButton ? "auto" : "none",
-            zIndex: 1000,
-          }}
-        >
-          <BsArrowUp size={20} />
-        </button>
-      )}
-
-      {/* Resumen de Orden */}
-      <OrderSummary
-        show={showOrderSummary}
-        handleClose={handleCloseOrderSummary}
-        orderData={getValues()}
-        trayQuantities={trayQuantities}
-        productos={filteredProducts}
-        sucursales={sucursales}
-        onConfirm={handleConfirmOrder}
-        isLoading={isLoading}
-      />
-
-      {/* Popup Éxito */}
-      <SuccessPopup
-        isOpen={isPopupOpen}
-        onClose={() => setIsPopupOpen(false)}
-        title="¡Éxito!"
-        message="La orden se agregó correctamente"
-        nombreBotonVolver="Ver Ordenes"
-        nombreBotonNuevo="Ingresar orden"
-        onView={() => navigate("/ordenes-produccion")}
-        onNew={() => { setIsPopupOpen(false); reset(); }}
-      />
-
-      {/* Popup Errores */}
-      <ErrorPopup
-        isOpen={isPopupErrorOpen}
-        onClose={() => setIsPopupErrorOpen(false)}
-        title="¡Error!"
-        message={errorPopupMessage}
-      />
-
-    </Container>
+    </div>
   );
 };
 

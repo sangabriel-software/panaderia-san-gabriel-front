@@ -28,3 +28,12 @@ export const consultarStockProductosDelDiaService = async (idSucursal, fechaDelD
       throw error;
     }
 }
+
+export const cosultarStockGeneralService = async (idSucursal, fechaDelDia) => {
+  try {
+      const response = await api.get(`${getEndpoints.GET_STOCK_GENERAL}?idSucursal=${idSucursal}&fecha=${fechaDelDia}`); 
+      return response.data;
+  } catch (error) {
+    throw error;
+  }
+}

@@ -1,19 +1,32 @@
 import { useNavigate, useParams } from "react-router";
-import { BsArrowLeft, BsX, BsArrowUp } from "react-icons/bs";
-import Title from "../../../components/Title/Title";
-import { Container, Spinner, Alert, Form, Table, Dropdown, Button } from "react-bootstrap";
-import { FaBoxOpen, FaSearch, FaPlus } from "react-icons/fa";
-import DotsMove from "../../../components/Spinners/DotsMove";
+import {
+  FiArrowLeft,
+  FiX,
+  FiArrowUp,
+  FiSearch,
+  FiPlus,
+  FiMinusCircle,
+  FiShuffle,
+  FiBox,
+  FiPackage,
+  FiClock,
+  FiFilter,
+  FiChevronDown,
+} from "react-icons/fi";
 import { useState, useMemo, useEffect } from "react";
-import { useMediaQuery } from "react-responsive";
 import { getInitials, getUniqueColor } from "../IngresarStock/IngresarStock.utils";
 import useGetStockGeneral from "../../../hooks/stock/useGetStockGeneral";
-import "./StockUnificado.styes.css";
 import useGetSucursales from "../../../hooks/sucursales/useGetSucursales";
 import { decryptId } from "../../../utils/CryptoParams";
 import useGetStockDelDia from "../../../hooks/stock/useGetStockDelDia";
 
-const StockUnificado = () => {
+const ACTIONS_TONES = {
+  brand: { icon: "bg-brand-600", bg: "bg-brand-50", text: "text-brand-700" },
+  warning: { icon: "bg-warning-500", bg: "bg-warning-50", text: "text-warning-700" },
+  accent: { icon: "bg-accent-600", bg: "bg-accent-50", text: "text-accent-700" },
+};
+
+function StockUnificado() {
   const { idSucursal } = useParams();
   const { stockGeneral, loadingStockGeneral } = useGetStockGeneral(idSucursal);
   const { stockDelDia, loadingStockDiario } = useGetStockDelDia(idSucursal);
@@ -21,142 +34,99 @@ const StockUnificado = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [showScrollButton, setShowScrollButton] = useState(false);
-  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: "ascending" });
   const [categoriaActiva, setCategoriaActiva] = useState("Todas");
 
   const decryptedIdSucursal = decryptId(decodeURIComponent(idSucursal));
-  const sucursal = sucursales?.find(item => 
-    Number(item.idSucursal) === Number(decryptedIdSucursal)
-  );
+  const sucursal = sucursales?.find((item) => Number(item.idSucursal) === Number(decryptedIdSucursal));
 
-  const handleIngresarStock = () => {
-    navigate(`/stock-productos/ingresar-stock/${encodeURIComponent(idSucursal)}`);
-  };
+  const handleIngresarStock = () => navigate(`/stock-productos/ingresar-stock/${encodeURIComponent(idSucursal)}`);
+  const handleDescontarStock = () => navigate(`/descuento-stock/stock-descuentos-lista/${encodeURIComponent(idSucursal)}`);
+  const handleTraslados = () => navigate(`/traslados-productos/traslados-lista/${encodeURIComponent(idSucursal)}`);
 
-  const handleDescontarStock = () => {
-    navigate(`/descuento-stock/stock-descuentos-lista/${encodeURIComponent(idSucursal)}`);
-  };
-
-
-  // Verificación segura de stocks vacíos
   const isStockDiarioEmpty = useMemo(() => {
-    return !stockDelDia || 
-           !Array.isArray(stockDelDia) ||
-           stockDelDia.length === 0 || 
-           (stockDelDia.length === 1 && stockDelDia[0]?.idStockDiario === 0);
+    return (
+      !stockDelDia ||
+      !Array.isArray(stockDelDia) ||
+      stockDelDia.length === 0 ||
+      (stockDelDia.length === 1 && stockDelDia[0]?.idStockDiario === 0)
+    );
   }, [stockDelDia]);
 
   const isStockGeneralEmpty = useMemo(() => {
     return !stockGeneral || !Array.isArray(stockGeneral) || stockGeneral.length === 0;
   }, [stockGeneral]);
 
-  // Combinación segura de stocks con prioridad al stock diario
   const combinedStock = useMemo(() => {
-    // Si ambos están vacíos, retornar array vacío
     if (isStockDiarioEmpty && isStockGeneralEmpty) return [];
-    
-    // Obtener productos del día (filtrados y marcados)
-    const productosDia = Array.isArray(stockDelDia) 
-      ? stockDelDia
-          .filter(item => item?.idStockDiario !== 0)
-          .map(item => ({ ...item, esStockDiario: true }))
+
+    const productosDia = Array.isArray(stockDelDia)
+      ? stockDelDia.filter((item) => item?.idStockDiario !== 0).map((item) => ({ ...item, esStockDiario: true }))
       : [];
-    
-    // Obtener productos generales (filtrados y marcados)
-    const productosGenerales = Array.isArray(stockGeneral) 
+
+    const productosGenerales = Array.isArray(stockGeneral)
       ? stockGeneral
-          .filter(genItem => !productosDia.some(diaItem => diaItem.idProducto === genItem.idProducto))
-          .map(item => ({ ...item, esStockDiario: false }))
+          .filter((genItem) => !productosDia.some((diaItem) => diaItem.idProducto === genItem.idProducto))
+          .map((item) => ({ ...item, esStockDiario: false }))
       : [];
-    
-    // Combinar dando prioridad a los productos del día
+
     return [...productosDia, ...productosGenerales];
   }, [stockGeneral, stockDelDia, isStockDiarioEmpty, isStockGeneralEmpty]);
 
-  // Detectar dispositivos
-  const isMobile = useMediaQuery({ maxWidth: 767 });
-
-  // Obtención segura de categorías
   const categorias = useMemo(() => {
     try {
-      if (!Array.isArray(combinedStock) || combinedStock.length === 0) return ['Todas'];
-      
-      const categoriasUnicas = [...new Set(
-        combinedStock
-          .map(item => item?.nombreCategoria)
-          .filter(cat => cat && typeof cat === 'string')
-      )];
-      return ['Todas', ...categoriasUnicas];
+      if (!Array.isArray(combinedStock) || combinedStock.length === 0) return ["Todas"];
+      const categoriasUnicas = [
+        ...new Set(combinedStock.map((item) => item?.nombreCategoria).filter((cat) => cat && typeof cat === "string")),
+      ];
+      return ["Todas", ...categoriasUnicas];
     } catch (error) {
-      console.error('Error al obtener categorías:', error);
-      return ['Todas'];
+      console.error("Error al obtener categorías:", error);
+      return ["Todas"];
     }
   }, [combinedStock]);
 
-  // Efecto para mostrar/ocultar el botón de scroll
   useEffect(() => {
-    const handleScroll = () => {
-      setShowScrollButton(window.scrollY > 100);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    const handleScroll = () => setShowScrollButton(window.scrollY > 200);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Función para volver al inicio
-  const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
-  };
+  const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
-  // Función para ordenar la tabla
   const requestSort = (key) => {
-    let direction = 'ascending';
-    if (sortConfig.key === key && sortConfig.direction === 'ascending') {
-      direction = 'descending';
+    let direction = "ascending";
+    if (sortConfig.key === key && sortConfig.direction === "ascending") {
+      direction = "descending";
     }
     setSortConfig({ key, direction });
   };
 
-  const isEmptyStock = useMemo(() => {
-    return !Array.isArray(combinedStock) || combinedStock.length === 0;
-  }, [combinedStock]);
+  const isEmptyStock = useMemo(() => !Array.isArray(combinedStock) || combinedStock.length === 0, [combinedStock]);
 
-  // Filtrar y ordenar productos de forma segura
   const filteredProducts = useMemo(() => {
     if (!Array.isArray(combinedStock)) return [];
-    
+
     let filtered = combinedStock.filter((producto) => {
       const matchesSearch = producto?.nombreProducto?.toLowerCase()?.includes(searchTerm.toLowerCase()) ?? false;
       const matchesCategory = categoriaActiva === "Todas" || producto?.nombreCategoria === categoriaActiva;
       return matchesSearch && matchesCategory;
     });
 
-    // Ordenar si hay configuración de ordenamiento
     if (sortConfig.key) {
       filtered.sort((a, b) => {
-        // Primero ordenar por si es stock diario (los del día primero)
         if (a.esStockDiario && !b.esStockDiario) return -1;
         if (!a.esStockDiario && b.esStockDiario) return 1;
-        
-        // Luego por el criterio de ordenamiento seleccionado
+
         const aValue = a[sortConfig.key];
         const bValue = b[sortConfig.key];
-        
         if (aValue == null) return 1;
         if (bValue == null) return -1;
-        
-        if (aValue < bValue) {
-          return sortConfig.direction === 'ascending' ? -1 : 1;
-        }
-        if (aValue > bValue) {
-          return sortConfig.direction === 'ascending' ? 1 : -1;
-        }
+        if (aValue < bValue) return sortConfig.direction === "ascending" ? -1 : 1;
+        if (aValue > bValue) return sortConfig.direction === "ascending" ? 1 : -1;
         return 0;
       });
     } else {
-      // Orden por defecto: primero stock diario, luego general
       filtered.sort((a, b) => {
         if (a.esStockDiario && !b.esStockDiario) return -1;
         if (!a.esStockDiario && b.esStockDiario) return 1;
@@ -167,262 +137,272 @@ const StockUnificado = () => {
     return filtered;
   }, [combinedStock, searchTerm, sortConfig, categoriaActiva]);
 
-  const handleClearSearch = () => {
-    setSearchTerm("");
+  const handleClearSearch = () => setSearchTerm("");
+
+  const SortIndicator = ({ column }) => {
+    if (sortConfig.key !== column) return null;
+    return (
+      <FiArrowUp
+        size={12}
+        className={`transition-transform duration-150 ${sortConfig.direction === "descending" ? "rotate-180" : ""}`}
+      />
+    );
   };
 
   if (loadingStockGeneral || loadingStockDiario || loadingSucursales) {
     return (
-      <Container
-        className="d-flex justify-content-center align-items-center"
-        style={{ minHeight: "70vh" }}
-      >
-        <DotsMove />
-      </Container>
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <span className="h-10 w-10 animate-spin-smooth rounded-full border-4 border-brand-200 border-t-brand-600" />
+      </div>
     );
   }
 
   return (
-    <Container className="stock-general-container">
-      {/* ---------------- Titulo ----------------- */}
-      <div className="text-center mb-3">
-        <div className="row">
-          <div className="col-2">
-            <button
-              className="btn bt-return rounded-circle d-flex align-items-center justify-content-center shadow"
-              style={{ width: "40px", height: "40px" }}
-              onClick={() => navigate("/stock-productos")}
-            >
-              <BsArrowLeft size={20} />
-            </button>
-          </div>
-          <div className="col-8">
-            <Title
-              title={`Inventario General ${sucursal?.nombreSucursal}`}
-              description="Todos los productos disponibles en inventario"
-            />
-          </div>
+    <div className="flex flex-col gap-6">
+      {/* ── Header ───────────────────────────────────────────────────── */}
+      <header className="flex items-center gap-3">
+        <button
+          type="button"
+          onClick={() => navigate("/stock-productos")}
+          aria-label="Volver"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-line bg-surface text-muted shadow-card transition-colors hover:bg-brand-50 hover:text-brand-700"
+        >
+          <FiArrowLeft size={17} />
+        </button>
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-600 text-white shadow-brand">
+          <FiBox size={19} />
+        </span>
+        <div className="min-w-0">
+          <h1 className="truncate text-xl font-bold text-ink sm:text-2xl">
+            Inventario General {sucursal?.nombreSucursal}
+          </h1>
+          <p className="text-sm text-muted">Todos los productos disponibles en inventario</p>
         </div>
-      </div>
+      </header>
 
-      {/* Acciones de inventario */}
-      <div className="su-actions-wrap">
+      {/* ── Acciones de inventario ──────────────────────────────────── */}
+      <section className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <button
+          type="button"
+          onClick={handleIngresarStock}
+          className={`flex items-center gap-3 rounded-2xl border-0 p-4 text-left transition-colors duration-150 ${ACTIONS_TONES.brand.bg} hover:brightness-95`}
+        >
+          <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-white ${ACTIONS_TONES.brand.icon}`}>
+            <FiPlus size={18} />
+          </span>
+          <div className="min-w-0">
+            <p className={`text-sm font-semibold ${ACTIONS_TONES.brand.text}`}>Ingresar Inventario</p>
+            <p className="text-xs text-muted">Agregar unidades</p>
+          </div>
+        </button>
 
-        {/* Botones de acción */}
-        <div className="su-action-btns">
-          <button className="su-action-btn su-action-btn--green" onClick={handleIngresarStock}>
-            <span className="su-action-btn__icon">
-              <FaPlus size={15} />
-            </span>
-            <span className="su-action-btn__text">
-              <span className="su-action-btn__label">Ingresar Inventario</span>
-              <span className="su-action-btn__sub">Agregar unidades</span>
-            </span>
-          </button>
+        <button
+          type="button"
+          onClick={handleDescontarStock}
+          className={`flex items-center gap-3 rounded-2xl border-0 p-4 text-left transition-colors duration-150 ${ACTIONS_TONES.warning.bg} hover:brightness-95`}
+        >
+          <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-white ${ACTIONS_TONES.warning.icon}`}>
+            <FiMinusCircle size={18} />
+          </span>
+          <div className="min-w-0">
+            <p className={`text-sm font-semibold ${ACTIONS_TONES.warning.text}`}>Descontar Inventario</p>
+            <p className="text-xs text-muted">Reducir inventario</p>
+          </div>
+        </button>
 
-          <button
-            className="su-action-btn su-action-btn--amber"
-            onClick={handleDescontarStock}
-          >
-            <span className="su-action-btn__icon">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
-                <line x1="12" y1="5" x2="12" y2="19"/>
-                <line x1="5" y1="12" x2="19" y2="12"/>
-                <circle cx="12" cy="12" r="10"/>
-                <line x1="8" y1="12" x2="16" y2="12"/>
-              </svg>
-            </span>
-            <span className="su-action-btn__text">
-              <span className="su-action-btn__label">Descontar Inventario</span>
-              <span className="su-action-btn__sub">Reducir Inventario</span>
-            </span>
-          </button>
+        <button
+          type="button"
+          onClick={handleTraslados}
+          className={`flex items-center gap-3 rounded-2xl border-0 p-4 text-left transition-colors duration-150 ${ACTIONS_TONES.accent.bg} hover:brightness-95`}
+        >
+          <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-white ${ACTIONS_TONES.accent.icon}`}>
+            <FiShuffle size={18} />
+          </span>
+          <div className="min-w-0">
+            <p className={`text-sm font-semibold ${ACTIONS_TONES.accent.text}`}>Traslados</p>
+            <p className="text-xs text-muted">Mover entre sucursales</p>
+          </div>
+        </button>
+      </section>
 
-          <button
-            className="su-action-btn su-action-btn--blue"
-            onClick={() => navigate("/traslados-productos")}
-          >
-            <span className="su-action-btn__icon">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
-                <path d="M5 17H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v3"/>
-                <rect x="9" y="11" width="14" height="10" rx="2"/>
-                <path d="M16 11v-3"/>
-              </svg>
-            </span>
-            <span className="su-action-btn__text">
-              <span className="su-action-btn__label">Traslados</span>
-              <span className="su-action-btn__sub">Mover entre sucursales</span>
-            </span>
-          </button>
-        </div>
-
-        {/* Búsqueda y filtro */}
-        <div className="su-search-filter">
-          <div className="su-search-wrap">
-            <FaSearch className="su-search-icon" />
-            <Form.Control
+      {/* ── Filtros ──────────────────────────────────────────────────── */}
+      <div className="rounded-2xl border border-line bg-surface p-4 shadow-card">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <div className="relative min-w-0 flex-1">
+            <FiSearch size={15} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" />
+            <input
               type="text"
               placeholder="Buscar producto..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="su-search-input"
+              className="w-full rounded-xl border border-line bg-surface py-2.5 pl-10 pr-9 text-sm text-ink placeholder:text-muted transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/25"
             />
             {searchTerm && (
-              <button className="su-search-clear" onClick={handleClearSearch} aria-label="Limpiar">
-                <BsX size={18} />
+              <button
+                type="button"
+                onClick={handleClearSearch}
+                aria-label="Limpiar búsqueda"
+                className="absolute right-2.5 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-md border-0 bg-transparent text-muted transition-colors hover:text-ink"
+              >
+                <FiX size={16} />
               </button>
             )}
           </div>
 
-          <Dropdown>
-            <Dropdown.Toggle
-              variant="light"
-              id="dropdown-categorias"
-              className="su-cat-toggle"
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" strokeWidth="2" strokeLinecap="round"
-                style={{ marginRight: 6 }}>
-                <line x1="8" y1="6" x2="21" y2="6"/>
-                <line x1="8" y1="12" x2="21" y2="12"/>
-                <line x1="8" y1="18" x2="21" y2="18"/>
-                <line x1="3" y1="6" x2="3.01" y2="6"/>
-                <line x1="3" y1="12" x2="3.01" y2="12"/>
-                <line x1="3" y1="18" x2="3.01" y2="18"/>
-              </svg>
-              {categoriaActiva === "Todas" ? "Categoría" : categoriaActiva}
-            </Dropdown.Toggle>
-            <Dropdown.Menu className="su-cat-menu">
-              {categorias.map((categoria) => (
-                <Dropdown.Item
-                  key={categoria}
-                  active={categoriaActiva === categoria}
-                  onClick={() => setCategoriaActiva(categoria)}
-                  className="su-cat-item"
-                >
-                  {categoria}
-                </Dropdown.Item>
-              ))}
-            </Dropdown.Menu>
-          </Dropdown>
+          {/* Dropdown de categorías en móvil — <select> nativo */}
+          {categorias.length > 1 && (
+            <div className="relative shrink-0 sm:hidden">
+              <FiFilter size={14} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" />
+              <select
+                value={categoriaActiva}
+                onChange={(e) => setCategoriaActiva(e.target.value)}
+                className="w-full appearance-none rounded-xl border border-line bg-surface py-2.5 pl-10 pr-9 text-sm font-medium text-ink transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/25"
+              >
+                {categorias.map((categoria) => (
+                  <option key={categoria} value={categoria}>
+                    {categoria}
+                  </option>
+                ))}
+              </select>
+              <FiChevronDown
+                size={14}
+                className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-muted"
+              />
+            </div>
+          )}
         </div>
 
+        {/* Categorías como chips — solo en desktop */}
+        {categorias.length > 1 && (
+          <div className="mt-3 hidden flex-wrap gap-2 sm:flex">
+            {categorias.map((categoria) => (
+              <button
+                key={categoria}
+                type="button"
+                onClick={() => setCategoriaActiva(categoria)}
+                className={`shrink-0 rounded-full border-0 px-3.5 py-1.5 text-xs font-medium transition-colors duration-150 ${
+                  categoriaActiva === categoria
+                    ? "bg-brand-600 text-white shadow-brand"
+                    : "bg-surface-2 text-muted hover:bg-brand-50 hover:text-brand-700"
+                }`}
+              >
+                {categoria}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
-      {/* Contenido condicional */}
+      {/* ── Contenido ────────────────────────────────────────────────── */}
       {isEmptyStock ? (
-        <div className="row justify-content-center">
-          <div className="col-md-8">
-            <Alert variant="info" className="stock-general-empty-alert">
-              <FaBoxOpen className="me-2" />
-              No hay productos disponibles en el stock.
-            </Alert>
-          </div>
+        <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-line bg-surface py-16 text-center">
+          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-surface-2 text-muted">
+            <FiPackage size={20} />
+          </span>
+          <p className="text-sm text-muted">No hay productos disponibles en el stock.</p>
         </div>
       ) : (
-        <div className="table-responsive excel-like-table-container">
-          <Table striped bordered hover className="excel-like-table">
-            <thead>
+        <div className="overflow-hidden rounded-2xl border border-line bg-surface shadow-card">
+          {/* table-fixed: los anchos de columna los mandan las clases w-*, no el contenido.
+              Desktop: 3 columnas iguales (1/3 c/u). Móvil: "Unidad" se oculta y
+              Producto/Cantidad se reparten 60% / 40%. */}
+          <table className="w-full table-fixed border-collapse text-sm">
+            <thead className="bg-surface-2/95">
               <tr>
                 <th
                   onClick={() => requestSort("nombreProducto")}
-                  className="sortable-header dark-header text-center align-middle"
+                  className="w-3/5 cursor-pointer select-none border-b border-line px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted sm:w-1/3"
                 >
-                  <div className="header-content">
-                    Producto
-                    {sortConfig.key === "nombreProducto" && (
-                      <BsArrowUp
-                        className={`sort-icon ${
-                          sortConfig.direction === "descending"
-                            ? "descending"
-                            : ""
-                        }`}
-                      />
-                    )}
+                  <div className="flex items-center gap-1.5">
+                    Producto <SortIndicator column="nombreProducto" />
                   </div>
                 </th>
                 <th
                   onClick={() => requestSort("cantidadExistente")}
-                  className="sortable-header dark-header text-center align-middle"
+                  className="w-2/5 cursor-pointer select-none border-b border-line px-2 py-3 text-center text-xs font-semibold uppercase tracking-wide text-muted sm:w-1/3 sm:px-4"
                 >
-                  <div className="header-content">
-                    Cantidad
-                    {sortConfig.key === "cantidadExistente" && (
-                      <BsArrowUp
-                        className={`sort-icon ${
-                          sortConfig.direction === "descending"
-                            ? "descending"
-                            : ""
-                        }`}
-                      />
-                    )}
+                  <div className="flex items-center justify-center gap-1.5">
+                    Cantidad <SortIndicator column="cantidadExistente" />
                   </div>
                 </th>
-                <th className="dark-header text-center align-middle">
+                <th className="hidden border-b border-line px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-muted sm:table-cell sm:w-1/3">
                   Unidad
                 </th>
               </tr>
             </thead>
             <tbody>
               {filteredProducts.length > 0 ? (
-                filteredProducts.map((producto) => {
+                filteredProducts.map((producto, i) => {
                   const esFrances = producto.nombreProducto === "Frances";
-                  const cantidadMostrada = producto.cantidadExistente;
-                  
+                  const unidad = esFrances ? "Filas" : "Unidades";
                   return (
-                    <tr key={`${producto.idProducto}-${producto.esStockDiario ? 'dia' : 'gen'}`}>
-                      <td className="product-cell">
-                        <div className="product-info">
-                          <div
-                            className="product-badge-general"
-                            style={{
-                              backgroundColor: getUniqueColor(
-                                producto.nombreProducto
-                              ),
-                            }}
+                    <tr
+                      key={`${producto.idProducto}-${producto.esStockDiario ? "dia" : "gen"}`}
+                      className={`border-b border-line last:border-0 transition-colors hover:bg-brand-50/50 ${
+                        i % 2 === 1 ? "bg-surface-2/30" : ""
+                      }`}
+                    >
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-3">
+                          <span
+                            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
+                            style={{ backgroundColor: getUniqueColor(producto.nombreProducto) }}
                           >
                             {getInitials(producto.nombreProducto)}
-                          </div>
-                          <span className="product-name">
-                            {producto.nombreProducto}
                           </span>
+                          {/* Nombre + badge "Hoy" en un mismo bloque: si no caben
+                              en una línea, el badge baja debajo del nombre */}
+                          <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
+                            <span className="font-medium text-ink">{producto.nombreProducto}</span>
+                            {producto.esStockDiario && (
+                              <span className="flex shrink-0 items-center gap-1 rounded-full bg-warning-50 px-2 py-0.5 text-2xs font-semibold text-warning-700">
+                                <FiClock size={10} /> Hoy
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </td>
-                      <td className="quantity-cell-general text-center align-middle fw-bold">
-                        {cantidadMostrada}
+
+                      <td className="px-2 py-3 sm:px-4">
+                        <div className="flex flex-wrap items-center justify-center gap-x-1.5 gap-y-0.5">
+                          <span className="inline-flex min-w-[2.75rem] justify-center rounded-full bg-brand-50 px-2.5 py-1 text-sm font-bold text-brand-700">
+                            {producto.cantidadExistente}
+                          </span>
+                          {/* Unidad al lado del número solo en móvil (la columna
+                              "Unidad" está oculta ahí) */}
+                          <span className="text-xs text-muted sm:hidden">{unidad}</span>
+                        </div>
                       </td>
-                      <td className="text-center align-middle">
-                        {esFrances ? "Filas" : "Unidades"}
-                      </td>
+
+                      <td className="hidden px-4 py-3 text-center text-muted sm:table-cell">{unidad}</td>
                     </tr>
                   );
                 })
               ) : (
                 <tr>
-                  <td colSpan="3" className="text-center py-4 align-middle">
+                  <td colSpan="3" className="px-4 py-10 text-center text-sm text-muted">
                     No se encontraron productos con ese nombre en esta categoría.
                   </td>
                 </tr>
               )}
             </tbody>
-          </Table>
+          </table>
         </div>
       )}
 
-      {/* Botón de scroll para móviles */}
-      {isMobile && showScrollButton && (
+      {/* ── Botón flotante: volver arriba ───────────────────────────── */}
+      {showScrollButton && (
         <button
+          type="button"
           onClick={scrollToTop}
-          className="scroll-to-top-btn"
           aria-label="Volver arriba"
+          className="fixed bottom-6 right-6 z-30 flex h-11 w-11 items-center justify-center rounded-full border-0 bg-brand-600 text-white shadow-brand transition-transform duration-150 hover:scale-105 active:scale-95 animate-fade-in"
         >
-          <BsArrowUp size={24} />
+          <FiArrowUp size={18} />
         </button>
       )}
-    </Container>
+    </div>
   );
-};
+}
 
 export default StockUnificado;

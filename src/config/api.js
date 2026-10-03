@@ -11,7 +11,7 @@ const api = axios.create({
 // Interceptor para agregar el token en cada solicitud
 api.interceptors.request.use(
   (config) => {
-    let token = localStorage.getItem("token");
+    const token = localStorage.getItem("token");
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -22,5 +22,20 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
+// Interceptor de respuesta: si el backend responde 401 (token inválido o revocado),
+// se limpia la sesión y se manda al login.
+// La condición sobre pathname evita redirigir en el propio login (credenciales incorrectas).
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401 && window.location.pathname !== "/login") {
+      localStorage.removeItem("token");
+      localStorage.removeItem("userData");
+      localStorage.removeItem("lastRoute");
+      window.location.replace("/login");
+    }
+    return Promise.reject(error);
+  }
+);
 
 export default api;
