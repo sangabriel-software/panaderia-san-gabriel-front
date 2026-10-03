@@ -28,6 +28,13 @@ const PrivateRoute = () => {
     return () => window.removeEventListener("pageshow", onPageShow);
   }, []);
 
+  // Recordar la última ruta visitada para volver a ella al reabrir la PWA
+  useEffect(() => {
+    if (TokenExpired && !isTokenExpired(TokenExpired) && hasPermission(rutaActual)) {
+      localStorage.setItem("lastRoute", rutaActual);
+    }
+  }, [rutaActual, TokenExpired]);
+
   useEffect(() => {
     if (!TokenExpired) {
       toast.error("Necesitas iniciar sesión para acceder.", { autoClose: 3000 });

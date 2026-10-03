@@ -4,7 +4,7 @@
   "short_name": "San Gabriel",
   "description": "Sistema de administración de Panadería San Gabriel",
   "lang": "es",
-  "start_url": "/",
+  "start_url": "/home",
   "scope": "/",
   "display": "standalone",
   "background_color": "#020617",

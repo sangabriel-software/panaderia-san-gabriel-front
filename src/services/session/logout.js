@@ -9,6 +9,7 @@ const useLogout = () => {
   const handleLogout = useCallback(() => {
     removeLocalStorage("userData");
     removeLocalStorage("token");
+    removeLocalStorage("lastRoute"); // ✅ el siguiente usuario no aterriza en la ruta del anterior
     sessionStorage.clear();
     clearbetterUser();
 

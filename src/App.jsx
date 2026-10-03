@@ -3,9 +3,12 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import PageLoader from "./components/PageLoader/PageLoader";
+import { hasValidSession, getStartRoute } from "./utils/Auth/sessionRoute";
+
 
 /* AI routes */
 const IngresarVentasAI = lazy(() => import("./pages/VentasAI/IngresarVentasAI"));
+
 
 /* reportes routes */
 const ReportesPanel = lazy(() => import("./pages/reportes/reportespanel/ReportesPanel"));
@@ -18,7 +21,9 @@ const SobrantesReport = lazy(() => import("./pages/reportes/reporteSobrantes/Sob
 const Gastos = lazy(() => import("./pages/reportes/Gastos/Gastos"));
 const ProductosVendidos = lazy(() => import("./pages/reportes/ProductosVendidos/ProductosVendidos"));
 
+
 const AccessDeniedPage = lazy(() => import("./components/AccesoDenegado/AccessDeniedPage"));
+
 
 const MainLayout = lazy(() => import("./layouts/MainLayout"));
 const LoginPage = lazy(() => import("./pages/LoginPages/LoginPage"));
@@ -63,6 +68,7 @@ import CambiarPasswordPage from "./pages/CambiarPassword/CambiarPasswordPage";
 import InstallBanner from "./shared/pwa/InstallBanner";
 import { GestionarEncuestasPage } from "./pages/Encuestas/GestionarEncuestasPage";
 
+
 function App() {
   return (
     <Suspense fallback={<PageLoader />}>
@@ -74,25 +80,35 @@ function App() {
         toastClassName="!rounded-xl !border !border-line !bg-surface !text-ink !shadow-modal !font-sans"
         progressClassName="!bg-brand-600"
       />
-      <InstallBanner /> 
+      <InstallBanner />
+
 
       <Routes>
         {/* Rutas públicas */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/acceso-denegado" element={<AccessDeniedPage />} />
-        <Route path="/" element={<Navigate to="/login" />} />
+
+        {/* Ruta raíz: si hay sesión válida vuelve a la última ruta; si no, al login */}
+        <Route
+          path="/"
+          element={<Navigate to={hasValidSession() ? getStartRoute() : "/login"} replace />}
+        />
+
 
         <Route path="/surveys">
           <Route path="customer-responses" element={<CustomerResponses />} />
         </Route>
 
+
         <Route path="/cambiar-password" element={<CambiarPasswordPage />} />
+
 
         {/* Rutas protegidas */}
         <Route element={<PrivateRoute />}>
           <Route element={<MainLayout />}>
             <Route path="/home" element={<HomePage />} />
             <Route path="/dashboard" element={<DashboardPage />} />
+
 
             <Route path="/users">
               <Route index element={<ManageUsers />} />
@@ -101,10 +117,12 @@ function App() {
               <Route path="editRol/:idRol" element={<UpdateRolesForm />} />
             </Route>
 
+
             <Route path="/productos">
               <Route index element={<ManageProducts />} />
               <Route path="ingresar-producto" element={<IngresarProductos />} />
             </Route>
+
 
             <Route path="/ordenes-produccion">
               <Route index element={<GestionPedidosProd />} />
@@ -112,15 +130,18 @@ function App() {
               <Route path="ingresar-orden" element={<IngresarOrdenProd />} />
             </Route>
 
+
             <Route path="/ventas">
               <Route index element={<GestionVentasPage />} />
               <Route path="ingresar-venta" element={<IngresarVentaPage />} />
               <Route path="detalle-venta/:idVenta" element={<DetalleVentaPage />} />
             </Route>
 
+
             <Route path="/sucursales">
               <Route index element={<GestionDeSucursalesPAge />} />
             </Route>
+
 
             <Route path="/config">
               <Route index element={<PanelConfig />} />
@@ -128,17 +149,20 @@ function App() {
               <Route path="configuracion-perfil" element={<PerfilPage />} />
             </Route>
 
+
             <Route path="/stock-productos">
               <Route index element={<GestionarStockPage />} />
               <Route path="ingresar-stock/:idSucursal" element={<IngresarStockGeneralPage />} />
               <Route path="stock-general/:idSucursal" element={<StockUnificado />} />
             </Route>
 
+
             <Route path="/pedido-especial">
               <Route index element={<OrdenesEspecialesList />} />
               <Route path="ingresar-orden-especial" element={<IngresarOrdenEspecialPage />} />
               <Route path="detalle-orden-especial/:idOrdenEspecial" element={<OrdenEspecialDetail />} />
             </Route>
+
 
             {/* Nota: se removió la "ñ" suelta que quedó pegada al final de este path,
                 era texto sin uso dentro del JSX y no debería estar ahí. */}
@@ -147,6 +171,7 @@ function App() {
               <Route path="descontar-stock/:idSucursal" element={<DescontarStock />} />
               <Route path="detalle-descuento/:idDescuento" element={<DetalleDescuento />} />
             </Route>
+
 
             <Route path="/reportes">
               <Route index element={<ReportesPanel />} />
@@ -160,27 +185,33 @@ function App() {
               <Route path="productos-vendidos" element={<ProductosVendidos />} />
             </Route>
 
+
             <Route path="/traslados-productos">
               <Route path="traslados-lista/:idSucursal" element={<GestionarTraslados />} />
               <Route path="detalles-traslado/:idTraslado/detalle/:idSucursal" element={<DetalleTraslados />} />
               <Route path="ingresar-traslado/:idSucursal" element={<IngresarTraslado />} />
             </Route>
 
+
             <Route path="/encuestas-config">
               <Route index element={<GestionarEncuestasPage />} />
             </Route>
+
 
             <Route path="/activar-fecha-produccion">
               <Route index element={<ActivarFechaProduccion />} />
             </Route>
 
+
             <Route path="/habilitar-notificaciones">
               <Route index element={<NotificacionesEspeciales />} />
             </Route>
 
+
             <Route path="/categorias">
               <Route index element={<CategoriasPage />} />
             </Route>
+
 
             <Route path="/reset-pass">
               <Route index element={<ResetPassPage />} />
@@ -191,5 +222,6 @@ function App() {
     </Suspense>
   );
 }
+
 
 export default App;

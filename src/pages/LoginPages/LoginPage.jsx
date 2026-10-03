@@ -1,36 +1,43 @@
-import { useState, useEffect, useCallback } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation, Navigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { useTheme } from "../../context/ThemeContext";
 import { FiEye, FiEyeOff, FiArrowRight } from "react-icons/fi";
 import sgMark from "../../assets/sg-mark.svg";
 import { handleLogin } from "./loginUtils";
+import { hasValidSession, getStartRoute } from "../../utils/Auth/sessionRoute";
+
 
 function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
+
 
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
-  
+
 
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+
   const { theme, toggleTheme } = useTheme();
+
 
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
+
 
     if (queryParams.get("logout") === "success") {
       toast.success("Sesión cerrada correctamente", {
         autoClose: 2000,
         toastId: "logout-success",
       });
+
 
       window.history.replaceState(
         {},
@@ -41,11 +48,20 @@ function LoginPage() {
   }, [location]);
 
 
+  // Si ya hay sesión válida (por ejemplo, la PWA se reabrió o se volvió atrás),
+  // no se muestra el login: se redirige a la última ruta visitada.
+  // Va DESPUÉS de todos los hooks para no romper su orden.
+  if (hasValidSession()) {
+    return <Navigate to={getStartRoute()} replace />;
+  }
+
+
   return (
     <div className="relative min-h-screen overflow-hidden bg-bg">
       {/* ─────────────────────────────────────────────
           BACKGROUND
       ───────────────────────────────────────────── */}
+
 
       <svg
         className="pointer-events-none absolute inset-0 h-full w-full"
@@ -68,6 +84,7 @@ function LoginPage() {
             />
           </pattern>
 
+
           <radialGradient
             id="fadeMask"
             cx="50%"
@@ -80,12 +97,14 @@ function LoginPage() {
               stopOpacity="1"
             />
 
+
             <stop
               offset="100%"
               stopColor="white"
               stopOpacity="0.25"
             />
           </radialGradient>
+
 
           <mask id="gridMask">
             <rect
@@ -96,6 +115,7 @@ function LoginPage() {
           </mask>
         </defs>
 
+
         <rect
           width="100%"
           height="100%"
@@ -104,14 +124,18 @@ function LoginPage() {
         />
       </svg>
 
+
       {/* Halos */}
       <div className="pointer-events-none absolute -left-32 -top-32 h-96 w-96 rounded-full bg-brand-400/20 blur-3xl" />
 
+
       <div className="pointer-events-none absolute bottom-0 right-0 h-96 w-96 rounded-full bg-brand-600/10 blur-3xl" />
+
 
       {/* ─────────────────────────────────────────────
           THEME TOGGLE
       ───────────────────────────────────────────── */}
+
 
       <button
         type="button"
@@ -119,29 +143,33 @@ function LoginPage() {
         aria-label="Cambiar tema"
         className="fixed right-4 top-4 z-20 flex h-10 w-10 items-center justify-center rounded-full border border-line bg-surface/80 text-muted shadow-card backdrop-blur-sm transition-colors hover:text-brand-700 sm:right-6 sm:top-6"
       >
-        { theme === "dark" ? (
+        {theme === "dark" ? (
           <span className="text-sm">☀︎</span>
         ) : (
           <span className="text-sm">☾</span>
         )}
       </button>
 
+
       {/* ─────────────────────────────────────────────
           CONTENT
       ───────────────────────────────────────────── */}
 
+
       <div className="relative z-10 mx-auto flex min-h-screen max-w-6xl items-center justify-center px-4 py-8 sm:px-6 sm:py-12 lg:flex-row lg:justify-between lg:gap-8">
-        
+
         {/* ─────────────────────────────────────────
             DESKTOP BRAND PANEL
             Se mantiene como estaba
         ───────────────────────────────────────── */}
+
 
         <div className="hidden max-w-md text-center lg:block lg:text-left">
           <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-line bg-surface/80 px-3 py-1.5 text-xs font-medium text-brand-700 shadow-card backdrop-blur-sm">
             <span className="h-1.5 w-1.5 rounded-full bg-brand-500" />
             Sistema de gestión
           </div>
+
 
           <h1 className="text-4xl font-bold leading-tight tracking-tight text-ink sm:text-5xl">
             Panaderia
@@ -151,22 +179,27 @@ function LoginPage() {
             </span>
           </h1>
 
+
           <p className="mt-5 text-base leading-relaxed text-muted">
             Inventario, producción, pedidos y ventas — todo lo que
             pasa en Panadería San Gabriel, en un mismo lugar.
           </p>
         </div>
 
+
         {/* ─────────────────────────────────────────
             LOGIN
         ───────────────────────────────────────── */}
 
+
         <div className="w-full max-w-md animate-fade-in sm:max-w-sm lg:max-w-sm">
           <div className="rounded-3xl border border-line bg-surface/90 p-5 shadow-modal backdrop-blur-sm sm:p-8">
+
 
             {/* ─────────────────────────────────────
                 MOBILE BRAND HEADER
             ───────────────────────────────────── */}
+
 
             <div className="mb-8 text-center lg:hidden">
               <div className="mb-4 flex justify-center">
@@ -179,18 +212,22 @@ function LoginPage() {
                 </div>
               </div>
 
+
               <h1 className="text-xl font-semibold tracking-tight text-ink">
                 Panadería San Gabriel
               </h1>
+
 
               <p className="mt-1 text-sm text-muted">
                 Acceso al sistema
               </p>
             </div>
 
+
             {/* ─────────────────────────────────────
                 DESKTOP BRAND HEADER
             ───────────────────────────────────── */}
+
 
             <div className="mb-7 hidden items-center gap-3 lg:flex">
               <img
@@ -199,10 +236,12 @@ function LoginPage() {
                 className="h-12 w-12 rounded-2xl shadow-brand"
               />
 
+
               <div>
                 <p className="text-sm font-semibold text-ink">
                   Panadería San Gabriel
                 </p>
+
 
                 <p className="text-xs text-muted">
                   Acceso al panel
@@ -210,9 +249,11 @@ function LoginPage() {
               </div>
             </div>
 
+
             {/* ─────────────────────────────────────
                 FORM
             ───────────────────────────────────── */}
+
 
             <form
               className="flex flex-col gap-5"
@@ -234,6 +275,7 @@ function LoginPage() {
                   Usuario
                 </label>
 
+
                 <input
                   type="text"
                   id="usuario"
@@ -250,12 +292,14 @@ function LoginPage() {
                   })}
                 />
 
+
                 {errors.usuario && (
                   <p className="mt-2 text-xs text-danger-600">
                     {errors.usuario.message}
                   </p>
                 )}
               </div>
+
 
               {/* Contraseña */}
               <div>
@@ -265,6 +309,7 @@ function LoginPage() {
                 >
                   Contraseña
                 </label>
+
 
                 <div className="relative">
                   <input
@@ -287,6 +332,7 @@ function LoginPage() {
                     })}
                   />
 
+
                   <button
                     type="button"
                     onClick={() =>
@@ -307,12 +353,14 @@ function LoginPage() {
                   </button>
                 </div>
 
+
                 {errors.contrasena && (
                   <p className="mt-2 text-xs text-danger-600">
                     {errors.contrasena.message}
                   </p>
                 )}
               </div>
+
 
               {/* Submit */}
               <button
@@ -329,6 +377,7 @@ function LoginPage() {
                   <>
                     Iniciar sesión
 
+
                     <FiArrowRight
                       size={17}
                       className="transition-transform duration-150 group-hover:translate-x-0.5"
@@ -337,6 +386,7 @@ function LoginPage() {
                 )}
               </button>
             </form>
+
 
             {/* Footer */}
             <p className="mt-7 text-center text-[11px] text-muted">
@@ -348,5 +398,6 @@ function LoginPage() {
     </div>
   );
 }
+
 
 export default LoginPage;
