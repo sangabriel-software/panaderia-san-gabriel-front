@@ -13,13 +13,13 @@ export const THEME_COLORS = {
   [THEMES.LIGHT]: "#ffffff",
 };
 
-// Por defecto: dark (igual que el script de index.html)
+// Por defecto: light (igual que el script de index.html)
 export const getStoredTheme = () => {
   try {
     const stored = localStorage.getItem(THEME_KEY);
-    return stored === THEMES.LIGHT ? THEMES.LIGHT : THEMES.DARK;
+    return stored === THEMES.DARK ? THEMES.DARK : THEMES.LIGHT;
   } catch (error) {
-    return THEMES.DARK;
+    return THEMES.LIGHT;
   }
 };
 
