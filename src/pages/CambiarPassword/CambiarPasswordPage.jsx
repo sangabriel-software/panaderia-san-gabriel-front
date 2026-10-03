@@ -85,7 +85,6 @@ const CambiarPasswordPage = () => {
 
         setTimeout(() => {
           handleLogout();
-          navigate("/");
         }, 3000);
       }
     } catch (err) {
