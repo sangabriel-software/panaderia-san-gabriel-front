@@ -1,43 +1,216 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="./src/assets/logo.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    
-    <meta name="description" content="San Gabriel - Aplicación web" />
-    <meta name="theme-color" content="#000000" />
-    
-    <meta name="mobile-web-app-capable" content="yes" /> 
 
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="San Gabriel" />
-    
-    <link rel="manifest" href="/manifest.json" />
-    
-    <link rel="apple-touch-icon" href="/icon-192x192.png" />
-    <link rel="apple-touch-icon" sizes="192x192" href="/icon-192x192.png" />
-    <link rel="apple-touch-icon" sizes="512x512" href="/icon-512x512.png" />
-    
-    <title>San Gabriel</title>
+<head>
+  <meta charset="UTF-8" />
 
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
 
-    <script>
-      if ("serviceWorker" in navigator) {
-        window.addEventListener("load", () => {
-          navigator.serviceWorker
-            .register("/service-worker.js")
-            .catch(() => {
-              // Error ignorado intencionalmente
-            });
-        });
+  <!-- ================================================================ PWA / NAVEGADOR ================================================================ -->
+  <meta name="theme-color" content="#020617" />
+
+  <meta name="description" content="San Gabriel App — Sistema de administración de Panadería San Gabriel" />
+
+  <meta name="application-name" content="San Gabriel App" />
+
+  <!-- Manifest -->
+  <link rel="manifest" href="/manifest.json" />
+
+  <!-- ================================================================ PWA MOBILE ================================================================ -->
+  <meta name="mobile-web-app-capable" content="yes" />
+
+  <!-- iOS -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="San Gabriel" />
+
+  <!-- ================================================================ ICONOS ================================================================ -->
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16.png" />
+
+  <!-- Apple (iOS no soporta transparencia: este icono va a sangre, sin esquinas) -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
+
+  <title>San Gabriel App</title>
+
+  <!-- ================================================================ SPLASH / LOADING ================================================================ -->
+  <!--
+    IMPORTANTE: este splash debe ser IDÉNTICO al componente PageLoader.jsx
+    (mismo tamaño de logo, misma separación, mismos puntos, mismos colores).
+    Si cambias uno, cambia el otro. Así, cuando React toma el control,
+    el usuario no percibe ninguna transición: se ve una sola pantalla de carga.
+  -->
+  <style>
+    /* ================================================================ RESET MÍNIMO ================================================================ */
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      min-height: 100%;
+      /* Modo claro por defecto; el modo oscuro se aplica con la clase .dark */
+      background: #ffffff;
+    }
+
+    html.dark,
+    html.dark body {
+      /* Slate 950 — igual que --color-bg en modo oscuro */
+      background: #020617;
+    }
+
+    /* ================================================================ SPLASH ================================================================ */
+    .app-loading {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #ffffff;
+    }
+
+    html.dark .app-loading {
+      background: #020617;
+    }
+
+    /* Logo + puntos (equivale a "flex flex-col items-center gap-4") */
+    .app-loading__content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    /* ================================================================ LOGO ================================================================ */
+    /* 64px, radio 17px = el radio del squircle del SVG (30/112 * 64) */
+    .app-loading__logo {
+      display: block;
+      width: 64px;
+      height: 64px;
+      border-radius: 17px;
+      animation: app-loading-brand-glow 2.4s ease-in-out infinite;
+    }
+
+    /* ================================================================ PUNTOS ================================================================ */
+    .app-loading__dots {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .app-loading__dots span {
+      width: 6px;
+      height: 6px;
+      border-radius: 9999px;
+      /* brand-500 */
+      background: #06b6d4;
+      animation: app-loading-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    .app-loading__dots span:nth-child(1) { animation-delay: -0.3s; }
+    .app-loading__dots span:nth-child(2) { animation-delay: -0.15s; }
+    .app-loading__dots span:nth-child(3) { animation-delay: 0s; }
+
+    /* ================================================================ ANIMACIONES (mismas que tailwind.config.js) ================================================================ */
+    @keyframes app-loading-brand-glow {
+      0%,
+      100% {
+        box-shadow: 0 0 0 0 rgb(6 182 212 / 0.35);
       }
-    </script>
-    
-  </body>
+
+      50% {
+        box-shadow: 0 0 0 8px rgb(6 182 212 / 0);
+      }
+    }
+
+    @keyframes app-loading-pulse {
+      50% {
+        opacity: 0.5;
+      }
+    }
+
+    /* ================================================================ REDUCIR ANIMACIONES ================================================================ */
+    @media (prefers-reduced-motion: reduce) {
+      .app-loading__logo,
+      .app-loading__dots span {
+        animation: none;
+      }
+    }
+
+    /* ================================================================ DESACTIVADO ================================================================ */
+    /* Grid tecnológica y glow central del splash anterior.
+       Se desactivaron porque PageLoader no los tiene y se notaba el cambio entre ambas pantallas.
+
+    .app-loading::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      opacity: 0.045;
+      background-image: linear-gradient(rgba(6, 182, 212, 0.75) 1px, transparent 1px), linear-gradient(90deg, rgba(6, 182, 212, 0.75) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+    }
+
+    .app-loading::after {
+      content: "";
+      position: absolute;
+      width: 280px;
+      height: 280px;
+      border-radius: 9999px;
+      background: radial-gradient(circle, rgba(6, 182, 212, 0.14) 0%, rgba(59, 130, 246, 0.07) 32%, rgba(6, 182, 212, 0.025) 52%, transparent 72%);
+      filter: blur(18px);
+      pointer-events: none;
+    }
+    */
+  </style>
+
+  <!-- ================================================================ TEMA INICIAL ================================================================ -->
+  <script>
+    /*
+     * Aplicamos el tema ANTES de cargar React.
+     *
+     * Por defecto: dark
+     *
+     * Esto evita el flash blanco durante el arranque y deja el splash
+     * del mismo color que PageLoader (que usa bg-bg).
+     */
+    (function () {
+      try {
+        var storedTheme = localStorage.getItem("theme");
+        var isDark = storedTheme ? storedTheme === "dark" : true;
+        document.documentElement.classList.toggle("dark", isDark);
+
+        // Barra de estado / barra de título del navegador según el tema
+        var themeMeta = document.querySelector('meta[name="theme-color"]');
+        if (themeMeta) themeMeta.setAttribute("content", isDark ? "#020617" : "#ffffff");
+      } catch (error) {
+        document.documentElement.classList.add("dark");
+      }
+    })();
+  </script>
+</head>
+
+<body class="bg-bg text-ink antialiased overscroll-none">
+  <!-- ================================================================ ROOT ================================================================ -->
+  <div id="root">
+    <!-- ============================================================
+       SPLASH ESTÁTICO (idéntico a PageLoader.jsx)
+       React lo reemplaza automáticamente al montar la app.
+       ============================================================ -->
+    <div class="app-loading" aria-hidden="true">
+      <div class="app-loading__content">
+        <img class="app-loading__logo" src="/sg-mark.svg" alt="" width="64" height="64" />
+        <div class="app-loading__dots">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================================================ APLICACIÓN REACT ================================================================ -->
+  <script type="module" src="/src/main.jsx"></script>
+</body>
+
 </html>

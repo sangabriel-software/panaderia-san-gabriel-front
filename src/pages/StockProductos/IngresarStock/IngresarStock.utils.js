@@ -2,6 +2,12 @@ import { ingresarStockProductos } from "../../../services/stockservices/stock.se
 import { getUserData } from "../../../utils/Auth/decodedata";
 import { decryptId } from "../../../utils/CryptoParams";
 import { currentDate, getCurrentDateTimeWithSeconds } from "../../../utils/dateUtils";
+import { encryptId } from "../../../utils/CryptoParams";
+
+export const handleNavigate = (navigate, sucursalId, ruta) => {
+    const encryptedId = encryptId(sucursalId.toString());
+    navigate(`/stock-productos/${ruta}/${encodeURIComponent(encryptedId)}`);
+};
 
 export const getInitials = (name) => {
     const names = name.split(" ");

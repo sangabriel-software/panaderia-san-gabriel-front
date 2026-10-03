@@ -38,6 +38,7 @@ const getEndpoints = {
     GET_PRODUCTOS_VENDIDOS: "venta-por-producto",
     GET_NOTIFICACIONES_ACTIVAS: "consultar-activaciones-notificaciones",
     GET_PRODUCTOS_INVENTARIO: "consultarProductosParaInventario",
+    GET_STOCK_GENERAL: "consultar-stock-general",
 };
 
 const postEndpoints = {
