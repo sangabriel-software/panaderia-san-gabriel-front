@@ -19,7 +19,7 @@ export const getStoredTheme = () => {
     const stored = localStorage.getItem(THEME_KEY);
     return stored === THEMES.LIGHT ? THEMES.LIGHT : THEMES.DARK;
   } catch (error) {
-    return THEMES.DARK;
+    return THEMES.LIGHT;
   }
 };
 
