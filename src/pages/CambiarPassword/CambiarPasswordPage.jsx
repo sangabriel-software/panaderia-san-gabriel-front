@@ -5,6 +5,8 @@ import { FiEye, FiEyeOff, FiCheck, FiLock, FiArrowRight } from "react-icons/fi";
 import { getUserData } from "../../utils/Auth/decodedata";
 import { cambiarPassService } from "../../services/userServices/usersservices/users.service";
 import sgMark from "../../assets/sg-mark.svg";
+import useLogout from "../../services/session/logout";
+import { removeLocalStorage } from "../../utils/Auth/localstorage";
 
 const CambiarPasswordPage = () => {
   const navigate = useNavigate();
@@ -20,6 +22,7 @@ const CambiarPasswordPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const { handleLogout } = useLogout();
 
   const rules = [
     {
@@ -81,7 +84,8 @@ const CambiarPasswordPage = () => {
         setSuccess(true);
 
         setTimeout(() => {
-          navigate("/login");
+          handleLogout();
+          navigate("/");
         }, 3000);
       }
     } catch (err) {
