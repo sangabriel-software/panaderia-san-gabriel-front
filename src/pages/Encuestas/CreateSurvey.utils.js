@@ -3,7 +3,7 @@ import {
   crearCampaniaServices, 
   eliminarCampaniaServices,
   consultarCampaniaDetalleServices 
-} from '../../../services/Encuestas/encuestas.service';
+} from '../../services/Encuestas/encuestas.service';
 
 /**
  * Crea una nueva campaña/encuesta

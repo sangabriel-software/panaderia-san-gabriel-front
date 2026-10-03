@@ -62,7 +62,6 @@ const CustomerResponses = lazy(() => import("./pages/Encuestas/CustomerResponses
 const ActivarFechaProduccion = lazy(() => import("./pages/Activar-Fecha-Produccion/ActivarFechaProduccion"));
 const NotificacionesEspeciales = lazy(() => import("./pages/notificaciones/notificaciones-especiales/NotificacionesEspeciales"));
 const CategoriasPage = lazy(() => import("./pages/Categorias/CategoriasPage"));
-const CreateSurvey = lazy(() => import("./pages/Encuestas/CreateSurvey/CreateSurvey"));
 const ResetPassPage = lazy(() => import("./pages/Reset-Pass/ResetPassPage"));
 import CambiarPasswordPage from "./pages/CambiarPassword/CambiarPasswordPage";
 import InstallBanner from "./shared/pwa/InstallBanner";
