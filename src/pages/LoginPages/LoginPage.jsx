@@ -27,6 +27,7 @@ function LoginPage() {
 
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
+    const motivo = location.state?.from; // lo envía PrivateRoute al redirigir
 
     if (queryParams.get("logout") === "success") {
       setAviso({
@@ -37,8 +38,27 @@ function LoginPage() {
       });
 
       window.history.replaceState({}, document.title, window.location.pathname);
+    } else if (motivo === "expired" || motivo === "unauthorized") {
+      setAviso(
+        motivo === "expired"
+          ? {
+              id: Date.now(),
+              type: "warning",
+              title: "Tu sesión ha expirado",
+              message: "Inicia sesión de nuevo para continuar.",
+            }
+          : {
+              id: Date.now(),
+              type: "info",
+              title: "Inicia sesión para continuar",
+              message: "Necesitas iniciar sesión para acceder.",
+            }
+      );
+
+      // El state de la navegación sobrevive a una recarga: se limpia para que el aviso no reaparezca
+      navigate(location.pathname, { replace: true, state: null });
     }
-  }, [location]);
+  }, [location, navigate]);
 
   // Si ya hay sesión válida (por ejemplo, la PWA se reabrió o se volvió atrás),
   // no se muestra el login: se redirige a la última ruta visitada.
@@ -193,9 +213,9 @@ function LoginPage() {
                 message={aviso.message}
                 className="mb-5"
                 onDismiss={() => setAviso(null)}
-                // Los errores se quedan hasta que el usuario los corrige; el éxito se cierra solo
-                autoClose={aviso.type === "success"}
-                duration={3000}
+                // Los errores se quedan hasta que el usuario los corrige; los demás avisos se cierran solos
+                autoClose={aviso.type !== "danger"}
+                duration={aviso.type === "success" ? 3000 : 6000}
               />
             )}
 
