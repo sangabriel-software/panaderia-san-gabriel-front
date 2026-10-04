@@ -71,6 +71,7 @@ function DashboardPage() {
     cantidadEmpleados,
     cantidadSucursales,
     ingresosMensuales,
+    ingresosAnuales,
     resumenMensual,
     topVentas,
   } = useGetDashboardData();
@@ -81,10 +82,12 @@ function DashboardPage() {
   };
 
   const calcularTotalIngresosAnuales = () => {
-    if (!ingresosMensuales || ingresosMensuales.length === 0) return "0.00";
+    if (!ingresosAnuales || ingresosAnuales.length === 0) return "0.00";
     // Nota: si tu API ya separa ingresosAnuales, reemplaza este cálculo por ese arreglo.
-    return ingresosMensuales.reduce((sum, s) => sum + (parseFloat(s.ingresoMensual) || 0), 0).toFixed(2);
+    return ingresosAnuales.reduce((sum, s) => sum + (parseFloat(s.ingresoMensual) || 0), 0).toFixed(2);
   };
+
+  console.log(calcularTotalIngresosAnuales())
 
   const resumenChartData = (resumenMensual || []).map((item) => ({
     mes: MONTH_LABELS[item.mes] || item.mes,

@@ -1,7 +1,5 @@
 import React, { lazy, Suspense } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import PageLoader from "./components/PageLoader/PageLoader";
 import { hasValidSession, getStartRoute } from "./utils/Auth/sessionRoute";
 
@@ -71,17 +69,6 @@ import { GestionarEncuestasPage } from "./pages/Encuestas/GestionarEncuestasPage
 function App() {
   return (
     <Suspense fallback={<PageLoader />}>
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        newestOnTop
-        theme="light"
-        toastClassName="!rounded-xl !border !border-line !bg-surface !text-ink !shadow-modal !font-sans"
-        progressClassName="!bg-brand-600"
-      />
-      <InstallBanner />
-
-
       <Routes>
         {/* Rutas públicas */}
         <Route path="/login" element={<LoginPage />} />

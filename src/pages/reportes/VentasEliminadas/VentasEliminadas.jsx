@@ -1,58 +1,96 @@
 import React, { useState, useEffect } from 'react';
-import { FiFilter, FiDownload, FiRefreshCw, FiCalendar, FiChevronDown, FiChevronUp, FiArrowLeft, FiTrash2, FiEye } from 'react-icons/fi';
-import { Container, Row, Col, Form, Button, Spinner, Card, Accordion, Table, Badge, Modal } from 'react-bootstrap';
+import {
+  FiFilter,
+  FiDownload,
+  FiRefreshCw,
+  FiChevronDown,
+  FiChevronUp,
+  FiArrowLeft,
+  FiTrash2,
+  FiUser,
+  FiCalendar,
+  FiDollarSign,
+  FiPackage,
+  FiAlertTriangle
+} from 'react-icons/fi';
 import dayjs from 'dayjs';
 import { useNavigate } from 'react-router-dom';
 import useGetSucursales from '../../../hooks/sucursales/useGetSucursales';
-import { generarReporteVentasEliminadasService } from '../../../services/reportes/reportes.service';
+import {
+  generarReporteVentasEliminadasService
+} from '../../../services/reportes/reportes.service';
 import { getUserData } from '../../../utils/Auth/decodedata';
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
-import autoTable from "jspdf-autotable";
+import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
-import './VentasEliminadas.styles.css';
 
 const VentasEliminadasPage = () => {
   const navigate = useNavigate();
-  const { sucursales, loadingSucursales, showErrorSucursales } = useGetSucursales();
+
+  const {
+    sucursales,
+    loadingSucursales,
+    showErrorSucursales
+  } = useGetSucursales();
+
   const userData = getUserData();
-  
+
   const [selectedSucursal, setSelectedSucursal] = useState('');
   const [ventasEliminadas, setVentasEliminadas] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [loadingReporte, setLoadingReporte] = useState(false);
   const [error, setError] = useState(null);
-  const [fechaInicio, setFechaInicio] = useState(dayjs().format('YYYY-MM-DD'));
-  const [fechaFin, setFechaFin] = useState(dayjs().format('YYYY-MM-DD'));
+
+  const [fechaInicio, setFechaInicio] = useState(
+    dayjs().format('YYYY-MM-DD')
+  );
+
+  const [fechaFin, setFechaFin] = useState(
+    dayjs().format('YYYY-MM-DD')
+  );
+
   const [activeVenta, setActiveVenta] = useState(null);
   const [generatingPDF, setGeneratingPDF] = useState(false);
   const [generatingExcel, setGeneratingExcel] = useState(false);
   const [selectedTurno, setSelectedTurno] = useState('Todos');
-  const [showDetalleModal, setShowDetalleModal] = useState(false);
-  const [ventaSeleccionada, setVentaSeleccionada] = useState(null);
 
+  /*
+   * Asignar automáticamente la sucursal del usuario
+   * cuando no es administrador.
+   */
   useEffect(() => {
     if (!loadingSucursales && sucursales.length > 0) {
       if (userData?.idRol !== 1) {
-        // Para usuarios que no son admin, asignar su sucursal automáticamente
-        const sucursalUsuario = sucursales.find(s => s.idSucursal === userData.idSucursal);
+        const sucursalUsuario = sucursales.find(
+          s => s.idSucursal === userData.idSucursal
+        );
+
         if (sucursalUsuario) {
           setSelectedSucursal(sucursalUsuario.idSucursal);
         }
       }
-      // Para admin, no asignamos automáticamente, dejamos que seleccione
     }
   }, [loadingSucursales, sucursales, userData]);
 
+  /*
+   * Filtrar por turno.
+   */
   useEffect(() => {
     if (selectedTurno === 'Todos') {
       setFilteredData(ventasEliminadas);
     } else {
-      const filtered = ventasEliminadas.filter(venta => venta.turno === selectedTurno);
+      const filtered = ventasEliminadas.filter(
+        venta => venta.turno === selectedTurno
+      );
+
       setFilteredData(filtered);
     }
   }, [selectedTurno, ventasEliminadas]);
 
+  /*
+   * Generar reporte.
+   */
   const handleGenerarReporte = async () => {
     if (!fechaInicio || !fechaFin) {
       setError('Debes seleccionar ambas fechas');
@@ -66,18 +104,26 @@ const VentasEliminadasPage = () => {
 
     const inicio = dayjs(fechaInicio);
     const fin = dayjs(fechaFin);
-    
+
     if (inicio.isAfter(fin)) {
-      setError('La fecha de inicio no puede ser mayor a la fecha final');
+      setError(
+        'La fecha de inicio no puede ser mayor a la fecha final'
+      );
       return;
     }
 
     setError(null);
     setLoadingReporte(true);
     setSelectedTurno('Todos');
+    setActiveVenta(null);
 
     try {
-      const data = await generarReporteVentasEliminadasService(fechaInicio, fechaFin, selectedSucursal);
+      const data = await generarReporteVentasEliminadasService(
+        fechaInicio,
+        fechaFin,
+        selectedSucursal
+      );
+
       setVentasEliminadas(data.ventasEliminadas || []);
       setFilteredData(data.ventasEliminadas || []);
     } catch (err) {
@@ -87,21 +133,27 @@ const VentasEliminadasPage = () => {
     }
   };
 
+  /*
+   * Reset.
+   */
   const handleReset = () => {
     setFechaInicio(dayjs().format('YYYY-MM-DD'));
     setFechaFin(dayjs().format('YYYY-MM-DD'));
-    // Al resetear, solo asignamos automáticamente para usuarios no admin
+
     if (!loadingSucursales && sucursales.length > 0) {
       if (userData?.idRol !== 1) {
-        const sucursalUsuario = sucursales.find(s => s.idSucursal === userData?.idSucursal);
+        const sucursalUsuario = sucursales.find(
+          s => s.idSucursal === userData?.idSucursal
+        );
+
         if (sucursalUsuario) {
           setSelectedSucursal(sucursalUsuario.idSucursal);
         }
       } else {
-        // Para admin, reseteamos a vacío para que tenga que seleccionar
         setSelectedSucursal('');
       }
     }
+
     setVentasEliminadas([]);
     setFilteredData([]);
     setError(null);
@@ -109,170 +161,332 @@ const VentasEliminadasPage = () => {
     setSelectedTurno('Todos');
   };
 
-  const formatFecha = (fecha) => {
+  /*
+   * Formatos.
+   */
+  const formatFecha = fecha => {
     return dayjs(fecha).format('DD/MM/YYYY');
   };
 
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('es-GT', { style: 'currency', currency: 'GTQ' }).format(amount);
+  const formatFechaHora = fecha => {
+    return dayjs(fecha).format('DD/MM/YYYY HH:mm');
   };
 
-  const toggleVenta = (id) => {
+  const formatCurrency = amount => {
+    return new Intl.NumberFormat('es-GT', {
+      style: 'currency',
+      currency: 'GTQ'
+    }).format(Number(amount || 0));
+  };
+
+  /*
+   * Expandir / contraer venta.
+   */
+  const toggleVenta = id => {
     setActiveVenta(activeVenta === id ? null : id);
   };
 
-  const handleVerDetalle = (venta) => {
-    setVentaSeleccionada(venta);
-    setShowDetalleModal(true);
+  /*
+   * Badge de turno.
+   */
+  const renderTurnoBadge = turno => {
+    const classes =
+      turno === 'AM'
+        ? 'bg-accent-100 text-accent-700 dark:bg-accent-900/30 dark:text-accent-300'
+        : turno === 'PM'
+        ? 'bg-brand-100 text-brand-700 dark:bg-brand-900/30 dark:text-brand-300'
+        : 'bg-surface-2 text-muted';
+
+    return (
+      <span
+        className={`inline-flex items-center rounded-full border border-line px-2.5 py-1 text-2xs font-bold ${classes}`}
+      >
+        {turno}
+      </span>
+    );
   };
 
-  const handleCloseDetalleModal = () => {
-    setShowDetalleModal(false);
-    setVentaSeleccionada(null);
+  /*
+   * Color de diferencia.
+   */
+  const getDifferenceClass = value => {
+    return Number(value || 0) < 0
+      ? 'text-danger-600 dark:text-danger-400'
+      : 'text-brand-600 dark:text-brand-400';
   };
 
-  const renderErrorAlert = (message) => (
-    <div className="ve-custom-alert ve-error">
-      <div className="ve-alert-content">
-        <span className="ve-alert-message">{message}</span>
-      </div>
-    </div>
-  );
-
-  const renderTurnoBadge = (turno) => {
-    switch(turno) {
-      case 'AM':
-        return <Badge bg="info" className="ve-turno-badge ve-am">{turno}</Badge>;
-      case 'PM':
-        return <Badge bg="primary" className="ve-turno-badge ve-pm">{turno}</Badge>;
-      default:
-        return <Badge bg="secondary" className="ve-turno-badge">{turno}</Badge>;
-    }
-  };
-
-  const getTurnoBackgroundColor = (turno) => {
-    return turno === 'AM' ? 'rgba(75, 192, 192, 0.2)' : 'rgba(153, 102, 255, 0.2)';
-  };
-
-  const getTurnoTextColor = (turno) => {
-    return turno === 'AM' ? 'rgba(75, 192, 192, 1)' : 'rgba(153, 102, 255, 1)';
-  };
-
+  /*
+   * Totales.
+   */
   const calcularTotales = () => {
     const totalVentas = filteredData.length;
-    const totalDiferencia = filteredData.reduce((sum, venta) => sum + venta.diferencia, 0);
-    const totalMontoIngresado = filteredData.reduce((sum, venta) => sum + venta.montoTotalIngresado, 0);
-    const totalMontoEsperado = filteredData.reduce((sum, venta) => sum + venta.montoEsperado, 0);
-    const totalGastos = filteredData.reduce((sum, venta) => sum + venta.montoTotalGastos, 0);
-    
-    return { totalVentas, totalDiferencia, totalMontoIngresado, totalMontoEsperado, totalGastos };
+
+    const totalDiferencia = filteredData.reduce(
+      (sum, venta) => sum + Number(venta.diferencia || 0),
+      0
+    );
+
+    const totalMontoIngresado = filteredData.reduce(
+      (sum, venta) => sum + Number(venta.montoTotalIngresado || 0),
+      0
+    );
+
+    const totalMontoEsperado = filteredData.reduce(
+      (sum, venta) => sum + Number(venta.montoEsperado || 0),
+      0
+    );
+
+    const totalGastos = filteredData.reduce(
+      (sum, venta) => sum + Number(venta.montoTotalGastos || 0),
+      0
+    );
+
+    return {
+      totalVentas,
+      totalDiferencia,
+      totalMontoIngresado,
+      totalMontoEsperado,
+      totalGastos
+    };
   };
 
+  /*
+   * Generar PDF.
+   */
   const generatePDF = () => {
     const dataToExport = filteredData;
-    
+
     if (dataToExport.length === 0) {
       setError('No hay datos para generar el reporte');
       return;
     }
-  
+
     setGeneratingPDF(true);
     setError(null);
-  
+
     try {
       const doc = new jsPDF('portrait', 'pt', 'a4');
-      const sucursalNombre = sucursales.find(s => s.idSucursal == selectedSucursal)?.nombreSucursal || 'Sucursal no especificada';
+
+      const sucursalNombre =
+        sucursales.find(
+          s => s.idSucursal == selectedSucursal
+        )?.nombreSucursal || 'Sucursal no especificada';
+
       const today = new Date();
-      const dateStr = today.toLocaleDateString('es-GT') + ' ' + today.toLocaleTimeString('es-GT', { hour: '2-digit', minute: '2-digit' });
-  
-      // Encabezado general solo en la primera página
+
+      const dateStr =
+        today.toLocaleDateString('es-GT') +
+        ' ' +
+        today.toLocaleTimeString('es-GT', {
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+
+      /*
+       * Encabezado.
+       */
       doc.setFontSize(18);
       doc.setTextColor(40);
       doc.setFont('helvetica', 'bold');
-      doc.text('REPORTE DE VENTAS ELIMINADAS', doc.internal.pageSize.getWidth() / 2, 40, { align: 'center' });
-  
+
+      doc.text(
+        'REPORTE DE VENTAS ELIMINADAS',
+        doc.internal.pageSize.getWidth() / 2,
+        40,
+        {
+          align: 'center'
+        }
+      );
+
       doc.setFontSize(10);
       doc.setTextColor(100);
-      doc.text(`Generado el: ${dateStr}`, doc.internal.pageSize.getWidth() / 2, 60, { align: 'center' });
-      
-      doc.setFontSize(12);
-      doc.text(`Sucursal: ${sucursalNombre}`, 40, 80);
+
       doc.text(
-        `Rango de fechas: ${dayjs(fechaInicio).format('DD/MM/YYYY')} - ${dayjs(fechaFin).format('DD/MM/YYYY')}`,
+        `Generado el: ${dateStr}`,
+        doc.internal.pageSize.getWidth() / 2,
+        60,
+        {
+          align: 'center'
+        }
+      );
+
+      doc.setFontSize(12);
+
+      doc.text(
+        `Sucursal: ${sucursalNombre}`,
+        40,
+        80
+      );
+
+      doc.text(
+        `Rango de fechas: ${dayjs(fechaInicio).format(
+          'DD/MM/YYYY'
+        )} - ${dayjs(fechaFin).format('DD/MM/YYYY')}`,
         40,
         95
       );
-      
+
       if (selectedTurno !== 'Todos') {
-        doc.text(`Turno: ${selectedTurno}`, 40, 110);
+        doc.text(
+          `Turno: ${selectedTurno}`,
+          40,
+          110
+        );
       }
-  
-      let currentY = 130;
-      
-      // Detalle de cada venta eliminada - UNA VENTA POR PÁGINA
+
+      let currentY = selectedTurno !== 'Todos' ? 130 : 115;
+
+      /*
+       * Una venta por página.
+       */
       dataToExport.forEach((venta, index) => {
-        // Si no es la primera venta, agregar nueva página
         if (index > 0) {
           doc.addPage();
           currentY = 40;
         }
 
-        // Encabezado de la venta eliminada
         doc.setFontSize(14);
         doc.setTextColor(40);
         doc.setFont('helvetica', 'bold');
-        doc.text(`VENTA ELIMINADA #${venta.idVenta}`, doc.internal.pageSize.getWidth() / 2, currentY, { align: 'center' });
-        
+
+        doc.text(
+          `VENTA ELIMINADA #${venta.idVenta}`,
+          doc.internal.pageSize.getWidth() / 2,
+          currentY,
+          {
+            align: 'center'
+          }
+        );
+
         currentY += 25;
 
-        // Información básica de la venta
+        /*
+         * Información general.
+         */
         doc.setFontSize(10);
         doc.setFont('helvetica', 'normal');
-        doc.text(`ID Eliminación: ${venta.idEliminacion}`, 40, currentY);
-        doc.text(`Fecha Eliminación: ${formatFecha(venta.fechaEliminacion)}`, 200, currentY);
+
+        doc.text(
+          `ID Eliminación: ${venta.idEliminacion}`,
+          40,
+          currentY
+        );
+
+        doc.text(
+          `Fecha Eliminación: ${formatFecha(
+            venta.fechaEliminacion
+          )}`,
+          200,
+          currentY
+        );
+
         currentY += 15;
-        
-        doc.text(`Usuario: ${venta.usuario}`, 40, currentY);
-        doc.text(`Turno: ${venta.turno}`, 200, currentY);
+
+        doc.text(
+          `Usuario: ${venta.usuario}`,
+          40,
+          currentY
+        );
+
+        doc.text(
+          `Turno: ${venta.turno}`,
+          200,
+          currentY
+        );
+
         currentY += 20;
 
-        // Resumen financiero
+        /*
+         * Resumen financiero.
+         */
         doc.setFont('helvetica', 'bold');
-        doc.text('RESUMEN FINANCIERO', 40, currentY);
+
+        doc.text(
+          'RESUMEN FINANCIERO',
+          40,
+          currentY
+        );
+
         currentY += 15;
-        
+
         doc.setFont('helvetica', 'normal');
-        doc.text(`Monto Ingresado: ${formatCurrency(venta.montoTotalIngresado)}`, 60, currentY);
-        doc.text(`Gastos: ${formatCurrency(venta.montoTotalGastos)}`, 200, currentY);
+
+        doc.text(
+          `Monto Ingresado: ${formatCurrency(
+            venta.montoTotalIngresado
+          )}`,
+          60,
+          currentY
+        );
+
+        doc.text(
+          `Gastos: ${formatCurrency(
+            venta.montoTotalGastos
+          )}`,
+          200,
+          currentY
+        );
+
         currentY += 15;
-        
-        doc.text(`Monto Esperado: ${formatCurrency(venta.montoEsperado)}`, 60, currentY);
-        doc.text(`Diferencia: ${formatCurrency(venta.diferencia)}`, 200, currentY);
+
+        doc.text(
+          `Monto Esperado: ${formatCurrency(
+            venta.montoEsperado
+          )}`,
+          60,
+          currentY
+        );
+
+        doc.text(
+          `Diferencia: ${formatCurrency(
+            venta.diferencia
+          )}`,
+          200,
+          currentY
+        );
+
         currentY += 25;
 
-        // Tabla de productos
-        if (venta.ventaEliminadaDetalle.length > 0) {
+        /*
+         * Productos.
+         */
+        if (
+          venta.ventaEliminadaDetalle &&
+          venta.ventaEliminadaDetalle.length > 0
+        ) {
           doc.setFont('helvetica', 'bold');
-          doc.text('PRODUCTOS ELIMINADOS:', 40, currentY);
+
+          doc.text(
+            'PRODUCTOS ELIMINADOS:',
+            40,
+            currentY
+          );
+
           currentY += 15;
 
-          const productosData = venta.ventaEliminadaDetalle.map(producto => [
-            producto.nombreProducto || `Producto #${producto.idProducto}`,
-            producto.cantidadVendidaEliminada.toString(),
-            formatCurrency(producto.precioUnitario),
-            formatCurrency(producto.subtotal)
-          ]);
+          const productosData =
+            venta.ventaEliminadaDetalle.map(producto => [
+              producto.nombreProducto ||
+                `Producto #${producto.idProducto}`,
+              producto.cantidadVendidaEliminada?.toString() || '0',
+              formatCurrency(producto.precioUnitario),
+              formatCurrency(producto.subtotal)
+            ]);
 
-          // Configurar autoTable para manejar páginas automáticamente
-          const tableOptions = {
+          autoTable(doc, {
             startY: currentY,
             head: [
-              ['Producto', 'Cantidad', 'Precio Unitario', 'Subtotal']
+              [
+                'Producto',
+                'Cantidad',
+                'Precio Unitario',
+                'Subtotal'
+              ]
             ],
             body: productosData,
             theme: 'grid',
             headStyles: {
-              fillColor: [52, 152, 219],
+              fillColor: [192, 57, 43],
               textColor: 255,
               fontStyle: 'bold',
               fontSize: 9
@@ -285,728 +499,1537 @@ const VentasEliminadasPage = () => {
               cellPadding: 4,
               overflow: 'linebreak'
             },
-            margin: { horizontal: 40 },
+            margin: {
+              horizontal: 40
+            },
             tableWidth: 'auto',
             pageBreak: 'auto'
-          };
-
-          autoTable(doc, tableOptions);
+          });
 
           currentY = doc.lastAutoTable.finalY + 15;
 
-          // Total de productos
-          const totalProductos = venta.ventaEliminadaDetalle.reduce((sum, prod) => sum + prod.subtotal, 0);
+          const totalProductos =
+            venta.ventaEliminadaDetalle.reduce(
+              (sum, prod) =>
+                sum + Number(prod.subtotal || 0),
+              0
+            );
+
           doc.setFontSize(9);
           doc.setTextColor(100);
-          doc.text(`Total productos: ${venta.ventaEliminadaDetalle.length}`, 40, currentY);
-          doc.text(`Monto total: ${formatCurrency(totalProductos)}`, 200, currentY);
-          
+
+          doc.text(
+            `Total productos: ${venta.ventaEliminadaDetalle.length}`,
+            40,
+            currentY
+          );
+
+          doc.text(
+            `Monto total: ${formatCurrency(totalProductos)}`,
+            200,
+            currentY
+          );
+
           currentY += 20;
         }
 
-        // Número de página para cada venta
+        /*
+         * Pie de página.
+         */
         doc.setFontSize(8);
         doc.setTextColor(150);
+
         doc.text(
-          `Página ${doc.internal.getNumberOfPages()} - Venta ${index + 1} de ${dataToExport.length}`,
+          `Página ${doc.internal.getNumberOfPages()} - Venta ${
+            index + 1
+          } de ${dataToExport.length}`,
           doc.internal.pageSize.getWidth() / 2,
           doc.internal.pageSize.getHeight() - 20,
-          { align: 'center' }
+          {
+            align: 'center'
+          }
         );
       });
-  
-      doc.save(`reporte-ventas-eliminadas-${sucursalNombre.replace(/\s+/g, '_')}-${dateStr.replace(/\//g, '-').replace(/:/g, '-').replace(' ', '_')}.pdf`);
+
+      const safeSucursalName = sucursalNombre.replace(
+        /\s+/g,
+        '_'
+      );
+
+      const safeDate = dateStr
+        .replace(/\//g, '-')
+        .replace(/:/g, '-')
+        .replace(' ', '_');
+
+      doc.save(
+        `reporte-ventas-eliminadas-${safeSucursalName}-${safeDate}.pdf`
+      );
     } catch (err) {
-      setError('Error al generar el PDF: ' + err.message);
+      setError(
+        'Error al generar el PDF: ' + err.message
+      );
     } finally {
       setGeneratingPDF(false);
     }
   };
 
+  /*
+   * Generar Excel.
+   */
   const generateExcel = () => {
     const dataToExport = filteredData;
-    
+
     if (dataToExport.length === 0) {
       setError('No hay datos para generar el reporte');
       return;
     }
-  
+
     setGeneratingExcel(true);
     setError(null);
-  
+
     try {
-      const sucursalNombre = sucursales.find(s => s.idSucursal == selectedSucursal)?.nombreSucursal || 'Sucursal no especificada';
+      const sucursalNombre =
+        sucursales.find(
+          s => s.idSucursal == selectedSucursal
+        )?.nombreSucursal || 'Sucursal no especificada';
+
       const today = new Date();
-      const dateStr = today.toLocaleDateString('es-GT') + ' ' + today.toLocaleTimeString('es-GT', { hour: '2-digit', minute: '2-digit' });
-  
+
+      const dateStr =
+        today.toLocaleDateString('es-GT') +
+        ' ' +
+        today.toLocaleTimeString('es-GT', {
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+
       const wb = XLSX.utils.book_new();
 
-      // Crear una hoja por cada venta - UNA VENTA POR HOJA
-      dataToExport.forEach((venta, index) => {
+      /*
+       * Una hoja por venta.
+       */
+      dataToExport.forEach(venta => {
         const ventaData = [
-          ["REPORTE DE VENTAS ELIMINADAS"],
+          ['REPORTE DE VENTAS ELIMINADAS'],
           [`Generado el: ${dateStr}`],
           [`Sucursal: ${sucursalNombre}`],
-          [`Rango de fechas: ${dayjs(fechaInicio).format('DD/MM/YYYY')} - ${dayjs(fechaFin).format('DD/MM/YYYY')}`],
-          selectedTurno !== 'Todos' ? [`Turno: ${selectedTurno}`] : [],
+          [
+            `Rango de fechas: ${dayjs(fechaInicio).format(
+              'DD/MM/YYYY'
+            )} - ${dayjs(fechaFin).format('DD/MM/YYYY')}`
+          ],
+          selectedTurno !== 'Todos'
+            ? [`Turno: ${selectedTurno}`]
+            : [],
           [],
-          ["DETALLE DE VENTA ELIMINADA"],
+          ['DETALLE DE VENTA ELIMINADA'],
           [`Venta #${venta.idVenta}`],
           [],
-          ["INFORMACIÓN GENERAL"],
+          ['INFORMACIÓN GENERAL'],
           [`ID Eliminación: ${venta.idEliminacion}`],
           [`ID Venta: ${venta.idVenta}`],
-          [`Fecha Eliminación: ${formatFecha(venta.fechaEliminacion)}`],
+          [
+            `Fecha Eliminación: ${formatFecha(
+              venta.fechaEliminacion
+            )}`
+          ],
           [`Usuario: ${venta.usuario}`],
           [`Turno: ${venta.turno}`],
           [],
-          ["RESUMEN FINANCIERO"],
-          [`Monto Ingresado: ${formatCurrency(venta.montoTotalIngresado)}`],
-          [`Gastos: ${formatCurrency(venta.montoTotalGastos)}`],
-          [`Monto Esperado: ${formatCurrency(venta.montoEsperado)}`],
-          [`Diferencia: ${formatCurrency(venta.diferencia)}`],
+          ['RESUMEN FINANCIERO'],
+          [
+            `Monto Ingresado: ${formatCurrency(
+              venta.montoTotalIngresado
+            )}`
+          ],
+          [
+            `Gastos: ${formatCurrency(
+              venta.montoTotalGastos
+            )}`
+          ],
+          [
+            `Monto Esperado: ${formatCurrency(
+              venta.montoEsperado
+            )}`
+          ],
+          [
+            `Diferencia: ${formatCurrency(
+              venta.diferencia
+            )}`
+          ],
           [],
-          ["PRODUCTOS ELIMINADOS"],
-          ["Producto", "Cantidad", "Precio Unitario", "Subtotal"]
+          ['PRODUCTOS ELIMINADOS'],
+          [
+            'Producto',
+            'Cantidad',
+            'Precio Unitario',
+            'Subtotal'
+          ]
         ];
 
-        // Agregar productos
-        venta.ventaEliminadaDetalle.forEach((producto) => {
-          ventaData.push([
-            producto.nombreProducto || `Producto #${producto.idProducto}`,
-            producto.cantidadVendidaEliminada,
-            producto.precioUnitario,
-            producto.subtotal
-          ]);
-        });
+        if (venta.ventaEliminadaDetalle) {
+          venta.ventaEliminadaDetalle.forEach(
+            producto => {
+              ventaData.push([
+                producto.nombreProducto ||
+                  `Producto #${producto.idProducto}`,
+                producto.cantidadVendidaEliminada,
+                producto.precioUnitario,
+                producto.subtotal
+              ]);
+            }
+          );
+        }
 
-        // Agregar total
-        const totalVenta = venta.ventaEliminadaDetalle.reduce((sum, prod) => sum + prod.subtotal, 0);
+        const totalVenta =
+          venta.ventaEliminadaDetalle?.reduce(
+            (sum, prod) =>
+              sum + Number(prod.subtotal || 0),
+            0
+          ) || 0;
+
         ventaData.push([]);
-        ventaData.push(["", "", "TOTAL:", totalVenta]);
-        ventaData.push([`Total productos: ${venta.ventaEliminadaDetalle.length}`]);
+        ventaData.push([
+          '',
+          '',
+          'TOTAL:',
+          totalVenta
+        ]);
 
-        const wsVenta = XLSX.utils.aoa_to_sheet(ventaData);
+        ventaData.push([
+          `Total productos: ${
+            venta.ventaEliminadaDetalle?.length || 0
+          }`
+        ]);
 
-        // Ajustar anchos de columnas para esta hoja
-        const colWidths = [
-          { wch: 35 }, { wch: 12 }, { wch: 15 }, { wch: 15 }
+        const wsVenta =
+          XLSX.utils.aoa_to_sheet(ventaData);
+
+        wsVenta['!cols'] = [
+          { wch: 35 },
+          { wch: 12 },
+          { wch: 15 },
+          { wch: 15 }
         ];
-        wsVenta['!cols'] = colWidths;
 
-        // Formatear celdas de encabezados principales
-        ['A1', 'A7', 'A10', 'A17', 'A23'].forEach(cell => {
+        /*
+         * Encabezados principales.
+         */
+        [
+          'A1',
+          'A7',
+          'A10',
+          'A17',
+          'A23'
+        ].forEach(cell => {
           if (wsVenta[cell]) {
             wsVenta[cell].s = {
-              font: { bold: true, color: { rgb: "FFFFFF" } },
-              fill: { fgColor: { rgb: "C0392B" } }
+              font: {
+                bold: true,
+                color: {
+                  rgb: 'FFFFFF'
+                }
+              },
+              fill: {
+                fgColor: {
+                  rgb: 'C0392B'
+                }
+              }
             };
           }
         });
 
-        // Formatear encabezado de productos
-        ['A23', 'B23', 'C23', 'D23'].forEach((cell, colIndex) => {
+        /*
+         * Encabezado productos.
+         */
+        [
+          'A23',
+          'B23',
+          'C23',
+          'D23'
+        ].forEach(cell => {
           if (wsVenta[cell]) {
             wsVenta[cell].s = {
-              font: { bold: true, color: { rgb: "FFFFFF" } },
-              fill: { fgColor: { rgb: "3498DB" } }
+              font: {
+                bold: true,
+                color: {
+                  rgb: 'FFFFFF'
+                }
+              },
+              fill: {
+                fgColor: {
+                  rgb: '3498DB'
+                }
+              }
             };
           }
         });
 
-        // Formatear celdas de moneda en resumen financiero
-        const currencyRows = [17, 18, 19, 20]; // Filas de resumen financiero
+        /*
+         * Formato de moneda.
+         */
+        const currencyRows = [17, 18, 19, 20];
+
         currencyRows.forEach(row => {
           ['C', 'D'].forEach(col => {
-            const cellRef = XLSX.utils.encode_cell({ r: row, c: col === 'C' ? 2 : 3 });
+            const cellRef =
+              XLSX.utils.encode_cell({
+                r: row,
+                c: col === 'C' ? 2 : 3
+              });
+
             if (wsVenta[cellRef]) {
-              wsVenta[cellRef].z = '"Q"#,##0.00';
+              wsVenta[cellRef].z =
+                '"Q"#,##0.00';
             }
           });
         });
 
-        // Formatear productos como moneda
+        /*
+         * Productos como moneda.
+         */
         const startProductsRow = 23;
-        venta.ventaEliminadaDetalle.forEach((_, productIndex) => {
-          const dataRow = startProductsRow + 1 + productIndex;
-          ['C', 'D'].forEach(col => {
-            const cellRef = XLSX.utils.encode_cell({ r: dataRow, c: col === 'C' ? 2 : 3 });
-            if (wsVenta[cellRef]) {
-              wsVenta[cellRef].z = '"Q"#,##0.00';
-            }
-          });
-        });
 
-        // Formatear total
-        const totalRow = startProductsRow + venta.ventaEliminadaDetalle.length + 2;
+        (venta.ventaEliminadaDetalle || []).forEach(
+          (_, productIndex) => {
+            const dataRow =
+              startProductsRow + 1 + productIndex;
+
+            ['C', 'D'].forEach(col => {
+              const cellRef =
+                XLSX.utils.encode_cell({
+                  r: dataRow,
+                  c: col === 'C' ? 2 : 3
+                });
+
+              if (wsVenta[cellRef]) {
+                wsVenta[cellRef].z =
+                  '"Q"#,##0.00';
+              }
+            });
+          }
+        );
+
+        /*
+         * Total.
+         */
+        const totalRow =
+          startProductsRow +
+          (venta.ventaEliminadaDetalle?.length || 0) +
+          2;
+
         ['C', 'D'].forEach(col => {
-          const cellRef = XLSX.utils.encode_cell({ r: totalRow, c: col === 'C' ? 2 : 3 });
+          const cellRef =
+            XLSX.utils.encode_cell({
+              r: totalRow,
+              c: col === 'C' ? 2 : 3
+            });
+
           if (wsVenta[cellRef]) {
-            wsVenta[cellRef].z = '"Q"#,##0.00';
-            wsVenta[cellRef].s = { font: { bold: true } };
+            wsVenta[cellRef].z =
+              '"Q"#,##0.00';
+
+            wsVenta[cellRef].s = {
+              font: {
+                bold: true
+              }
+            };
           }
         });
 
-        XLSX.utils.book_append_sheet(wb, wsVenta, `Venta ${venta.idVenta}`);
+        XLSX.utils.book_append_sheet(
+          wb,
+          wsVenta,
+          `Venta ${venta.idVenta}`
+        );
       });
 
-      const fileName = `Reporte_Ventas_Eliminadas_${sucursalNombre.replace(/\s+/g, '_')}_${dateStr.replace(/\//g, '-').replace(/:/g, '-').replace(' ', '_')}.xlsx`;
-      XLSX.writeFile(wb, fileName);
+      const safeSucursalName =
+        sucursalNombre.replace(/\s+/g, '_');
 
+      const safeDate = dateStr
+        .replace(/\//g, '-')
+        .replace(/:/g, '-')
+        .replace(' ', '_');
+
+      const fileName =
+        `Reporte_Ventas_Eliminadas_${safeSucursalName}_${safeDate}.xlsx`;
+
+      XLSX.writeFile(wb, fileName);
     } catch (err) {
-      setError('Error al generar el Excel: ' + err.message);
-      console.error('Error detallado:', err);
+      setError(
+        'Error al generar el Excel: ' + err.message
+      );
+
+      console.error(
+        'Error detallado:',
+        err
+      );
     } finally {
       setGeneratingExcel(false);
     }
   };
 
-  const { totalVentas, totalDiferencia, totalMontoIngresado, totalMontoEsperado, totalGastos } = calcularTotales();
+  const {
+    totalVentas,
+    totalDiferencia,
+    totalMontoIngresado,
+    totalMontoEsperado,
+    totalGastos
+  } = calcularTotales();
+
+  /*
+   * Tarjeta de detalle de productos.
+   */
+  const renderProductosDetalle = venta => {
+    if (
+      !venta.ventaEliminadaDetalle ||
+      venta.ventaEliminadaDetalle.length === 0
+    ) {
+      return (
+        <div className="rounded-xl border border-line bg-surface-2 p-4 text-sm text-muted">
+          No hay productos registrados en el detalle de esta venta.
+        </div>
+      );
+    }
+
+    const totalProductos =
+      venta.ventaEliminadaDetalle.reduce(
+        (sum, producto) =>
+          sum + Number(producto.subtotal || 0),
+        0
+      );
+
+    return (
+      <div className="overflow-hidden rounded-xl border border-line bg-surface">
+        <div className="flex items-center justify-between gap-3 border-b border-line bg-surface-2 px-4 py-3">
+          <div className="flex items-center gap-2">
+            <FiPackage className="text-brand-600 dark:text-brand-400" />
+
+            <div>
+              <p className="text-sm font-bold text-ink">
+                Productos eliminados
+              </p>
+
+              <p className="text-2xs text-muted">
+                {venta.ventaEliminadaDetalle.length}{' '}
+                producto
+                {venta.ventaEliminadaDetalle.length !== 1
+                  ? 's'
+                  : ''}
+              </p>
+            </div>
+          </div>
+
+          <span className="text-sm font-bold text-ink">
+            {formatCurrency(totalProductos)}
+          </span>
+        </div>
+
+        <div className="divide-y divide-line">
+          {venta.ventaEliminadaDetalle.map(
+            (producto, index) => (
+              <div
+                key={`${venta.idEliminacion}-${index}`}
+                className="grid gap-3 px-4 py-4 sm:grid-cols-[minmax(0,1fr)_100px_130px_130px] sm:items-center"
+              >
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold text-ink">
+                    {producto.nombreProducto ||
+                      `Producto #${producto.idProducto}`}
+                  </p>
+
+                  <p className="mt-0.5 text-2xs text-muted">
+                    ID producto: {producto.idProducto}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-2xs font-bold uppercase tracking-wide text-muted">
+                    Cantidad
+                  </p>
+
+                  <p className="mt-1 text-sm font-semibold text-ink">
+                    {producto.cantidadVendidaEliminada}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-2xs font-bold uppercase tracking-wide text-muted">
+                    Precio unitario
+                  </p>
+
+                  <p className="mt-1 text-sm font-semibold text-ink">
+                    {formatCurrency(
+                      producto.precioUnitario
+                    )}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-2xs font-bold uppercase tracking-wide text-muted">
+                    Subtotal
+                  </p>
+
+                  <p className="mt-1 text-sm font-bold text-ink">
+                    {formatCurrency(
+                      producto.subtotal
+                    )}
+                  </p>
+                </div>
+              </div>
+            )
+          )}
+        </div>
+
+        <div className="flex items-center justify-between border-t border-line bg-surface-2 px-4 py-3">
+          <span className="text-xs font-semibold text-muted">
+            Total de productos
+          </span>
+
+          <span className="text-sm font-bold text-ink">
+            {formatCurrency(totalProductos)}
+          </span>
+        </div>
+      </div>
+    );
+  };
+
+  /*
+   * Detalle expandido.
+   */
+  const renderVentaDetail = venta => (
+    <div className="border-t border-danger-200 bg-danger-50/70 p-4 dark:border-danger-900/50 dark:bg-danger-900/10 sm:p-5">
+      <div className="overflow-hidden rounded-2xl border border-danger-200 bg-surface shadow-sm dark:border-danger-900/50">
+        {/* Encabezado */}
+        <div className="flex flex-col gap-3 border-b border-line bg-surface-2 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-start gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-danger-100 text-danger-600 dark:bg-danger-900/30 dark:text-danger-400">
+              <FiTrash2 />
+            </div>
+
+            <div>
+              <p className="text-sm font-bold text-ink">
+                Detalle de venta eliminada #{venta.idVenta}
+              </p>
+
+              <p className="mt-0.5 text-xs text-muted">
+                Eliminada el{' '}
+                {formatFechaHora(
+                  venta.fechaEliminacion
+                )}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            {renderTurnoBadge(venta.turno)}
+
+            <span className="inline-flex items-center rounded-full border border-danger-200 bg-danger-50 px-2.5 py-1 text-2xs font-bold text-danger-700 dark:border-danger-900/50 dark:bg-danger-900/20 dark:text-danger-300">
+              ELIMINADA
+            </span>
+          </div>
+        </div>
+
+        {/* Información general */}
+        <div className="border-b border-line p-4 sm:p-5">
+          <div className="mb-4 flex items-center gap-2">
+            <FiUser className="text-brand-600 dark:text-brand-400" />
+
+            <h3 className="text-sm font-bold text-ink">
+              Información de eliminación
+            </h3>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="rounded-xl border border-line bg-surface-2 p-3">
+              <p className="text-2xs font-bold uppercase tracking-wide text-muted">
+                ID Eliminación
+              </p>
+
+              <p className="mt-1 text-sm font-bold text-ink">
+                #{venta.idEliminacion}
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-line bg-surface-2 p-3">
+              <p className="text-2xs font-bold uppercase tracking-wide text-muted">
+                ID Venta
+              </p>
+
+              <p className="mt-1 text-sm font-bold text-ink">
+                #{venta.idVenta}
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-line bg-surface-2 p-3">
+              <p className="text-2xs font-bold uppercase tracking-wide text-muted">
+                Usuario
+              </p>
+
+              <p className="mt-1 truncate text-sm font-semibold text-ink">
+                {venta.usuario || 'No disponible'}
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-line bg-surface-2 p-3">
+              <p className="text-2xs font-bold uppercase tracking-wide text-muted">
+                Fecha de eliminación
+              </p>
+
+              <p className="mt-1 text-sm font-semibold text-ink">
+                {formatFechaHora(
+                  venta.fechaEliminacion
+                )}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Resumen financiero */}
+        <div className="border-b border-line p-4 sm:p-5">
+          <div className="mb-4 flex items-center gap-2">
+            <FiDollarSign className="text-brand-600 dark:text-brand-400" />
+
+            <h3 className="text-sm font-bold text-ink">
+              Resumen financiero
+            </h3>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+            <div className="rounded-xl border border-line bg-surface-2 p-3">
+              <p className="text-2xs font-bold uppercase tracking-wide text-muted">
+                Monto ingresado
+              </p>
+
+              <p className="mt-1 text-sm font-bold text-ink">
+                {formatCurrency(
+                  venta.montoTotalIngresado
+                )}
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-line bg-surface-2 p-3">
+              <p className="text-2xs font-bold uppercase tracking-wide text-muted">
+                Gastos
+              </p>
+
+              <p className="mt-1 text-sm font-bold text-ink">
+                {formatCurrency(
+                  venta.montoTotalGastos
+                )}
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-line bg-surface-2 p-3">
+              <p className="text-2xs font-bold uppercase tracking-wide text-muted">
+                Monto esperado
+              </p>
+
+              <p className="mt-1 text-sm font-bold text-ink">
+                {formatCurrency(
+                  venta.montoEsperado
+                )}
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-line bg-surface-2 p-3">
+              <p className="text-2xs font-bold uppercase tracking-wide text-muted">
+                Diferencia
+              </p>
+
+              <p
+                className={`mt-1 text-sm font-bold ${getDifferenceClass(
+                  venta.diferencia
+                )}`}
+              >
+                {formatCurrency(venta.diferencia)}
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-line bg-surface-2 p-3">
+              <p className="text-2xs font-bold uppercase tracking-wide text-muted">
+                Turno
+              </p>
+
+              <div className="mt-1">
+                {renderTurnoBadge(venta.turno)}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Productos */}
+        <div className="p-4 sm:p-5">
+          <div className="mb-4 flex items-center gap-2">
+            <FiPackage className="text-brand-600 dark:text-brand-400" />
+
+            <h3 className="text-sm font-bold text-ink">
+              Productos eliminados
+            </h3>
+          </div>
+
+          {renderProductosDetalle(venta)}
+        </div>
+      </div>
+    </div>
+  );
 
   return (
-    <Container fluid className="ve-container">
-      <Row className="ve-header-row">
-        <Col xs="auto" className="ve-back-col">
-          <Button 
-            variant="outline-primary" 
-            onClick={() => navigate('/reportes')}
-            className="ve-back-button"
-          >
-            <FiArrowLeft size={20} />
-          </Button>
-        </Col>
-        <Col>
-          <h1 className="ve-title">
-            <FiTrash2 className="ve-title-icon" />
-            Ventas Eliminadas
-          </h1>
-          <p className="ve-subtitle">Consulta el historial de ventas eliminadas por sucursal y fecha</p>
-        </Col>
-      </Row>
+    <div className="flex flex-col gap-6">
+      {/* ============================================================
+          HEADER
+      ============================================================ */}
+      <div className="flex items-start gap-3">
+        <button
+          type="button"
+          onClick={() => navigate('/reportes')}
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-line bg-surface text-muted transition hover:border-brand-300 hover:bg-brand-50 hover:text-brand-600 dark:hover:bg-brand-900/20"
+          aria-label="Regresar a reportes"
+        >
+          <FiArrowLeft size={19} />
+        </button>
 
-      {/* Resumen - Solo visible en desktop */}
+        <div className="flex items-start gap-3">
+          <div className="hidden h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-danger-100 text-danger-600 dark:bg-danger-900/30 dark:text-danger-400 sm:flex">
+            <FiTrash2 size={21} />
+          </div>
+
+          <div>
+            <h1 className="text-xl font-bold text-ink sm:text-2xl">
+              Ventas Eliminadas
+            </h1>
+
+            <p className="mt-1 text-sm text-muted">
+              Consulta el historial de ventas eliminadas por
+              sucursal y fecha.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* ============================================================
+          RESUMEN
+      ============================================================ */}
       {ventasEliminadas.length > 0 && (
-        <div className="d-none d-md-block">
-          <Row className="ve-resumen-row">
-            <Col>
-              <Card className="ve-resumen-card">
-                <Card.Body>
-                  <Row>
-                    <Col md={3} className="ve-resumen-col">
-                      <div className="ve-resumen-item">
-                        <div className="ve-resumen-icon ve-eliminar">
-                          <FiTrash2 />
-                        </div>
-                        <div className="ve-resumen-info">
-                          <span className="ve-resumen-label">Ventas Eliminadas</span>
-                          <span className="ve-resumen-value">{totalVentas}</span>
-                        </div>
-                      </div>
-                    </Col>
-                    <Col md={3} className="ve-resumen-col">
-                      <div className="ve-resumen-item">
-                        <div className="ve-resumen-icon ve-ingresos">
-                          <FiDownload />
-                        </div>
-                        <div className="ve-resumen-info">
-                          <span className="ve-resumen-label">Monto Ingresado</span>
-                          <span className="ve-resumen-value">{formatCurrency(totalMontoIngresado)}</span>
-                        </div>
-                      </div>
-                    </Col>
-                    <Col md={3} className="ve-resumen-col">
-                      <div className="ve-resumen-item">
-                        <div className="ve-resumen-icon ve-gastos">
-                          <FiRefreshCw />
-                        </div>
-                        <div className="ve-resumen-info">
-                          <span className="ve-resumen-label">Total Gastos</span>
-                          <span className="ve-resumen-value">{formatCurrency(totalGastos)}</span>
-                        </div>
-                      </div>
-                    </Col>
-                    <Col md={3} className="ve-resumen-col">
-                      <div className="ve-resumen-item">
-                        <div className="ve-resumen-icon ve-diferencia">
-                          <span className={`${totalDiferencia < 0 ? 've-text-danger' : 've-text-success'}`}>
-                            {totalDiferencia < 0 ? '▼' : '▲'}
-                          </span>
-                        </div>
-                        <div className="ve-resumen-info">
-                          <span className="ve-resumen-label">Diferencia Total</span>
-                          <span className={`ve-resumen-value ${totalDiferencia < 0 ? 've-text-danger' : 've-text-success'}`}>
-                            {formatCurrency(totalDiferencia)}
-                          </span>
-                        </div>
-                      </div>
-                    </Col>
-                  </Row>
-                </Card.Body>
-              </Card>
-            </Col>
-          </Row>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {/* Ventas */}
+          <div className="rounded-2xl border border-line bg-surface p-4 shadow-card">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-danger-100 text-danger-600 dark:bg-danger-900/30 dark:text-danger-400">
+                <FiTrash2 />
+              </div>
+
+              <div className="min-w-0">
+                <p className="text-2xs font-bold uppercase tracking-wide text-muted">
+                  Ventas eliminadas
+                </p>
+
+                <p className="mt-1 text-xl font-bold text-ink">
+                  {totalVentas}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Ingresado */}
+          <div className="rounded-2xl border border-line bg-surface p-4 shadow-card">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-100 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400">
+                <FiDollarSign />
+              </div>
+
+              <div className="min-w-0">
+                <p className="text-2xs font-bold uppercase tracking-wide text-muted">
+                  Monto ingresado
+                </p>
+
+                <p className="mt-1 truncate text-lg font-bold text-ink">
+                  {formatCurrency(
+                    totalMontoIngresado
+                  )}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Gastos */}
+          <div className="rounded-2xl border border-line bg-surface p-4 shadow-card">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-surface-2 text-muted">
+                <FiRefreshCw />
+              </div>
+
+              <div className="min-w-0">
+                <p className="text-2xs font-bold uppercase tracking-wide text-muted">
+                  Total gastos
+                </p>
+
+                <p className="mt-1 truncate text-lg font-bold text-ink">
+                  {formatCurrency(totalGastos)}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Diferencia */}
+          <div className="rounded-2xl border border-line bg-surface p-4 shadow-card">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-surface-2 text-muted">
+                <FiAlertTriangle />
+              </div>
+
+              <div className="min-w-0">
+                <p className="text-2xs font-bold uppercase tracking-wide text-muted">
+                  Diferencia total
+                </p>
+
+                <p
+                  className={`mt-1 truncate text-lg font-bold ${getDifferenceClass(
+                    totalDiferencia
+                  )}`}
+                >
+                  {formatCurrency(totalDiferencia)}
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
-      <Card className="ve-filtros-card">
-        <Card.Body>
-          <Row>
-            <Col md={3} className="ve-filtro-col">
-              <Form.Group>
-                <Form.Label className="ve-filter-label">Fecha Inicio</Form.Label>
-                <Form.Control
-                  type="date"
-                  value={fechaInicio}
-                  max={fechaFin || dayjs().format('YYYY-MM-DD')}
-                  onChange={(e) => setFechaInicio(e.target.value)}
-                  className="ve-filter-select ve-date-input"
-                  placeholder=" "
-                  onFocus={(e) => e.target.showPicker()}
+      {/* ============================================================
+          FILTROS
+      ============================================================ */}
+      <div className="rounded-2xl border border-line bg-surface p-4 shadow-card sm:p-5">
+        <div className="mb-4 flex items-center gap-2">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-100 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400">
+            <FiFilter size={17} />
+          </div>
+
+          <div>
+            <h2 className="text-sm font-bold text-ink">
+              Filtros del reporte
+            </h2>
+
+            <p className="text-2xs text-muted">
+              Selecciona los criterios para consultar las
+              ventas eliminadas.
+            </p>
+          </div>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          {/* Fecha inicio */}
+          <div>
+            <label className="mb-1.5 block text-xs font-semibold text-muted">
+              Fecha inicio
+            </label>
+
+            <div className="relative">
+              <FiCalendar
+                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted"
+                size={16}
+              />
+
+              <input
+                type="date"
+                value={fechaInicio}
+                max={
+                  fechaFin ||
+                  dayjs().format('YYYY-MM-DD')
+                }
+                onChange={e =>
+                  setFechaInicio(e.target.value)
+                }
+                onFocus={e =>
+                  e.target.showPicker?.()
+                }
+                className="h-11 w-full rounded-xl border border-line bg-surface-2 pl-10 pr-3 text-sm text-ink outline-none transition focus:border-brand-400 focus:ring-2 focus:ring-brand-500/20"
+              />
+            </div>
+          </div>
+
+          {/* Fecha fin */}
+          <div>
+            <label className="mb-1.5 block text-xs font-semibold text-muted">
+              Fecha fin
+            </label>
+
+            <div className="relative">
+              <FiCalendar
+                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted"
+                size={16}
+              />
+
+              <input
+                type="date"
+                value={fechaFin}
+                min={fechaInicio}
+                max={dayjs().format('YYYY-MM-DD')}
+                onChange={e =>
+                  setFechaFin(e.target.value)
+                }
+                onFocus={e =>
+                  e.target.showPicker?.()
+                }
+                className="h-11 w-full rounded-xl border border-line bg-surface-2 pl-10 pr-3 text-sm text-ink outline-none transition focus:border-brand-400 focus:ring-2 focus:ring-brand-500/20"
+              />
+            </div>
+          </div>
+
+          {/* Sucursal */}
+          <div>
+            <label className="mb-1.5 block text-xs font-semibold text-muted">
+              Sucursal
+            </label>
+
+            {userData?.idRol === 1 ? (
+              <div className="relative">
+                <select
+                  value={selectedSucursal}
+                  onChange={e =>
+                    setSelectedSucursal(e.target.value)
+                  }
+                  disabled={
+                    loadingSucursales ||
+                    sucursales.length === 0
+                  }
+                  className="h-11 w-full appearance-none rounded-xl border border-line bg-surface-2 px-3 pr-10 text-sm text-ink outline-none transition focus:border-brand-400 focus:ring-2 focus:ring-brand-500/20 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  <option value="">
+                    Seleccionar sucursal
+                  </option>
+
+                  {sucursales.map(sucursal => (
+                    <option
+                      key={sucursal.idSucursal}
+                      value={sucursal.idSucursal}
+                    >
+                      {sucursal.nombreSucursal}
+                    </option>
+                  ))}
+                </select>
+
+                <FiChevronDown
+                  className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-muted"
+                  size={17}
                 />
-              </Form.Group>
-            </Col>
-
-            <Col md={3} className="ve-filtro-col">
-              <Form.Group>
-                <Form.Label className="ve-filter-label">Fecha Fin</Form.Label>
-                <Form.Control
-                  type="date"
-                  value={fechaFin}
-                  min={fechaInicio}
-                  max={dayjs().format('YYYY-MM-DD')}
-                  onChange={(e) => setFechaFin(e.target.value)}
-                  className="ve-filter-select ve-date-input"
-                  placeholder=" "
-                  onFocus={(e) => e.target.showPicker()}
-                />
-              </Form.Group>
-            </Col>
-
-            <Col md={3} className="ve-filtro-col">
-              <Form.Group>
-                <Form.Label className="ve-filter-label">Sucursal</Form.Label>
-                {userData?.idRol === 1 ? (
-                  <Form.Control
-                    as="select"
-                    value={selectedSucursal}
-                    onChange={(e) => setSelectedSucursal(e.target.value)}
-                    disabled={loadingSucursales || sucursales.length === 0}
-                    className="ve-filter-select"
-                  >
-                    <option value="">Seleccionar sucursal</option>
-                    {sucursales.map((sucursal) => (
-                      <option key={sucursal.idSucursal} value={sucursal.idSucursal}>
-                        {sucursal.nombreSucursal}
-                      </option>
-                    ))}
-                  </Form.Control>
-                ) : (
-                  <Form.Control
-                    type="text"
-                    readOnly
-                    value={sucursales.find(s => s.idSucursal === userData?.idSucursal)?.nombreSucursal || "Tu sucursal"}
-                    className="ve-filter-select"
-                  />
-                )}
-                {loadingSucursales && <small className="ve-loading-text">Cargando sucursales...</small>}
-                {!loadingSucursales && sucursales.length === 0 && (
-                  <small className="ve-error-text">No hay sucursales disponibles</small>
-                )}
-              </Form.Group>
-            </Col>
-
-            <Col md={3} className="ve-filtro-col">
-              <Form.Group>
-                <Form.Label className="ve-filter-label">Turno</Form.Label>
-                <Form.Control
-                  as="select"
-                  value={selectedTurno}
-                  onChange={(e) => setSelectedTurno(e.target.value)}
-                  disabled={ventasEliminadas.length === 0}
-                  className="ve-filter-select"
-                >
-                  <option value="Todos">Todos los turnos</option>
-                  <option value="AM">Turno AM</option>
-                  <option value="PM">Turno PM</option>
-                </Form.Control>
-              </Form.Group>
-            </Col>
-          </Row>
-
-          <Row className="ve-actions-row">
-            <Col className="ve-actions-col">
-              <div className="ve-actions-buttons">
-                <Button
-                  variant="outline-secondary"
-                  onClick={handleReset}
-                  className="ve-reset-btn"
-                >
-                  <FiRefreshCw />
-                </Button>
-                <Button
-                  variant="primary"
-                  onClick={handleGenerarReporte}
-                  disabled={!fechaInicio || !fechaFin || !selectedSucursal || loadingReporte}
-                  className="ve-generar-btn"
-                >
-                  {loadingReporte ? (
-                    <Spinner animation="border" size="sm" />
-                  ) : (
-                    <>
-                      <FiFilter className="ve-btn-icon" /> Generar
-                    </>
-                  )}
-                </Button>
               </div>
-            </Col>
-          </Row>
-        </Card.Body>
-      </Card>
+            ) : (
+              <input
+                type="text"
+                readOnly
+                value={
+                  sucursales.find(
+                    s =>
+                      s.idSucursal ===
+                      userData?.idSucursal
+                  )?.nombreSucursal ||
+                  'Tu sucursal'
+                }
+                className="h-11 w-full rounded-xl border border-line bg-surface-2 px-3 text-sm text-ink outline-none"
+              />
+            )}
 
+            {loadingSucursales && (
+              <p className="mt-1 text-2xs text-muted">
+                Cargando sucursales...
+              </p>
+            )}
+
+            {!loadingSucursales &&
+              sucursales.length === 0 && (
+                <p className="mt-1 text-2xs text-danger-600 dark:text-danger-400">
+                  No hay sucursales disponibles.
+                </p>
+              )}
+          </div>
+
+          {/* Turno */}
+          <div>
+            <label className="mb-1.5 block text-xs font-semibold text-muted">
+              Turno
+            </label>
+
+            <div className="relative">
+              <select
+                value={selectedTurno}
+                onChange={e =>
+                  setSelectedTurno(e.target.value)
+                }
+                disabled={ventasEliminadas.length === 0}
+                className="h-11 w-full appearance-none rounded-xl border border-line bg-surface-2 px-3 pr-10 text-sm text-ink outline-none transition focus:border-brand-400 focus:ring-2 focus:ring-brand-500/20 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                <option value="Todos">
+                  Todos los turnos
+                </option>
+
+                <option value="AM">
+                  Turno AM
+                </option>
+
+                <option value="PM">
+                  Turno PM
+                </option>
+              </select>
+
+              <FiChevronDown
+                className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-muted"
+                size={17}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Acciones */}
+        <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:justify-end">
+          <button
+            type="button"
+            onClick={handleReset}
+            className="flex h-11 items-center justify-center gap-2 rounded-xl border border-line bg-surface px-4 text-sm font-semibold text-muted transition hover:bg-surface-2"
+          >
+            <FiRefreshCw size={16} />
+            Restablecer
+          </button>
+
+          <button
+            type="button"
+            onClick={handleGenerarReporte}
+            disabled={
+              !fechaInicio ||
+              !fechaFin ||
+              !selectedSucursal ||
+              loadingReporte
+            }
+            className="flex h-11 items-center justify-center gap-2 rounded-xl bg-brand-600 px-5 text-sm font-semibold text-white shadow-brand transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {loadingReporte ? (
+              <>
+                <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                Generando...
+              </>
+            ) : (
+              <>
+                <FiFilter size={16} />
+                Generar reporte
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+
+      {/* ============================================================
+          ERRORES
+      ============================================================ */}
       {error && (
-        <Row className="ve-error-row">
-          <Col>
-            {renderErrorAlert(error)}
-          </Col>
-        </Row>
+        <div className="rounded-xl border border-danger-200 bg-danger-50 px-4 py-3 text-sm font-medium text-danger-700 dark:border-danger-900/50 dark:bg-danger-900/20 dark:text-danger-300">
+          {error}
+        </div>
       )}
 
       {showErrorSucursales && (
-        <Row className="ve-error-row">
-          <Col xs={12} md={6}>
-            {renderErrorAlert(`Error al cargar las sucursales`)}
-          </Col>
-        </Row>
+        <div className="rounded-xl border border-danger-200 bg-danger-50 px-4 py-3 text-sm font-medium text-danger-700 dark:border-danger-900/50 dark:bg-danger-900/20 dark:text-danger-300">
+          Error al cargar las sucursales.
+        </div>
       )}
 
+      {/* ============================================================
+          EXPORTACIONES
+      ============================================================ */}
       {ventasEliminadas.length > 0 && (
-        <>
-          <Row className="ve-export-row">
-            <Col md={12} className="ve-export-col">
-              <Button 
-                variant="outline-primary" 
-                className="ve-export-btn ve-excel-btn"
-                onClick={generateExcel}
-                disabled={generatingExcel || filteredData.length === 0}
-              >
-                {generatingExcel ? (
-                  <>
-                    <Spinner animation="border" size="sm" className="ve-btn-spinner" /> Generando...
-                  </>
-                ) : (
-                  <>
-                    <FiDownload className="ve-btn-icon" /> Exportar a Excel
-                  </>
-                )}
-              </Button>
-              <Button 
-                variant="outline-danger" 
-                className="ve-export-btn ve-pdf-btn"
-                onClick={generatePDF}
-                disabled={generatingPDF || filteredData.length === 0}
-              >
-                {generatingPDF ? (
-                  <>
-                    <Spinner animation="border" size="sm" className="ve-btn-spinner" /> Generando...
-                  </>
-                ) : (
-                  <>
-                    <FiDownload className="ve-btn-icon" /> Exportar a PDF
-                  </>
-                )}
-              </Button>
-            </Col>
-          </Row>
-        </>
+        <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
+          <button
+            type="button"
+            onClick={generateExcel}
+            disabled={
+              generatingExcel ||
+              filteredData.length === 0
+            }
+            className="flex h-11 items-center justify-center gap-2 rounded-xl border border-line bg-surface px-4 text-sm font-semibold text-ink transition hover:bg-surface-2 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {generatingExcel ? (
+              <>
+                <span className="h-4 w-4 animate-spin rounded-full border-2 border-muted/30 border-t-muted" />
+                Generando...
+              </>
+            ) : (
+              <>
+                <FiDownload size={16} />
+                Exportar a Excel
+              </>
+            )}
+          </button>
+
+          <button
+            type="button"
+            onClick={generatePDF}
+            disabled={
+              generatingPDF ||
+              filteredData.length === 0
+            }
+            className="flex h-11 items-center justify-center gap-2 rounded-xl border border-danger-200 bg-danger-50 px-4 text-sm font-semibold text-danger-700 transition hover:bg-danger-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-danger-900/50 dark:bg-danger-900/20 dark:text-danger-300 dark:hover:bg-danger-900/30"
+          >
+            {generatingPDF ? (
+              <>
+                <span className="h-4 w-4 animate-spin rounded-full border-2 border-danger-300/40 border-t-danger-600 dark:border-danger-700/40 dark:border-t-danger-300" />
+                Generando...
+              </>
+            ) : (
+              <>
+                <FiDownload size={16} />
+                Exportar a PDF
+              </>
+            )}
+          </button>
+        </div>
       )}
 
-      <Row>
-        <Col>
-          {filteredData.length > 0 ? (
-            <>
-              <div className="d-none d-md-block">
-                <Table responsive bordered hover className="ve-table">
-                  <thead>
-                    <tr>
-                      <th>Fecha Eliminación</th>
-                      <th>ID Venta</th>
-                      <th>Usuario</th>
-                      <th>Turno</th>
-                      <th>Monto Ingresado</th>
-                      <th>Gastos</th>
-                      <th>Monto Esperado</th>
-                      <th>Diferencia</th>
-                      <th>Acciones</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredData.map((venta) => (
-                      <tr key={venta.idEliminacion}>
-                        <td>{formatFecha(venta.fechaEliminacion)}</td>
-                        <td className="ve-text-center">{venta.idVenta}</td>
-                        <td className="ve-text-center">{venta.usuario}</td>
-                        <td style={{
-                          backgroundColor: getTurnoBackgroundColor(venta.turno),
-                          color: getTurnoTextColor(venta.turno),
-                          fontWeight: 'bold'
-                        }} className="ve-text-center">
-                          {venta.turno}
-                        </td>
-                        <td className="ve-text-end">{formatCurrency(venta.montoTotalIngresado)}</td>
-                        <td className="ve-text-end">{formatCurrency(venta.montoTotalGastos)}</td>
-                        <td className="ve-text-end">{formatCurrency(venta.montoEsperado)}</td>
-                        <td className={`ve-text-end ${venta.diferencia < 0 ? 've-text-danger' : 've-text-success'}`}>
-                          {formatCurrency(venta.diferencia)}
-                        </td>
-                        <td className="ve-text-center">
-                          <Button
-                            variant="outline-info"
-                            size="sm"
-                            onClick={() => handleVerDetalle(venta)}
-                            className="ve-detalle-btn"
-                          >
-                            <FiEye className="ve-btn-icon" />
-                            Ver Detalle
-                          </Button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </Table>
-              </div>
+      {/* ============================================================
+          RESULTADOS
+      ============================================================ */}
+      {filteredData.length > 0 ? (
+        <>
+          {/* ========================================================
+              DESKTOP
+          ======================================================== */}
+          <div className="hidden overflow-hidden rounded-2xl border border-line bg-surface shadow-card sm:block">
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-left">
+                <thead className="bg-surface-2">
+                  <tr>
+                    <th className="px-4 py-3 text-2xs font-bold uppercase tracking-wide text-muted">
+                      Fecha
+                    </th>
 
-              <div className="d-md-none">
-                <Accordion activeKey={activeVenta}>
-                  {filteredData.map((venta) => (
-                    <Accordion.Item 
-                      key={venta.idEliminacion} 
-                      eventKey={venta.idEliminacion}
-                      className="ve-venta-card"
-                    >
-                      <Accordion.Header onClick={() => toggleVenta(venta.idEliminacion)}>
-                        <div className="ve-accordion-header">
-                          <div className="ve-venta-info">
-                            <span className="ve-venta-fecha">{formatFecha(venta.fechaEliminacion)}</span>
-                            <span className="ve-venta-id">Venta #{venta.idVenta}</span>
-                          </div>
-                          <div className="ve-venta-datos">
-                            <span className={`ve-venta-diferencia ${venta.diferencia < 0 ? 've-text-danger' : 've-text-success'}`}>
-                              {formatCurrency(venta.diferencia)}
-                            </span>
-                            {renderTurnoBadge(venta.turno)}
-                          </div>
-                          {activeVenta === venta.idEliminacion ? <FiChevronUp /> : <FiChevronDown />}
-                        </div>
-                      </Accordion.Header>
-                      <Accordion.Body>
-                        <div className="ve-venta-details">
-                          <div className="ve-detail-row">
-                            <span className="ve-detail-label">Usuario:</span>
-                            <span>{venta.usuario}</span>
-                          </div>
-                          <div className="ve-detail-row">
-                            <span className="ve-detail-label">Monto Ingresado:</span>
-                            <span>{formatCurrency(venta.montoTotalIngresado)}</span>
-                          </div>
-                          <div className="ve-detail-row">
-                            <span className="ve-detail-label">Gastos:</span>
-                            <span>{formatCurrency(venta.montoTotalGastos)}</span>
-                          </div>
-                          <div className="ve-detail-row">
-                            <span className="ve-detail-label">Monto Esperado:</span>
-                            <span>{formatCurrency(venta.montoEsperado)}</span>
-                          </div>
-                          
-                          {/* Detalle de productos */}
-                          {venta.ventaEliminadaDetalle.length > 0 && (
-                            <div className="ve-productos-detalle">
-                              <h6 className="ve-detalle-title">Detalle de Productos:</h6>
-                              {venta.ventaEliminadaDetalle.map((producto, index) => (
-                                <div key={index} className="ve-producto-item">
-                                  <div className="ve-detail-row">
-                                    <span className="ve-detail-label">Producto:</span>
-                                    <span>{producto.nombreProducto || `Producto #${producto.idProducto}`}</span>
-                                  </div>
-                                  <div className="ve-detail-row">
-                                    <span className="ve-detail-label">Cantidad:</span>
-                                    <span>{producto.cantidadVendidaEliminada} unidades</span>
-                                  </div>
-                                  <div className="ve-detail-row">
-                                    <span className="ve-detail-label">Precio Unitario:</span>
-                                    <span>{formatCurrency(producto.precioUnitario)}</span>
-                                  </div>
-                                  <div className="ve-detail-row">
-                                    <span className="ve-detail-label">Subtotal:</span>
-                                    <span>{formatCurrency(producto.subtotal)}</span>
-                                  </div>
-                                </div>
-                              ))}
+                    <th className="px-4 py-3 text-2xs font-bold uppercase tracking-wide text-muted">
+                      Venta / Usuario
+                    </th>
+
+                    <th className="px-4 py-3 text-2xs font-bold uppercase tracking-wide text-muted">
+                      Turno
+                    </th>
+
+                    <th className="px-4 py-3 text-right text-2xs font-bold uppercase tracking-wide text-muted">
+                      Ingresado
+                    </th>
+
+                    <th className="px-4 py-3 text-right text-2xs font-bold uppercase tracking-wide text-muted">
+                      Diferencia
+                    </th>
+
+                    <th className="w-12 px-4 py-3" />
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {filteredData.map(venta => {
+                    const isOpen =
+                      activeVenta ===
+                      venta.idEliminacion;
+
+                    return (
+                      <React.Fragment
+                        key={venta.idEliminacion}
+                      >
+                        {/* Fila resumen */}
+                        <tr
+                          onClick={() =>
+                            toggleVenta(
+                              venta.idEliminacion
+                            )
+                          }
+                          className="cursor-pointer border-t border-line text-sm text-ink"
+                        >
+                          <td className="px-4 py-4 align-middle">
+                            <div className="flex items-center gap-2">
+                              <FiCalendar
+                                className="shrink-0 text-muted"
+                                size={15}
+                              />
+
+                              <div>
+                                <p className="font-semibold">
+                                  {formatFecha(
+                                    venta.fechaEliminacion
+                                  )}
+                                </p>
+
+                                <p className="text-2xs text-muted">
+                                  {dayjs(
+                                    venta.fechaEliminacion
+                                  ).format('HH:mm')}
+                                </p>
+                              </div>
                             </div>
-                          )}
-                        </div>
-                      </Accordion.Body>
-                    </Accordion.Item>
-                  ))}
-                </Accordion>
-              </div>
-            </>
-          ) : ventasEliminadas.length > 0 && filteredData.length === 0 ? (
-            <Card className="ve-empty-state">
-              <Card.Body className="ve-empty-body">
-                <FiFilter size={48} className="ve-empty-icon" />
-                <h5>No hay resultados para el filtro aplicado</h5>
-                <p className="ve-empty-text">
-                  No se encontraron ventas eliminadas para el turno seleccionado
-                </p>
-              </Card.Body>
-            </Card>
-          ) : !showErrorSucursales && (
-            <Card className="ve-empty-state">
-              <Card.Body className="ve-empty-body">
-                {loadingReporte ? (
-                  <>
-                    <Spinner animation="border" variant="primary" />
-                    <p className="ve-loading-text">Generando reporte...</p>
-                  </>
-                ) : (
-                  <>
-                    <FiTrash2 size={48} className="ve-empty-icon" />
-                    <h5>No hay datos para mostrar</h5>
-                    <p className="ve-empty-text">
-                      Selecciona un rango de fechas y una sucursal para generar el reporte de ventas eliminadas
-                    </p>
-                  </>
-                )}
-              </Card.Body>
-            </Card>
-          )}
-        </Col>
-      </Row>
+                          </td>
 
-      {/* Modal de Detalle */}
-      <Modal 
-        show={showDetalleModal} 
-        onHide={handleCloseDetalleModal}
-        size="lg"
-        centered
-        className="ve-modal"
-      >
-        <Modal.Header closeButton className="ve-modal-header">
-          <Modal.Title className="ve-modal-title">
-            <FiEye className="ve-modal-icon" />
-            Detalle de Venta Eliminada
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body className="ve-modal-body">
-          {ventaSeleccionada && (
-            <div className="ve-detalle-content">
-              <Row className="ve-detalle-info-row">
-                <Col md={6}>
-                  <div className="ve-detalle-info">
-                    <strong>ID Eliminación:</strong> {ventaSeleccionada.idEliminacion}
-                  </div>
-                  <div className="ve-detalle-info">
-                    <strong>ID Venta:</strong> {ventaSeleccionada.idVenta}
-                  </div>
-                  <div className="ve-detalle-info">
-                    <strong>Usuario:</strong> {ventaSeleccionada.usuario}
-                  </div>
-                </Col>
-                <Col md={6}>
-                  <div className="ve-detalle-info">
-                    <strong>Fecha Eliminación:</strong> {formatFecha(ventaSeleccionada.fechaEliminacion)}
-                  </div>
-                  <div className="ve-detalle-info">
-                    <strong>Turno:</strong> {renderTurnoBadge(ventaSeleccionada.turno)}
-                  </div>
-                </Col>
-              </Row>
+                          <td className="px-4 py-4 align-middle">
+                            <p className="font-bold text-ink">
+                              Venta #{venta.idVenta}
+                            </p>
 
-              <Row className="ve-summary-row">
-                <Col md={6}>
-                  <Card className="ve-summary-card">
-                    <Card.Body>
-                      <div className="ve-summary-item">
-                        <span>Monto Ingresado:</span>
-                        <strong>{formatCurrency(ventaSeleccionada.montoTotalIngresado)}</strong>
-                      </div>
-                      <div className="ve-summary-item">
-                        <span>Gastos:</span>
-                        <strong>{formatCurrency(ventaSeleccionada.montoTotalGastos)}</strong>
-                      </div>
-                    </Card.Body>
-                  </Card>
-                </Col>
-                <Col md={6}>
-                  <Card className="ve-summary-card">
-                    <Card.Body>
-                      <div className="ve-summary-item">
-                        <span>Monto Esperado:</span>
-                        <strong>{formatCurrency(ventaSeleccionada.montoEsperado)}</strong>
-                      </div>
-                      <div className="ve-summary-item">
-                        <span>Diferencia:</span>
-                        <strong className={ventaSeleccionada.diferencia < 0 ? 've-text-danger' : 've-text-success'}>
-                          {formatCurrency(ventaSeleccionada.diferencia)}
-                        </strong>
-                      </div>
-                    </Card.Body>
-                  </Card>
-                </Col>
-              </Row>
+                            <p className="mt-0.5 text-xs text-muted">
+                              {venta.usuario ||
+                                'Usuario no disponible'}
+                            </p>
+                          </td>
 
-              <Card className="ve-productos-card">
-                <Card.Header className="ve-productos-header">
-                  <h6 className="ve-productos-title">
-                    <FiEye className="ve-productos-icon" />
-                    Productos Eliminados ({ventaSeleccionada.ventaEliminadaDetalle.length})
-                  </h6>
-                </Card.Header>
-                <Card.Body className="ve-productos-body">
-                  <div className="ve-table-responsive">
-                    <Table striped bordered hover size="sm" className="ve-productos-table">
-                      <thead>
-                        <tr>
-                          <th>Producto</th>
-                          <th>Cantidad</th>
-                          <th>Precio Unitario</th>
-                          <th>Subtotal</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {ventaSeleccionada.ventaEliminadaDetalle.map((producto, index) => (
-                          <tr key={index}>
-                            <td>{producto.nombreProducto || `Producto #${producto.idProducto}`}</td>
-                            <td className="ve-text-center">{producto.cantidadVendidaEliminada}</td>
-                            <td className="ve-text-end">{formatCurrency(producto.precioUnitario)}</td>
-                            <td className="ve-text-end">{formatCurrency(producto.subtotal)}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                      <tfoot>
-                        <tr>
-                          <td colSpan="3" className="ve-text-end"><strong>Total:</strong></td>
-                          <td className="ve-text-end">
-                            <strong>
-                              {formatCurrency(ventaSeleccionada.ventaEliminadaDetalle.reduce((sum, prod) => sum + prod.subtotal, 0))}
-                            </strong>
+                          <td className="px-4 py-4 align-middle">
+                            {renderTurnoBadge(
+                              venta.turno
+                            )}
+                          </td>
+
+                          <td className="px-4 py-4 text-right align-middle">
+                            <span className="font-semibold text-ink">
+                              {formatCurrency(
+                                venta.montoTotalIngresado
+                              )}
+                            </span>
+                          </td>
+
+                          <td className="px-4 py-4 text-right align-middle">
+                            <span
+                              className={`font-bold ${getDifferenceClass(
+                                venta.diferencia
+                              )}`}
+                            >
+                              {formatCurrency(
+                                venta.diferencia
+                              )}
+                            </span>
+                          </td>
+
+                          <td className="px-4 py-4 text-center align-middle">
+                            <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-surface-2 text-muted">
+                              {isOpen ? (
+                                <FiChevronUp
+                                  size={17}
+                                />
+                              ) : (
+                                <FiChevronDown
+                                  size={17}
+                                />
+                              )}
+                            </span>
                           </td>
                         </tr>
-                      </tfoot>
-                    </Table>
-                  </div>
-                </Card.Body>
-              </Card>
+
+                        {/* Detalle expandido */}
+                        {isOpen && (
+                          <tr className="border-t border-line">
+                            <td
+                              colSpan={6}
+                              className="p-0"
+                            >
+                              {renderVentaDetail(
+                                venta
+                              )}
+                            </td>
+                          </tr>
+                        )}
+                      </React.Fragment>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
-          )}
-        </Modal.Body>
-        <Modal.Footer className="ve-modal-footer">
-          <Button variant="secondary" onClick={handleCloseDetalleModal} className="ve-close-btn">
-            Cerrar
-          </Button>
-        </Modal.Footer>
-      </Modal>
-    </Container>
+          </div>
+
+          {/* ========================================================
+              MOBILE
+          ======================================================== */}
+          <div className="space-y-3 sm:hidden">
+            {filteredData.map(venta => {
+              const isOpen =
+                activeVenta ===
+                venta.idEliminacion;
+
+              return (
+                <div
+                  key={venta.idEliminacion}
+                  className="overflow-hidden rounded-2xl border border-line bg-surface shadow-card"
+                >
+                  {/* Resumen */}
+                  <button
+                    type="button"
+                    onClick={() =>
+                      toggleVenta(
+                        venta.idEliminacion
+                      )
+                    }
+                    className="flex w-full items-center justify-between gap-3 p-4 text-left"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-danger-100 text-danger-600 dark:bg-danger-900/30 dark:text-danger-400">
+                          <FiTrash2 size={16} />
+                        </div>
+
+                        <div className="min-w-0">
+                          <p className="truncate text-sm font-bold text-ink">
+                            Venta #{venta.idVenta}
+                          </p>
+
+                          <p className="mt-0.5 text-2xs text-muted">
+                            {formatFecha(
+                              venta.fechaEliminacion
+                            )}{' '}
+                            ·{' '}
+                            {dayjs(
+                              venta.fechaEliminacion
+                            ).format('HH:mm')}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="mt-3 flex flex-wrap items-center gap-2">
+                        <span className="truncate text-xs font-medium text-muted">
+                          {venta.usuario ||
+                            'Usuario no disponible'}
+                        </span>
+
+                        {renderTurnoBadge(
+                          venta.turno
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex shrink-0 flex-col items-end gap-2">
+                      <span
+                        className={`text-sm font-bold ${getDifferenceClass(
+                          venta.diferencia
+                        )}`}
+                      >
+                        {formatCurrency(
+                          venta.diferencia
+                        )}
+                      </span>
+
+                      <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-surface-2 text-muted">
+                        {isOpen ? (
+                          <FiChevronUp size={17} />
+                        ) : (
+                          <FiChevronDown size={17} />
+                        )}
+                      </span>
+                    </div>
+                  </button>
+
+                  {/* Detalle */}
+                  {isOpen && (
+                    <div className="border-t border-danger-200 bg-danger-50/70 p-3 dark:border-danger-900/50 dark:bg-danger-900/10">
+                      <div className="overflow-hidden rounded-xl border border-danger-200 bg-surface shadow-sm dark:border-danger-900/50">
+                        <div className="border-b border-line bg-surface-2 p-4">
+                          <div className="flex items-center justify-between gap-3">
+                            <div>
+                              <p className="text-sm font-bold text-ink">
+                                Detalle de eliminación
+                              </p>
+
+                              <p className="mt-0.5 text-2xs text-muted">
+                                ID eliminación #
+                                {venta.idEliminacion}
+                              </p>
+                            </div>
+
+                            <span className="inline-flex items-center rounded-full border border-danger-200 bg-danger-50 px-2.5 py-1 text-2xs font-bold text-danger-700 dark:border-danger-900/50 dark:bg-danger-900/20 dark:text-danger-300">
+                              ELIMINADA
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="space-y-4 p-4">
+                          {/* Información */}
+                          <div>
+                            <div className="mb-3 flex items-center gap-2">
+                              <FiUser
+                                size={15}
+                                className="text-brand-600 dark:text-brand-400"
+                              />
+
+                              <p className="text-xs font-bold text-ink">
+                                Información general
+                              </p>
+                            </div>
+
+                            <div className="grid gap-2">
+                              <div className="rounded-lg bg-surface-2 p-3">
+                                <p className="text-2xs font-bold uppercase tracking-wide text-muted">
+                                  Usuario
+                                </p>
+
+                                <p className="mt-1 text-sm font-semibold text-ink">
+                                  {venta.usuario ||
+                                    'No disponible'}
+                                </p>
+                              </div>
+
+                              <div className="rounded-lg bg-surface-2 p-3">
+                                <p className="text-2xs font-bold uppercase tracking-wide text-muted">
+                                  Fecha de eliminación
+                                </p>
+
+                                <p className="mt-1 text-sm font-semibold text-ink">
+                                  {formatFechaHora(
+                                    venta.fechaEliminacion
+                                  )}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Finanzas */}
+                          <div>
+                            <div className="mb-3 flex items-center gap-2">
+                              <FiDollarSign
+                                size={15}
+                                className="text-brand-600 dark:text-brand-400"
+                              />
+
+                              <p className="text-xs font-bold text-ink">
+                                Resumen financiero
+                              </p>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-2">
+                              <div className="rounded-lg bg-surface-2 p-3">
+                                <p className="text-2xs font-bold uppercase tracking-wide text-muted">
+                                  Ingresado
+                                </p>
+
+                                <p className="mt-1 text-sm font-bold text-ink">
+                                  {formatCurrency(
+                                    venta.montoTotalIngresado
+                                  )}
+                                </p>
+                              </div>
+
+                              <div className="rounded-lg bg-surface-2 p-3">
+                                <p className="text-2xs font-bold uppercase tracking-wide text-muted">
+                                  Gastos
+                                </p>
+
+                                <p className="mt-1 text-sm font-bold text-ink">
+                                  {formatCurrency(
+                                    venta.montoTotalGastos
+                                  )}
+                                </p>
+                              </div>
+
+                              <div className="rounded-lg bg-surface-2 p-3">
+                                <p className="text-2xs font-bold uppercase tracking-wide text-muted">
+                                  Esperado
+                                </p>
+
+                                <p className="mt-1 text-sm font-bold text-ink">
+                                  {formatCurrency(
+                                    venta.montoEsperado
+                                  )}
+                                </p>
+                              </div>
+
+                              <div className="rounded-lg bg-surface-2 p-3">
+                                <p className="text-2xs font-bold uppercase tracking-wide text-muted">
+                                  Diferencia
+                                </p>
+
+                                <p
+                                  className={`mt-1 text-sm font-bold ${getDifferenceClass(
+                                    venta.diferencia
+                                  )}`}
+                                >
+                                  {formatCurrency(
+                                    venta.diferencia
+                                  )}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Productos */}
+                          <div>
+                            <div className="mb-3 flex items-center gap-2">
+                              <FiPackage
+                                size={15}
+                                className="text-brand-600 dark:text-brand-400"
+                              />
+
+                              <p className="text-xs font-bold text-ink">
+                                Productos eliminados
+                              </p>
+                            </div>
+
+                            {renderProductosDetalle(
+                              venta
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </>
+      ) : ventasEliminadas.length > 0 &&
+        filteredData.length === 0 ? (
+        /* ============================================================
+           FILTRO SIN RESULTADOS
+        ============================================================ */
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-line bg-surface px-6 py-12 text-center shadow-card">
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-surface-2 text-muted">
+            <FiFilter size={25} />
+          </div>
+
+          <h3 className="mt-4 text-base font-bold text-ink">
+            No hay resultados
+          </h3>
+
+          <p className="mt-1 max-w-md text-sm text-muted">
+            No se encontraron ventas eliminadas para el
+            turno seleccionado.
+          </p>
+        </div>
+      ) : (
+        /* ============================================================
+           ESTADO VACÍO
+        ============================================================ */
+        !showErrorSucursales && (
+          <div className="flex flex-col items-center justify-center rounded-2xl border border-line bg-surface px-6 py-14 text-center shadow-card">
+            {loadingReporte ? (
+              <>
+                <span className="h-8 w-8 animate-spin rounded-full border-2 border-brand-200 border-t-brand-600 dark:border-brand-900/40 dark:border-t-brand-400" />
+
+                <h3 className="mt-4 text-base font-bold text-ink">
+                  Generando reporte...
+                </h3>
+
+                <p className="mt-1 text-sm text-muted">
+                  Estamos consultando las ventas eliminadas.
+                </p>
+              </>
+            ) : (
+              <>
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-danger-100 text-danger-600 dark:bg-danger-900/30 dark:text-danger-400">
+                  <FiTrash2 size={26} />
+                </div>
+
+                <h3 className="mt-4 text-base font-bold text-ink">
+                  No hay datos para mostrar
+                </h3>
+
+                <p className="mt-1 max-w-md text-sm text-muted">
+                  Selecciona un rango de fechas y una sucursal
+                  para generar el reporte de ventas eliminadas.
+                </p>
+              </>
+            )}
+          </div>
+        )
+      )}
+    </div>
   );
 };
 
