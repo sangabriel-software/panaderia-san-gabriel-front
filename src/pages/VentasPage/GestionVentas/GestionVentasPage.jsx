@@ -235,7 +235,7 @@ const GestionVentasPage = () => {
           <div className="relative">
             <FiSearch size={14} className="pointer-events-none absolute left-9 top-1/2 -translate-y-1/2 text-muted" />
             <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-muted">
-              ORD-
+              VNT-
             </span>
             <input
               type="text"
