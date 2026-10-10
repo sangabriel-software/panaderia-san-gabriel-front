@@ -29,6 +29,7 @@ export const payloadCreacionDeUsuario = (data) => {
 
     const dataUsuario = {
         ...data,
+        cambioContrasenia: 1,
         fechaCreacion: currentDate()
     }
     

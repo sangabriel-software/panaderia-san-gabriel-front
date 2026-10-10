@@ -1,3 +1,7 @@
+// Debe ir PRIMERO: registra los listeners de error de chunks antes que cualquier otro
+// módulo (BetterStack, etc.) para poder silenciar ese error y evitar que se reporte.
+import "./shared/appUpdate/chunkErrorReload.js";
+
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
@@ -18,19 +22,6 @@ initBetterStack();
 // para no perder el evento si el navegador lo dispara temprano.
 initPwaInstall();
 
-// Si tras un deploy una pantalla intenta cargar un archivo (chunk) de la versión anterior
-// que ya no existe, Vite dispara este evento: se recarga UNA vez para traer la versión nueva.
-window.addEventListener("vite:preloadError", () => {
-  const RELOAD_FLAG = "chunk-reload-at";
-  const lastReload = Number(sessionStorage.getItem(RELOAD_FLAG) || 0);
-
-  // Evita un bucle de recargas si el error persiste (máximo una vez por minuto)
-  if (Date.now() - lastReload > 60 * 1000) {
-    sessionStorage.setItem(RELOAD_FLAG, String(Date.now()));
-    window.location.reload();
-  }
-});
-
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     {/* ThemeProvider va por fuera de todo: así cualquier componente (Sidebar, páginas, login) puede usar useTheme() */}
@@ -49,12 +40,13 @@ createRoot(document.getElementById("root")).render(
 
 // Registro del Service Worker para PWA
 // (vite.config.js tiene injectRegister: false, así que este es el único registro)
+// /sw.js lo genera vite-plugin-pwa en cada build.
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker
       .register('/sw.js', { scope: '/' })
       .then((registration) => {
-        
+
         // Actualización automática del service worker
         registration.addEventListener('updatefound', () => {
           const newWorker = registration.installing;
@@ -65,7 +57,7 @@ if ('serviceWorker' in navigator) {
         });
       })
       .catch((error) => {
-       
+
       });
   });
 }
