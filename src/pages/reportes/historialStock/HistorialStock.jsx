@@ -9,7 +9,6 @@ import {
   FiCalendar,
   FiChevronDown,
   FiSearch,
-  FiX,
   FiTrendingUp,
   FiTrendingDown,
   FiUser,
@@ -28,6 +27,14 @@ import Alert from "../../../components/Alerts/Alert";
 const selectClass =
   "w-full appearance-none rounded-xl border border-line bg-surface py-2.5 pl-10 pr-9 text-sm font-medium text-ink transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/25 disabled:cursor-not-allowed disabled:bg-surface-2 disabled:text-muted";
 
+const SIN_OBSERVACIONES = "__sin_observaciones__";
+
+const etiquetaObservacion = (observacion) => {
+  if (!observacion) return "Sin observaciones";
+  const nombre = observacion.replace(/^control de stock diario\s*-\s*/i, "");
+  return nombre.charAt(0).toUpperCase() + nombre.slice(1);
+};
+
 function HistorialStock() {
   const navigate = useNavigate();
   const { productos, loadigProducts, showErrorProductos } = useGetProductosYPrecios();
@@ -37,7 +44,7 @@ function HistorialStock() {
   const [selectedProducto, setSelectedProducto] = useState(null);
   const [selectedSucursal, setSelectedSucursal] = useState("");
   const [reporteData, setReporteData] = useState([]);
-  const [filteredData, setFilteredData] = useState([]);
+  const [observacionSeleccionada, setObservacionSeleccionada] = useState("");
   const [loadingReporte, setLoadingReporte] = useState(false);
   const [error, setError] = useState(null);
   const [fechaInicio, setFechaInicio] = useState("");
@@ -64,6 +71,19 @@ function HistorialStock() {
     return productos.filter((p) => p.nombreCategoria === categoriaActiva);
   }, [productos, categoriaActiva]);
 
+  const observaciones = useMemo(
+    () => [...new Set(reporteData.map((item) => String(item.observaciones ?? "").trim()))],
+    [reporteData]
+  );
+
+  const filteredData = useMemo(() => {
+    if (!observacionSeleccionada) return reporteData;
+    return reporteData.filter((item) => {
+      const observacion = String(item.observaciones ?? "").trim();
+      return observacionSeleccionada === SIN_OBSERVACIONES ? !observacion : observacion === observacionSeleccionada;
+    });
+  }, [reporteData, observacionSeleccionada]);
+
   const handleGenerarReporte = async () => {
     if (!selectedProducto || !selectedSucursal || !fechaInicio || !fechaFin) {
       setError("Debes completar todos los campos obligatorios");
@@ -80,12 +100,14 @@ function HistorialStock() {
 
     setError(null);
     setLoadingReporte(true);
-    setYaGenero(true);
+    setYaGenero(false);
+    setReporteData([]);
+    setObservacionSeleccionada("");
 
     try {
       const data = await generarReporteHistorialStockService(selectedProducto.value, selectedSucursal, fechaInicio, fechaFin);
       setReporteData(data.reporte || []);
-      setFilteredData(data.reporte || []);
+      setYaGenero(true);
     } catch (err) {
       setError("Error al generar el reporte: " + err.message);
     } finally {
@@ -97,7 +119,7 @@ function HistorialStock() {
     setSelectedProducto(null);
     setSelectedSucursal(userData?.idRol === 1 ? "" : userData?.idSucursal || "");
     setReporteData([]);
-    setFilteredData([]);
+    setObservacionSeleccionada("");
     setFechaInicio("");
     setFechaFin("");
     setError(null);
@@ -108,7 +130,7 @@ function HistorialStock() {
   const formatFecha = (fecha) => dayjs(fecha).format("DD/MM/YYYY HH:mm");
 
   const generatePDF = () => {
-    if (filteredData.length === 0 && reporteData.length === 0) {
+    if (filteredData.length === 0) {
       setError("No hay datos para generar el reporte");
       return;
     }
@@ -118,7 +140,7 @@ function HistorialStock() {
 
     try {
       const doc = new jsPDF("portrait", "pt", "a4");
-      const dataToExport = filteredData.length > 0 ? filteredData : reporteData;
+      const dataToExport = filteredData;
       const sucursalNombre = sucursales.find((s) => s.idSucursal === selectedSucursal)?.nombreSucursal || selectedSucursal;
       const today = new Date();
       const dateStr = today.toLocaleDateString("es-GT") + " " + today.toLocaleTimeString("es-GT", { hour: "2-digit", minute: "2-digit" });
@@ -183,7 +205,7 @@ function HistorialStock() {
   };
 
   const generateExcel = () => {
-    if (filteredData.length === 0 && reporteData.length === 0) {
+    if (filteredData.length === 0) {
       setError("No hay datos para generar el reporte");
       return;
     }
@@ -192,7 +214,7 @@ function HistorialStock() {
     setError(null);
 
     try {
-      const dataToExport = filteredData.length > 0 ? filteredData : reporteData;
+      const dataToExport = filteredData;
       const sucursalNombre = sucursales.find((s) => s.idSucursal === selectedSucursal)?.nombreSucursal || selectedSucursal;
       const today = new Date();
       const dateStr = today.toLocaleDateString("es-GT") + " " + today.toLocaleTimeString("es-GT", { hour: "2-digit", minute: "2-digit" });
@@ -462,35 +484,62 @@ function HistorialStock() {
         </div>
       </div>
 
-      {/* ── Botones de exportación ───────────────────────────────────── */}
-      {filteredData.length > 0 && (
-        <div className="flex justify-end gap-2">
-          <button
-            type="button"
-            onClick={generateExcel}
-            disabled={generatingExcel}
-            className="flex items-center gap-2 rounded-xl border border-line bg-surface px-4 py-2 text-sm font-semibold text-ink shadow-card transition-colors hover:bg-surface-2 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {generatingExcel ? (
-              <span className="h-3.5 w-3.5 animate-spin-smooth rounded-full border-2 border-brand-300 border-t-brand-600" />
-            ) : (
-              <FiDownload size={14} />
-            )}
-            Excel
-          </button>
-          <button
-            type="button"
-            onClick={generatePDF}
-            disabled={generatingPDF}
-            className="flex items-center gap-2 rounded-xl border border-line bg-surface px-4 py-2 text-sm font-semibold text-ink shadow-card transition-colors hover:bg-surface-2 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {generatingPDF ? (
-              <span className="h-3.5 w-3.5 animate-spin-smooth rounded-full border-2 border-danger-300 border-t-danger-600" />
-            ) : (
-              <FiDownload size={14} />
-            )}
-            PDF
-          </button>
+      {/* ── Filtro de observaciones y exportación ───────────────────── */}
+      {yaGenero && reporteData.length > 0 && (
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div className="order-2 w-full sm:order-1 sm:w-72">
+            <label htmlFor="filtro-observaciones" className="mb-1.5 block text-xs font-medium text-muted">
+              Filtrar por observación
+            </label>
+            <div className="relative">
+              <FiFilter size={14} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" />
+              <select
+                id="filtro-observaciones"
+                value={observacionSeleccionada}
+                onChange={(e) => setObservacionSeleccionada(e.target.value)}
+                className={selectClass}
+              >
+                <option value="">Todas las observaciones</option>
+                {observaciones.map((observacion) => (
+                  <option key={observacion || SIN_OBSERVACIONES} value={observacion || SIN_OBSERVACIONES}>
+                    {etiquetaObservacion(observacion)}
+                  </option>
+                ))}
+              </select>
+              <FiChevronDown size={14} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-muted" />
+            </div>
+          </div>
+
+          {filteredData.length > 0 && (
+            <div className="order-1 flex gap-2 sm:order-2">
+              <button
+                type="button"
+                onClick={generateExcel}
+                disabled={generatingExcel}
+                className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-success-500/40 bg-success-500/10 px-3.5 py-2 text-sm font-medium text-success-700 transition-colors hover:bg-success-500/20 disabled:cursor-wait disabled:opacity-60 dark:text-success-300 sm:flex-none"
+              >
+                {generatingExcel ? (
+                  <span className="h-3.5 w-3.5 animate-spin-smooth rounded-full border-2 border-success-500/40 border-t-success-600" />
+                ) : (
+                  <FiDownload size={15} />
+                )}
+                Excel
+              </button>
+              <button
+                type="button"
+                onClick={generatePDF}
+                disabled={generatingPDF}
+                className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-danger-500/40 bg-danger-500/10 px-3.5 py-2 text-sm font-medium text-danger-700 transition-colors hover:bg-danger-500/20 disabled:cursor-wait disabled:opacity-60 dark:text-danger-300 sm:flex-none"
+              >
+                {generatingPDF ? (
+                  <span className="h-3.5 w-3.5 animate-spin-smooth rounded-full border-2 border-danger-500/40 border-t-danger-600" />
+                ) : (
+                  <FiFileText size={15} />
+                )}
+                PDF
+              </button>
+            </div>
+          )}
         </div>
       )}
 
@@ -591,6 +640,10 @@ function HistorialStock() {
             })}
           </ul>
         </>
+      ) : yaGenero && reporteData.length > 0 && !loadingReporte ? (
+        <div className="rounded-2xl border border-dashed border-line bg-surface py-12 text-center text-sm text-muted">
+          No hay movimientos para la observación seleccionada.
+        </div>
       ) : yaGenero && !loadingReporte ? (
         <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-line bg-surface py-16 text-center">
           <span className="flex h-12 w-12 items-center justify-center rounded-full bg-surface-2 text-muted">
