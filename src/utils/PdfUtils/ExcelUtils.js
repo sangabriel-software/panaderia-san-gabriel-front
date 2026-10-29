@@ -1,6 +1,6 @@
 import { utils, writeFile } from 'xlsx-js-style';
 import * as XLSX from "xlsx";
-import { getCurrentDateTimeWithSeconds, getCurrentDateTimeWithSecondsFiles, getCurrentDateTimeWithSecondsFilesVentas } from '../dateUtils';
+import { getCurrentDateTimeWithSeconds, getCurrentDateTimeWithSecondsFiles, getCurrentDateTimeWithSeconsForFileName } from '../dateUtils';
 import { redondearASiguienteMultiploDe5 } from '../utils';
 import { isToday } from 'date-fns';
 
@@ -388,8 +388,60 @@ export const descargarPlantillaVentas = (productos, turno, idSucural) => {
     "_" +
     turno +
     "_" +
-    getCurrentDateTimeWithSecondsFilesVentas() +
+    getCurrentDateTimeWithSeconsForFileName() +
     ".xlsx";
 
   XLSX.writeFile(wb, nombreArchivo);
+};
+
+export const descargarExcelInventarioProductos = (productos) => {
+  const productosInventario = productos.filter((producto) => producto.controlarInventario === 1);
+
+  const filas = [
+    ["Codigo producto", "Nombre Producto", "Cantidad", "Precio Por Unidad", "Precio"],
+    ...productosInventario.map((producto) => [
+      producto.idProducto,
+      producto.nombreProducto,
+      producto.cantidad,
+      producto.precioPorUnidad,
+      producto.precio,
+    ]),
+  ];
+
+  const hoja = utils.aoa_to_sheet(filas);
+  const estiloEncabezado = {
+    fill: { fgColor: { rgb: "E8EDF2" } },
+    font: { bold: true, color: { rgb: "263238" }, sz: 11 },
+    alignment: { vertical: "center" },
+    border: { bottom: { style: "medium", color: { rgb: "90A4AE" } } },
+  };
+
+  for (let columna = 0; columna < 5; columna++) {
+    hoja[XLSX.utils.encode_cell({ r: 0, c: columna })].s = estiloEncabezado;
+  }
+
+  productosInventario.forEach((_, indice) => {
+    const celdaNombre = hoja[XLSX.utils.encode_cell({ r: indice + 1, c: 1 })];
+    if (celdaNombre) {
+      celdaNombre.s = {
+        fill: { fgColor: { rgb: indice % 2 === 0 ? "F4F7F9" : "FFFFFF" } },
+        font: { color: { rgb: "37474F" }, sz: 11 },
+        border: { bottom: { style: "thin", color: { rgb: "CFD8DC" } } },
+      };
+    }
+  });
+
+  hoja["!rows"] = [{ hpt: 28 }, ...productosInventario.map(() => ({ hpt: 22 }))];
+  hoja["!cols"] = [
+    { wch: 18 },
+    { wch: 30 },
+    { wch: 12 },
+    { wch: 20 },
+    { wch: 12 },
+  ];
+
+  const libro = utils.book_new();
+  const nombreArchivo = `productos_inventario_${getCurrentDateTimeWithSeconsForFileName()}.xlsx`;
+  utils.book_append_sheet(libro, hoja, "Inventario");
+  writeFile(libro, nombreArchivo);
 };
