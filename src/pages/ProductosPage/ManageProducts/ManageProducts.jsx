@@ -15,8 +15,10 @@ import {
   FiFilter,
   FiDollarSign,
   FiHash,
+  FiDownload,
 } from "react-icons/fi";
 import { useGetProductosYPrecios } from "../../../hooks/productosprecios/useGetProductosYprecios";
+import { descargarExcelInventarioProductos } from "../../../utils/PdfUtils/ExcelUtils";
 import useGetCategorias from "../../../hooks/categorias/UseGetCategorias";
 import Alert from "../../../components/Alerts/Alert";
 import {
@@ -474,6 +476,14 @@ function ManageProducts() {
           <h1 className="truncate text-xl font-bold text-ink sm:text-2xl">Productos</h1>
           <p className="text-sm text-muted">Administración de productos existentes</p>
         </div>
+        <button
+          type="button"
+          onClick={() => descargarExcelInventarioProductos(productos)}
+          disabled={showErrorProductos || !productos.some((producto) => producto.controlarInventario === 1)}
+          className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-success-500/40 bg-success-500/10 px-3.5 py-2 text-sm font-medium text-success-700 transition-colors hover:bg-success-500/20 disabled:cursor-not-allowed disabled:opacity-60 dark:text-success-300 sm:flex-none"
+        >
+          <FiDownload size={15} /> Excel
+        </button>
         <button
           type="button"
           onClick={() => navigate("ingresar-producto")}
