@@ -25,6 +25,6 @@ export const getCurrentDateTimeWithSecondsFiles = () => {
 export const currentDateToFormat = (fecha) => {
     return dayjs(fecha).format("YYYY-MM-DD");
 }
-export const getCurrentDateTimeWithSecondsFilesVentas = () => {
+export const getCurrentDateTimeWithSeconsForFileName = () => {
     return dayjs().format("DD_MM_YYYY_HH_mm_ss");
 };

@@ -15,8 +15,12 @@ import {
   FiFilter,
   FiDollarSign,
   FiHash,
+  FiDownload,
+  FiFileText,
 } from "react-icons/fi";
 import { useGetProductosYPrecios } from "../../../hooks/productosprecios/useGetProductosYprecios";
+import { descargarExcelInventarioProductos } from "../../../utils/PdfUtils/ExcelUtils";
+import { descargarCatalogoProductos } from "../../../utils/PdfUtils/PdfUtils";
 import useGetCategorias from "../../../hooks/categorias/UseGetCategorias";
 import Alert from "../../../components/Alerts/Alert";
 import {
@@ -74,6 +78,7 @@ function ManageProducts() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [descargandoPDF, setDescargandoPDF] = useState(false);
 
   const [showEditPanel, setShowEditPanel] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -182,6 +187,18 @@ function ManageProducts() {
       () => {}
     );
     setIsDeleting(false);
+  };
+
+  const handleDescargarPDF = async () => {
+    setDescargandoPDF(true);
+    try {
+      await descargarCatalogoProductos(productos);
+    } catch (error) {
+      console.error("Error al generar el catálogo PDF:", error);
+      setErrorMessage("No se pudo generar el catálogo PDF. Inténtalo de nuevo.");
+    } finally {
+      setDescargandoPDF(false);
+    }
   };
 
   // true si el producto que se está editando aparece en la lista visible.
@@ -473,6 +490,29 @@ function ManageProducts() {
         <div className="min-w-0 flex-1">
           <h1 className="truncate text-xl font-bold text-ink sm:text-2xl">Productos</h1>
           <p className="text-sm text-muted">Administración de productos existentes</p>
+        </div>
+        <div className="flex w-full gap-2 sm:contents">
+          <button
+            type="button"
+            onClick={() => descargarExcelInventarioProductos(productos)}
+            disabled={showErrorProductos || !productos.some((producto) => producto.controlarInventario === 1)}
+            className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-success-500/40 bg-success-500/10 px-3.5 py-2 text-sm font-medium text-success-700 transition-colors hover:bg-success-500/20 disabled:cursor-not-allowed disabled:opacity-60 dark:text-success-300 sm:flex-none"
+          >
+            <FiDownload size={15} /> Excel
+          </button>
+          <button
+            type="button"
+            onClick={handleDescargarPDF}
+            disabled={descargandoPDF || showErrorProductos || !productos.some((producto) => producto.controlarInventario === 1)}
+            className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-danger-500/40 bg-danger-500/10 px-3.5 py-2 text-sm font-medium text-danger-700 transition-colors hover:bg-danger-500/20 disabled:cursor-wait disabled:opacity-60 dark:text-danger-300 sm:flex-none"
+          >
+            {descargandoPDF ? (
+              <span className="h-3.5 w-3.5 animate-spin-smooth rounded-full border-2 border-danger-500/40 border-t-danger-600" />
+            ) : (
+              <FiFileText size={15} />
+            )}
+            PDF
+          </button>
         </div>
         <button
           type="button"
